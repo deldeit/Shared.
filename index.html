@@ -85,7 +85,6 @@
   </div>
 
   <div class="form">
-    <input id="username" placeholder="Username">
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
 
@@ -95,40 +94,47 @@
     </div>
   </div>
 
-<script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
-const API = "https://shared-bk4b.onrender.com"; 
+  <script>
+    const supabase = supabaseJs.createClient(
+      "https://cnhaonawapuahzoctqav.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+    );
 
-async function signUp() {
-  const username = document.getElementById("username").value;
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+    async function signUp() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-  const res = await fetch(API + "/signup", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ username, email, password })
-  });
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
 
-  const data = await res.json();
-  alert(data.message);
-}
+      if (error) {
+        alert(error.message);
+      } else {
+        alert("Controlla email per conferma");
+      }
+    }
 
-async function signIn() {
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+    async function signIn() {
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
 
-  const res = await fetch(API + "/signin", {
-    method: "POST",
-    headers: {"Content-Type":"application/json"},
-    body: JSON.stringify({ email, password })
-  });
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-  const data = await res.json();
-  alert(data.message);
-}
-
-</script>
+      if (error) {
+        alert(error.message);
+      } else {
+        alert("Login OK");
+        console.log(data);
+      }
+    }
+  </script>
 
 </body>
 </html>
