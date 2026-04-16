@@ -86,7 +86,7 @@
   </div>
 
   <div class="form">
-    <input id="email" placeholder="Email">
+    <input id="email" placeholder="Email address">
     <input id="password" type="password" placeholder="Password">
 
     <div class="btns">
@@ -95,15 +95,15 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module">
+    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-  <script>
-    const supabase = window.supabase.createClient(
+    const supabase = createClient(
       "https://cnhaonawapuahzoctqav.supabase.co",
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
     );
 
-    async function signUp() {
+    window.signUp = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
@@ -115,11 +115,11 @@
       if (error) {
         alert(error.message);
       } else {
-        alert("Controlla email per conferma");
+        alert("Check your email to confirm your account");
       }
-    }
+    };
 
-    async function signIn() {
+    window.signIn = async function () {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
@@ -131,10 +131,10 @@
       if (error) {
         alert(error.message);
       } else {
-        alert("Login OK");
+        alert("Login successful");
         console.log(data);
       }
-    }
+    };
   </script>
 
 </body>
