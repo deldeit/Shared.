@@ -8,55 +8,47 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Archivo Black', sans-serif;
-    }
+    * { margin:0; padding:0; box-sizing:border-box; font-family:'Archivo Black',sans-serif; }
 
     body {
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: black;
-      color: white;
-      gap: 20px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:center;
+      background:black;
+      color:white;
+      gap:15px;
     }
 
     h1 {
-      font-size: 80px;
+      font-size:80px;
       background: linear-gradient(90deg,#fff,#999);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      -webkit-background-clip:text;
+      -webkit-text-fill-color:transparent;
     }
 
     input {
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: #111;
-      color: white;
-      width: 260px;
+      padding:12px;
+      border-radius:10px;
+      border:none;
+      background:#111;
+      color:white;
+      width:260px;
     }
 
-    .btns {
-      display: flex;
-      gap: 10px;
-    }
+    .btns { display:flex; gap:10px; }
 
     button {
-      padding: 12px;
-      border-radius: 999px;
-      cursor: pointer;
-      border: none;
-      width: 130px;
+      padding:12px;
+      border-radius:999px;
+      border:none;
+      width:130px;
+      cursor:pointer;
     }
 
-    .primary { background: white; color: black; }
-    .secondary { background: transparent; color: white; border: 1px solid #555; }
+    .primary { background:white; color:black; }
+    .secondary { background:transparent; color:white; border:1px solid #555; }
   </style>
 </head>
 
@@ -64,12 +56,13 @@
 
   <h1>Shared</h1>
 
+  <input id="username" placeholder="Username">
   <input id="email" placeholder="Email">
   <input id="password" type="password" placeholder="Password">
 
   <div class="btns">
-    <button class="primary" onclick="signIn()">Sign in</button>
-    <button class="secondary" onclick="signUp()">Sign up</button>
+    <button class="primary" onclick="signUp()">Sign up</button>
+    <button class="secondary" onclick="signIn()">Sign in</button>
   </div>
 
   <p id="status"></p>
@@ -79,39 +72,39 @@
 
     const supabase = createClient(
       "https://cnhaonawapuahzoctqav.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+      "INSERISCI_ANON_KEY"
     );
 
     const status = document.getElementById("status");
 
-    // SESSION CHECK
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (data.session) {
-        status.innerText = "Logged in as: " + data.session.user.email;
-      }
-    };
-
-    checkSession();
-
-    // SIGN UP
     window.signUp = async () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+      const username = document.getElementById("username").value;
 
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password
       });
 
-      if (error) {
-        alert(error.message);
+      if (error) return alert(error.message);
+
+      const user = data.user;
+
+      const { error: profileError } = await supabase
+        .from("profiles")
+        .insert({
+          id: user.id,
+          username
+        });
+
+      if (profileError) {
+        alert(profileError.message);
       } else {
-        alert("Check your email to confirm your account");
+        alert("Account created!");
       }
     };
 
-    // SIGN IN
     window.signIn = async () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -121,11 +114,15 @@
         password
       });
 
-      if (error) {
-        alert(error.message);
-      } else {
-        status.innerText = "Logged in as: " + data.user.email;
-      }
+      if (error) return alert(error.message);
+
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("username")
+        .eq("id", data.user.id)
+        .single();
+
+      status.innerText = "Logged in as @" + profile.username;
     };
   </script>
 
