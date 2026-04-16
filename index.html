@@ -1,70 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shared</title>
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+  const supabase = createClient(
+    "https://cnhaonawapuahzoctqav.supabase.co",
+    "INSERISCI_ANON_KEY"
+  );
 
-  <style>
-    body { background:#000; color:white; font-family:Archivo Black; display:flex; flex-direction:column; height:100vh; justify-content:space-between; align-items:center; }
-    input,button{padding:12px;border-radius:10px;margin:5px}
-    .btns{display:flex;gap:10px}
-    button{cursor:pointer}
-    .primary{background:white;color:black}
-    .secondary{background:transparent;color:white;border:1px solid #555}
-  </style>
-</head>
+  window.supabaseTest = supabase;
 
-<body>
-
-  <div>
-    <h1>Shared</h1>
-    <p>Live the moment</p>
-  </div>
-
-  <div>
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
-
-    <div class="btns">
-      <button class="primary" onclick="signIn()">Sign in</button>
-      <button class="secondary" onclick="signUp()">Sign up</button>
-    </div>
-  </div>
-
-  <!-- SUPABASE OLD GLOBAL CDN (STABILE) -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <script>
-    const supabase = window.supabase.createClient(
-      "https://cnhaonawapuahzoctqav.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
-    );
-
-    async function signUp() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      const res = await supabase.auth.signUp({ email, password });
-
-      console.log(res);
-
-      alert(res.error ? res.error.message : "Check your email");
-    }
-
-    async function signIn() {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      const res = await supabase.auth.signInWithPassword({ email, password });
-
-      console.log(res);
-
-      alert(res.error ? res.error.message : "Login success");
-    }
-  </script>
-
-</body>
-</html>
+  console.log("Supabase loaded:", supabase);
+</script>
