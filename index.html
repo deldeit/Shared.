@@ -81,60 +81,66 @@
 
   <p id="status"></p>
 
+  <!-- SCRIPT FUNZIONANTE -->
   <script type="module">
     import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const supabase = createClient(
-      "https://cnhaonawapuahzoctqav.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
-    );
+    // 🔥 METTI QUI LA TUA ANON KEY
+    const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+
+    window.supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
     const status = document.getElementById("status");
 
     // -----------------------
-    // SIGN UP (USERNAME + PROFILE)
+    // SIGN UP
     // -----------------------
     window.signUp = async () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
       const username = document.getElementById("username").value;
 
+      console.log("START SIGNUP");
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password
       });
+
+      console.log("AUTH:", data, error);
 
       if (error) {
         alert(error.message);
         return;
       }
 
-      const user = data.user;
+      // 🔥 prende user SEMPRE
+      const { data: userData } = await supabase.auth.getUser();
+      const user = userData.user;
+
+      console.log("USER:", user);
 
       if (!user) {
-        alert("Check email to confirm account");
+        alert("Check email (user not active yet)");
         return;
       }
 
-      const { error: insertError } = await supabase
+      const res = await supabase
         .from("profiles")
-        .insert([
-          {
-            id: user.id,
-            username: username
-          }
-        ]);
+        .insert([{ id: user.id, username }]);
 
-      if (insertError) {
-        alert("Profile error: " + insertError.message);
-        console.log(insertError);
+      console.log("INSERT:", res);
+
+      if (res.error) {
+        alert("ERROR: " + res.error.message);
       } else {
         status.innerText = "User created: @" + username;
       }
     };
 
     // -----------------------
-    // SIGN IN + LOAD USERNAME
+    // SIGN IN
     // -----------------------
     window.signIn = async () => {
       const email = document.getElementById("email").value;
@@ -145,6 +151,8 @@
         password
       });
 
+      console.log("LOGIN:", data, error);
+
       if (error) {
         alert(error.message);
         return;
@@ -152,14 +160,22 @@
 
       const user = data.user;
 
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from("profiles")
         .select("username")
         .eq("id", user.id)
         .single();
 
-      status.innerText = "Logged in as @" + profile.username;
+      console.log("PROFILE:", profile, profileError);
+
+      if (profileError) {
+        alert(profileError.message);
+      } else {
+        status.innerText = "Logged in as @" + profile.username;
+      }
     };
+
+    console.log("SUPABASE READY");
   </script>
 
 </body>
