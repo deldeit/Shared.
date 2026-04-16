@@ -24,7 +24,6 @@ body {
   align-items:center;
 }
 
-/* HEADER */
 header {
   width:100%;
   max-width:900px;
@@ -32,7 +31,6 @@ header {
   opacity:0.8;
 }
 
-/* CONTAINER */
 .container {
   width:100%;
   max-width:900px;
@@ -42,7 +40,6 @@ header {
   gap:18px;
 }
 
-/* CARD */
 .card {
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.08);
@@ -53,14 +50,12 @@ header {
   gap:12px;
 }
 
-/* DROPZONE */
 .dropzone {
   border:1px dashed rgba(255,255,255,0.25);
   border-radius:14px;
   padding:16px;
   text-align:center;
   font-size:13px;
-  opacity:0.8;
   cursor:pointer;
 }
 
@@ -68,7 +63,6 @@ header {
   background:rgba(255,255,255,0.05);
 }
 
-/* IMAGE */
 .preview {
   width:100%;
   max-height:320px;
@@ -77,7 +71,6 @@ header {
   display:none;
 }
 
-/* INPUTS */
 textarea, input {
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(255,255,255,0.08);
@@ -88,7 +81,6 @@ textarea, input {
   font-size:13px;
 }
 
-/* UPLOAD */
 .upload-btn {
   display:flex;
   align-items:center;
@@ -105,7 +97,6 @@ textarea, input {
   display:none;
 }
 
-/* SONGS */
 .songs {
   background:rgba(0,0,0,0.6);
   border-radius:12px;
@@ -126,7 +117,11 @@ textarea, input {
   background:rgba(255,255,255,0.05);
 }
 
-/* BUTTON */
+.material-icons {
+  cursor:pointer;
+  font-size:20px;
+}
+
 button {
   padding:10px;
   border:none;
@@ -137,7 +132,11 @@ button {
   cursor:pointer;
 }
 
-/* POST */
+button:disabled {
+  opacity:0.5;
+  cursor:not-allowed;
+}
+
 .post {
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.08);
@@ -163,11 +162,10 @@ button {
 
 <div class="container">
 
-  <!-- CREATOR -->
   <div class="card">
 
     <div id="dropzone" class="dropzone">
-      Drag and drop one image here
+      Drag & drop one image here
     </div>
 
     <label class="upload-btn">
@@ -184,7 +182,8 @@ button {
 
     <div id="suggestions" class="songs"></div>
 
-    <button onclick="publishPost()">Publish</button>
+    <button id="publishBtn" onclick="publishPost()">Publish</button>
+
   </div>
 
   <div id="feed"></div>
@@ -195,11 +194,11 @@ button {
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
-  "https://cnhaonawapuahzoctqav.supabase.co",
+  "https://YOUR_PROJECT.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
-/* SESSION */
+/* AUTH */
 const { data: sessionData } = await supabase.auth.getSession();
 if (!sessionData.session) {
   window.location.href = "index.html";
@@ -207,22 +206,21 @@ if (!sessionData.session) {
 
 const user = sessionData.session.user;
 
-/* SINGLE IMAGE STATE */
+/* STATE */
 let imageData = null;
+let selectedMusic = null;
+let currentAudio = null;
 
-/* HANDLE IMAGE */
+/* IMAGE HANDLER */
 function handleFile(file) {
   if (!file) return;
 
   const allowed = ["image/jpeg","image/png","image/jpg","image/gif"];
-  if (!allowed.includes(file.type)) {
-    alert("Invalid file type");
-    return;
-  }
+  if (!allowed.includes(file.type)) return alert("Invalid file type");
 
   const reader = new FileReader();
 
-  reader.onload = (e) => {
+  reader.onload = e => {
     imageData = e.target.result;
 
     const img = document.getElementById("preview");
@@ -235,7 +233,6 @@ function handleFile(file) {
   reader.readAsDataURL(file);
 }
 
-/* INPUT FILE */
 document.getElementById("file").onchange = e => {
   handleFile(e.target.files[0]);
 };
@@ -258,11 +255,7 @@ dropzone.addEventListener("drop", e => {
   handleFile(e.dataTransfer.files[0]);
 });
 
-/* MUSIC */
-let selectedMusic = null;
-let currentAudio = null;
-
-/* DEEZER JSONP */
+/* MUSIC (DEEZER JSONP) */
 window.handleDeezer = function(data){
   const box = document.getElementById("suggestions");
   box.innerHTML = "";
@@ -300,7 +293,6 @@ window.handleDeezer = function(data){
   });
 };
 
-/* MUSIC SEARCH */
 let debounce;
 
 document.getElementById("songInput").addEventListener("input", e => {
@@ -316,19 +308,67 @@ document.getElementById("songInput").addEventListener("input", e => {
   }, 250);
 });
 
-/* PUBLISH */
+/* RESET */
+function resetComposer(){
+  imageData = null;
+  selectedMusic = null;
+
+  document.getElementById("caption").value = "";
+  document.getElementById("file").value = "";
+  document.getElementById("songInput").value = "";
+  document.getElementById("suggestions").innerHTML = "";
+
+  const img = document.getElementById("preview");
+  img.src = "";
+  img.style.display = "none";
+}
+
+/* PUBLISH (BUCKET = shared) */
 window.publishPost = async () => {
-  const caption = document.getElementById("caption").value;
+  const btn = document.getElementById("publishBtn");
 
-  await supabase.from("posts").insert([{
-    user_id: user.id,
-    image_url: imageData,
-    caption,
-    music_title: selectedMusic?.title || null,
-    music_preview: selectedMusic?.preview || null
-  }]);
+  try {
+    if (!imageData) return alert("Select an image");
 
-  loadFeed();
+    btn.disabled = true;
+    btn.textContent = "Uploading...";
+
+    const file = document.getElementById("file").files[0];
+    const fileName = `${user.id}-${Date.now()}`;
+
+    /* 🔥 BUCKET = shared */
+    const { error: uploadError } = await supabase
+      .storage
+      .from("shared")
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase
+      .storage
+      .from("shared")
+      .getPublicUrl(fileName);
+
+    const publicUrl = data.publicUrl;
+
+    await supabase.from("posts").insert([{
+      user_id: user.id,
+      image_url: publicUrl,
+      caption: document.getElementById("caption").value.trim(),
+      music_title: selectedMusic?.title || null,
+      music_preview: selectedMusic?.preview || null
+    }]);
+
+    resetComposer();
+    loadFeed();
+
+  } catch (err) {
+    console.error(err);
+    alert("Upload failed");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Publish";
+  }
 };
 
 /* FEED */
@@ -336,7 +376,7 @@ async function loadFeed(){
   const { data } = await supabase
     .from("posts")
     .select("*")
-    .order("created_at", { ascending:false });
+    .order("created_at",{ascending:false});
 
   const feed = document.getElementById("feed");
   feed.innerHTML = "";
