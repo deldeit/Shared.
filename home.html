@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Home</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+
+<style>
+* {
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Archivo Black', sans-serif;
+}
+
+body {
+  background:black;
+  color:white;
+}
+
+/* TOP */
+.top {
+  padding:20px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+h1 {
+  font-size:28px;
+}
+
+/* UPLOAD */
+.upload {
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+input, textarea {
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  background:#111;
+  color:white;
+}
+
+button {
+  padding:12px;
+  border-radius:999px;
+  border:none;
+  background:white;
+  color:black;
+  cursor:pointer;
+}
+
+/* FEED */
+.feed {
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.post {
+  background:#111;
+  border-radius:15px;
+  overflow:hidden;
+}
+
+.post img {
+  width:100%;
+  display:block;
+}
+
+.post-content {
+  padding:10px;
+}
+
+.small {
+  opacity:0.7;
+  font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="top">
+  <h1>Shared</h1>
+  <button onclick="logout()">Logout</button>
+</div>
+
+<div class="upload">
+  <input type="file" id="image">
+  <input type="text" id="caption" placeholder="Caption">
+  <input type="text" id="music" placeholder="Music URL">
+  <button onclick="uploadPost()">Post</button>
+</div>
+
+<div class="feed" id="feed"></div>
+
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+const supabase = createClient(
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "YOUR_ANON_KEY"
+);
+
+// SESSION CHECK
+const { data: sessionData } = await supabase.auth.getSession();
+if (!sessionData.session) {
+  window.location.href = "index.html";
+}
+
+const user = sessionData.session.user;
+
+// LOAD FEED
+async function loadFeed() {
+  const { data } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending:false });
+
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "";
+
+  data.forEach(post => {
+    const div = document.createElement("div");
+    div.className = "post";
+
+    div.innerHTML = `
+      <img src="${post.image_url}">
+      <div class="post-content">
+        <div>${post.caption}</div>
+        <div class="small">${post.music_url || ""}</div>
+      </div>
+    `;
+
+    feed.appendChild(div);
+  });
+}
+
+await loadFeed();
+
+// UPLOAD POST
+window.uploadPost = async () => {
+  const file = document.getElementById("image").files[0];
+  const caption = document.getElementById("caption").value;
+  const music = document.getElementById("music").value;
+
+  const fileName = `${user.id}-${Date.now()}`;
+
+  const { data: upload } = await supabase.storage
+    .from("posts")
+    .upload(fileName, file);
+
+  const imageUrl = supabase.storage
+    .from("posts")
+    .getPublicUrl(fileName).data.publicUrl;
+
+  await supabase.from("posts").insert([
+    {
+      user_id: user.id,
+      image_url: imageUrl,
+      caption,
+      music_url: music
+    }
+  ]);
+
+  loadFeed();
+};
+
+// LOGOUT
+window.logout = async () => {
+  await supabase.auth.signOut();
+  window.location.href = "index.html";
+};
+</script>
+
+</body>
+</html>
