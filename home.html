@@ -5,14 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Homepage</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+
+<!-- GOOGLE ICONS -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
 * {
   margin:0;
   padding:0;
   box-sizing:border-box;
-  font-family: Inter, sans-serif;
+  font-family:'Archivo Black', sans-serif;
 }
 
 body {
@@ -36,10 +39,10 @@ header {
 .container {
   width:100%;
   max-width:900px;
+  padding:20px;
   display:flex;
   flex-direction:column;
   gap:18px;
-  padding:20px;
 }
 
 /* CARD */
@@ -62,7 +65,7 @@ header {
   display:none;
 }
 
-/* INPUTS */
+/* INPUT */
 textarea, input {
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(255,255,255,0.08);
@@ -70,26 +73,38 @@ textarea, input {
   padding:10px;
   border-radius:12px;
   outline:none;
-  font-size:13px;
 }
 
-/* MUSIC LIST */
+/* SONG LIST */
 .songs {
-  background:rgba(0,0,0,0.5);
+  background:rgba(0,0,0,0.6);
   border:1px solid rgba(255,255,255,0.08);
   border-radius:12px;
-  max-height:140px;
+  max-height:160px;
   overflow:auto;
 }
 
 .song {
   padding:10px;
-  font-size:13px;
-  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:12px;
 }
 
 .song:hover {
-  background:rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.05);
+}
+
+/* PLAY BUTTON */
+.material-icons {
+  cursor:pointer;
+  font-size:20px;
+  opacity:0.8;
+}
+
+.material-icons:hover {
+  opacity:1;
 }
 
 /* BUTTON */
@@ -122,7 +137,6 @@ button {
   flex-direction:column;
   gap:6px;
   font-size:13px;
-  opacity:0.9;
 }
 </style>
 </head>
@@ -148,7 +162,6 @@ button {
     <button onclick="publishPost()">Publish</button>
   </div>
 
-  <!-- FEED -->
   <div id="feed"></div>
 
 </div>
@@ -170,7 +183,7 @@ if (!sessionData.session) {
 
 const user = sessionData.session.user;
 
-/* IMAGE PREVIEW */
+/* IMAGE */
 window.loadImage = (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
@@ -184,9 +197,11 @@ window.loadImage = (e) => {
   reader.readAsDataURL(file);
 };
 
-/* MUSIC SEARCH (DEEZER) */
+/* MUSIC */
+let currentAudio = null;
 let selectedMusic = null;
 
+/* SEARCH */
 window.searchMusic = async () => {
   const q = document.getElementById("musicSearch").value;
   const box = document.getElementById("songs");
@@ -198,11 +213,40 @@ window.searchMusic = async () => {
 
   box.innerHTML = "";
 
-  data.data.slice(0,5).forEach(song => {
+  data.data.slice(0,6).forEach(song => {
+
     const div = document.createElement("div");
     div.className = "song";
 
-    div.textContent = song.title + " - " + song.artist.name;
+    div.innerHTML = `
+      <span>${song.title} - ${song.artist.name}</span>
+      <span class="material-icons">play_arrow</span>
+    `;
+
+    const icon = div.querySelector(".material-icons");
+
+    icon.onclick = (e) => {
+      e.stopPropagation();
+
+      if (currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+      }
+
+      currentAudio = new Audio(song.preview);
+      currentAudio.play();
+
+      selectedMusic = {
+        title: song.title,
+        preview: song.preview
+      };
+
+      icon.textContent = "pause";
+
+      currentAudio.onended = () => {
+        icon.textContent = "play_arrow";
+      };
+    };
 
     div.onclick = () => {
       selectedMusic = {
@@ -218,25 +262,23 @@ window.searchMusic = async () => {
   });
 };
 
-/* PUBLISH POST */
+/* POST */
 window.publishPost = async () => {
   const caption = document.getElementById("caption").value;
   const image = document.getElementById("preview").src;
 
-  await supabase.from("posts").insert([
-    {
-      user_id: user.id,
-      image_url: image,
-      caption,
-      music_title: selectedMusic?.title || null,
-      music_preview: selectedMusic?.preview || null
-    }
-  ]);
+  await supabase.from("posts").insert([{
+    user_id: user.id,
+    image_url: image,
+    caption,
+    music_title: selectedMusic?.title || null,
+    music_preview: selectedMusic?.preview || null
+  }]);
 
   loadFeed();
 };
 
-/* LOAD FEED */
+/* FEED */
 async function loadFeed() {
   const { data } = await supabase
     .from("posts")
