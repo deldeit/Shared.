@@ -86,7 +86,7 @@
   </div>
 
   <div class="form">
-    <input id="email" placeholder="Email address">
+    <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
 
     <div class="btns">
@@ -98,10 +98,10 @@
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-    const supabase = createClient(
-      "https://cnhaonawapuahzoctqav.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
-    );
+    const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+
+    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     window.signUp = async function () {
       const email = document.getElementById("email").value;
@@ -111,6 +111,8 @@
         email,
         password
       });
+
+      console.log(error, data);
 
       if (error) {
         alert(error.message);
@@ -128,11 +130,12 @@
         password
       });
 
+      console.log(error, data);
+
       if (error) {
         alert(error.message);
       } else {
         alert("Login successful");
-        console.log(data);
       }
     };
   </script>
