@@ -8,47 +8,61 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
   <style>
-    * { margin:0; padding:0; box-sizing:border-box; font-family:'Archivo Black',sans-serif; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Archivo Black', sans-serif;
+    }
 
     body {
       height: 100vh;
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      align-items:center;
-      background:black;
-      color:white;
-      gap:15px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: black;
+      color: white;
+      gap: 12px;
     }
 
     h1 {
-      font-size:80px;
+      font-size: 80px;
       background: linear-gradient(90deg,#fff,#999);
-      -webkit-background-clip:text;
-      -webkit-text-fill-color:transparent;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     input {
-      padding:12px;
-      border-radius:10px;
-      border:none;
-      background:#111;
-      color:white;
-      width:260px;
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #111;
+      color: white;
+      width: 260px;
     }
 
-    .btns { display:flex; gap:10px; }
+    .btns {
+      display: flex;
+      gap: 10px;
+    }
 
     button {
-      padding:12px;
-      border-radius:999px;
-      border:none;
-      width:130px;
-      cursor:pointer;
+      padding: 12px;
+      border-radius: 999px;
+      border: none;
+      width: 130px;
+      cursor: pointer;
     }
 
-    .primary { background:white; color:black; }
-    .secondary { background:transparent; color:white; border:1px solid #555; }
+    .primary { background: white; color: black; }
+    .secondary { background: transparent; color: white; border: 1px solid #555; }
+
+    #status {
+      margin-top: 10px;
+      opacity: 0.8;
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -77,6 +91,9 @@
 
     const status = document.getElementById("status");
 
+    // -----------------------
+    // SIGN UP (USERNAME + PROFILE)
+    // -----------------------
     window.signUp = async () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -87,24 +104,38 @@
         password
       });
 
-      if (error) return alert(error.message);
+      if (error) {
+        alert(error.message);
+        return;
+      }
 
       const user = data.user;
 
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: user.id,
-          username
-        });
+      if (!user) {
+        alert("Check email to confirm account");
+        return;
+      }
 
-      if (profileError) {
-        alert(profileError.message);
+      const { error: insertError } = await supabase
+        .from("profiles")
+        .insert([
+          {
+            id: user.id,
+            username: username
+          }
+        ]);
+
+      if (insertError) {
+        alert("Profile error: " + insertError.message);
+        console.log(insertError);
       } else {
-        alert("Account created!");
+        status.innerText = "User created: @" + username;
       }
     };
 
+    // -----------------------
+    // SIGN IN + LOAD USERNAME
+    // -----------------------
     window.signIn = async () => {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
@@ -114,12 +145,17 @@
         password
       });
 
-      if (error) return alert(error.message);
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      const user = data.user;
 
       const { data: profile } = await supabase
         .from("profiles")
         .select("username")
-        .eq("id", data.user.id)
+        .eq("id", user.id)
         .single();
 
       status.innerText = "Logged in as @" + profile.username;
