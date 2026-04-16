@@ -8,84 +8,23 @@
   <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Archivo Black', sans-serif;
-    }
-
-    body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      color: white;
-      background: #000;
-    }
-
-    .hero {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-    }
-
-    h1 {
-      font-size: 110px;
-      background: linear-gradient(90deg,#fff,#999);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    h2 {
-      opacity: 0.8;
-    }
-
-    .form {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-width: 400px;
-      margin: 0 auto 60px;
-    }
-
-    input {
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: #111;
-      color: white;
-    }
-
-    .btns {
-      display: flex;
-      gap: 10px;
-    }
-
-    button {
-      flex: 1;
-      padding: 12px;
-      border-radius: 999px;
-      cursor: pointer;
-      border: none;
-    }
-
-    .primary { background: white; color: black; }
-    .secondary { background: transparent; color: white; border: 1px solid #555; }
+    body { background:#000; color:white; font-family:Archivo Black; display:flex; flex-direction:column; height:100vh; justify-content:space-between; align-items:center; }
+    input,button{padding:12px;border-radius:10px;margin:5px}
+    .btns{display:flex;gap:10px}
+    button{cursor:pointer}
+    .primary{background:white;color:black}
+    .secondary{background:transparent;color:white;border:1px solid #555}
   </style>
 </head>
 
 <body>
 
-  <div class="hero">
-    <h1>Shared.</h1>
-    <h2>Live the moment</h2>
+  <div>
+    <h1>Shared</h1>
+    <p>Live the moment</p>
   </div>
 
-  <div class="form">
+  <div>
     <input id="email" placeholder="Email">
     <input id="password" type="password" placeholder="Password">
 
@@ -95,49 +34,36 @@
     </div>
   </div>
 
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  <!-- SUPABASE OLD GLOBAL CDN (STABILE) -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+  <script>
+    const supabase = window.supabase.createClient(
+      "https://cnhaonawapuahzoctqav.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+    );
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-    window.signUp = async function () {
+    async function signUp() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      });
+      const res = await supabase.auth.signUp({ email, password });
 
-      console.log(error, data);
+      console.log(res);
 
-      if (error) {
-        alert(error.message);
-      } else {
-        alert("Check your email to confirm your account");
-      }
-    };
+      alert(res.error ? res.error.message : "Check your email");
+    }
 
-    window.signIn = async function () {
+    async function signIn() {
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
 
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
+      const res = await supabase.auth.signInWithPassword({ email, password });
 
-      console.log(error, data);
+      console.log(res);
 
-      if (error) {
-        alert(error.message);
-      } else {
-        alert("Login successful");
-      }
-    };
+      alert(res.error ? res.error.message : "Login success");
+    }
   </script>
 
 </body>
