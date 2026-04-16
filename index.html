@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shared</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Archivo Black', sans-serif;
+    }
+
+    body {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      color: white;
+      background: #000;
+    }
+
+    .hero {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 110px;
+      background: linear-gradient(90deg,#fff,#999);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    h2 {
+      opacity: 0.8;
+    }
+
+    .form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto 60px;
+    }
+
+    input {
+      padding: 12px;
+      border-radius: 10px;
+      border: none;
+      background: #111;
+      color: white;
+    }
+
+    .btns {
+      display: flex;
+      gap: 10px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .primary { background: white; color: black; border: none; }
+    .secondary { background: transparent; color: white; border: 1px solid #555; }
+  </style>
+</head>
+
+<body>
+
+  <div class="hero">
+    <h1>Shared.</h1>
+    <h2>Live the moment</h2>
+  </div>
+
+  <div class="form">
+    <input id="username" placeholder="Username">
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <div class="btns">
+      <button class="primary" onclick="signIn()">Sign in</button>
+      <button class="secondary" onclick="signUp()">Sign up</button>
+    </div>
+  </div>
+
+<script>
+const API = "https://YOUR-RENDER-URL.onrender.com";
+
+async function signUp() {
+  const username = document.getElementById("username").value;
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch(API + "/signup", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ username, email, password })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+}
+
+async function signIn() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+
+  const res = await fetch(API + "/signin", {
+    method: "POST",
+    headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({ email, password })
+  });
+
+  const data = await res.json();
+  alert(data.message);
+}
+</script>
+
+</body>
+</html>
