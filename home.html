@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Shared Composer</title>
+<title>Homepage</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
@@ -16,184 +16,182 @@
 }
 
 body {
-  height:100vh;
+  background:#000;
+  color:#fff;
   display:flex;
-  justify-content:center;
+  flex-direction:column;
   align-items:center;
-  background: radial-gradient(circle at top, #111, #000);
-  color:white;
 }
 
-/* CARD PRINCIPALE */
-.composer {
-  width:420px;
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(18px);
-  border-radius: 26px;
+/* HEADER */
+header {
+  width:100%;
+  max-width:900px;
+  padding:20px;
+  font-size:18px;
+  opacity:0.8;
+}
+
+/* CONTAINER */
+.container {
+  width:100%;
+  max-width:900px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  padding:20px;
+}
+
+/* CARD */
+.card {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:18px;
   padding:16px;
   display:flex;
   flex-direction:column;
   gap:12px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
 }
 
-/* TEXTAREA */
-textarea {
-  background: transparent;
-  border:none;
-  outline:none;
-  resize:none;
-  color:white;
-  font-size:14px;
-  height:70px;
-  line-height:1.4;
-}
-
-/* IMAGE PREVIEW */
+/* IMAGE */
 .preview {
-  width:72px;
-  height:72px;
-  border-radius:18px;
-  object-fit:cover;
-  display:none;
-  border:1px solid rgba(255,255,255,0.1);
-}
-
-/* ROW */
-.row {
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-/* ICON BUTTONS */
-.icon {
-  cursor:pointer;
-  opacity:0.7;
-  transition:0.2s;
-  font-size:18px;
-  user-select:none;
-}
-
-.icon:hover {
-  opacity:1;
-  transform:scale(1.05);
-}
-
-/* INPUT MUSIC */
-input[type="text"] {
   width:100%;
-  padding:10px 12px;
-  border-radius:12px;
+  max-height:320px;
+  object-fit:cover;
+  border-radius:14px;
+  display:none;
+}
+
+/* INPUTS */
+textarea, input {
+  background:rgba(0,0,0,0.4);
   border:1px solid rgba(255,255,255,0.08);
-  background: rgba(0,0,0,0.3);
   color:white;
+  padding:10px;
+  border-radius:12px;
   outline:none;
   font-size:13px;
 }
 
-/* DROPDOWN SONGS */
+/* MUSIC LIST */
 .songs {
-  background: rgba(0,0,0,0.5);
+  background:rgba(0,0,0,0.5);
   border:1px solid rgba(255,255,255,0.08);
-  border-radius:14px;
+  border-radius:12px;
   max-height:140px;
   overflow:auto;
 }
 
 .song {
   padding:10px;
-  font-size:12px;
+  font-size:13px;
   cursor:pointer;
-  opacity:0.8;
-  transition:0.15s;
 }
 
 .song:hover {
-  background: rgba(255,255,255,0.06);
-  opacity:1;
+  background:rgba(255,255,255,0.06);
 }
 
-/* FILE INPUT HIDDEN */
-input[type="file"] {
-  display:none;
-}
-
-/* POST BUTTON */
+/* BUTTON */
 button {
-  margin-top:4px;
   padding:10px;
-  border-radius:14px;
   border:none;
-  background:white;
-  color:black;
+  border-radius:12px;
+  background:#fff;
+  color:#000;
   font-weight:600;
   cursor:pointer;
-  transition:0.2s;
 }
 
-button:hover {
-  transform: translateY(-1px);
+/* POST */
+.post {
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:16px;
+  overflow:hidden;
+}
+
+.post img {
+  width:100%;
+  display:block;
+}
+
+.post-body {
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  font-size:13px;
+  opacity:0.9;
 }
 </style>
 </head>
 
 <body>
 
-<div class="composer">
+<header>Homepage</header>
 
-  <!-- TEXT -->
-  <textarea id="text" placeholder="What's happening?"></textarea>
+<div class="container">
 
-  <!-- IMAGE PREVIEW -->
-  <img id="preview" class="preview">
+  <!-- CREATOR -->
+  <div class="card">
 
-  <!-- ACTIONS -->
-  <div class="row">
-    <label class="icon">
-      📎
-      <input type="file" id="file" onchange="loadImage(event)">
-    </label>
+    <input type="file" id="file" onchange="loadImage(event)">
+    <img id="preview" class="preview">
 
-    <div class="icon">🎵</div>
+    <textarea id="caption" placeholder="Write a caption"></textarea>
+
+    <input id="musicSearch" placeholder="Search music..." oninput="searchMusic()">
+
+    <div class="songs" id="songs"></div>
+
+    <button onclick="publishPost()">Publish</button>
   </div>
 
-  <!-- MUSIC SEARCH -->
-  <input id="musicSearch" type="text" placeholder="Search music..." oninput="searchMusic()">
-
-  <div class="songs" id="songs"></div>
-
-  <button onclick="publish()">Publish</button>
+  <!-- FEED -->
+  <div id="feed"></div>
 
 </div>
 
-<script>
-let selectedSong = null;
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-/* IMAGE */
-function loadImage(e) {
+const supabase = createClient(
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "YOUR_ANON_KEY"
+);
+
+/* SESSION */
+const { data: sessionData } = await supabase.auth.getSession();
+
+if (!sessionData.session) {
+  window.location.href = "index.html";
+}
+
+const user = sessionData.session.user;
+
+/* IMAGE PREVIEW */
+window.loadImage = (e) => {
   const file = e.target.files[0];
   const reader = new FileReader();
 
-  reader.onload = function(evt) {
+  reader.onload = (evt) => {
     const img = document.getElementById("preview");
     img.src = evt.target.result;
     img.style.display = "block";
   };
 
   reader.readAsDataURL(file);
-}
+};
 
-/* MUSIC SEARCH */
-async function searchMusic() {
+/* MUSIC SEARCH (DEEZER) */
+let selectedMusic = null;
+
+window.searchMusic = async () => {
   const q = document.getElementById("musicSearch").value;
   const box = document.getElementById("songs");
 
-  if (q.length < 2) {
-    box.innerHTML = "";
-    return;
-  }
+  if (q.length < 2) return box.innerHTML = "";
 
   const res = await fetch(`https://api.deezer.com/search?q=${q}`);
   const data = await res.json();
@@ -204,30 +202,67 @@ async function searchMusic() {
     const div = document.createElement("div");
     div.className = "song";
 
-    div.textContent = `${song.title} — ${song.artist.name}`;
+    div.textContent = song.title + " - " + song.artist.name;
 
     div.onclick = () => {
-      selectedSong = song.preview;
+      selectedMusic = {
+        title: song.title,
+        preview: song.preview
+      };
+
       document.getElementById("musicSearch").value = song.title;
       box.innerHTML = "";
     };
 
     box.appendChild(div);
   });
-}
+};
 
-/* PUBLISH (placeholder backend hook) */
-function publish() {
-  const text = document.getElementById("text").value;
+/* PUBLISH POST */
+window.publishPost = async () => {
+  const caption = document.getElementById("caption").value;
+  const image = document.getElementById("preview").src;
 
-  console.log({
-    text,
-    image: document.getElementById("preview").src,
-    music: selectedSong
+  await supabase.from("posts").insert([
+    {
+      user_id: user.id,
+      image_url: image,
+      caption,
+      music_title: selectedMusic?.title || null,
+      music_preview: selectedMusic?.preview || null
+    }
+  ]);
+
+  loadFeed();
+};
+
+/* LOAD FEED */
+async function loadFeed() {
+  const { data } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending:false });
+
+  const feed = document.getElementById("feed");
+  feed.innerHTML = "";
+
+  data.forEach(post => {
+    const div = document.createElement("div");
+    div.className = "post";
+
+    div.innerHTML = `
+      <img src="${post.image_url}">
+      <div class="post-body">
+        <div>${post.caption || ""}</div>
+        <div>${post.music_title || ""}</div>
+      </div>
+    `;
+
+    feed.appendChild(div);
   });
-
-  alert("Post ready (hook backend here)");
 }
+
+loadFeed();
 </script>
 
 </body>
