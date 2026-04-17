@@ -9,367 +9,166 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
-* {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Archivo Black', sans-serif;
-}
-
-body {
-  background:#000;
-  color:#fff;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-header {
-  width:100%;
-  max-width:900px;
-  padding:20px;
-  font-size:18px;
-  opacity:0.8;
-}
-
-.container {
-  width:100%;
-  max-width:900px;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-.card {
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:18px;
-  padding:16px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-.dropzone {
-  border:1px dashed rgba(255,255,255,0.25);
-  border-radius:14px;
-  padding:18px;
-  text-align:center;
-  font-size:13px;
-  opacity:0.8;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-.dropzone.dragover {
-  background:rgba(255,255,255,0.05);
-}
-
-.preview {
-  width:100%;
-  max-height:340px;
-  object-fit:cover;
-  border-radius:14px;
-  display:none;
-}
-
-input, textarea {
-  background:rgba(0,0,0,0.4);
-  border:1px solid rgba(255,255,255,0.08);
-  color:#fff;
-  padding:10px;
-  border-radius:12px;
-  outline:none;
-  font-size:13px;
-}
-
-.songs {
-  background:rgba(0,0,0,0.6);
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,0.08);
-  max-height:160px;
-  overflow:auto;
-}
-
-.song {
-  padding:10px;
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  cursor:pointer;
-}
-
-.song:hover {
-  background:rgba(255,255,255,0.05);
-}
-
-button {
-  padding:12px;
-  border:none;
-  border-radius:12px;
-  background:#fff;
-  color:#000;
-  font-weight:600;
-  cursor:pointer;
-  transition:0.2s;
-}
-
-button:disabled {
-  opacity:0.5;
-}
-
-.post {
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.08);
-  border-radius:16px;
-  overflow:hidden;
-}
-
-.post img {
-  width:100%;
-  display:block;
-}
-
-.post-body {
-  padding:12px;
-  font-size:13px;
-}
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Archivo Black',sans-serif}
+body{background:#000;color:#fff;display:flex;flex-direction:column;align-items:center}
+header{width:100%;max-width:900px;padding:20px;font-size:18px;opacity:.8}
+.container{width:100%;max-width:900px;padding:20px;display:flex;flex-direction:column;gap:18px}
+.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.dropzone{border:1px dashed rgba(255,255,255,.25);border-radius:14px;padding:18px;text-align:center;font-size:13px;opacity:.8;cursor:pointer}
+.preview{width:100%;max-height:340px;object-fit:cover;border-radius:14px;display:none}
+input,textarea{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);color:#fff;padding:10px;border-radius:12px;outline:none;font-size:13px}
+.songs{background:rgba(0,0,0,.6);border-radius:12px;border:1px solid rgba(255,255,255,.08);max-height:160px;overflow:auto}
+.song{padding:10px;display:flex;justify-content:space-between;font-size:12px;cursor:pointer}
+button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;font-weight:600;cursor:pointer}
+button:disabled{opacity:.5}
+.post{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+.post img{width:100%}
+.post-body{padding:12px;font-size:13px}
+.lock{opacity:.5;pointer-events:none}
 </style>
 </head>
 
 <body>
 
-<header>Homepage</header>
+<header id="status">Loading...</header>
 
 <div class="container">
 
-  <div class="card">
+<div id="creator" class="card lock">
 
-    <div id="dropzone" class="dropzone">
-      Drag & drop image here
-    </div>
+<div id="dropzone" class="dropzone">Drag & drop image here</div>
+<input type="file" id="file">
+<img id="preview" class="preview">
+<textarea id="caption"></textarea>
+<input id="songInput">
+<div id="suggestions" class="songs"></div>
+<button id="publishBtn">Publish</button>
 
-    <input type="file" id="file" accept=".jpg,.jpeg,.png,.gif">
+</div>
 
-    <img id="preview" class="preview">
-
-    <textarea id="caption" placeholder="Write something..."></textarea>
-
-    <input id="songInput" placeholder="Search music...">
-    <div id="suggestions" class="songs"></div>
-
-    <button id="publishBtn" onclick="publishPost()">Publish</button>
-
-  </div>
-
-  <div id="feed"></div>
+<div id="feed"></div>
 
 </div>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient(
-  "https://YOUR_PROJECT.supabase.co",
-  "YOUR_ANON_KEY"
-);
+const supabase = createClient("https://cnhaonawapuahzoctqav.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes");
 
-let user = null;
-let authReady = false;
+let user=null;
 
-const { data: { session } } = await supabase.auth.getSession();
+const status=document.getElementById("status");
+const creator=document.getElementById("creator");
 
-if (session) {
-  user = session.user;
+async function init(){
+  const { data:{ session } } = await supabase.auth.getSession();
+
+  if(session){
+    user=session.user;
+    unlock();
+  }else{
+    lock();
+  }
 }
 
-authReady = true;
-
-supabase.auth.onAuthStateChange((event, session) => {
-  if (session) {
-    user = session.user;
-  } else {
-    user = null;
-    if (authReady) {
-      window.location.href = "index.html";
-    }
+supabase.auth.onAuthStateChange((e,session)=>{
+  if(session){
+    user=session.user;
+    unlock();
+  }else{
+    user=null;
+    lock();
   }
 });
 
-let imageFile = null;
-let selectedMusic = null;
-let audio = null;
-
-function handleFile(file) {
-  if (!file) return;
-
-  const allowed = ["image/jpeg","image/png","image/jpg","image/gif"];
-  if (!allowed.includes(file.type)) return alert("Invalid file");
-
-  imageFile = file;
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById("preview");
-    img.src = e.target.result;
-    img.style.display = "block";
-  };
-  reader.readAsDataURL(file);
+function unlock(){
+  status.textContent="Online";
+  creator.classList.remove("lock");
 }
 
-document.getElementById("file").onchange = e => handleFile(e.target.files[0]);
+function lock(){
+  status.textContent="Not logged";
+  creator.classList.add("lock");
+}
 
-const dropzone = document.getElementById("dropzone");
+let imageFile=null;
+let selectedMusic=null;
+let audio=null;
 
-dropzone.addEventListener("dragover", e => {
+function handleFile(file){
+  if(!file)return;
+  imageFile=file;
+  const r=new FileReader();
+  r.onload=e=>{
+    const img=document.getElementById("preview");
+    img.src=e.target.result;
+    img.style.display="block";
+  };
+  r.readAsDataURL(file);
+}
+
+document.getElementById("file").onchange=e=>handleFile(e.target.files[0]);
+
+document.getElementById("dropzone").ondrop=e=>{
   e.preventDefault();
-  dropzone.classList.add("dragover");
-});
-
-dropzone.addEventListener("dragleave", () => {
-  dropzone.classList.remove("dragover");
-});
-
-dropzone.addEventListener("drop", e => {
-  e.preventDefault();
-  dropzone.classList.remove("dragover");
   handleFile(e.dataTransfer.files[0]);
-});
+};
 
-window.handleDeezer = function(data){
-  const box = document.getElementById("suggestions");
-  box.innerHTML = "";
-
-  data.data?.slice(0,5).forEach(t => {
-
-    const div = document.createElement("div");
-    div.className = "song";
-
-    div.innerHTML = `
-      <span>${t.title} - ${t.artist.name}</span>
-      <span class="material-icons">play_arrow</span>
-    `;
-
-    const icon = div.querySelector(".material-icons");
-
-    icon.onclick = (e) => {
-      e.stopPropagation();
-      if(audio) audio.pause();
-      audio = new Audio(t.preview);
-      audio.play();
-      selectedMusic = t;
-    };
-
-    div.onclick = () => {
-      selectedMusic = t;
-      document.getElementById("songInput").value = t.title;
-      box.innerHTML = "";
-    };
-
-    box.appendChild(div);
+window.handleDeezer=function(data){
+  const box=document.getElementById("suggestions");
+  box.innerHTML="";
+  data.data?.slice(0,5).forEach(t=>{
+    const d=document.createElement("div");
+    d.className="song";
+    d.innerHTML=`<span>${t.title}</span>`;
+    d.onclick=()=>{selectedMusic=t};
+    box.appendChild(d);
   });
 };
 
 let debounce;
-
-document.getElementById("songInput").addEventListener("input", e => {
+document.getElementById("songInput").oninput=e=>{
   clearTimeout(debounce);
-
-  if(e.target.value.length < 2) return;
-
-  debounce = setTimeout(() => {
-    const s = document.createElement("script");
-    s.src = `https://api.deezer.com/search?q=${encodeURIComponent(e.target.value)}&output=jsonp&callback=handleDeezer`;
+  debounce=setTimeout(()=>{
+    const s=document.createElement("script");
+    s.src=`https://api.deezer.com/search?q=${e.target.value}&output=jsonp&callback=handleDeezer`;
     document.body.appendChild(s);
-    setTimeout(() => s.remove(), 2000);
-  }, 250);
-});
+    setTimeout(()=>s.remove(),2000);
+  },300);
+};
 
-function reset(){
-  imageFile = null;
-  selectedMusic = null;
+document.getElementById("publishBtn").onclick=async()=>{
+  if(!user)return alert("login required");
+  if(!imageFile)return alert("no image");
 
-  document.getElementById("caption").value = "";
-  document.getElementById("file").value = "";
-  document.getElementById("songInput").value = "";
-  document.getElementById("preview").style.display = "none";
-  document.getElementById("suggestions").innerHTML = "";
-}
+  const fileName=user.id+"-"+Date.now();
 
-window.publishPost = async () => {
-  const btn = document.getElementById("publishBtn");
+  await supabase.storage.from("shared").upload(fileName,imageFile);
 
-  if (!user) {
-    alert("Not authenticated");
-    return;
-  }
+  const { data }=supabase.storage.from("shared").getPublicUrl(fileName);
 
-  if (!imageFile) return alert("Select image");
+  await supabase.from("posts").insert([{
+    user_id:user.id,
+    image_url:data.publicUrl,
+    caption:document.getElementById("caption").value
+  }]);
 
-  btn.disabled = true;
-  btn.textContent = "Uploading...";
-
-  try {
-    const fileName = `${user.id}-${Date.now()}`;
-
-    const { error } = await supabase
-      .storage
-      .from("shared")
-      .upload(fileName, imageFile);
-
-    if (error) throw error;
-
-    const { data } = supabase
-      .storage
-      .from("shared")
-      .getPublicUrl(fileName);
-
-    await supabase.from("posts").insert([{
-      user_id: user.id,
-      image_url: data.publicUrl,
-      caption: document.getElementById("caption").value,
-      music_title: selectedMusic?.title || null,
-      music_preview: selectedMusic?.preview || null
-    }]);
-
-    reset();
-    loadFeed();
-
-  } catch (e) {
-    alert("Upload failed");
-    console.error(e);
-  }
-
-  btn.disabled = false;
-  btn.textContent = "Publish";
+  loadFeed();
 };
 
 async function loadFeed(){
-  const { data } = await supabase
-    .from("posts")
-    .select("*")
-    .order("created_at",{ascending:false});
-
-  const feed = document.getElementById("feed");
-  feed.innerHTML = "";
-
-  data.forEach(p => {
-    const div = document.createElement("div");
-    div.className = "post";
-
-    div.innerHTML = `
-      <img src="${p.image_url}">
-      <div class="post-body">
-        <div>${p.caption || ""}</div>
-        <div>${p.music_title || ""}</div>
-      </div>
-    `;
-
-    feed.appendChild(div);
+  const { data }=await supabase.from("posts").select("*").order("created_at",{ascending:false});
+  const feed=document.getElementById("feed");
+  feed.innerHTML="";
+  data.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="post";
+    d.innerHTML=`<img src="${p.image_url}"><div class="post-body">${p.caption||""}</div>`;
+    feed.appendChild(d);
   });
 }
 
+init();
 loadFeed();
 </script>
 
