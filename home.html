@@ -17,8 +17,6 @@ header{width:100%;max-width:900px;padding:20px;font-size:22px}
 .dropzone{border:1px dashed rgba(255,255,255,.25);border-radius:14px;padding:18px;text-align:center;font-size:13px}
 .preview{width:100%;max-height:340px;object-fit:cover;border-radius:14px;display:none}
 input,textarea{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);color:#fff;padding:10px;border-radius:12px}
-.songs{max-height:160px;overflow:auto}
-.song{padding:10px;cursor:pointer}
 button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;font-weight:600;cursor:pointer}
 .post img{width:100%}
 .post-body{padding:12px;font-size:13px}
@@ -33,13 +31,11 @@ button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;fo
 <div class="container">
 
 <div id="creator" class="card lock">
-
 <div id="dropzone" class="dropzone">Drag & drop image here</div>
 <input type="file" id="file" accept=".jpg,.jpeg,.png,.gif">
 <img id="preview" class="preview">
 <textarea id="caption" placeholder="Write something..."></textarea>
 <button id="publishBtn">Publish</button>
-
 </div>
 
 <div id="feed"></div>
@@ -49,17 +45,18 @@ button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;fo
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient(
-  "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
-);
+// 🔴 CONFIGURA QUI
+const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+const BUCKET = "shared"; // oppure "shared"
+const TWIC_DOMAIN = "https://shared.twic.pics"; // opzionale
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 window.user = null;
-
 const creator = document.getElementById("creator");
 
 async function init(){
-
   const { data:{ session } } = await supabase.auth.getSession();
 
   if(!session){
@@ -68,28 +65,24 @@ async function init(){
   }
 
   window.user = session.user;
-  unlock();
+  creator.classList.remove("lock");
 }
 
+// AUTH CHANGE
 supabase.auth.onAuthStateChange((event,session)=>{
   if(!session){
     window.location.replace("index.html");
     return;
   }
-
   window.user = session.user;
-  unlock();
+  creator.classList.remove("lock");
 });
 
-function unlock(){
-  creator.classList.remove("lock");
-}
-
+// FILE
 let imageFile = null;
 
 function handleFile(file){
   if(!file) return;
-
   imageFile = file;
 
   const reader = new FileReader();
@@ -117,6 +110,16 @@ function reset(){
   document.getElementById("preview").style.display = "none";
 }
 
+// 🔥 TWIC (se non lo usi, torna URL normale)
+function getImageUrl(publicUrl){
+  if(!TWIC_DOMAIN.includes("twic.pics")){
+    return publicUrl; // fallback normale
+  }
+  const path = publicUrl.split("/storage/v1/object/public/")[1];
+  return `${TWIC_DOMAIN}/${path}?twic=v1/cover=1/resize=800`;
+}
+
+// UPLOAD
 document.getElementById("publishBtn").onclick = async ()=>{
 
   if(!window.user) return alert("login required");
@@ -127,31 +130,32 @@ document.getElementById("publishBtn").onclick = async ()=>{
   btn.textContent = "Uploading...";
 
   try{
-
     const ext = imageFile.name.split('.').pop();
-    const fileName = window.user.id + "-" + Date.now() + "." + ext;
+    const fileName = `${window.user.id}/${Date.now()}.${ext}`;
 
-    const { error } = await supabase.storage
-      .from("images")
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
       .upload(fileName, imageFile, {
         contentType: imageFile.type
       });
 
-    if(error) throw error;
+    if(uploadError) throw uploadError;
 
     const { data } = supabase.storage
-      .from("images")
+      .from(BUCKET)
       .getPublicUrl(fileName);
 
-    await supabase.from("posts").insert([{
+    if(!data?.publicUrl) throw new Error("URL non generato");
+
+    const { error: dbError } = await supabase.from("posts").insert([{
       user_id: window.user.id,
       image_url: data.publicUrl,
       caption: document.getElementById("caption").value
     }]);
 
+    if(dbError) throw dbError;
+
     reset();
-    loadFeed();
-    window.scrollTo(0,0);
 
   }catch(e){
     alert(e.message);
@@ -162,28 +166,51 @@ document.getElementById("publishBtn").onclick = async ()=>{
   btn.textContent = "Publish";
 };
 
-async function loadFeed(){
+// RENDER
+function renderPost(p){
+  const div = document.createElement("div");
+  div.className = "post";
 
-  const { data } = await supabase
+  div.innerHTML = `
+    <img src="${getImageUrl(p.image_url)}">
+    <div class="post-body">${p.caption || ""}</div>
+  `;
+
+  return div;
+}
+
+// LOAD
+async function loadFeed(){
+  const { data, error } = await supabase
     .from("posts")
     .select("*")
     .order("created_at",{ascending:false});
+
+  if(error){
+    console.error(error);
+    return;
+  }
 
   const feed = document.getElementById("feed");
   feed.innerHTML = "";
 
   data.forEach(p=>{
-    const div = document.createElement("div");
-    div.className = "post";
-
-    div.innerHTML = `
-      <img src="${p.image_url}?twic=v1/cover=1/resize=800">
-      <div class="post-body">${p.caption || ""}</div>
-    `;
-
-    feed.appendChild(div);
+    feed.appendChild(renderPost(p));
   });
 }
+
+// REALTIME
+supabase
+  .channel("posts")
+  .on("postgres_changes", {
+    event: "INSERT",
+    schema: "public",
+    table: "posts"
+  }, payload => {
+    const feed = document.getElementById("feed");
+    feed.prepend(renderPost(payload.new));
+  })
+  .subscribe();
 
 init();
 loadFeed();
