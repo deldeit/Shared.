@@ -3,118 +3,67 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared</title>
+<title>Shared Home</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Archivo Black',sans-serif;
-}
-
 body{
+  margin:0;
   background:black;
   color:white;
+  font-family:'Archivo Black',sans-serif;
   display:flex;
   flex-direction:column;
   align-items:center;
-}
-
-header{
-  width:100%;
-  max-width:900px;
-  padding:20px;
-  font-size:22px;
 }
 
 .container{
   width:100%;
   max-width:900px;
   padding:20px;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
 }
 
 .card{
-  background:rgba(255,255,255,0.05);
-  border:1px solid rgba(255,255,255,0.1);
   padding:16px;
-  border-radius:16px;
+  border:1px solid #222;
+  border-radius:14px;
+  margin-bottom:16px;
 }
 
-.dropzone{
-  border:1px dashed rgba(255,255,255,0.3);
-  padding:16px;
-  text-align:center;
-  border-radius:12px;
-}
-
-.preview{
-  width:100%;
-  max-height:300px;
-  object-fit:cover;
-  display:none;
-  border-radius:12px;
-  margin-top:10px;
-}
-
-input,textarea{
+input,textarea,button{
   width:100%;
   padding:10px;
   margin-top:10px;
   border-radius:10px;
   border:none;
-  background:#111;
-  color:white;
 }
 
 button{
-  margin-top:10px;
-  padding:12px;
-  width:100%;
-  border:none;
-  border-radius:10px;
-  cursor:pointer;
   background:white;
   color:black;
-  font-weight:bold;
+  cursor:pointer;
 }
 
-.post img{
+img{
   width:100%;
   border-radius:12px;
 }
 
 .post{
-  margin-top:10px;
-}
-
-.post-body{
-  padding:10px;
-  font-size:13px;
+  margin-top:15px;
 }
 </style>
 </head>
 
 <body>
 
-<header>Shared</header>
-
 <div class="container">
 
   <div class="card">
-    <div class="dropzone" id="dropzone">Drop image here</div>
-
-    <input type="file" id="file" accept="image/*">
-    <img id="preview" class="preview">
-
-    <textarea id="caption" placeholder="Write caption..."></textarea>
-
-    <button id="publishBtn">Publish</button>
+    <input type="file" id="file">
+    <textarea id="caption" placeholder="Caption..."></textarea>
+    <button id="uploadBtn">Upload</button>
   </div>
 
   <div id="feed"></div>
@@ -124,29 +73,24 @@ button{
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-/* 🔴 CONFIG */
-const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-const BUCKET = "shared";
-
-/* 🔴 CLIENT (GLOBAL IN MODULE) */
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
+const supabase = createClient(
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes",
+  {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true
+    }
   }
-});
+);
 
 let user = null;
-let imageFile = null;
+let file = null;
+const BUCKET = "shared";
 
-/* 🔴 INIT SESSION */
+// 🔴 FIX SESSION (CORRETTO)
 async function init(){
-
   const { data: { session } } = await supabase.auth.getSession();
-
-  console.log("SESSION:", session);
 
   if(!session){
     window.location.href = "index.html";
@@ -154,133 +98,67 @@ async function init(){
   }
 
   user = session.user;
-
   loadFeed();
 }
 
 init();
 
-/* 🔴 AUTH LISTENER */
-supabase.auth.onAuthStateChange((_event, session) => {
-  user = session?.user || null;
-});
-
-/* 🔴 FILE HANDLING */
+// FILE
 document.getElementById("file").onchange = e => {
-  handleFile(e.target.files[0]);
+  file = e.target.files[0];
 };
 
-document.getElementById("dropzone").ondragover = e => e.preventDefault();
+// UPLOAD
+document.getElementById("uploadBtn").onclick = async () => {
 
-document.getElementById("dropzone").ondrop = e => {
-  e.preventDefault();
-  handleFile(e.dataTransfer.files[0]);
+  if(!user) return alert("Not logged in");
+  if(!file) return alert("No file");
+
+  const ext = file.name.split(".").pop();
+  const fileName = `${user.id}/${Date.now()}.${ext}`;
+
+  // 🔴 STORAGE FIXATO
+  const { error: uploadError } = await supabase.storage
+    .from(BUCKET)
+    .upload(fileName, file);
+
+  if(uploadError) return alert(uploadError.message);
+
+  const { data } = supabase.storage
+    .from(BUCKET)
+    .getPublicUrl(fileName);
+
+  const { error: dbError } = await supabase
+    .from("posts")
+    .insert([{
+      user_id: user.id,
+      image_url: data.publicUrl,
+      caption: document.getElementById("caption").value
+    }]);
+
+  if(dbError) return alert(dbError.message);
+
+  loadFeed();
 };
 
-function handleFile(file){
-  if(!file) return;
-
-  imageFile = file;
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    const img = document.getElementById("preview");
-    img.src = e.target.result;
-    img.style.display = "block";
-  };
-  reader.readAsDataURL(file);
-}
-
-/* 🔴 UPLOAD FIXATO */
-document.getElementById("publishBtn").onclick = async () => {
-
-  if(!user){
-    alert("Not logged in");
-    return;
-  }
-
-  if(!imageFile){
-    alert("No image selected");
-    return;
-  }
-
-  const btn = document.getElementById("publishBtn");
-  btn.disabled = true;
-  btn.textContent = "Uploading...";
-
-  try {
-
-    const ext = imageFile.name.split(".").pop();
-    const fileName = `${user.id}/${Date.now()}.${ext}`;
-
-    /* UPLOAD CORRETTO */
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(fileName, imageFile, {
-        contentType: imageFile.type
-      });
-
-    if(uploadError) throw uploadError;
-
-    const { data } = supabase.storage
-      .from(BUCKET)
-      .getPublicUrl(fileName);
-
-    /* DB INSERT */
-    const { error: dbError } = await supabase
-      .from("posts")
-      .insert([{
-        user_id: user.id,
-        image_url: data.publicUrl,
-        caption: document.getElementById("caption").value
-      }]);
-
-    if(dbError) throw dbError;
-
-    reset();
-    loadFeed();
-
-  } catch (err) {
-    console.error(err);
-    alert(err.message);
-  }
-
-  btn.disabled = false;
-  btn.textContent = "Publish";
-};
-
-function reset(){
-  imageFile = null;
-  document.getElementById("caption").value = "";
-  document.getElementById("file").value = "";
-  document.getElementById("preview").style.display = "none";
-}
-
-/* 🔴 FEED */
+// FEED
 async function loadFeed(){
 
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("posts")
     .select("*")
-    .order("created_at", { ascending: false });
-
-  if(error){
-    console.error(error);
-    return;
-  }
+    .order("created_at",{ascending:false});
 
   const feed = document.getElementById("feed");
   feed.innerHTML = "";
 
-  data.forEach(post => {
+  data.forEach(p => {
     const div = document.createElement("div");
     div.className = "post";
-
     div.innerHTML = `
-      <img src="${post.image_url}">
-      <div class="post-body">${post.caption || ""}</div>
+      <img src="${p.image_url}">
+      <p>${p.caption || ""}</p>
     `;
-
     feed.appendChild(div);
   });
 }
