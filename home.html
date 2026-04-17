@@ -18,44 +18,107 @@ header{
   padding:20px;
   font-size:22px;
   letter-spacing:1px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
 }
 
-.container{width:100%;max-width:900px;padding:20px;display:flex;flex-direction:column;gap:18px}
+.container{
+  width:100%;
+  max-width:900px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
 
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.card{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:18px;
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
 
-.dropzone{border:1px dashed rgba(255,255,255,.25);border-radius:14px;padding:18px;text-align:center;font-size:13px;opacity:.8;cursor:pointer}
+.dropzone{
+  border:1px dashed rgba(255,255,255,.25);
+  border-radius:14px;
+  padding:18px;
+  text-align:center;
+  font-size:13px;
+  opacity:.8;
+  cursor:pointer;
+}
 
-.preview{width:100%;max-height:340px;object-fit:cover;border-radius:14px;display:none}
+.preview{
+  width:100%;
+  max-height:340px;
+  object-fit:cover;
+  border-radius:14px;
+  display:none;
+}
 
-input,textarea{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);color:#fff;padding:10px;border-radius:12px;outline:none;font-size:13px}
+input,textarea{
+  background:rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.08);
+  color:#fff;
+  padding:10px;
+  border-radius:12px;
+  outline:none;
+  font-size:13px;
+}
 
-.songs{background:rgba(0,0,0,.6);border-radius:12px;border:1px solid rgba(255,255,255,.08);max-height:160px;overflow:auto}
+.songs{
+  background:rgba(0,0,0,.6);
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.08);
+  max-height:160px;
+  overflow:auto;
+}
 
-.song{padding:10px;display:flex;justify-content:space-between;font-size:12px;cursor:pointer}
+.song{
+  padding:10px;
+  font-size:12px;
+  cursor:pointer;
+}
 
-button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;font-weight:600;cursor:pointer}
+button{
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  background:#fff;
+  color:#000;
+  font-weight:600;
+  cursor:pointer;
+}
 
 button:disabled{opacity:.5}
 
-.post{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+.post{
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:16px;
+  overflow:hidden;
+}
 
-.post img{width:100%}
+.post img{
+  width:100%;
+}
 
-.post-body{padding:12px;font-size:13px}
+.post-body{
+  padding:12px;
+  font-size:13px;
+}
 
-.lock{opacity:.4;pointer-events:none}
+.lock{
+  opacity:.4;
+  pointer-events:none;
+}
 </style>
 </head>
 
 <body>
 
-<header>
-  <div>Shared</div>
-</header>
+<header>Shared</header>
 
 <div class="container">
 
@@ -84,11 +147,13 @@ const supabase = createClient(
 );
 
 let user=null;
+let imageFile=null;
+let selectedMusic=null;
+let audio=null;
 
 const creator=document.getElementById("creator");
 
 async function init(){
-
   const { data:{ session } } = await supabase.auth.getSession();
 
   if(!session){
@@ -100,26 +165,24 @@ async function init(){
   unlock();
 }
 
-supabase.auth.onAuthStateChange((e,session)=>{
+supabase.auth.onAuthStateChange((event,session)=>{
   if(!session){
     window.location.replace("index.html");
-  }else{
-    user=session.user;
-    unlock();
+    return;
   }
+
+  user=session.user;
+  unlock();
 });
 
 function unlock(){
   creator.classList.remove("lock");
 }
 
-let imageFile=null;
-let selectedMusic=null;
-let audio=null;
-
 function handleFile(file){
   if(!file)return;
   imageFile=file;
+
   const r=new FileReader();
   r.onload=e=>{
     const img=document.getElementById("preview");
@@ -139,10 +202,11 @@ document.getElementById("dropzone").ondrop=e=>{
 window.handleDeezer=function(data){
   const box=document.getElementById("suggestions");
   box.innerHTML="";
+
   data.data?.slice(0,5).forEach(t=>{
     const d=document.createElement("div");
     d.className="song";
-    d.innerHTML=`<span>${t.title} - ${t.artist.name}</span>`;
+    d.textContent=t.title+" - "+t.artist.name;
     d.onclick=()=>selectedMusic=t;
     box.appendChild(d);
   });
@@ -152,6 +216,7 @@ let debounce;
 document.getElementById("songInput").oninput=e=>{
   clearTimeout(debounce);
   if(e.target.value.length<2)return;
+
   debounce=setTimeout(()=>{
     const s=document.createElement("script");
     s.src=`https://api.deezer.com/search?q=${encodeURIComponent(e.target.value)}&output=jsonp&callback=handleDeezer`;
@@ -163,6 +228,7 @@ document.getElementById("songInput").oninput=e=>{
 function reset(){
   imageFile=null;
   selectedMusic=null;
+
   document.getElementById("caption").value="";
   document.getElementById("file").value="";
   document.getElementById("preview").style.display="none";
@@ -170,31 +236,55 @@ function reset(){
 }
 
 document.getElementById("publishBtn").onclick=async()=>{
-  if(!user)return;
 
-  const ext=imageFile.name.split('.').pop();
-  const fileName=user.id+"-"+Date.now()+"."+ext;
+  if(!user)return alert("login required");
+  if(!imageFile)return alert("no image");
 
-  await supabase.storage.from("images").upload(fileName,imageFile,{
-    contentType:imageFile.type
-  });
+  const btn=document.getElementById("publishBtn");
+  btn.disabled=true;
+  btn.textContent="Uploading...";
 
-  const twicUrl="https://shared.twic.pics/shared/"+fileName;
+  try{
+    const ext=imageFile.name.split('.').pop();
+    const fileName=user.id+"-"+Date.now()+"."+ext;
 
-  await supabase.from("posts").insert([{
-    user_id:user.id,
-    image_url:twicUrl,
-    caption:document.getElementById("caption").value,
-    music_title:selectedMusic?.title||null
-  }]);
+    const { error } = await supabase.storage
+      .from("images")
+      .upload(fileName,imageFile,{
+        contentType:imageFile.type
+      });
 
-  reset();
-  loadFeed();
-  window.scrollTo(0,0);
+    if(error)throw error;
+
+    const { data } = supabase.storage
+      .from("images")
+      .getPublicUrl(fileName);
+
+    await supabase.from("posts").insert([{
+      user_id:user.id,
+      image_url:data.publicUrl,
+      caption:document.getElementById("caption").value,
+      music_title:selectedMusic?.title||null
+    }]);
+
+    reset();
+    loadFeed();
+    window.scrollTo(0,0);
+
+  }catch(e){
+    console.error(e);
+    alert(e.message);
+  }
+
+  btn.disabled=false;
+  btn.textContent="Publish";
 };
 
 async function loadFeed(){
-  const { data }=await supabase.from("posts").select("*").order("created_at",{ascending:false});
+  const { data } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at",{ascending:false});
 
   const feed=document.getElementById("feed");
   feed.innerHTML="";
@@ -202,6 +292,7 @@ async function loadFeed(){
   data.forEach(p=>{
     const d=document.createElement("div");
     d.className="post";
+
     d.innerHTML=`
       <img src="${p.image_url}?twic=v1/cover=1/resize=800">
       <div class="post-body">
@@ -209,6 +300,7 @@ async function loadFeed(){
         <div>${p.music_title||""}</div>
       </div>
     `;
+
     feed.appendChild(d);
   });
 }
