@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared Home</title>
+<title>Shared</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
@@ -97,11 +97,6 @@ button{
   padding:10px;
   font-size:13px;
 }
-
-.lock{
-  opacity:.4;
-  pointer-events:none;
-}
 </style>
 </head>
 
@@ -111,7 +106,7 @@ button{
 
 <div class="container">
 
-  <div class="card" id="creator">
+  <div class="card">
     <div class="dropzone" id="dropzone">Drop image here</div>
 
     <input type="file" id="file" accept="image/*">
@@ -131,27 +126,16 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-const BUCKET = "shared"; // oppure "images"
+const BUCKET = "shared"; // 🔴 cambia se il tuo bucket è "images"
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
-});
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 let currentUser = null;
 let imageFile = null;
 
-const creator = document.getElementById("creator");
-
-// 🔥 SESSION FIX DEFINITIVO
+// 🔴 SESSION FIX
 async function init(){
-
   const { data: { session } } = await supabase.auth.getSession();
-
-  console.log("SESSION:", session);
 
   if(!session){
     window.location.href = "index.html";
@@ -159,24 +143,15 @@ async function init(){
   }
 
   currentUser = session.user;
-  unlock();
-
   loadFeed();
 }
 
-function unlock(){
-  creator.classList.remove("lock");
-}
-
-// 🔴 LISTENER AUTH
+// 🔴 AUTH SAFE
 supabase.auth.onAuthStateChange((_event, session) => {
-  if(session){
-    currentUser = session.user;
-    unlock();
-  }
+  currentUser = session?.user || null;
 });
 
-// 🔥 FILE HANDLING
+// 🔴 FILE HANDLING
 document.getElementById("file").onchange = e => {
   handleFile(e.target.files[0]);
 };
@@ -202,7 +177,7 @@ function handleFile(file){
   reader.readAsDataURL(file);
 }
 
-// 🔥 UPLOAD FIXATO
+// 🔴 UPLOAD FIXATO (NO URL MANUALI)
 document.getElementById("publishBtn").onclick = async () => {
 
   if(!currentUser){
@@ -211,7 +186,7 @@ document.getElementById("publishBtn").onclick = async () => {
   }
 
   if(!imageFile){
-    alert("No image");
+    alert("No image selected");
     return;
   }
 
@@ -224,16 +199,24 @@ document.getElementById("publishBtn").onclick = async () => {
     const ext = imageFile.name.split(".").pop();
     const fileName = `${currentUser.id}/${Date.now()}.${ext}`;
 
+    // ✔ UPLOAD CORRETTO
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
-      .upload(fileName, imageFile);
+      .upload(fileName, imageFile, {
+        contentType: imageFile.type,
+        upsert: false
+      });
 
     if(uploadError) throw uploadError;
 
+    // ✔ URL PUBBLICO
     const { data } = supabase.storage
       .from(BUCKET)
       .getPublicUrl(fileName);
 
+    if(!data?.publicUrl) throw new Error("URL non generato");
+
+    // ✔ DB INSERT
     const { error: dbError } = await supabase
       .from("posts")
       .insert([{
@@ -263,7 +246,7 @@ function reset(){
   document.getElementById("preview").style.display = "none";
 }
 
-// 🔥 FEED
+// 🔴 FEED
 async function loadFeed(){
 
   const { data, error } = await supabase
