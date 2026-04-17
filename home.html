@@ -179,7 +179,7 @@ document.getElementById("publishBtn").onclick=async()=>{
     contentType:imageFile.type
   });
 
-  const twicUrl="https://YOUR_TWIC_DOMAIN.twic.pics/shared/"+fileName;
+  const twicUrl="https://shared.twic.pics/shared/"+fileName;
 
   await supabase.from("posts").insert([{
     user_id:user.id,
