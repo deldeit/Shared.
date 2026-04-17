@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Homepage</title>
+<title>Shared</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -11,30 +11,56 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Archivo Black',sans-serif}
 body{background:#000;color:#fff;display:flex;flex-direction:column;align-items:center}
-header{width:100%;max-width:900px;padding:20px;font-size:18px;opacity:.8}
+
+header{
+  width:100%;
+  max-width:900px;
+  padding:20px;
+  font-size:22px;
+  letter-spacing:1px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
 .container{width:100%;max-width:900px;padding:20px;display:flex;flex-direction:column;gap:18px}
+
 .card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
+
 .dropzone{border:1px dashed rgba(255,255,255,.25);border-radius:14px;padding:18px;text-align:center;font-size:13px;opacity:.8;cursor:pointer}
+
 .preview{width:100%;max-height:340px;object-fit:cover;border-radius:14px;display:none}
+
 input,textarea{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);color:#fff;padding:10px;border-radius:12px;outline:none;font-size:13px}
+
 .songs{background:rgba(0,0,0,.6);border-radius:12px;border:1px solid rgba(255,255,255,.08);max-height:160px;overflow:auto}
+
 .song{padding:10px;display:flex;justify-content:space-between;font-size:12px;cursor:pointer}
+
 button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;font-weight:600;cursor:pointer}
+
 button:disabled{opacity:.5}
+
 .post{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden}
+
 .post img{width:100%}
+
 .post-body{padding:12px;font-size:13px}
-.lock{opacity:.5;pointer-events:none}
+
+.lock{opacity:.4;pointer-events:none}
 </style>
 </head>
 
 <body>
 
-<header id="status">Loading...</header>
+<header>
+  <div>Shared</div>
+</header>
 
 <div class="container">
 
 <div id="creator" class="card lock">
+
 <div id="dropzone" class="dropzone">Drag & drop image here</div>
 <input type="file" id="file" accept=".jpg,.jpeg,.png,.gif">
 <img id="preview" class="preview">
@@ -42,6 +68,7 @@ button:disabled{opacity:.5}
 <input id="songInput" placeholder="Search music...">
 <div id="suggestions" class="songs"></div>
 <button id="publishBtn">Publish</button>
+
 </div>
 
 <div id="feed"></div>
@@ -52,45 +79,38 @@ button:disabled{opacity:.5}
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
-  "https://YOUR_PROJECT.supabase.co",
-  "YOUR_ANON_KEY"
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
-
-const TWIC_DOMAIN = "https://YOUR_TWIC_DOMAIN.twic.pics";
 
 let user=null;
 
-const status=document.getElementById("status");
 const creator=document.getElementById("creator");
 
 async function init(){
+
   const { data:{ session } } = await supabase.auth.getSession();
-  if(session){
-    user=session.user;
-    unlock();
-  }else{
-    lock();
+
+  if(!session){
+    window.location.replace("index.html");
+    return;
   }
+
+  user=session.user;
+  unlock();
 }
 
 supabase.auth.onAuthStateChange((e,session)=>{
-  if(session){
+  if(!session){
+    window.location.replace("index.html");
+  }else{
     user=session.user;
     unlock();
-  }else{
-    user=null;
-    lock();
   }
 });
 
 function unlock(){
-  status.textContent="Online";
   creator.classList.remove("lock");
-}
-
-function lock(){
-  status.textContent="Not logged";
-  creator.classList.add("lock");
 }
 
 let imageFile=null;
@@ -123,7 +143,7 @@ window.handleDeezer=function(data){
     const d=document.createElement("div");
     d.className="song";
     d.innerHTML=`<span>${t.title} - ${t.artist.name}</span>`;
-    d.onclick=()=>{selectedMusic=t};
+    d.onclick=()=>selectedMusic=t;
     box.appendChild(d);
   });
 };
@@ -140,76 +160,41 @@ document.getElementById("songInput").oninput=e=>{
   },300);
 };
 
-function fullReset(){
+function reset(){
   imageFile=null;
   selectedMusic=null;
-  audio=null;
   document.getElementById("caption").value="";
   document.getElementById("file").value="";
-  document.getElementById("songInput").value="";
+  document.getElementById("preview").style.display="none";
   document.getElementById("suggestions").innerHTML="";
-  const preview=document.getElementById("preview");
-  preview.src="";
-  preview.style.display="none";
 }
 
 document.getElementById("publishBtn").onclick=async()=>{
-  if(!user)return alert("login required");
-  if(!imageFile)return alert("no image");
+  if(!user)return;
 
-  const btn=document.getElementById("publishBtn");
-  btn.disabled=true;
-  btn.textContent="Uploading...";
+  const ext=imageFile.name.split('.').pop();
+  const fileName=user.id+"-"+Date.now()+"."+ext;
 
-  try{
-    const ext=imageFile.name.split('.').pop();
-    const fileName=user.id+"-"+Date.now()+"."+ext;
+  await supabase.storage.from("images").upload(fileName,imageFile,{
+    contentType:imageFile.type
+  });
 
-    const { data: uploadData, error: uploadError } = await supabase.storage
-      .from("images")
-      .upload(fileName,imageFile,{
-        contentType:imageFile.type,
-        upsert:false
-      });
+  const twicUrl="https://YOUR_TWIC_DOMAIN.twic.pics/shared/"+fileName;
 
-    if(uploadError){
-      console.error(uploadError);
-      alert(uploadError.message);
-      return;
-    }
+  await supabase.from("posts").insert([{
+    user_id:user.id,
+    image_url:twicUrl,
+    caption:document.getElementById("caption").value,
+    music_title:selectedMusic?.title||null
+  }]);
 
-    const { data: publicData } = supabase.storage
-      .from("images")
-      .getPublicUrl(fileName);
-
-    const twicUrl = TWIC_DOMAIN + "/shared/" + fileName;
-
-    await supabase.from("posts").insert([{
-      user_id:user.id,
-      image_url:twicUrl,
-      caption:document.getElementById("caption").value,
-      music_title:selectedMusic?.title||null,
-      music_preview:selectedMusic?.preview||null
-    }]);
-
-    fullReset();
-    loadFeed();
-    window.scrollTo(0,0);
-
-  }catch(e){
-    console.error(e);
-    alert(e.message);
-  }
-
-  btn.disabled=false;
-  btn.textContent="Publish";
+  reset();
+  loadFeed();
+  window.scrollTo(0,0);
 };
 
 async function loadFeed(){
-  const { data }=await supabase
-    .from("posts")
-    .select("*")
-    .order("created_at",{ascending:false});
+  const { data }=await supabase.from("posts").select("*").order("created_at",{ascending:false});
 
   const feed=document.getElementById("feed");
   feed.innerHTML="";
