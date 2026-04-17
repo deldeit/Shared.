@@ -3,17 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared</title>
+<title>Shared - Homepage</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
 body{
   margin:0;
-  background:#0f0f0f;
-  color:white;
-  font-family:'Inter',sans-serif;
+  background:#000;
+  color:#fff;
+  font-family:'Archivo Black', sans-serif;
 }
 
 .container{
@@ -23,46 +22,66 @@ body{
 }
 
 .card{
-  background:#1a1a1a;
+  background:#0f0f0f;
+  border:1px solid #222;
+  border-radius:20px;
   padding:16px;
-  border-radius:16px;
   margin-bottom:20px;
 }
 
 input, textarea{
   width:100%;
-  padding:10px;
-  border-radius:10px;
-  border:none;
+  padding:12px;
   margin-top:10px;
-  background:#2a2a2a;
-  color:white;
+  border-radius:14px;
+  border:1px solid #222;
+  background:#000;
+  color:#fff;
+  font-family:'Archivo Black', sans-serif;
 }
 
 button{
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:10px;
+  width:100%;
+  margin-top:12px;
+  padding:12px;
+  border-radius:14px;
   border:none;
-  border-radius:12px;
-  background:white;
-  color:black;
+  background:#fff;
+  color:#000;
+  font-family:'Archivo Black', sans-serif;
   cursor:pointer;
 }
 
 .post{
-  margin-top:20px;
-  background:#1a1a1a;
+  background:#0f0f0f;
+  border:1px solid #222;
+  border-radius:20px;
   padding:12px;
-  border-radius:14px;
+  margin-top:16px;
 }
 
 img{
   width:100%;
+  border-radius:16px;
+  margin-bottom:10px;
+}
+
+.status{
+  margin-top:10px;
+  font-size:12px;
+  opacity:0.7;
+}
+
+.song-result{
+  padding:8px;
+  border:1px solid #222;
   border-radius:12px;
-  margin-bottom:8px;
+  margin-top:6px;
+  cursor:pointer;
+  font-size:12px;
+}
+.song-result:hover{
+  background:#111;
 }
 </style>
 </head>
@@ -71,18 +90,26 @@ img{
 
 <div class="container">
 
+  <!-- UPLOAD -->
   <div class="card">
+
+    <div>NEW POST</div>
+
     <input type="file" id="file">
-    <textarea id="caption" placeholder="Write a caption..."></textarea>
+    <textarea id="caption" placeholder="Write caption..."></textarea>
 
-    <button id="uploadBtn">
-      <span class="material-symbols-outlined">send</span>
-      Upload
-    </button>
+    <!-- SONG SEARCH -->
+    <input type="text" id="songSearch" placeholder="Search a song...">
+    <div id="songResults"></div>
 
-    <div id="status"></div>
+    <audio id="previewAudio" controls style="width:100%; display:none; margin-top:10px;"></audio>
+
+    <button id="uploadBtn">UPLOAD</button>
+
+    <div id="status" class="status"></div>
   </div>
 
+  <!-- FEED -->
   <div id="feed"></div>
 
 </div>
@@ -97,13 +124,12 @@ const supabase = createClient(
 
 const BUCKET = "shared";
 
-// 🔴 METTI IL TUO DOMINIO TWICPICS
-const TWIC_DOMAIN = "https://shared.twic.pics";
-
 let user = null;
 let file = null;
+let selectedSong = null;
 
 const status = document.getElementById("status");
+const audio = document.getElementById("previewAudio");
 
 // INIT
 async function init(){
@@ -124,65 +150,131 @@ document.getElementById("file").onchange = e => {
   file = e.target.files[0];
 };
 
+// IMAGE PROCESSING (crop + compress)
+async function processImage(file){
+  return new Promise((resolve) => {
+    const img = new Image();
+    const reader = new FileReader();
+
+    reader.onload = e => img.src = e.target.result;
+
+    img.onload = () => {
+      const size = Math.min(img.width, img.height);
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 800;
+      canvas.height = 800;
+
+      const ctx = canvas.getContext("2d");
+
+      const sx = (img.width - size) / 2;
+      const sy = (img.height - size) / 2;
+
+      ctx.drawImage(img, sx, sy, size, size, 0, 0, 800, 800);
+
+      canvas.toBlob(blob => resolve(blob), "image/jpeg", 0.7);
+    };
+
+    reader.readAsDataURL(file);
+  });
+}
+
+// DEEZER SEARCH
+document.getElementById("songSearch").oninput = async (e) => {
+  const q = e.target.value;
+
+  if(q.length < 2){
+    document.getElementById("songResults").innerHTML = "";
+    return;
+  }
+
+  const res = await fetch(`https://api.deezer.com/search?q=${q}&output=jsonp`);
+  const text = await res.text();
+
+  const json = JSON.parse(text.replace(/^.+\(/,'').slice(0,-2));
+  const results = json.data;
+
+  const container = document.getElementById("songResults");
+  container.innerHTML = "";
+
+  results.slice(0,5).forEach(track => {
+    const div = document.createElement("div");
+    div.className = "song-result";
+
+    div.innerText = `${track.title} - ${track.artist.name}`;
+
+    div.onclick = () => {
+      selectedSong = track;
+
+      audio.src = track.preview;
+      audio.style.display = "block";
+      audio.play();
+
+      container.innerHTML = "";
+      document.getElementById("songSearch").value =
+        `${track.title} - ${track.artist.name}`;
+    };
+
+    container.appendChild(div);
+  });
+};
+
 // UPLOAD
 document.getElementById("uploadBtn").onclick = async () => {
 
-  if(!user) return setStatus("Not logged in");
-  if(!file) return setStatus("Select a file");
-
-  setStatus("Uploading...");
+  if(!user) return status.innerText = "NOT LOGGED IN";
+  if(!file) return status.innerText = "SELECT FILE";
 
   try {
-    const ext = file.name.split(".").pop();
-    const fileName = `${user.id}/${Date.now()}.${ext}`;
+    status.innerText = "PROCESSING IMAGE...";
 
-    // Upload su Supabase
+    const processedFile = await processImage(file);
+
+    const fileName = `${user.id}/${Date.now()}.jpg`;
+
+    status.innerText = "UPLOADING...";
+
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
-      .upload(fileName, file);
+      .upload(fileName, processedFile, {
+        contentType: "image/jpeg"
+      });
 
     if(uploadError) throw uploadError;
 
-    // URL pubblico Supabase
     const { data } = supabase.storage
       .from(BUCKET)
       .getPublicUrl(fileName);
 
-    const originalUrl = data.publicUrl;
-
-    // 🔴 URL TWICPICS CORRETTO
-    const twicUrl = `${TWIC_DOMAIN}/image?src=${encodeURIComponent(originalUrl)}&twic=v1/cover=800x600`;
-
-    // Salva nel DB
     const { error: dbError } = await supabase
       .from("posts")
       .insert([{
         user_id: user.id,
-        image_url: twicUrl,
-        caption: document.getElementById("caption").value
+        image_url: data.publicUrl,
+        caption: document.getElementById("caption").value,
+        song_title: selectedSong
+          ? `${selectedSong.title} - ${selectedSong.artist.name}`
+          : null,
+        song_preview: selectedSong ? selectedSong.preview : null
       }]);
 
     if(dbError) throw dbError;
 
-    setStatus("Upload OK ✅");
+    status.innerText = "UPLOAD SUCCESS";
+
     loadFeed();
 
   } catch(err){
-    setStatus("Error: " + (err.message || err));
+    status.innerText = "ERROR: " + (err.message || err);
   }
 };
 
 // FEED
 async function loadFeed(){
-  const { data, error } = await supabase
+  const { data } = await supabase
     .from("posts")
     .select("*")
     .order("created_at",{ascending:false});
-
-  if(error){
-    setStatus("Errore feed");
-    return;
-  }
 
   const feed = document.getElementById("feed");
   feed.innerHTML = "";
@@ -190,17 +282,22 @@ async function loadFeed(){
   data.forEach(p => {
     const div = document.createElement("div");
     div.className = "post";
+
     div.innerHTML = `
       <img src="${p.image_url}">
       <div>${p.caption || ""}</div>
+
+      ${p.song_title ? `<div style="margin-top:8px;">🎵 ${p.song_title}</div>` : ""}
+
+      ${p.song_preview ? `
+        <audio controls style="width:100%; margin-top:8px;">
+          <source src="${p.song_preview}" type="audio/mpeg">
+        </audio>
+      ` : ""}
     `;
+
     feed.appendChild(div);
   });
-}
-
-// STATUS
-function setStatus(msg){
-  status.innerText = msg;
 }
 </script>
 
