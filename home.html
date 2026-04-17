@@ -3,11 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared - Homepage</title>
+<title>Shared</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
+/* FIX BASE */
+*{
+  box-sizing: border-box;
+}
+
 body{
   margin:0;
   background:#000;
@@ -15,31 +20,45 @@ body{
   font-family:'Archivo Black', sans-serif;
 }
 
+/* CONTAINER */
 .container{
-  max-width:700px;
+  max-width:720px;
   margin:auto;
   padding:20px;
 }
 
+/* LOGO */
+.header{
+  text-align:center;
+  font-size:28px;
+  margin-bottom:20px;
+}
+
+/* CARD */
 .card{
   background:#0f0f0f;
   border:1px solid #222;
   border-radius:20px;
   padding:16px;
-  margin-bottom:20px;
+  margin-bottom:18px;
+  overflow:hidden;
 }
 
+/* INPUTS */
 input, textarea{
   width:100%;
-  padding:12px;
+  max-width:100%;
+  padding:10px;
   margin-top:10px;
   border-radius:14px;
   border:1px solid #222;
   background:#000;
   color:#fff;
   font-family:'Archivo Black', sans-serif;
+  outline:none;
 }
 
+/* BUTTON */
 button{
   width:100%;
   margin-top:12px;
@@ -48,10 +67,11 @@ button{
   border:none;
   background:#fff;
   color:#000;
-  font-family:'Archivo Black', sans-serif;
   cursor:pointer;
+  font-family:'Archivo Black', sans-serif;
 }
 
+/* POSTS */
 .post{
   background:#0f0f0f;
   border:1px solid #222;
@@ -66,22 +86,30 @@ img{
   margin-bottom:10px;
 }
 
-.status{
-  margin-top:10px;
-  font-size:12px;
-  opacity:0.7;
-}
-
-.song-result{
-  padding:8px;
+/* SONG RESULTS */
+.song{
+  padding:10px;
   border:1px solid #222;
   border-radius:12px;
-  margin-top:6px;
+  margin-top:8px;
   cursor:pointer;
   font-size:12px;
 }
-.song-result:hover{
+
+.song:hover{
   background:#111;
+}
+
+/* STATUS */
+.status{
+  font-size:12px;
+  opacity:0.7;
+  margin-top:10px;
+}
+
+audio{
+  width:100%;
+  margin-top:8px;
 }
 </style>
 </head>
@@ -90,23 +118,23 @@ img{
 
 <div class="container">
 
+  <!-- LOGO -->
+  <div class="header">Shared.</div>
+
   <!-- UPLOAD -->
   <div class="card">
 
-    <div>NEW POST</div>
-
     <input type="file" id="file">
-    <textarea id="caption" placeholder="Write caption..."></textarea>
+    <textarea id="caption" placeholder="Write a caption..."></textarea>
 
-    <!-- SONG SEARCH -->
     <input type="text" id="songSearch" placeholder="Search a song...">
     <div id="songResults"></div>
 
-    <audio id="previewAudio" controls style="width:100%; display:none; margin-top:10px;"></audio>
+    <audio id="preview" controls style="display:none"></audio>
 
     <button id="uploadBtn">UPLOAD</button>
 
-    <div id="status" class="status"></div>
+    <div class="status" id="status"></div>
   </div>
 
   <!-- FEED -->
@@ -129,9 +157,9 @@ let file = null;
 let selectedSong = null;
 
 const status = document.getElementById("status");
-const audio = document.getElementById("previewAudio");
+const preview = document.getElementById("preview");
 
-// INIT
+/* INIT */
 async function init(){
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -145,12 +173,12 @@ async function init(){
 }
 init();
 
-// FILE
+/* FILE */
 document.getElementById("file").onchange = e => {
   file = e.target.files[0];
 };
 
-// IMAGE PROCESSING (crop + compress)
+/* IMAGE PROCESS (crop + compress) */
 async function processImage(file){
   return new Promise((resolve) => {
     const img = new Image();
@@ -167,10 +195,14 @@ async function processImage(file){
 
       const ctx = canvas.getContext("2d");
 
-      const sx = (img.width - size) / 2;
-      const sy = (img.height - size) / 2;
-
-      ctx.drawImage(img, sx, sy, size, size, 0, 0, 800, 800);
+      ctx.drawImage(
+        img,
+        (img.width - size)/2,
+        (img.height - size)/2,
+        size,
+        size,
+        0,0,800,800
+      );
 
       canvas.toBlob(blob => resolve(blob), "image/jpeg", 0.7);
     };
@@ -179,7 +211,7 @@ async function processImage(file){
   });
 }
 
-// DEEZER SEARCH
+/* SONG SEARCH (Deezer) */
 document.getElementById("songSearch").oninput = async (e) => {
   const q = e.target.value;
 
@@ -188,27 +220,24 @@ document.getElementById("songSearch").oninput = async (e) => {
     return;
   }
 
-  const res = await fetch(`https://api.deezer.com/search?q=${q}&output=jsonp`);
-  const text = await res.text();
-
-  const json = JSON.parse(text.replace(/^.+\(/,'').slice(0,-2));
-  const results = json.data;
+  const res = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(q)}`);
+  const data = await res.json();
 
   const container = document.getElementById("songResults");
   container.innerHTML = "";
 
-  results.slice(0,5).forEach(track => {
-    const div = document.createElement("div");
-    div.className = "song-result";
+  data.data.slice(0,5).forEach(track => {
 
+    const div = document.createElement("div");
+    div.className = "song";
     div.innerText = `${track.title} - ${track.artist.name}`;
 
     div.onclick = () => {
       selectedSong = track;
 
-      audio.src = track.preview;
-      audio.style.display = "block";
-      audio.play();
+      preview.src = track.preview;
+      preview.style.display = "block";
+      preview.play();
 
       container.innerHTML = "";
       document.getElementById("songSearch").value =
@@ -219,58 +248,55 @@ document.getElementById("songSearch").oninput = async (e) => {
   });
 };
 
-// UPLOAD
+/* UPLOAD */
 document.getElementById("uploadBtn").onclick = async () => {
 
   if(!user) return status.innerText = "NOT LOGGED IN";
   if(!file) return status.innerText = "SELECT FILE";
 
-  try {
+  try{
     status.innerText = "PROCESSING IMAGE...";
 
-    const processedFile = await processImage(file);
+    const processed = await processImage(file);
 
     const fileName = `${user.id}/${Date.now()}.jpg`;
 
     status.innerText = "UPLOADING...";
 
-    const { error: uploadError } = await supabase.storage
+    const { error } = await supabase.storage
       .from(BUCKET)
-      .upload(fileName, processedFile, {
-        contentType: "image/jpeg"
+      .upload(fileName, processed, {
+        contentType:"image/jpeg"
       });
 
-    if(uploadError) throw uploadError;
+    if(error) throw error;
 
     const { data } = supabase.storage
       .from(BUCKET)
       .getPublicUrl(fileName);
 
-    const { error: dbError } = await supabase
-      .from("posts")
-      .insert([{
-        user_id: user.id,
-        image_url: data.publicUrl,
-        caption: document.getElementById("caption").value,
-        song_title: selectedSong
-          ? `${selectedSong.title} - ${selectedSong.artist.name}`
-          : null,
-        song_preview: selectedSong ? selectedSong.preview : null
-      }]);
+    await supabase.from("posts").insert([{
+      user_id: user.id,
+      image_url: data.publicUrl,
+      caption: document.getElementById("caption").value,
+      song_title: selectedSong
+        ? `${selectedSong.title} - ${selectedSong.artist.name}`
+        : null,
+      song_preview: selectedSong?.preview || null
+    }]);
 
-    if(dbError) throw dbError;
-
-    status.innerText = "UPLOAD SUCCESS";
+    status.innerText = "UPLOADED ✔";
 
     loadFeed();
 
   } catch(err){
-    status.innerText = "ERROR: " + (err.message || err);
+    status.innerText = err.message;
   }
 };
 
-// FEED
+/* FEED */
 async function loadFeed(){
+
   const { data } = await supabase
     .from("posts")
     .select("*")
@@ -280,6 +306,7 @@ async function loadFeed(){
   feed.innerHTML = "";
 
   data.forEach(p => {
+
     const div = document.createElement("div");
     div.className = "post";
 
@@ -290,7 +317,7 @@ async function loadFeed(){
       ${p.song_title ? `<div style="margin-top:8px;">🎵 ${p.song_title}</div>` : ""}
 
       ${p.song_preview ? `
-        <audio controls style="width:100%; margin-top:8px;">
+        <audio controls>
           <source src="${p.song_preview}" type="audio/mpeg">
         </audio>
       ` : ""}
