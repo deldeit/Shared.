@@ -37,10 +37,10 @@ button:disabled{opacity:.5}
 <div id="creator" class="card lock">
 
 <div id="dropzone" class="dropzone">Drag & drop image here</div>
-<input type="file" id="file">
+<input type="file" id="file" accept=".jpg,.jpeg,.png,.gif">
 <img id="preview" class="preview">
-<textarea id="caption"></textarea>
-<input id="songInput">
+<textarea id="caption" placeholder="Write something..."></textarea>
+<input id="songInput" placeholder="Search music...">
 <div id="suggestions" class="songs"></div>
 <button id="publishBtn">Publish</button>
 
@@ -53,7 +53,12 @@ button:disabled{opacity:.5}
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient("https://cnhaonawapuahzoctqav.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes");
+const supabase = createClient(
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+);
+
+const TWIC_DOMAIN = "https://shared.twic.pics";
 
 let user=null;
 
@@ -120,7 +125,7 @@ window.handleDeezer=function(data){
   data.data?.slice(0,5).forEach(t=>{
     const d=document.createElement("div");
     d.className="song";
-    d.innerHTML=`<span>${t.title}</span>`;
+    d.innerHTML=`<span>${t.title} - ${t.artist.name}</span>`;
     d.onclick=()=>{selectedMusic=t};
     box.appendChild(d);
   });
@@ -129,9 +134,10 @@ window.handleDeezer=function(data){
 let debounce;
 document.getElementById("songInput").oninput=e=>{
   clearTimeout(debounce);
+  if(e.target.value.length<2)return;
   debounce=setTimeout(()=>{
     const s=document.createElement("script");
-    s.src=`https://api.deezer.com/search?q=${e.target.value}&output=jsonp&callback=handleDeezer`;
+    s.src=`https://api.deezer.com/search?q=${encodeURIComponent(e.target.value)}&output=jsonp&callback=handleDeezer`;
     document.body.appendChild(s);
     setTimeout(()=>s.remove(),2000);
   },300);
@@ -141,29 +147,71 @@ document.getElementById("publishBtn").onclick=async()=>{
   if(!user)return alert("login required");
   if(!imageFile)return alert("no image");
 
-  const fileName=user.id+"-"+Date.now();
+  const btn=document.getElementById("publishBtn");
+  btn.disabled=true;
+  btn.textContent="Uploading...";
 
-  await supabase.storage.from("shared").upload(fileName,imageFile);
+  try{
+    const ext=imageFile.name.split('.').pop();
+    const fileName=user.id+"-"+Date.now()+"."+ext;
 
-  const { data }=supabase.storage.from("shared").getPublicUrl(fileName);
+    const { error }=await supabase.storage
+      .from("images")
+      .upload(fileName,imageFile,{contentType:imageFile.type});
 
-  await supabase.from("posts").insert([{
-    user_id:user.id,
-    image_url:data.publicUrl,
-    caption:document.getElementById("caption").value
-  }]);
+    if(error)throw error;
 
-  loadFeed();
+    const { data }=supabase.storage
+      .from("images")
+      .getPublicUrl(fileName);
+
+    const twicUrl = TWIC_DOMAIN + "/shared/" + fileName;
+
+    await supabase.from("posts").insert([{
+      user_id:user.id,
+      image_url:twicUrl,
+      caption:document.getElementById("caption").value,
+      music_title:selectedMusic?.title||null,
+      music_preview:selectedMusic?.preview||null
+    }]);
+
+    document.getElementById("caption").value="";
+    document.getElementById("file").value="";
+    document.getElementById("preview").style.display="none";
+    document.getElementById("suggestions").innerHTML="";
+
+    loadFeed();
+
+  }catch(e){
+    alert(e.message);
+    console.error(e);
+  }
+
+  btn.disabled=false;
+  btn.textContent="Publish";
 };
 
 async function loadFeed(){
-  const { data }=await supabase.from("posts").select("*").order("created_at",{ascending:false});
+  const { data }=await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at",{ascending:false});
+
   const feed=document.getElementById("feed");
   feed.innerHTML="";
+
   data.forEach(p=>{
     const d=document.createElement("div");
     d.className="post";
-    d.innerHTML=`<img src="${p.image_url}"><div class="post-body">${p.caption||""}</div>`;
+
+    d.innerHTML=`
+      <img src="${p.image_url}?twic=v1/cover=1/resize=800">
+      <div class="post-body">
+        <div>${p.caption||""}</div>
+        <div>${p.music_title||""}</div>
+      </div>
+    `;
+
     feed.appendChild(d);
   });
 }
