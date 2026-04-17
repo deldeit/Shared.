@@ -3,12 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared</title>
+<title>Shared - feed</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -23,6 +25,7 @@ body{
   padding:20px;
 }
 
+/* HEADER */
 .header{
   text-align:center;
   font-size:28px;
@@ -36,12 +39,13 @@ body{
   border-radius:20px;
   padding:16px;
   margin-bottom:18px;
+  overflow:hidden;
 }
 
-/* IMAGE PREVIEW SQUIRCLE */
+/* IMAGE PREVIEW */
 .preview{
-  width:100px;
-  height:100px;
+  width:110px;
+  height:110px;
   border-radius:28px;
   background:#111;
   margin-bottom:10px;
@@ -58,12 +62,12 @@ body{
   object-fit:cover;
 }
 
-/* HIDDEN FILE INPUT */
+/* FILE INPUT */
 input[type="file"]{
   display:none;
 }
 
-/* CUSTOM BUTTON */
+/* FILE BUTTON */
 .file-btn{
   width:100%;
   padding:12px;
@@ -72,9 +76,11 @@ input[type="file"]{
   background:#000;
   color:#fff;
   cursor:pointer;
+  display:block;
+  text-align:center;
 }
 
-/* TEXT INPUTS */
+/* INPUTS */
 input, textarea{
   width:100%;
   padding:10px;
@@ -83,10 +89,10 @@ input, textarea{
   border:1px solid #222;
   background:#000;
   color:#fff;
-  font-family:'Archivo Black';
+  font-family:'Archivo Black', sans-serif;
 }
 
-/* SONG */
+/* SONG ITEM */
 .song-item{
   padding:10px;
   border:1px solid #222;
@@ -100,7 +106,31 @@ input, textarea{
   background:#111;
 }
 
-/* POSTS */
+/* UPLOAD BUTTON */
+button{
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  border-radius:16px;
+  border:none;
+  background:linear-gradient(135deg,#ffffff,#cfcfcf);
+  color:#000;
+  cursor:pointer;
+  font-family:'Archivo Black';
+  font-size:14px;
+  letter-spacing:1px;
+  transition:0.15s ease;
+}
+
+button:hover{
+  transform:scale(1.02);
+}
+
+button:active{
+  transform:scale(0.98);
+}
+
+/* POST */
 .post{
   background:#0f0f0f;
   border:1px solid #222;
@@ -116,14 +146,10 @@ img{
   margin-bottom:10px;
 }
 
+/* SONG TEXT */
 .song-title{
   font-size:18px;
   margin-top:10px;
-}
-
-.song-sub{
-  font-size:12px;
-  opacity:0.6;
 }
 </style>
 </head>
@@ -137,7 +163,6 @@ img{
   <!-- UPLOAD -->
   <div class="card">
 
-    <!-- IMAGE PREVIEW -->
     <div class="preview" id="previewBox">+</div>
 
     <label class="file-btn">
@@ -147,7 +172,6 @@ img{
 
     <textarea id="caption" placeholder="Write caption..."></textarea>
 
-    <!-- SONG -->
     <input id="songInput" placeholder="Search song...">
     <div id="suggestions"></div>
     <div id="songList"></div>
@@ -172,9 +196,12 @@ const BUCKET = "shared";
 
 let user = null;
 let file = null;
-let songs = [];
 let croppedBlob = null;
+let selectedSong = null;
+
+/* GLOBAL AUDIO */
 let globalAudio = new Audio();
+let currentPlayingId = null;
 
 /* INIT */
 async function init(){
@@ -185,8 +212,8 @@ async function init(){
 }
 init();
 
-/* IMAGE PICK + CROPPING PREVIEW */
-document.getElementById("file").onchange = async e => {
+/* IMAGE PROCESS */
+document.getElementById("file").onchange = e => {
   file = e.target.files[0];
   if(!file) return;
 
@@ -211,21 +238,19 @@ document.getElementById("file").onchange = async e => {
       0,0,800,800
     );
 
-    canvas.toBlob(blob => croppedBlob = blob, "image/jpeg", 0.7);
+    canvas.toBlob(blob => {
+      croppedBlob = blob;
 
-    const url = URL.createObjectURL(croppedBlob);
-
-    document.getElementById("previewBox").innerHTML =
-      `<img src="${url}">`;
+      const url = URL.createObjectURL(blob);
+      document.getElementById("previewBox").innerHTML =
+        `<img src="${url}">`;
+    }, "image/jpeg", 0.7);
   };
 
   reader.readAsDataURL(file);
 };
 
-/* =========================
-   DEEZER (YOUR FUNCTION)
-========================= */
-
+/* DEEZER */
 window.handleDeezer = function(data){
   const box = document.getElementById('suggestions');
   box.innerHTML = '';
@@ -236,12 +261,16 @@ window.handleDeezer = function(data){
     div.textContent = `${t.title} - ${t.artist.name}`;
 
     div.onclick = () => {
-      songs.push({ title: div.textContent, preview: t.preview });
+      selectedSong = {
+        title: `${t.title} - ${t.artist.name}`,
+        preview: t.preview
+      };
 
-      document.getElementById('songList')
-        .insertAdjacentHTML('beforeend',
-          `<div class="song-item">${div.textContent}</div>`
-        );
+      document.getElementById('songList').innerHTML =
+        `<div class="song-item">${selectedSong.title}</div>`;
+
+      globalAudio.src = selectedSong.preview;
+      globalAudio.play();
 
       box.innerHTML = '';
       document.getElementById('songInput').value = '';
@@ -285,15 +314,16 @@ document.getElementById("uploadBtn").onclick = async () => {
     user_id: user.id,
     image_url: data.publicUrl,
     caption: document.getElementById("caption").value,
-    song_title: songs[0]?.title || null,
-    song_preview: songs[0]?.preview || null
+    song_title: selectedSong?.title || null,
+    song_preview: selectedSong?.preview || null
   }]);
 
   loadFeed();
 };
 
-/* FEED (tap to play) */
+/* FEED AUDIO TOGGLE */
 async function loadFeed(){
+
   const { data } = await supabase
     .from("posts")
     .select("*")
@@ -302,16 +332,29 @@ async function loadFeed(){
   const feed = document.getElementById("feed");
   feed.innerHTML = "";
 
-  data.forEach(p => {
+  data.forEach((p, index) => {
+
+    const postId = p.id || index;
 
     const div = document.createElement("div");
     div.className = "post";
 
     div.onclick = () => {
-      if(p.song_preview){
-        globalAudio.src = p.song_preview;
-        globalAudio.play();
+
+      if(!p.song_preview) return;
+
+      if(currentPlayingId === postId){
+        if(globalAudio.paused){
+          globalAudio.play();
+        } else {
+          globalAudio.pause();
+        }
+        return;
       }
+
+      currentPlayingId = postId;
+      globalAudio.src = p.song_preview;
+      globalAudio.play();
     };
 
     div.innerHTML = `
@@ -320,7 +363,6 @@ async function loadFeed(){
 
       ${p.song_title ? `
         <div class="song-title">${p.song_title}</div>
-        <div class="song-sub">tap to play</div>
       ` : ""}
     `;
 
