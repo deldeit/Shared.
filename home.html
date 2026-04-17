@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Homepage</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
@@ -35,7 +35,6 @@ button:disabled{opacity:.5}
 <div class="container">
 
 <div id="creator" class="card lock">
-
 <div id="dropzone" class="dropzone">Drag & drop image here</div>
 <input type="file" id="file" accept=".jpg,.jpeg,.png,.gif">
 <img id="preview" class="preview">
@@ -43,7 +42,6 @@ button:disabled{opacity:.5}
 <input id="songInput" placeholder="Search music...">
 <div id="suggestions" class="songs"></div>
 <button id="publishBtn">Publish</button>
-
 </div>
 
 <div id="feed"></div>
@@ -54,11 +52,11 @@ button:disabled{opacity:.5}
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
-  "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+  "https://YOUR_PROJECT.supabase.co",
+  "YOUR_ANON_KEY"
 );
 
-const TWIC_DOMAIN = "https://shared.twic.pics";
+const TWIC_DOMAIN = "https://YOUR_TWIC_DOMAIN.twic.pics";
 
 let user=null;
 
@@ -67,7 +65,6 @@ const creator=document.getElementById("creator");
 
 async function init(){
   const { data:{ session } } = await supabase.auth.getSession();
-
   if(session){
     user=session.user;
     unlock();
@@ -143,6 +140,19 @@ document.getElementById("songInput").oninput=e=>{
   },300);
 };
 
+function fullReset(){
+  imageFile=null;
+  selectedMusic=null;
+  audio=null;
+  document.getElementById("caption").value="";
+  document.getElementById("file").value="";
+  document.getElementById("songInput").value="";
+  document.getElementById("suggestions").innerHTML="";
+  const preview=document.getElementById("preview");
+  preview.src="";
+  preview.style.display="none";
+}
+
 document.getElementById("publishBtn").onclick=async()=>{
   if(!user)return alert("login required");
   if(!imageFile)return alert("no image");
@@ -155,13 +165,20 @@ document.getElementById("publishBtn").onclick=async()=>{
     const ext=imageFile.name.split('.').pop();
     const fileName=user.id+"-"+Date.now()+"."+ext;
 
-    const { error }=await supabase.storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from("images")
-      .upload(fileName,imageFile,{contentType:imageFile.type});
+      .upload(fileName,imageFile,{
+        contentType:imageFile.type,
+        upsert:false
+      });
 
-    if(error)throw error;
+    if(uploadError){
+      console.error(uploadError);
+      alert(uploadError.message);
+      return;
+    }
 
-    const { data }=supabase.storage
+    const { data: publicData } = supabase.storage
       .from("images")
       .getPublicUrl(fileName);
 
@@ -175,16 +192,13 @@ document.getElementById("publishBtn").onclick=async()=>{
       music_preview:selectedMusic?.preview||null
     }]);
 
-    document.getElementById("caption").value="";
-    document.getElementById("file").value="";
-    document.getElementById("preview").style.display="none";
-    document.getElementById("suggestions").innerHTML="";
-
+    fullReset();
     loadFeed();
+    window.scrollTo(0,0);
 
   }catch(e){
-    alert(e.message);
     console.error(e);
+    alert(e.message);
   }
 
   btn.disabled=false;
@@ -203,7 +217,6 @@ async function loadFeed(){
   data.forEach(p=>{
     const d=document.createElement("div");
     d.className="post";
-
     d.innerHTML=`
       <img src="${p.image_url}?twic=v1/cover=1/resize=800">
       <div class="post-body">
@@ -211,7 +224,6 @@ async function loadFeed(){
         <div>${p.music_title||""}</div>
       </div>
     `;
-
     feed.appendChild(d);
   });
 }
