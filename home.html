@@ -8,9 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
-/* FIX BASE */
 *{
-  box-sizing: border-box;
+  box-sizing:border-box;
 }
 
 body{
@@ -20,34 +19,28 @@ body{
   font-family:'Archivo Black', sans-serif;
 }
 
-/* CONTAINER */
 .container{
   max-width:720px;
   margin:auto;
   padding:20px;
 }
 
-/* LOGO */
 .header{
   text-align:center;
   font-size:28px;
   margin-bottom:20px;
 }
 
-/* CARD */
 .card{
   background:#0f0f0f;
   border:1px solid #222;
   border-radius:20px;
   padding:16px;
   margin-bottom:18px;
-  overflow:hidden;
 }
 
-/* INPUTS */
 input, textarea{
   width:100%;
-  max-width:100%;
   padding:10px;
   margin-top:10px;
   border-radius:14px;
@@ -55,10 +48,8 @@ input, textarea{
   background:#000;
   color:#fff;
   font-family:'Archivo Black', sans-serif;
-  outline:none;
 }
 
-/* BUTTON */
 button{
   width:100%;
   margin-top:12px;
@@ -68,16 +59,20 @@ button{
   background:#fff;
   color:#000;
   cursor:pointer;
-  font-family:'Archivo Black', sans-serif;
 }
 
-/* POSTS */
 .post{
   background:#0f0f0f;
   border:1px solid #222;
   border-radius:20px;
   padding:12px;
   margin-top:16px;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+.post:active{
+  transform:scale(0.99);
 }
 
 img{
@@ -86,8 +81,19 @@ img{
   margin-bottom:10px;
 }
 
-/* SONG RESULTS */
-.song{
+/* SONG TITLE BIGGER */
+.song-title{
+  font-size:18px;
+  margin-top:10px;
+}
+
+.song-sub{
+  font-size:12px;
+  opacity:0.7;
+  margin-top:4px;
+}
+
+.song-result{
   padding:10px;
   border:1px solid #222;
   border-radius:12px;
@@ -96,20 +102,14 @@ img{
   font-size:12px;
 }
 
-.song:hover{
+.song-result:hover{
   background:#111;
 }
 
-/* STATUS */
 .status{
   font-size:12px;
   opacity:0.7;
   margin-top:10px;
-}
-
-audio{
-  width:100%;
-  margin-top:8px;
 }
 </style>
 </head>
@@ -118,7 +118,6 @@ audio{
 
 <div class="container">
 
-  <!-- LOGO -->
   <div class="header">Shared.</div>
 
   <!-- UPLOAD -->
@@ -129,8 +128,6 @@ audio{
 
     <input type="text" id="songSearch" placeholder="Search a song...">
     <div id="songResults"></div>
-
-    <audio id="preview" controls style="display:none"></audio>
 
     <button id="uploadBtn">UPLOAD</button>
 
@@ -156,8 +153,8 @@ let user = null;
 let file = null;
 let selectedSong = null;
 
-const status = document.getElementById("status");
-const preview = document.getElementById("preview");
+/* AUDIO GLOBAL (IMPORTANT) */
+let globalAudio = new Audio();
 
 /* INIT */
 async function init(){
@@ -178,7 +175,7 @@ document.getElementById("file").onchange = e => {
   file = e.target.files[0];
 };
 
-/* IMAGE PROCESS (crop + compress) */
+/* IMAGE PROCESS */
 async function processImage(file){
   return new Promise((resolve) => {
     const img = new Image();
@@ -211,7 +208,7 @@ async function processImage(file){
   });
 }
 
-/* SONG SEARCH (Deezer) */
+/* DEEZER SEARCH */
 document.getElementById("songSearch").oninput = async (e) => {
   const q = e.target.value;
 
@@ -229,15 +226,14 @@ document.getElementById("songSearch").oninput = async (e) => {
   data.data.slice(0,5).forEach(track => {
 
     const div = document.createElement("div");
-    div.className = "song";
+    div.className = "song-result";
     div.innerText = `${track.title} - ${track.artist.name}`;
 
     div.onclick = () => {
       selectedSong = track;
 
-      preview.src = track.preview;
-      preview.style.display = "block";
-      preview.play();
+      globalAudio.src = track.preview;
+      globalAudio.play();
 
       container.innerHTML = "";
       document.getElementById("songSearch").value =
@@ -251,47 +247,33 @@ document.getElementById("songSearch").oninput = async (e) => {
 /* UPLOAD */
 document.getElementById("uploadBtn").onclick = async () => {
 
-  if(!user) return status.innerText = "NOT LOGGED IN";
-  if(!file) return status.innerText = "SELECT FILE";
+  if(!user) return;
+  if(!file) return;
 
-  try{
-    status.innerText = "PROCESSING IMAGE...";
+  const processed = await processImage(file);
+  const fileName = `${user.id}/${Date.now()}.jpg`;
 
-    const processed = await processImage(file);
+  await supabase.storage
+    .from(BUCKET)
+    .upload(fileName, processed, {
+      contentType:"image/jpeg"
+    });
 
-    const fileName = `${user.id}/${Date.now()}.jpg`;
+  const { data } = supabase.storage
+    .from(BUCKET)
+    .getPublicUrl(fileName);
 
-    status.innerText = "UPLOADING...";
+  await supabase.from("posts").insert([{
+    user_id: user.id,
+    image_url: data.publicUrl,
+    caption: document.getElementById("caption").value,
+    song_title: selectedSong
+      ? `${selectedSong.title} - ${selectedSong.artist.name}`
+      : null,
+    song_preview: selectedSong?.preview || null
+  }]);
 
-    const { error } = await supabase.storage
-      .from(BUCKET)
-      .upload(fileName, processed, {
-        contentType:"image/jpeg"
-      });
-
-    if(error) throw error;
-
-    const { data } = supabase.storage
-      .from(BUCKET)
-      .getPublicUrl(fileName);
-
-    await supabase.from("posts").insert([{
-      user_id: user.id,
-      image_url: data.publicUrl,
-      caption: document.getElementById("caption").value,
-      song_title: selectedSong
-        ? `${selectedSong.title} - ${selectedSong.artist.name}`
-        : null,
-      song_preview: selectedSong?.preview || null
-    }]);
-
-    status.innerText = "UPLOADED ✔";
-
-    loadFeed();
-
-  } catch(err){
-    status.innerText = err.message;
-  }
+  loadFeed();
 };
 
 /* FEED */
@@ -310,16 +292,20 @@ async function loadFeed(){
     const div = document.createElement("div");
     div.className = "post";
 
+    div.onclick = () => {
+      if(p.song_preview){
+        globalAudio.src = p.song_preview;
+        globalAudio.play();
+      }
+    };
+
     div.innerHTML = `
       <img src="${p.image_url}">
       <div>${p.caption || ""}</div>
 
-      ${p.song_title ? `<div style="margin-top:8px;">🎵 ${p.song_title}</div>` : ""}
-
-      ${p.song_preview ? `
-        <audio controls>
-          <source src="${p.song_preview}" type="audio/mpeg">
-        </audio>
+      ${p.song_title ? `
+        <div class="song-title">🎵 ${p.song_title}</div>
+        <div class="song-sub">Tap to play</div>
       ` : ""}
     `;
 
