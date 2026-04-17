@@ -8,9 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 body{
   margin:0;
@@ -31,6 +29,7 @@ body{
   margin-bottom:20px;
 }
 
+/* CARD */
 .card{
   background:#0f0f0f;
   border:1px solid #222;
@@ -39,6 +38,43 @@ body{
   margin-bottom:18px;
 }
 
+/* IMAGE PREVIEW SQUIRCLE */
+.preview{
+  width:100px;
+  height:100px;
+  border-radius:28px;
+  background:#111;
+  margin-bottom:10px;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #222;
+}
+
+.preview img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* HIDDEN FILE INPUT */
+input[type="file"]{
+  display:none;
+}
+
+/* CUSTOM BUTTON */
+.file-btn{
+  width:100%;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid #222;
+  background:#000;
+  color:#fff;
+  cursor:pointer;
+}
+
+/* TEXT INPUTS */
 input, textarea{
   width:100%;
   padding:10px;
@@ -47,20 +83,24 @@ input, textarea{
   border:1px solid #222;
   background:#000;
   color:#fff;
-  font-family:'Archivo Black', sans-serif;
+  font-family:'Archivo Black';
 }
 
-button{
-  width:100%;
-  margin-top:12px;
-  padding:12px;
-  border-radius:14px;
-  border:none;
-  background:#fff;
-  color:#000;
+/* SONG */
+.song-item{
+  padding:10px;
+  border:1px solid #222;
+  border-radius:12px;
+  margin-top:6px;
   cursor:pointer;
+  font-size:12px;
 }
 
+.song-item:hover{
+  background:#111;
+}
+
+/* POSTS */
 .post{
   background:#0f0f0f;
   border:1px solid #222;
@@ -68,11 +108,6 @@ button{
   padding:12px;
   margin-top:16px;
   cursor:pointer;
-  transition:0.15s;
-}
-
-.post:active{
-  transform:scale(0.99);
 }
 
 img{
@@ -81,7 +116,6 @@ img{
   margin-bottom:10px;
 }
 
-/* SONG TITLE BIGGER */
 .song-title{
   font-size:18px;
   margin-top:10px;
@@ -89,27 +123,7 @@ img{
 
 .song-sub{
   font-size:12px;
-  opacity:0.7;
-  margin-top:4px;
-}
-
-.song-result{
-  padding:10px;
-  border:1px solid #222;
-  border-radius:12px;
-  margin-top:8px;
-  cursor:pointer;
-  font-size:12px;
-}
-
-.song-result:hover{
-  background:#111;
-}
-
-.status{
-  font-size:12px;
-  opacity:0.7;
-  margin-top:10px;
+  opacity:0.6;
 }
 </style>
 </head>
@@ -123,15 +137,22 @@ img{
   <!-- UPLOAD -->
   <div class="card">
 
-    <input type="file" id="file">
-    <textarea id="caption" placeholder="Write a caption..."></textarea>
+    <!-- IMAGE PREVIEW -->
+    <div class="preview" id="previewBox">+</div>
 
-    <input type="text" id="songSearch" placeholder="Search a song...">
-    <div id="songResults"></div>
+    <label class="file-btn">
+      Choose Image
+      <input type="file" id="file">
+    </label>
+
+    <textarea id="caption" placeholder="Write caption..."></textarea>
+
+    <!-- SONG -->
+    <input id="songInput" placeholder="Search song...">
+    <div id="suggestions"></div>
+    <div id="songList"></div>
 
     <button id="uploadBtn">UPLOAD</button>
-
-    <div class="status" id="status"></div>
   </div>
 
   <!-- FEED -->
@@ -151,111 +172,108 @@ const BUCKET = "shared";
 
 let user = null;
 let file = null;
-let selectedSong = null;
-
-/* AUDIO GLOBAL (IMPORTANT) */
+let songs = [];
+let croppedBlob = null;
 let globalAudio = new Audio();
 
 /* INIT */
 async function init(){
-  const { data: { session } } = await supabase.auth.getSession();
-
-  if(!session){
-    window.location.href = "index.html";
-    return;
-  }
-
+  const { data:{session} } = await supabase.auth.getSession();
+  if(!session) location.href="index.html";
   user = session.user;
   loadFeed();
 }
 init();
 
-/* FILE */
-document.getElementById("file").onchange = e => {
+/* IMAGE PICK + CROPPING PREVIEW */
+document.getElementById("file").onchange = async e => {
   file = e.target.files[0];
+  if(!file) return;
+
+  const img = new Image();
+  const reader = new FileReader();
+
+  reader.onload = ev => img.src = ev.target.result;
+
+  img.onload = () => {
+    const size = Math.min(img.width, img.height);
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 800;
+
+    const ctx = canvas.getContext("2d");
+
+    ctx.drawImage(img,
+      (img.width-size)/2,
+      (img.height-size)/2,
+      size,size,
+      0,0,800,800
+    );
+
+    canvas.toBlob(blob => croppedBlob = blob, "image/jpeg", 0.7);
+
+    const url = URL.createObjectURL(croppedBlob);
+
+    document.getElementById("previewBox").innerHTML =
+      `<img src="${url}">`;
+  };
+
+  reader.readAsDataURL(file);
 };
 
-/* IMAGE PROCESS */
-async function processImage(file){
-  return new Promise((resolve) => {
-    const img = new Image();
-    const reader = new FileReader();
+/* =========================
+   DEEZER (YOUR FUNCTION)
+========================= */
 
-    reader.onload = e => img.src = e.target.result;
+window.handleDeezer = function(data){
+  const box = document.getElementById('suggestions');
+  box.innerHTML = '';
 
-    img.onload = () => {
-      const size = Math.min(img.width, img.height);
-
-      const canvas = document.createElement("canvas");
-      canvas.width = 800;
-      canvas.height = 800;
-
-      const ctx = canvas.getContext("2d");
-
-      ctx.drawImage(
-        img,
-        (img.width - size)/2,
-        (img.height - size)/2,
-        size,
-        size,
-        0,0,800,800
-      );
-
-      canvas.toBlob(blob => resolve(blob), "image/jpeg", 0.7);
-    };
-
-    reader.readAsDataURL(file);
-  });
-}
-
-/* DEEZER SEARCH */
-document.getElementById("songSearch").oninput = async (e) => {
-  const q = e.target.value;
-
-  if(q.length < 2){
-    document.getElementById("songResults").innerHTML = "";
-    return;
-  }
-
-  const res = await fetch(`https://api.deezer.com/search?q=${encodeURIComponent(q)}`);
-  const data = await res.json();
-
-  const container = document.getElementById("songResults");
-  container.innerHTML = "";
-
-  data.data.slice(0,5).forEach(track => {
-
-    const div = document.createElement("div");
-    div.className = "song-result";
-    div.innerText = `${track.title} - ${track.artist.name}`;
+  data.data?.slice(0,5).forEach(t => {
+    const div = document.createElement('div');
+    div.className = 'song-item';
+    div.textContent = `${t.title} - ${t.artist.name}`;
 
     div.onclick = () => {
-      selectedSong = track;
+      songs.push({ title: div.textContent, preview: t.preview });
 
-      globalAudio.src = track.preview;
-      globalAudio.play();
+      document.getElementById('songList')
+        .insertAdjacentHTML('beforeend',
+          `<div class="song-item">${div.textContent}</div>`
+        );
 
-      container.innerHTML = "";
-      document.getElementById("songSearch").value =
-        `${track.title} - ${track.artist.name}`;
+      box.innerHTML = '';
+      document.getElementById('songInput').value = '';
     };
 
-    container.appendChild(div);
+    box.appendChild(div);
   });
 };
+
+let debounce;
+document.getElementById('songInput').addEventListener('input', e => {
+  clearTimeout(debounce);
+  if(e.target.value.length < 2) return;
+
+  debounce = setTimeout(() => {
+    const s = document.createElement('script');
+    s.src = `https://api.deezer.com/search?q=${encodeURIComponent(e.target.value)}&output=jsonp&callback=handleDeezer`;
+    document.body.appendChild(s);
+    setTimeout(() => s.remove(), 2000);
+  }, 250);
+});
 
 /* UPLOAD */
 document.getElementById("uploadBtn").onclick = async () => {
 
-  if(!user) return;
-  if(!file) return;
+  if(!user || !croppedBlob) return;
 
-  const processed = await processImage(file);
   const fileName = `${user.id}/${Date.now()}.jpg`;
 
   await supabase.storage
     .from(BUCKET)
-    .upload(fileName, processed, {
+    .upload(fileName, croppedBlob, {
       contentType:"image/jpeg"
     });
 
@@ -267,18 +285,15 @@ document.getElementById("uploadBtn").onclick = async () => {
     user_id: user.id,
     image_url: data.publicUrl,
     caption: document.getElementById("caption").value,
-    song_title: selectedSong
-      ? `${selectedSong.title} - ${selectedSong.artist.name}`
-      : null,
-    song_preview: selectedSong?.preview || null
+    song_title: songs[0]?.title || null,
+    song_preview: songs[0]?.preview || null
   }]);
 
   loadFeed();
 };
 
-/* FEED */
+/* FEED (tap to play) */
 async function loadFeed(){
-
   const { data } = await supabase
     .from("posts")
     .select("*")
@@ -304,8 +319,8 @@ async function loadFeed(){
       <div>${p.caption || ""}</div>
 
       ${p.song_title ? `
-        <div class="song-title">🎵 ${p.song_title}</div>
-        <div class="song-sub">Tap to play</div>
+        <div class="song-title">${p.song_title}</div>
+        <div class="song-sub">tap to play</div>
       ` : ""}
     `;
 
