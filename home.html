@@ -3,24 +3,100 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared</title>
+<title>Shared Home</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:'Archivo Black',sans-serif}
-body{background:#000;color:#fff;display:flex;flex-direction:column;align-items:center}
-header{width:100%;max-width:900px;padding:20px;font-size:22px}
-.container{width:100%;max-width:900px;padding:20px;display:flex;flex-direction:column;gap:18px}
-.card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:16px;display:flex;flex-direction:column;gap:12px}
-.dropzone{border:1px dashed rgba(255,255,255,.25);border-radius:14px;padding:18px;text-align:center;font-size:13px}
-.preview{width:100%;max-height:340px;object-fit:cover;border-radius:14px;display:none}
-input,textarea{background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.08);color:#fff;padding:10px;border-radius:12px}
-button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;font-weight:600;cursor:pointer}
-.post img{width:100%}
-.post-body{padding:12px;font-size:13px}
-.lock{opacity:.4;pointer-events:none}
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Archivo Black',sans-serif;
+}
+
+body{
+  background:black;
+  color:white;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+header{
+  width:100%;
+  max-width:900px;
+  padding:20px;
+  font-size:22px;
+}
+
+.container{
+  width:100%;
+  max-width:900px;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+.card{
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  padding:16px;
+  border-radius:16px;
+}
+
+.dropzone{
+  border:1px dashed rgba(255,255,255,0.3);
+  padding:16px;
+  text-align:center;
+  border-radius:12px;
+}
+
+.preview{
+  width:100%;
+  max-height:300px;
+  object-fit:cover;
+  display:none;
+  border-radius:12px;
+  margin-top:10px;
+}
+
+input,textarea{
+  width:100%;
+  padding:10px;
+  margin-top:10px;
+  border-radius:10px;
+  border:none;
+  background:#111;
+  color:white;
+}
+
+button{
+  margin-top:10px;
+  padding:12px;
+  width:100%;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  background:white;
+  color:black;
+  font-weight:bold;
+}
+
+.post img{
+  width:100%;
+  border-radius:12px;
+}
+
+.post{
+  margin-top:10px;
+}
+
+.post-body{
+  padding:10px;
+  font-size:13px;
+}
 </style>
 </head>
 
@@ -30,63 +106,75 @@ button{padding:12px;border:none;border-radius:12px;background:#fff;color:#000;fo
 
 <div class="container">
 
-<div id="creator" class="card lock">
-<div id="dropzone" class="dropzone">Drag & drop image here</div>
-<input type="file" id="file" accept=".jpg,.jpeg,.png,.gif">
-<img id="preview" class="preview">
-<textarea id="caption" placeholder="Write something..."></textarea>
-<button id="publishBtn">Publish</button>
-</div>
+  <div class="card" id="creator">
+    <div class="dropzone" id="dropzone">Drop image here</div>
 
-<div id="feed"></div>
+    <input type="file" id="file" accept="image/*">
+    <img id="preview" class="preview">
+
+    <textarea id="caption" placeholder="Write caption..."></textarea>
+
+    <button id="publishBtn">Publish</button>
+  </div>
+
+  <div id="feed"></div>
 
 </div>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-// 🔴 CONFIGURA QUI
 const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-const BUCKET = "shared"; // oppure "shared"
-const TWIC_DOMAIN = "https://shared.twic.pics"; // opzionale
+const BUCKET = "shared"; // 🔴 cambia in "images" se serve
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
-window.user = null;
-const creator = document.getElementById("creator");
+let currentUser = null;
+let imageFile = null;
 
-async function init(){
-  const { data:{ session } } = await supabase.auth.getSession();
-
-  if(!session){
-    window.location.replace("index.html");
-    return;
-  }
-
-  window.user = session.user;
-  creator.classList.remove("lock");
+// 🔴 SESSIONE SICURA
+async function getUser(){
+  const { data: { user } } = await supabase.auth.getUser();
+  currentUser = user;
+  return user;
 }
 
-// AUTH CHANGE
-supabase.auth.onAuthStateChange((event,session)=>{
-  if(!session){
-    window.location.replace("index.html");
+// 🔴 INIT
+async function init(){
+  const user = await getUser();
+
+  if(!user){
+    window.location.href = "index.html";
     return;
   }
-  window.user = session.user;
-  creator.classList.remove("lock");
+
+  loadFeed();
+}
+
+supabase.auth.onAuthStateChange(async () => {
+  await getUser();
 });
 
-// FILE
-let imageFile = null;
+// 🔴 FILE HANDLING
+document.getElementById("file").onchange = e => {
+  handleFile(e.target.files[0]);
+};
+
+document.getElementById("dropzone").ondragover = e => e.preventDefault();
+
+document.getElementById("dropzone").ondrop = e => {
+  e.preventDefault();
+  handleFile(e.dataTransfer.files[0]);
+};
 
 function handleFile(file){
   if(!file) return;
+
   imageFile = file;
 
   const reader = new FileReader();
-  reader.onload = e=>{
+  reader.onload = e => {
     const img = document.getElementById("preview");
     img.src = e.target.result;
     img.style.display = "block";
@@ -94,13 +182,54 @@ function handleFile(file){
   reader.readAsDataURL(file);
 }
 
-document.getElementById("file").onchange = e=>{
-  handleFile(e.target.files[0]);
-};
+// 🔴 UPLOAD (CORRETTO)
+document.getElementById("publishBtn").onclick = async () => {
 
-document.getElementById("dropzone").ondrop = e=>{
-  e.preventDefault();
-  handleFile(e.dataTransfer.files[0]);
+  if(!currentUser) return alert("Not logged in");
+  if(!imageFile) return alert("No image");
+
+  const btn = document.getElementById("publishBtn");
+  btn.disabled = true;
+  btn.textContent = "Uploading...";
+
+  try {
+
+    const ext = imageFile.name.split(".").pop();
+    const fileName = `${currentUser.id}/${Date.now()}.${ext}`;
+
+    // UPLOAD CORRETTO
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(fileName, imageFile);
+
+    if(uploadError) throw uploadError;
+
+    // GET URL
+    const { data } = supabase.storage
+      .from(BUCKET)
+      .getPublicUrl(fileName);
+
+    // DB INSERT
+    const { error: dbError } = await supabase
+      .from("posts")
+      .insert([{
+        user_id: currentUser.id,
+        image_url: data.publicUrl,
+        caption: document.getElementById("caption").value
+      }]);
+
+    if(dbError) throw dbError;
+
+    reset();
+    loadFeed();
+
+  } catch (err) {
+    alert(err.message);
+    console.error(err);
+  }
+
+  btn.disabled = false;
+  btn.textContent = "Publish";
 };
 
 function reset(){
@@ -110,81 +239,13 @@ function reset(){
   document.getElementById("preview").style.display = "none";
 }
 
-// 🔥 TWIC (se non lo usi, torna URL normale)
-function getImageUrl(publicUrl){
-  if(!TWIC_DOMAIN.includes("twic.pics")){
-    return publicUrl; // fallback normale
-  }
-  const path = publicUrl.split("/storage/v1/object/public/")[1];
-  return `${TWIC_DOMAIN}/${path}?twic=v1/cover=1/resize=800`;
-}
-
-// UPLOAD
-document.getElementById("publishBtn").onclick = async ()=>{
-
-  if(!window.user) return alert("login required");
-  if(!imageFile) return alert("no image");
-
-  const btn = document.getElementById("publishBtn");
-  btn.disabled = true;
-  btn.textContent = "Uploading...";
-
-  try{
-    const ext = imageFile.name.split('.').pop();
-    const fileName = `${window.user.id}/${Date.now()}.${ext}`;
-
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET)
-      .upload(fileName, imageFile, {
-        contentType: imageFile.type
-      });
-
-    if(uploadError) throw uploadError;
-
-    const { data } = supabase.storage
-      .from(BUCKET)
-      .getPublicUrl(fileName);
-
-    if(!data?.publicUrl) throw new Error("URL non generato");
-
-    const { error: dbError } = await supabase.from("posts").insert([{
-      user_id: window.user.id,
-      image_url: data.publicUrl,
-      caption: document.getElementById("caption").value
-    }]);
-
-    if(dbError) throw dbError;
-
-    reset();
-
-  }catch(e){
-    alert(e.message);
-    console.error(e);
-  }
-
-  btn.disabled = false;
-  btn.textContent = "Publish";
-};
-
-// RENDER
-function renderPost(p){
-  const div = document.createElement("div");
-  div.className = "post";
-
-  div.innerHTML = `
-    <img src="${getImageUrl(p.image_url)}">
-    <div class="post-body">${p.caption || ""}</div>
-  `;
-
-  return div;
-}
-
-// LOAD
+// 🔴 FEED
 async function loadFeed(){
+
   const { data, error } = await supabase
     .from("posts")
     .select("*")
-    .order("created_at",{ascending:false});
+    .order("created_at", { ascending: false });
 
   if(error){
     console.error(error);
@@ -194,26 +255,20 @@ async function loadFeed(){
   const feed = document.getElementById("feed");
   feed.innerHTML = "";
 
-  data.forEach(p=>{
-    feed.appendChild(renderPost(p));
+  data.forEach(post => {
+    const div = document.createElement("div");
+    div.className = "post";
+
+    div.innerHTML = `
+      <img src="${post.image_url}">
+      <div class="post-body">${post.caption || ""}</div>
+    `;
+
+    feed.appendChild(div);
   });
 }
 
-// REALTIME
-supabase
-  .channel("posts")
-  .on("postgres_changes", {
-    event: "INSERT",
-    schema: "public",
-    table: "posts"
-  }, payload => {
-    const feed = document.getElementById("feed");
-    feed.prepend(renderPost(payload.new));
-  })
-  .subscribe();
-
 init();
-loadFeed();
 </script>
 
 </body>
