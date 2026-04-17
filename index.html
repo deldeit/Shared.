@@ -1,159 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shared</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Shared Login</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Archivo Black', sans-serif;
-    }
+<style>
+body{
+  margin:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  background:black;
+  color:white;
+  font-family:'Archivo Black',sans-serif;
+  gap:10px;
+}
 
-    body {
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background: black;
-      color: white;
-      gap: 12px;
-    }
+input,button{
+  padding:12px;
+  border-radius:10px;
+  border:none;
+  width:260px;
+}
 
-    h1 {
-      font-size: 80px;
-      color: white;
-    }
-
-    .subtitle {
-      font-size: 20px;
-      opacity: 0.8;
-      margin-bottom: 20px;
-    }
-
-    input {
-      padding: 12px;
-      border-radius: 10px;
-      border: none;
-      background: #111;
-      color: white;
-      width: 260px;
-    }
-
-    .btns {
-      display: flex;
-      gap: 10px;
-    }
-
-    button {
-      padding: 12px;
-      border-radius: 999px;
-      border: none;
-      width: 130px;
-      cursor: pointer;
-    }
-
-    .primary { background: white; color: black; }
-    .secondary { background: transparent; color: white; border: 1px solid #555; }
-  </style>
+input{background:#111;color:white}
+button{cursor:pointer}
+.primary{background:white;color:black}
+.secondary{background:transparent;border:1px solid #555;color:white}
+</style>
 </head>
 
 <body>
 
-  <h1>Shared</h1>
-  <div class="subtitle">Live the moment.</div>
+<h1>Shared</h1>
 
-  <input id="username" placeholder="Username">
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+<input id="email" placeholder="Email">
+<input id="password" type="password" placeholder="Password">
 
-  <div class="btns">
-    <button class="primary" onclick="signUp()">Sign up</button>
-    <button class="secondary" onclick="signIn()">Sign in</button>
-  </div>
+<button class="primary" onclick="signIn()">Sign in</button>
+<button class="secondary" onclick="signUp()">Sign up</button>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const supabase = createClient(
-      "https://cnhaonawapuahzoctqav.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes",
-      {
-        auth: {
-          persistSession: true,
-          autoRefreshToken: true
-        }
-      }
-    );
+const supabase = createClient(
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "METTI_ANON_KEY"
+);
 
-    window.supabase = supabase;
+// persist session
+await supabase.auth.getSession();
 
-    // 🚀 AUTO REDIRECT SE LOGGATO
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
+// redirect if already logged
+const { data: { session } } = await supabase.auth.getSession();
+if(session){
+  window.location.href = "home.html";
+}
 
-      if (data.session) {
-        window.location.href = "home.html";
-      }
-    };
+window.signIn = async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-    checkSession();
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
 
-    // SIGN UP
-    window.signUp = async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-      const username = document.getElementById("username").value;
+  if(error) return alert(error.message);
 
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      });
+  window.location.href = "home.html";
+};
 
-      if (error) return alert(error.message);
+window.signUp = async () => {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
 
-      const { data: userData } = await supabase.auth.getUser();
-      const user = userData.user;
+  const { error } = await supabase.auth.signUp({
+    email,
+    password
+  });
 
-      if (!user) {
-        alert("Check email to confirm account");
-        return;
-      }
+  if(error) return alert(error.message);
 
-      const { error: insertError } = await supabase
-        .from("profiles")
-        .insert([{ id: user.id, username }]);
-
-      if (insertError) {
-        alert(insertError.message);
-      } else {
-        window.location.href = "home.html";
-      }
-    };
-
-    // SIGN IN
-    window.signIn = async () => {
-      const email = document.getElementById("email").value;
-      const password = document.getElementById("password").value;
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      if (error) {
-        alert(error.message);
-      } else {
-        window.location.href = "home.html";
-      }
-    };
-  </script>
+  alert("Check email to confirm");
+};
+</script>
 
 </body>
 </html>
