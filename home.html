@@ -97,6 +97,11 @@ button{
   padding:10px;
   font-size:13px;
 }
+
+.lock{
+  opacity:.4;
+  pointer-events:none;
+}
 </style>
 </head>
 
@@ -126,37 +131,52 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-const BUCKET = "shared"; // 🔴 cambia in "images" se serve
+const BUCKET = "shared"; // oppure "images"
 
-const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  }
+});
 
 let currentUser = null;
 let imageFile = null;
 
-// 🔴 SESSIONE SICURA
-async function getUser(){
-  const { data: { user } } = await supabase.auth.getUser();
-  currentUser = user;
-  return user;
-}
+const creator = document.getElementById("creator");
 
-// 🔴 INIT
+// 🔥 SESSION FIX DEFINITIVO
 async function init(){
-  const user = await getUser();
 
-  if(!user){
+  const { data: { session } } = await supabase.auth.getSession();
+
+  console.log("SESSION:", session);
+
+  if(!session){
     window.location.href = "index.html";
     return;
   }
 
+  currentUser = session.user;
+  unlock();
+
   loadFeed();
 }
 
-supabase.auth.onAuthStateChange(async () => {
-  await getUser();
+function unlock(){
+  creator.classList.remove("lock");
+}
+
+// 🔴 LISTENER AUTH
+supabase.auth.onAuthStateChange((_event, session) => {
+  if(session){
+    currentUser = session.user;
+    unlock();
+  }
 });
 
-// 🔴 FILE HANDLING
+// 🔥 FILE HANDLING
 document.getElementById("file").onchange = e => {
   handleFile(e.target.files[0]);
 };
@@ -182,11 +202,18 @@ function handleFile(file){
   reader.readAsDataURL(file);
 }
 
-// 🔴 UPLOAD (CORRETTO)
+// 🔥 UPLOAD FIXATO
 document.getElementById("publishBtn").onclick = async () => {
 
-  if(!currentUser) return alert("Not logged in");
-  if(!imageFile) return alert("No image");
+  if(!currentUser){
+    alert("Not logged in");
+    return;
+  }
+
+  if(!imageFile){
+    alert("No image");
+    return;
+  }
 
   const btn = document.getElementById("publishBtn");
   btn.disabled = true;
@@ -197,19 +224,16 @@ document.getElementById("publishBtn").onclick = async () => {
     const ext = imageFile.name.split(".").pop();
     const fileName = `${currentUser.id}/${Date.now()}.${ext}`;
 
-    // UPLOAD CORRETTO
     const { error: uploadError } = await supabase.storage
       .from(BUCKET)
       .upload(fileName, imageFile);
 
     if(uploadError) throw uploadError;
 
-    // GET URL
     const { data } = supabase.storage
       .from(BUCKET)
       .getPublicUrl(fileName);
 
-    // DB INSERT
     const { error: dbError } = await supabase
       .from("posts")
       .insert([{
@@ -224,8 +248,8 @@ document.getElementById("publishBtn").onclick = async () => {
     loadFeed();
 
   } catch (err) {
-    alert(err.message);
     console.error(err);
+    alert(err.message);
   }
 
   btn.disabled = false;
@@ -239,7 +263,7 @@ function reset(){
   document.getElementById("preview").style.display = "none";
 }
 
-// 🔴 FEED
+// 🔥 FEED
 async function loadFeed(){
 
   const { data, error } = await supabase
