@@ -24,7 +24,6 @@ body {
   align-items:center;
 }
 
-/* HEADER */
 header {
   width:100%;
   max-width:900px;
@@ -33,7 +32,6 @@ header {
   opacity:0.8;
 }
 
-/* CONTAINER */
 .container {
   width:100%;
   max-width:900px;
@@ -43,7 +41,6 @@ header {
   gap:18px;
 }
 
-/* CARD */
 .card {
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.08);
@@ -54,7 +51,6 @@ header {
   gap:12px;
 }
 
-/* DROPZONE */
 .dropzone {
   border:1px dashed rgba(255,255,255,0.25);
   border-radius:14px;
@@ -70,7 +66,6 @@ header {
   background:rgba(255,255,255,0.05);
 }
 
-/* IMAGE */
 .preview {
   width:100%;
   max-height:340px;
@@ -79,7 +74,6 @@ header {
   display:none;
 }
 
-/* INPUT */
 input, textarea {
   background:rgba(0,0,0,0.4);
   border:1px solid rgba(255,255,255,0.08);
@@ -90,7 +84,6 @@ input, textarea {
   font-size:13px;
 }
 
-/* SONGS */
 .songs {
   background:rgba(0,0,0,0.6);
   border-radius:12px;
@@ -111,7 +104,6 @@ input, textarea {
   background:rgba(255,255,255,0.05);
 }
 
-/* BUTTON */
 button {
   padding:12px;
   border:none;
@@ -127,7 +119,6 @@ button:disabled {
   opacity:0.5;
 }
 
-/* POST */
 .post {
   background:rgba(255,255,255,0.04);
   border:1px solid rgba(255,255,255,0.08);
@@ -153,7 +144,6 @@ button:disabled {
 
 <div class="container">
 
-  <!-- CREATOR -->
   <div class="card">
 
     <div id="dropzone" class="dropzone">
@@ -182,30 +172,35 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
   "https://YOUR_PROJECT.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+  "YOUR_ANON_KEY"
 );
 
-/* AUTH SAFE GUARD (NO LOOP) */
-async function authGuard() {
-  const { data } = await supabase.auth.getSession();
-  const session = data?.session;
+let user = null;
+let authReady = false;
 
-  if (!session) {
-    window.location.replace("index.html");
-    return;
-  }
+const { data: { session } } = await supabase.auth.getSession();
 
-  window.user = session.user;
+if (session) {
+  user = session.user;
 }
 
-await authGuard();
+authReady = true;
 
-/* STATE */
+supabase.auth.onAuthStateChange((event, session) => {
+  if (session) {
+    user = session.user;
+  } else {
+    user = null;
+    if (authReady) {
+      window.location.href = "index.html";
+    }
+  }
+});
+
 let imageFile = null;
 let selectedMusic = null;
 let audio = null;
 
-/* IMAGE */
 function handleFile(file) {
   if (!file) return;
 
@@ -225,7 +220,6 @@ function handleFile(file) {
 
 document.getElementById("file").onchange = e => handleFile(e.target.files[0]);
 
-/* DROP */
 const dropzone = document.getElementById("dropzone");
 
 dropzone.addEventListener("dragover", e => {
@@ -243,7 +237,6 @@ dropzone.addEventListener("drop", e => {
   handleFile(e.dataTransfer.files[0]);
 });
 
-/* MUSIC */
 window.handleDeezer = function(data){
   const box = document.getElementById("suggestions");
   box.innerHTML = "";
@@ -262,11 +255,9 @@ window.handleDeezer = function(data){
 
     icon.onclick = (e) => {
       e.stopPropagation();
-
       if(audio) audio.pause();
       audio = new Audio(t.preview);
       audio.play();
-
       selectedMusic = t;
     };
 
@@ -295,7 +286,6 @@ document.getElementById("songInput").addEventListener("input", e => {
   }, 250);
 });
 
-/* RESET */
 function reset(){
   imageFile = null;
   selectedMusic = null;
@@ -307,9 +297,13 @@ function reset(){
   document.getElementById("suggestions").innerHTML = "";
 }
 
-/* PUBLISH */
 window.publishPost = async () => {
   const btn = document.getElementById("publishBtn");
+
+  if (!user) {
+    alert("Not authenticated");
+    return;
+  }
 
   if (!imageFile) return alert("Select image");
 
@@ -351,7 +345,6 @@ window.publishPost = async () => {
   btn.textContent = "Publish";
 };
 
-/* FEED */
 async function loadFeed(){
   const { data } = await supabase
     .from("posts")
