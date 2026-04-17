@@ -12,49 +12,108 @@ body{
   margin:0;
   height:100vh;
   display:flex;
-  flex-direction:column;
   justify-content:center;
   align-items:center;
-  background:black;
-  color:white;
-  font-family:'Archivo Black',sans-serif;
-  gap:10px;
+  background:#000;
+  color:#fff;
+  font-family:'Archivo Black', sans-serif;
 }
 
-input,button{
+.container{
+  width:320px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  text-align:center;
+}
+
+.card{
+  background:#0f0f0f;
+  border:1px solid #222;
+  border-radius:20px;
+  padding:20px;
+}
+
+h1{
+  margin:0;
+  font-size:26px;
+}
+
+input{
+  width:100%;
   padding:12px;
-  border-radius:10px;
-  border:none;
-  width:260px;
+  margin-top:10px;
+  border-radius:14px;
+  border:1px solid #222;
+  background:#000;
+  color:#fff;
+  font-family:'Archivo Black', sans-serif;
+  outline:none;
 }
 
-input{background:#111;color:white}
-button{cursor:pointer}
-.primary{background:white;color:black}
-.secondary{background:transparent;border:1px solid #555;color:white}
+input:focus{
+  border-color:#555;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  margin-top:10px;
+  border-radius:14px;
+  border:none;
+  font-family:'Archivo Black', sans-serif;
+  cursor:pointer;
+  transition:0.15s;
+}
+
+button:hover{
+  opacity:0.9;
+}
+
+.primary{
+  background:#fff;
+  color:#000;
+}
+
+.secondary{
+  background:#000;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.small{
+  font-size:11px;
+  opacity:0.6;
+  margin-top:10px;
+}
 </style>
 </head>
 
 <body>
 
-<h1>Shared</h1>
+<div class="container">
 
-<input id="email" placeholder="Email">
-<input id="password" type="password" placeholder="Password">
+  <div class="card">
+    <h1>Shared</h1>
 
-<button class="primary" onclick="signIn()">Sign in</button>
-<button class="secondary" onclick="signUp()">Sign up</button>
+    <input id="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
+
+    <button class="primary" onclick="signIn()">SIGN IN</button>
+    <button class="secondary" onclick="signUp()">SIGN UP</button>
+
+    <div class="small" id="status"></div>
+  </div>
+
+</div>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+  "YOUR_ANON_KEY"
 );
-
-// persist session
-await supabase.auth.getSession();
 
 // redirect if already logged
 const { data: { session } } = await supabase.auth.getSession();
@@ -62,7 +121,11 @@ if(session){
   window.location.href = "home.html";
 }
 
+const status = document.getElementById("status");
+
 window.signIn = async () => {
+  status.innerText = "SIGNING IN...";
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
@@ -71,12 +134,17 @@ window.signIn = async () => {
     password
   });
 
-  if(error) return alert(error.message);
+  if(error){
+    status.innerText = error.message;
+    return;
+  }
 
   window.location.href = "home.html";
 };
 
 window.signUp = async () => {
+  status.innerText = "CREATING ACCOUNT...";
+
   const email = document.getElementById("email").value;
   const password = document.getElementById("password").value;
 
@@ -85,9 +153,12 @@ window.signUp = async () => {
     password
   });
 
-  if(error) return alert(error.message);
+  if(error){
+    status.innerText = error.message;
+    return;
+  }
 
-  alert("Check email to confirm");
+  status.innerText = "CHECK EMAIL TO CONFIRM";
 };
 </script>
 
