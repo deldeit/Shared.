@@ -8,6 +8,10 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
+*{
+  box-sizing:border-box;
+}
+
 body{
   margin:0;
   height:100vh;
@@ -19,26 +23,25 @@ body{
   font-family:'Archivo Black', sans-serif;
 }
 
-.container{
-  width:320px;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  text-align:center;
-}
-
+/* CARD */
 .card{
+  width:340px;
   background:#0f0f0f;
   border:1px solid #222;
   border-radius:20px;
-  padding:20px;
+  padding:22px;
 }
 
+/* TITLE */
 h1{
   margin:0;
-  font-size:26px;
+  text-align:center;
+  font-size:28px;
+  letter-spacing:1px;
+  margin-bottom:16px;
 }
 
+/* INPUTS */
 input{
   width:100%;
   padding:12px;
@@ -52,58 +55,66 @@ input{
 }
 
 input:focus{
-  border-color:#555;
+  border-color:#444;
 }
 
+/* BUTTON BASE */
 button{
   width:100%;
-  padding:12px;
+  padding:14px;
   margin-top:10px;
-  border-radius:14px;
+  border-radius:16px;
   border:none;
   font-family:'Archivo Black', sans-serif;
   cursor:pointer;
-  transition:0.15s;
+  transition:0.15s ease;
+  letter-spacing:1px;
 }
 
-button:hover{
-  opacity:0.9;
-}
-
+/* PRIMARY */
 .primary{
-  background:#fff;
+  background:linear-gradient(135deg,#ffffff,#d0d0d0);
   color:#000;
 }
 
+.primary:hover{
+  transform:scale(1.02);
+}
+
+/* SECONDARY */
 .secondary{
   background:#000;
   color:#fff;
   border:1px solid #333;
 }
 
+.secondary:hover{
+  background:#111;
+}
+
+/* STATUS */
 .small{
   font-size:11px;
   opacity:0.6;
-  margin-top:10px;
+  margin-top:12px;
+  text-align:center;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="card">
 
-  <div class="card">
-    <h1>Shared</h1>
+  <h1>Shared.</h1>
 
-    <input id="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
 
-    <button class="primary" onclick="signIn()">SIGN IN</button>
-    <button class="secondary" onclick="signUp()">SIGN UP</button>
+  <button class="primary" onclick="signIn()">SIGN IN</button>
+  <button class="secondary" onclick="signUp()">SIGN UP</button>
 
-    <div class="small" id="status"></div>
-  </div>
+  <div class="small" id="status"></div>
 
 </div>
 
@@ -112,18 +123,20 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
-  "YOUR_ANON_KEY"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
-// redirect if already logged
-const { data: { session } } = await supabase.auth.getSession();
+/* AUTO REDIRECT */
+const { data:{session} } = await supabase.auth.getSession();
 if(session){
   window.location.href = "home.html";
 }
 
 const status = document.getElementById("status");
 
+/* SIGN IN */
 window.signIn = async () => {
+
   status.innerText = "SIGNING IN...";
 
   const email = document.getElementById("email").value;
@@ -142,7 +155,9 @@ window.signIn = async () => {
   window.location.href = "home.html";
 };
 
+/* SIGN UP */
 window.signUp = async () => {
+
   status.innerText = "CREATING ACCOUNT...";
 
   const email = document.getElementById("email").value;
