@@ -3,55 +3,66 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shared Home</title>
+<title>Shared</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 <style>
 body{
   margin:0;
-  background:black;
+  background:#0f0f0f;
   color:white;
-  font-family:'Archivo Black',sans-serif;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  font-family:'Inter',sans-serif;
 }
 
 .container{
-  width:100%;
-  max-width:900px;
+  max-width:700px;
+  margin:auto;
   padding:20px;
 }
 
 .card{
+  background:#1a1a1a;
   padding:16px;
-  border:1px solid #222;
-  border-radius:14px;
-  margin-bottom:16px;
+  border-radius:16px;
+  margin-bottom:20px;
 }
 
-input,textarea,button{
+input, textarea{
   width:100%;
   padding:10px;
-  margin-top:10px;
   border-radius:10px;
   border:none;
+  margin-top:10px;
+  background:#2a2a2a;
+  color:white;
 }
 
 button{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
   background:white;
   color:black;
   cursor:pointer;
 }
 
+.post{
+  margin-top:20px;
+  background:#1a1a1a;
+  padding:12px;
+  border-radius:14px;
+}
+
 img{
   width:100%;
   border-radius:12px;
-}
-
-.post{
-  margin-top:15px;
+  margin-bottom:8px;
 }
 </style>
 </head>
@@ -62,8 +73,14 @@ img{
 
   <div class="card">
     <input type="file" id="file">
-    <textarea id="caption" placeholder="Caption..."></textarea>
-    <button id="uploadBtn">Upload</button>
+    <textarea id="caption" placeholder="Write a caption..."></textarea>
+
+    <button id="uploadBtn">
+      <span class="material-symbols-outlined">send</span>
+      Upload
+    </button>
+
+    <div id="status"></div>
   </div>
 
   <div id="feed"></div>
@@ -75,20 +92,20 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes",
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true
-    }
-  }
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
+
+const BUCKET = "shared";
+
+// 🔴 METTI IL TUO DOMINIO TWICPICS
+const TWIC_DOMAIN = "https://shared.twic.pics";
 
 let user = null;
 let file = null;
-const BUCKET = "shared";
 
-// 🔴 FIX SESSION (CORRETTO)
+const status = document.getElementById("status");
+
+// INIT
 async function init(){
   const { data: { session } } = await supabase.auth.getSession();
 
@@ -100,7 +117,6 @@ async function init(){
   user = session.user;
   loadFeed();
 }
-
 init();
 
 // FILE
@@ -111,43 +127,62 @@ document.getElementById("file").onchange = e => {
 // UPLOAD
 document.getElementById("uploadBtn").onclick = async () => {
 
-  if(!user) return alert("Not logged in");
-  if(!file) return alert("No file");
+  if(!user) return setStatus("Not logged in");
+  if(!file) return setStatus("Select a file");
 
-  const ext = file.name.split(".").pop();
-  const fileName = `${user.id}/${Date.now()}.${ext}`;
+  setStatus("Uploading...");
 
-  // 🔴 STORAGE FIXATO
-  const { error: uploadError } = await supabase.storage
-    .from(BUCKET)
-    .upload(fileName, file);
+  try {
+    const ext = file.name.split(".").pop();
+    const fileName = `${user.id}/${Date.now()}.${ext}`;
 
-  if(uploadError) return alert(uploadError.message);
+    // Upload su Supabase
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET)
+      .upload(fileName, file);
 
-  const { data } = supabase.storage
-    .from(BUCKET)
-    .getPublicUrl(fileName);
+    if(uploadError) throw uploadError;
 
-  const { error: dbError } = await supabase
-    .from("posts")
-    .insert([{
-      user_id: user.id,
-      image_url: data.publicUrl,
-      caption: document.getElementById("caption").value
-    }]);
+    // URL pubblico Supabase
+    const { data } = supabase.storage
+      .from(BUCKET)
+      .getPublicUrl(fileName);
 
-  if(dbError) return alert(dbError.message);
+    const originalUrl = data.publicUrl;
 
-  loadFeed();
+    // 🔴 URL TWICPICS CORRETTO
+    const twicUrl = `${TWIC_DOMAIN}/image?src=${encodeURIComponent(originalUrl)}&twic=v1/cover=800x600`;
+
+    // Salva nel DB
+    const { error: dbError } = await supabase
+      .from("posts")
+      .insert([{
+        user_id: user.id,
+        image_url: twicUrl,
+        caption: document.getElementById("caption").value
+      }]);
+
+    if(dbError) throw dbError;
+
+    setStatus("Upload OK ✅");
+    loadFeed();
+
+  } catch(err){
+    setStatus("Error: " + (err.message || err));
+  }
 };
 
 // FEED
 async function loadFeed(){
-
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("posts")
     .select("*")
     .order("created_at",{ascending:false});
+
+  if(error){
+    setStatus("Errore feed");
+    return;
+  }
 
   const feed = document.getElementById("feed");
   feed.innerHTML = "";
@@ -157,12 +192,16 @@ async function loadFeed(){
     div.className = "post";
     div.innerHTML = `
       <img src="${p.image_url}">
-      <p>${p.caption || ""}</p>
+      <div>${p.caption || ""}</div>
     `;
     feed.appendChild(div);
   });
 }
 
+// STATUS
+function setStatus(msg){
+  status.innerText = msg;
+}
 </script>
 
 </body>
