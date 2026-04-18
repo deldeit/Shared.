@@ -4,9 +4,10 @@ import multer from "multer";
 import OpenAI from "openai";
 
 const app = express();
-app.use(cors());
 
-/* FILE HANDLING (memory upload) */
+app.use(cors());
+app.use(express.json());
+
 const upload = multer({ storage: multer.memoryStorage() });
 
 /* OPENAI */
@@ -14,16 +15,27 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-/* HEALTH CHECK (Render test) */
+/* 🔥 HEALTH CHECK (OBBLIGATORIO PER RENDER DEBUG) */
 app.get("/", (req, res) => {
-  res.json({ ok: true, service: "shared-backend" });
+  res.json({
+    ok: true,
+    status: "server alive"
+  });
 });
 
-/* MODERATION ENDPOINT */
+/* 🔥 TEST ROUTE PER VERIFICARE CHE POST FUNZIONA */
+app.post("/ping", (req, res) => {
+  res.json({ ok: true, message: "POST works" });
+});
+
+/* 🔥 MODERATION */
 app.post("/moderate", upload.single("file"), async (req, res) => {
   try {
+
+    console.log("👉 /moderate HIT");
+
     if (!req.file) {
-      return res.json({ ok: false, error: "no file received" });
+      return res.json({ ok: false, error: "no file" });
     }
 
     const base64 = req.file.buffer.toString("base64");
@@ -38,27 +50,28 @@ app.post("/moderate", upload.single("file"), async (req, res) => {
       ]
     });
 
-    const result = response.results?.[0];
+    console.log("OPENAI RESPONSE:", response);
 
-    const flagged = result?.flagged === true;
+    const flagged = response.results?.[0]?.flagged ?? false;
 
     return res.json({
       ok: !flagged,
-      flagged: flagged
+      flagged
     });
 
   } catch (err) {
     console.error("MODERATION ERROR:", err);
-    return res.json({
+
+    return res.status(500).json({
       ok: false,
-      error: "server error"
+      error: "internal error"
     });
   }
 });
 
-/* START SERVER (RENDER SAFE) */
-const PORT = process.env.PORT || 3000;
+/* 🔥 IMPORTANTISSIMO PER RENDER */
+const PORT = process.env.PORT || 10000;
 
-app.listen(PORT, () => {
-  console.log("Server running on port", PORT);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log("🚀 Server running on port", PORT);
 });
