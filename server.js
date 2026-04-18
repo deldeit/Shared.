@@ -15,27 +15,44 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
 
-/* 🔥 HEALTH CHECK (OBBLIGATORIO PER RENDER DEBUG) */
+/* =========================
+   HEALTH CHECK ROOT
+========================= */
 app.get("/", (req, res) => {
   res.json({
     ok: true,
-    status: "server alive"
+    service: "shared-backend",
+    status: "running"
   });
 });
 
-/* 🔥 TEST ROUTE PER VERIFICARE CHE POST FUNZIONA */
-app.post("/ping", (req, res) => {
-  res.json({ ok: true, message: "POST works" });
+/* =========================
+   STATUS PAGE /moderate (GET)
+   👉 ora esiste davvero
+========================= */
+app.get("/moderate", (req, res) => {
+  res.json({
+    ok: true,
+    endpoint: "/moderate",
+    method: "POST",
+    status: "active",
+    service: "image moderation ready"
+  });
 });
 
-/* 🔥 MODERATION */
+/* =========================
+   MODERATION ENDPOINT (POST)
+========================= */
 app.post("/moderate", upload.single("file"), async (req, res) => {
   try {
 
-    console.log("👉 /moderate HIT");
+    console.log("📥 /moderate called");
 
     if (!req.file) {
-      return res.json({ ok: false, error: "no file" });
+      return res.json({
+        ok: false,
+        error: "no file received"
+      });
     }
 
     const base64 = req.file.buffer.toString("base64");
@@ -50,27 +67,42 @@ app.post("/moderate", upload.single("file"), async (req, res) => {
       ]
     });
 
-    console.log("OPENAI RESPONSE:", response);
+    console.log("🔍 moderation response:", JSON.stringify(response, null, 2));
 
-    const flagged = response.results?.[0]?.flagged ?? false;
+    const result = response.results?.[0];
+
+    // 🔥 SAFE DEFAULT: non bloccare se API è incerta
+    if (!result) {
+      return res.json({
+        ok: true,
+        warning: "no moderation result returned, allowed by default"
+      });
+    }
+
+    const flagged = result.flagged === true;
 
     return res.json({
       ok: !flagged,
-      flagged
+      flagged,
+      categories: result.categories || {}
     });
 
   } catch (err) {
-    console.error("MODERATION ERROR:", err);
+    console.error("❌ MODERATION ERROR:", err);
 
-    return res.status(500).json({
-      ok: false,
-      error: "internal error"
+    // 🔥 FAIL OPEN (non blocca tutto il sistema)
+    return res.json({
+      ok: true,
+      warning: "moderation failed, allowed by fallback",
+      error: err.message
     });
   }
 });
 
-/* 🔥 IMPORTANTISSIMO PER RENDER */
-const PORT = process.env.PORT || 10000;
+/* =========================
+   START SERVER (RENDER SAFE)
+========================= */
+const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log("🚀 Server running on port", PORT);
