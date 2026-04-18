@@ -14,27 +14,78 @@
   font-family:'Archivo Black', sans-serif;
 }
 
+:root{
+  --bg:#000;
+  --panel:#0f0f0f;
+  --panel-2:#111;
+  --border:#222;
+  --border-2:#333;
+  --text:#fff;
+  --muted:rgba(255,255,255,.65);
+}
+
 body{
   margin:0;
-  background:#000;
-  color:#fff;
+  background:var(--bg);
+  color:var(--text);
 }
 
 .container{
   max-width:720px;
-  margin:auto;
+  margin:0 auto;
   padding:20px;
 }
 
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:20px;
+}
+
 .header{
-  text-align:center;
   font-size:30px;
-  margin-bottom:24px;
+  line-height:1;
+}
+
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:none;
+  border-radius:999px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-size:12px;
+  background:#fff;
+  color:#000;
+}
+
+.icon-btn.secondary{
+  background:#1a1a1a;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.icon-btn.liked{
+  color:#ff2d55;
+}
+
+.material-symbols-outlined{
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+  line-height:1;
+  font-size:20px;
+}
+
+.icon-btn.liked .material-symbols-outlined{
+  font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;
 }
 
 .upload-box{
-  background:#0f0f0f;
-  border:1px solid #222;
+  background:var(--panel);
+  border:1px solid var(--border);
   border-radius:24px;
   padding:16px;
   margin-bottom:18px;
@@ -42,17 +93,20 @@ body{
 
 .dropzone{
   width:100%;
-  height:160px;
+  min-height:160px;
   border-radius:18px;
-  border:2px dashed #333;
+  border:2px dashed var(--border-2);
   display:flex;
   align-items:center;
   justify-content:center;
   flex-direction:column;
+  gap:8px;
   color:#777;
   cursor:pointer;
-  transition:0.2s;
+  transition:.2s;
   user-select:none;
+  text-align:center;
+  padding:18px;
 }
 
 .dropzone.dragover{
@@ -67,7 +121,7 @@ body{
   overflow:hidden;
   display:none;
   margin-bottom:10px;
-  border:1px solid #222;
+  border:1px solid var(--border);
 }
 
 .preview img{
@@ -79,9 +133,9 @@ body{
 input,textarea{
   width:100%;
   margin-top:10px;
-  padding:12px;
+  padding:12px 14px;
   border-radius:14px;
-  border:1px solid #222;
+  border:1px solid var(--border);
   background:#000;
   color:#fff;
   outline:none;
@@ -96,18 +150,14 @@ textarea{
   position:relative;
 }
 
-#songInput{
-  margin-top:10px;
-}
-
 #suggestions{
   position:absolute;
   top:100%;
   left:0;
   right:0;
   margin-top:6px;
-  background:#0f0f0f;
-  border:1px solid #222;
+  background:var(--panel);
+  border:1px solid var(--border);
   border-radius:14px;
   max-height:260px;
   overflow:auto;
@@ -117,7 +167,7 @@ textarea{
 
 .song-item{
   padding:12px;
-  border-bottom:1px solid #222;
+  border-bottom:1px solid var(--border);
   cursor:pointer;
   font-size:12px;
 }
@@ -127,22 +177,22 @@ textarea{
 }
 
 .song-item:hover{
-  background:#111;
+  background:#151515;
 }
 
 .song-item small{
   display:block;
   margin-top:4px;
   opacity:.7;
-  font-family:inherit;
   font-size:11px;
+  font-family:inherit;
 }
 
 .selected-song{
   margin-top:10px;
-  border:1px solid #222;
+  border:1px solid var(--border);
   border-radius:16px;
-  background:#111;
+  background:var(--panel-2);
   padding:12px;
   display:flex;
   align-items:center;
@@ -152,18 +202,19 @@ textarea{
 
 .selected-song .meta{
   min-width:0;
+  flex:1;
 }
 
 .selected-song .title{
   font-size:12px;
-  line-height:1.3;
+  line-height:1.35;
 }
 
 .selected-song .artist{
   display:block;
   margin-top:4px;
   font-size:11px;
-  opacity:.7;
+  opacity:.72;
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
@@ -176,61 +227,16 @@ textarea{
   flex:0 0 auto;
 }
 
-button{
-  border:none;
-  cursor:pointer;
-  font-family:inherit;
-}
-
 .primary-btn{
   width:100%;
   margin-top:12px;
   padding:14px;
   border-radius:16px;
-  background:linear-gradient(135deg,#fff,#cfcfcf);
+  border:none;
+  background:linear-gradient(135deg,#fff,#d7d7d7);
   color:#000;
+  cursor:pointer;
   font-size:14px;
-}
-
-.icon-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:10px 12px;
-  border-radius:999px;
-  background:#fff;
-  color:#000;
-  font-size:12px;
-}
-
-.icon-btn.secondary{
-  background:#1a1a1a;
-  color:#fff;
-  border:1px solid #333;
-}
-
-.material-symbols-outlined{
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
-  line-height:1;
-  font-size:20px;
-}
-
-.icon-btn.liked{
-  background:#fff;
-  color:#ff2d55;
-}
-
-.icon-btn.liked .material-symbols-outlined{
-  font-variation-settings:
-    'FILL' 1,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24;
 }
 
 #feed{
@@ -239,8 +245,8 @@ button{
 }
 
 .post{
-  background:#0f0f0f;
-  border:1px solid #222;
+  background:var(--panel);
+  border:1px solid var(--border);
   border-radius:20px;
   padding:14px;
 }
@@ -265,6 +271,7 @@ button{
   display:flex;
   flex-direction:column;
   gap:4px;
+  min-width:0;
 }
 
 .post-user .name{
@@ -273,23 +280,23 @@ button{
 
 .post-user .time{
   font-size:11px;
-  opacity:.7;
+  opacity:.72;
   display:flex;
-  gap:6px;
   align-items:center;
+  gap:6px;
 }
 
 .post-caption{
   font-size:14px;
   line-height:1.4;
-  margin-top:8px;
   white-space:pre-wrap;
+  margin-top:8px;
 }
 
 .post-song{
   margin-top:12px;
   padding-top:12px;
-  border-top:1px solid #222;
+  border-top:1px solid var(--border);
   display:flex;
   align-items:center;
   justify-content:space-between;
@@ -300,12 +307,12 @@ button{
   min-width:0;
 }
 
-.song-meta .song-title{
+.song-title{
   font-size:12px;
   line-height:1.35;
 }
 
-.song-meta .song-sub{
+.song-sub{
   margin-top:4px;
   font-size:11px;
   opacity:.7;
@@ -341,24 +348,24 @@ button{
 }
 
 @media (max-width:520px){
+  .topbar{
+    align-items:flex-start;
+  }
+
   .post-actions,
-  .post-song{
-    align-items:flex-start;
-    flex-direction:column;
-  }
-
-  .icon-btn{
-    width:100%;
-  }
-
+  .post-song,
   .selected-song{
-    align-items:flex-start;
     flex-direction:column;
+    align-items:flex-start;
   }
 
   .selected-song-actions{
     width:100%;
     justify-content:space-between;
+  }
+
+  .icon-btn{
+    width:100%;
   }
 }
 </style>
@@ -366,11 +373,18 @@ button{
 
 <body>
 <div class="container">
-  <div class="header">Shared.</div>
+
+  <div class="topbar">
+    <div class="header">Shared.</div>
+    <button id="logoutBtn" class="icon-btn secondary" type="button">
+      <span class="material-symbols-outlined">logout</span>
+      Logout
+    </button>
+  </div>
 
   <div class="upload-box">
     <div class="dropzone" id="dropzone">
-      <span class="material-symbols-outlined" style="font-size:30px;margin-bottom:8px;">upload</span>
+      <span class="material-symbols-outlined" style="font-size:30px;">upload</span>
       Drag & drop or click
     </div>
 
@@ -401,29 +415,29 @@ const supabase = createClient(
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("file");
+const previewBox = document.getElementById("previewBox");
+const captionInput = document.getElementById("caption");
+const songInput = document.getElementById("songInput");
+const suggestions = document.getElementById("suggestions");
+const songList = document.getElementById("songList");
+const feed = document.getElementById("feed");
+const uploadBtn = document.getElementById("uploadBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+
 let user = null;
-let username = "user";
+let displayName = "user";
 let croppedBlob = null;
 let selectedSong = null;
 let debounce = null;
 let globalAudio = new Audio();
 let activePlayButton = null;
 let jsonpScript = null;
-let feedSyncTimer = null;
+let postState = new Map();
+let canSaveUsername = false;
 
-const dropzone = document.getElementById("dropzone");
-const fileInput = document.getElementById("file");
-const previewBox = document.getElementById("previewBox");
-const caption = document.getElementById("caption");
-const songInput = document.getElementById("songInput");
-const suggestions = document.getElementById("suggestions");
-const songList = document.getElementById("songList");
-const feed = document.getElementById("feed");
-const uploadBtn = document.getElementById("uploadBtn");
-
-const postState = new Map();
-
-function getUsernameFromSession(sessionUser){
+function getFallbackName(sessionUser){
   return (
     sessionUser?.user_metadata?.username ||
     sessionUser?.user_metadata?.name ||
@@ -449,11 +463,11 @@ function setAudioButtonState(button, playing){
 
   if(playing){
     icon.textContent = "pause";
-    label.textContent = button.dataset.pauseLabel || "Pause preview";
+    label.textContent = "Pause preview";
     button.dataset.playing = "1";
   }else{
     icon.textContent = "play_arrow";
-    label.textContent = button.dataset.playLabel || "Play preview";
+    label.textContent = "Play preview";
     button.dataset.playing = "0";
   }
 }
@@ -495,13 +509,36 @@ globalAudio.addEventListener("ended", ()=>{
 (async ()=>{
   const { data: { session } } = await supabase.auth.getSession();
   if(!session) location.href = "index.html";
+
   user = session.user;
-  username = getUsernameFromSession(user);
+  displayName = getFallbackName(user);
+
+  await detectUsernameColumn();
   await loadFeed();
   realtime();
 })();
 
-/* IMAGE INPUT */
+async function detectUsernameColumn(){
+  try{
+    const { data, error } = await supabase
+      .from("posts")
+      .select("username")
+      .limit(1);
+
+    canSaveUsername = !error;
+    if(error) console.warn("username column not available:", error.message);
+  }catch(_){
+    canSaveUsername = false;
+  }
+}
+
+/* logout */
+logoutBtn.onclick = async ()=>{
+  await supabase.auth.signOut();
+  location.href = "index.html";
+};
+
+/* image picker */
 dropzone.onclick = ()=> fileInput.click();
 
 dropzone.ondragover = e=>{
@@ -529,7 +566,9 @@ async function handleFile(file){
   const reader = new FileReader();
   const img = new Image();
 
-  reader.onload = e=> img.src = e.target.result;
+  reader.onload = e=>{
+    img.src = e.target.result;
+  };
 
   img.onload = ()=>{
     const canvas = document.createElement("canvas");
@@ -562,7 +601,7 @@ async function handleFile(file){
   reader.readAsDataURL(file);
 }
 
-/* DEEZER JSONP */
+/* Deezer JSONP */
 function deezerSearch(query){
   return new Promise((resolve, reject)=>{
     if(jsonpScript){
@@ -585,7 +624,7 @@ function deezerSearch(query){
       jsonpScript = null;
     }
 
-    window[callbackName] = (data)=>{
+    window[callbackName] = data=>{
       cleanup();
       resolve(data);
     };
@@ -602,70 +641,7 @@ function deezerSearch(query){
   });
 }
 
-/* SONG SEARCH */
-songInput.addEventListener("input", async e=>{
-  clearTimeout(debounce);
-  const q = e.target.value.trim();
-
-  if(q.length < 2){
-    suggestions.innerHTML = "";
-    suggestions.style.display = "none";
-    return;
-  }
-
-  debounce = setTimeout(async ()=>{
-    try{
-      const data = await deezerSearch(q);
-      const tracks = (data?.data || []).filter(track => track && track.preview);
-
-      suggestions.innerHTML = "";
-
-      if(tracks.length === 0){
-        suggestions.innerHTML = `<div class="song-item">No results</div>`;
-        suggestions.style.display = "block";
-        return;
-      }
-
-      tracks.slice(0, 6).forEach(track=>{
-        const row = document.createElement("div");
-        row.className = "song-item";
-        row.innerHTML = `
-          ${track.title}
-          <small>${track.artist?.name || "Unknown artist"}</small>
-        `;
-
-        row.onclick = ()=>{
-          selectedSong = {
-            title: track.title,
-            artist: track.artist?.name || "",
-            preview: track.preview,
-            id: track.id
-          };
-
-          renderSelectedSong();
-          suggestions.innerHTML = "";
-          suggestions.style.display = "none";
-          songInput.value = "";
-        };
-
-        suggestions.appendChild(row);
-      });
-
-      suggestions.style.display = "block";
-    }catch(err){
-      console.error(err);
-      suggestions.innerHTML = `<div class="song-item">Search failed</div>`;
-      suggestions.style.display = "block";
-    }
-  }, 250);
-});
-
-document.addEventListener("click", e=>{
-  if(!e.target.closest(".song-wrapper")){
-    suggestions.style.display = "none";
-  }
-});
-
+/* selected song */
 function renderSelectedSong(){
   if(!selectedSong){
     songList.innerHTML = "";
@@ -705,14 +681,77 @@ function renderSelectedSong(){
   };
 }
 
-/* UPLOAD */
+/* search songs */
+songInput.addEventListener("input", async e=>{
+  clearTimeout(debounce);
+  const q = e.target.value.trim();
+
+  if(q.length < 2){
+    suggestions.innerHTML = "";
+    suggestions.style.display = "none";
+    return;
+  }
+
+  debounce = setTimeout(async ()=>{
+    try{
+      const data = await deezerSearch(q);
+      const tracks = (data?.data || []).filter(track => track && track.preview);
+
+      suggestions.innerHTML = "";
+
+      if(tracks.length === 0){
+        suggestions.innerHTML = `<div class="song-item">No results</div>`;
+        suggestions.style.display = "block";
+        return;
+      }
+
+      tracks.slice(0, 6).forEach(track=>{
+        const row = document.createElement("div");
+        row.className = "song-item";
+        row.innerHTML = `
+          ${track.title}
+          <small>${track.artist?.name || "Unknown artist"}</small>
+        `;
+
+        row.onclick = ()=>{
+          selectedSong = {
+            title: track.title,
+            artist: track.artist?.name || "",
+            preview: track.preview,
+            id: track.id
+          };
+          renderSelectedSong();
+          suggestions.innerHTML = "";
+          suggestions.style.display = "none";
+          songInput.value = "";
+        };
+
+        suggestions.appendChild(row);
+      });
+
+      suggestions.style.display = "block";
+    }catch(err){
+      console.error(err);
+      suggestions.innerHTML = `<div class="song-item">Search failed</div>`;
+      suggestions.style.display = "block";
+    }
+  }, 250);
+});
+
+document.addEventListener("click", e=>{
+  if(!e.target.closest(".song-wrapper")){
+    suggestions.style.display = "none";
+  }
+});
+
+/* upload */
 uploadBtn.onclick = async ()=>{
   if(!croppedBlob){
     alert("Image required");
     return;
   }
 
-  if(!caption.value.trim()){
+  if(!captionInput.value.trim()){
     alert("Caption required");
     return;
   }
@@ -739,14 +778,20 @@ uploadBtn.onclick = async ()=>{
 
   const { data } = supabase.storage.from("shared").getPublicUrl(path);
 
-  const { error: insertError } = await supabase.from("posts").insert([{
+  const payload = {
     user_id: user.id,
-    username,
     image_url: data.publicUrl,
-    caption: caption.value.trim(),
+    caption: captionInput.value.trim(),
     song_title: selectedSong.title,
-    song_preview: selectedSong.preview
-  }]);
+    song_preview: selectedSong.preview,
+    created_at: new Date().toISOString()
+  };
+
+  if(canSaveUsername){
+    payload.username = displayName;
+  }
+
+  const { error: insertError } = await supabase.from("posts").insert([payload]);
 
   if(insertError){
     console.error(insertError);
@@ -761,7 +806,7 @@ uploadBtn.onclick = async ()=>{
   previewBox.style.display = "none";
   dropzone.style.display = "flex";
 
-  caption.value = "";
+  captionInput.value = "";
   songInput.value = "";
   songList.innerHTML = "";
   suggestions.innerHTML = "";
@@ -770,12 +815,14 @@ uploadBtn.onclick = async ()=>{
   await loadFeed();
 };
 
-/* LIKE TOGGLE */
+/* likes */
 async function toggleLike(postId){
   const { data: { session } } = await supabase.auth.getSession();
   if(!session) return;
 
   const uid = session.user.id;
+  const state = postState.get(postId);
+  if(!state) return;
 
   const { data: existing, error: findError } = await supabase
     .from("likes")
@@ -789,33 +836,75 @@ async function toggleLike(postId){
     return;
   }
 
+  const row = state.element;
+  const likeBtn = row.querySelector(".likeBtn");
+  const likeCountEl = row.querySelector(".likeCount");
+  const iconEl = likeBtn.querySelector(".material-symbols-outlined");
+
   if(existing){
-    const { error: delError } = await supabase
+    const { error } = await supabase
       .from("likes")
       .delete()
       .eq("id", existing.id);
 
-    if(delError){
-      console.error(delError);
-      alert(delError.message || "Unlike failed");
+    if(error){
+      console.error(error);
+      alert(error.message || "Unlike failed");
       return;
     }
+
+    state.likedByMe = false;
+    state.count = Math.max(0, state.count - 1);
   }else{
-    const { error: insError } = await supabase
+    const { error } = await supabase
       .from("likes")
       .insert([{ post_id: postId, user_id: uid }]);
 
-    if(insError){
-      console.error(insError);
-      alert(insError.message || "Like failed");
+    if(error){
+      console.error(error);
+      alert(error.message || "Like failed");
       return;
     }
+
+    state.likedByMe = true;
+    state.count += 1;
   }
 
-  updatePostLikeUI(postId);
+  likeCountEl.textContent = String(state.count);
+
+  if(state.likedByMe){
+    likeBtn.classList.add("liked");
+    iconEl.textContent = "favorite";
+  }else{
+    likeBtn.classList.remove("liked");
+    iconEl.textContent = "favorite_border";
+  }
 }
 
-/* LOAD FEED */
+/* delete own post */
+async function deletePost(postId){
+  const { data: { session } } = await supabase.auth.getSession();
+  if(!session) return;
+
+  const confirmDelete = confirm("Delete this post?");
+  if(!confirmDelete) return;
+
+  const { error } = await supabase
+    .from("posts")
+    .delete()
+    .eq("id", postId)
+    .eq("user_id", user.id);
+
+  if(error){
+    console.error(error);
+    alert(error.message || "Delete failed");
+    return;
+  }
+
+  await loadFeed();
+}
+
+/* feed */
 async function loadFeed(){
   const { data: posts, error: postsError } = await supabase
     .from("posts")
@@ -863,49 +952,32 @@ async function loadFeed(){
     }
   });
 
+  rows.sort((a, b)=>{
+    const diffLikes = (likeCountMap.get(b.id) || 0) - (likeCountMap.get(a.id) || 0);
+    if(diffLikes !== 0) return diffLikes;
+    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
+  });
+
   for(const post of rows){
-    const count = likeCountMap.get(post.id) || 0;
+    const likeCount = likeCountMap.get(post.id) || 0;
     const likedByMe = likedByMeMap.get(post.id) || false;
-    const postEl = renderPost(post, count, likedByMe);
+    const postEl = renderPost(post, likeCount, likedByMe);
     feed.appendChild(postEl);
 
     postState.set(post.id, {
-      count,
+      count: likeCount,
       likedByMe,
       element: postEl
     });
   }
 }
 
-function updatePostLikeUI(postId){
-  const state = postState.get(postId);
-  if(!state) return;
-
-  const row = state.element;
-  const likeBtn = row.querySelector(".likeBtn");
-  const likeCountEl = row.querySelector(".likeCount");
-
-  state.count = state.likedByMe ? Math.max(0, state.count - 1) : state.count + 1;
-  state.likedByMe = !state.likedByMe;
-
-  likeCountEl.textContent = String(state.count);
-
-  const icon = likeBtn.querySelector(".material-symbols-outlined");
-  if(state.likedByMe){
-    likeBtn.classList.add("liked");
-    icon.textContent = "favorite";
-  }else{
-    likeBtn.classList.remove("liked");
-    icon.textContent = "favorite_border";
-  }
-}
-
-/* RENDER POST */
 function renderPost(post, likeCount, likedByMe){
   const postDiv = document.createElement("div");
   postDiv.className = "post";
   postDiv.dataset.postId = post.id;
 
+  const author = post.username || "user";
   const formattedDate = formatDateTime(post.created_at);
 
   postDiv.innerHTML = `
@@ -913,14 +985,21 @@ function renderPost(post, likeCount, likedByMe){
 
     <div class="post-header">
       <div class="post-user">
-        <div class="name">${post.username || "user"}</div>
+        <div class="name">${author}</div>
         <div class="time">
           <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
           <span>${formattedDate || ""}</span>
         </div>
       </div>
 
-      <span class="material-symbols-outlined" style="opacity:.6;">more_horiz</span>
+      ${
+        post.user_id === user.id
+          ? `<button type="button" class="icon-btn secondary deleteBtn" title="Delete post">
+              <span class="material-symbols-outlined">delete</span>
+              Delete
+            </button>`
+          : `<span class="material-symbols-outlined" style="opacity:.6;">more_horiz</span>`
+      }
     </div>
 
     <div class="post-caption">${post.caption || ""}</div>
@@ -934,7 +1013,7 @@ function renderPost(post, likeCount, likedByMe){
         <div class="song-sub">Hover to play preview</div>
       </div>
 
-      <button type="button" class="icon-btn secondary playBtn" data-play-label="Play preview" data-pause-label="Pause preview">
+      <button type="button" class="icon-btn secondary playBtn">
         <span class="material-symbols-outlined">play_arrow</span>
         <span class="btn-label">Play preview</span>
       </button>
@@ -946,9 +1025,9 @@ function renderPost(post, likeCount, likedByMe){
           <span class="material-symbols-outlined">${likedByMe ? "favorite" : "favorite_border"}</span>
           <span>Like</span>
         </button>
+
         <div class="like-count">
-          <span class="likeCount">${likeCount}</span>
-          <span style="opacity:.75;">likes</span>
+          <span class="likeCount">${likeCount}</span> likes
         </div>
       </div>
     </div>
@@ -956,6 +1035,7 @@ function renderPost(post, likeCount, likedByMe){
 
   const playBtn = postDiv.querySelector(".playBtn");
   const likeBtn = postDiv.querySelector(".likeBtn");
+  const deleteBtn = postDiv.querySelector(".deleteBtn");
 
   playBtn.onclick = ()=>{
     playPreview(post.song_preview, playBtn);
@@ -976,124 +1056,21 @@ function renderPost(post, likeCount, likedByMe){
   });
 
   likeBtn.onclick = async ()=>{
-    const state = postState.get(post.id);
-    if(!state) return;
-
-    const wasLiked = state.likedByMe;
-
-    if(wasLiked){
-      state.count = Math.max(0, state.count - 1);
-      state.likedByMe = false;
-    }else{
-      state.count += 1;
-      state.likedByMe = true;
-    }
-
-    const countEl = postDiv.querySelector(".likeCount");
-    const iconEl = likeBtn.querySelector(".material-symbols-outlined");
-    countEl.textContent = String(state.count);
-
-    if(state.likedByMe){
-      likeBtn.classList.add("liked");
-      iconEl.textContent = "favorite";
-    }else{
-      likeBtn.classList.remove("liked");
-      iconEl.textContent = "favorite_border";
-    }
-
-    try{
-      const { data: { session } } = await supabase.auth.getSession();
-      const uid = session.user.id;
-
-      const { data: existing } = await supabase
-        .from("likes")
-        .select("id")
-        .eq("post_id", post.id)
-        .eq("user_id", uid)
-        .maybeSingle();
-
-      if(wasLiked && existing){
-        const { error } = await supabase
-          .from("likes")
-          .delete()
-          .eq("id", existing.id);
-        if(error) throw error;
-      }else if(!wasLiked && !existing){
-        const { error } = await supabase
-          .from("likes")
-          .insert([{ post_id: post.id, user_id: uid }]);
-        if(error) throw error;
-      }
-
-      syncLikeCountsDebounced();
-    }catch(err){
-      console.error(err);
-      await loadFeed();
-    }
+    await toggleLike(post.id);
   };
+
+  if(deleteBtn){
+    deleteBtn.onclick = async ()=>{
+      await deletePost(post.id);
+    };
+  }
 
   return postDiv;
 }
 
-/* SYNC LIKE COUNTS WITHOUT RELOADING THE FEED */
-function syncLikeCountsDebounced(){
-  clearTimeout(feedSyncTimer);
-  feedSyncTimer = setTimeout(syncLikeCounts, 150);
-}
-
-async function syncLikeCounts(){
-  const postIds = [...postState.keys()];
-  if(postIds.length === 0) return;
-
-  const { data: likesData, error } = await supabase
-    .from("likes")
-    .select("post_id,user_id")
-    .in("post_id", postIds);
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  const newCounts = new Map();
-  const likedByMe = new Map();
-
-  likesData.forEach(row=>{
-    newCounts.set(row.post_id, (newCounts.get(row.post_id) || 0) + 1);
-    if(row.user_id === user.id){
-      likedByMe.set(row.post_id, true);
-    }
-  });
-
-  for(const [postId, state] of postState.entries()){
-    const count = newCounts.get(postId) || 0;
-    const liked = likedByMe.get(postId) || false;
-    state.count = count;
-    state.likedByMe = liked;
-
-    const row = state.element;
-    if(!row) continue;
-
-    const likeCountEl = row.querySelector(".likeCount");
-    const likeBtn = row.querySelector(".likeBtn");
-    const iconEl = likeBtn.querySelector(".material-symbols-outlined");
-
-    likeCountEl.textContent = String(count);
-
-    if(liked){
-      likeBtn.classList.add("liked");
-      iconEl.textContent = "favorite";
-    }else{
-      likeBtn.classList.remove("liked");
-      iconEl.textContent = "favorite_border";
-    }
-  }
-}
-
-/* REALTIME */
 function realtime(){
   supabase
-    .channel("shared-posts")
+    .channel("shared-posts-likes")
     .on("postgres_changes", {
       event: "*",
       schema: "public",
@@ -1105,8 +1082,8 @@ function realtime(){
       event: "*",
       schema: "public",
       table: "likes"
-    }, ()=>{
-      syncLikeCountsDebounced();
+    }, async ()=>{
+      await loadFeed();
     })
     .subscribe();
 }
