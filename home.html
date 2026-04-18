@@ -88,28 +88,18 @@ input,textarea{
   border:1px solid #222;
   background:#000;
   color:#fff;
+  outline:none;
 }
 
-/* SONG */
+/* SONG SEARCH */
 .song-wrapper{
   position:relative;
 }
 
-.song-item{
-  padding:10px;
-  border:1px solid #222;
-  border-radius:12px;
-  margin-top:6px;
-  cursor:pointer;
-  font-size:12px;
-  background:#0f0f0f;
+#songInput{
+  margin-bottom:0;
 }
 
-.song-item:hover{
-  background:#111;
-}
-
-/* dropdown */
 #suggestions{
   position:absolute;
   top:100%;
@@ -117,11 +107,56 @@ input,textarea{
   right:0;
   background:#0f0f0f;
   border:1px solid #222;
-  border-radius:12px;
+  border-radius:14px;
   margin-top:6px;
-  max-height:220px;
+  max-height:240px;
   overflow:auto;
-  z-index:10;
+  z-index:20;
+  display:none;
+}
+
+.song-item{
+  padding:10px 12px;
+  border-bottom:1px solid #222;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.song-item:last-child{
+  border-bottom:none;
+}
+
+.song-item:hover{
+  background:#111;
+}
+
+.song-item small{
+  display:block;
+  opacity:.7;
+  margin-top:4px;
+  font-family:inherit;
+}
+
+/* SELECTED SONG */
+#songList{
+  margin-top:10px;
+}
+
+.selected-song{
+  padding:12px;
+  border:1px solid #222;
+  border-radius:14px;
+  background:#111;
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.selected-song span{
+  opacity:.8;
+  font-size:11px;
 }
 
 /* BUTTON */
@@ -152,60 +187,123 @@ button{
   border-radius:16px;
   margin-bottom:10px;
 }
+
+.post-header{
+  display:flex;
+  justify-content:space-between;
+  font-size:12px;
+  opacity:0.7;
+  margin-bottom:8px;
+}
+
+.post-caption{
+  font-size:14px;
+  margin:8px 0 10px;
+  line-height:1.35;
+}
+
+.post-song{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  border-top:1px solid #222;
+  padding-top:10px;
+  margin-top:10px;
+}
+
+.post-song .meta{
+  min-width:0;
+}
+
+.post-song .meta strong{
+  display:block;
+  font-size:12px;
+  margin-bottom:4px;
+}
+
+.post-song .meta span{
+  display:block;
+  font-size:11px;
+  opacity:.7;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:100%;
+}
+
+.playBtn{
+  flex:0 0 auto;
+  width:auto;
+  margin-top:0;
+  padding:10px 14px;
+  border-radius:999px;
+  background:#fff;
+  color:#000;
+  font-size:12px;
+}
+
+.playBtn:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+.icon{
+  font-family:'Material Symbols Outlined';
+  font-size:22px;
+  cursor:pointer;
+}
+
+.liked{
+  color:#ff3b3b;
+}
 </style>
 </head>
 
 <body>
 
 <div class="container">
+  <div class="header">Shared.</div>
 
-<div class="header">Shared.</div>
+  <div class="upload-box">
+    <div class="dropzone" id="dropzone">
+      Drag & drop or click
+    </div>
 
-<div class="upload-box">
+    <div class="preview" id="previewBox"></div>
 
-  <div class="dropzone" id="dropzone">Drag & drop or click</div>
+    <input type="file" id="file" hidden accept="image/png,image/jpeg,image/jpg,image/gif">
 
-  <div class="preview" id="previewBox"></div>
+    <textarea id="caption" placeholder="Write a caption..."></textarea>
 
-  <input type="file" id="file" hidden accept="image/png,image/jpeg,image/jpg,image/gif">
+    <div class="song-wrapper">
+      <input id="songInput" placeholder="Search song...">
+      <div id="suggestions"></div>
+    </div>
 
-  <textarea id="caption" placeholder="Write a caption..."></textarea>
+    <div id="songList"></div>
 
-  <!-- SONG -->
-  <div class="song-wrapper">
-    <input id="songInput" placeholder="Search song...">
-    <div id="suggestions"></div>
+    <button id="uploadBtn">UPLOAD</button>
   </div>
 
-  <div id="songList"></div>
-
-  <button id="uploadBtn">UPLOAD</button>
-
-</div>
-
-<div id="feed"></div>
-
+  <div id="feed"></div>
 </div>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
-"https://cnhaonawapuahzoctqav.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
 let user;
 let croppedBlob = null;
 let selectedSong = null;
-let audio = new Audio();
-
-/* INIT */
-(async()=>{
-  const {data:{session}} = await supabase.auth.getSession();
-  if(!session) location.href="index.html";
-  user = session.user;
-})();
+let globalAudio = new Audio();
+let activePlayButton = null;
+let debounce = null;
+let currentJsonpScript = null;
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
@@ -214,13 +312,57 @@ const caption = document.getElementById("caption");
 const songInput = document.getElementById("songInput");
 const suggestions = document.getElementById("suggestions");
 const songList = document.getElementById("songList");
+const feed = document.getElementById("feed");
 
-/* IMAGE HANDLING */
+/* INIT */
+(async()=>{
+  const {data:{session}} = await supabase.auth.getSession();
+  if(!session) location.href="index.html";
+  user = session.user;
+  await loadFeed();
+  realtime();
+})();
+
+/* DROPZONE */
 dropzone.onclick = ()=>fileInput.click();
 
+dropzone.ondragover = e=>{
+  e.preventDefault();
+  dropzone.classList.add("dragover");
+};
+
+dropzone.ondragleave = ()=>{
+  dropzone.classList.remove("dragover");
+};
+
+dropzone.ondrop = e=>{
+  e.preventDefault();
+  dropzone.classList.remove("dragover");
+  handleFile(e.dataTransfer.files[0]);
+};
+
 fileInput.onchange = e=>{
-  const f = e.target.files[0];
+  handleFile(e.target.files[0]);
+};
+
+/* IMAGE + CROPPING */
+async function handleFile(f){
   if(!f) return;
+
+  const formData = new FormData();
+  formData.append("file", f);
+
+  const res = await fetch("https://shared-bk4b.onrender.com/moderate",{
+    method:"POST",
+    body:formData
+  });
+
+  const result = await res.json();
+
+  if(!result.ok){
+    alert("Image rejected");
+    return;
+  }
 
   const reader = new FileReader();
   const img = new Image();
@@ -228,125 +370,318 @@ fileInput.onchange = e=>{
   reader.onload = e=>img.src=e.target.result;
 
   img.onload = ()=>{
-    const canvas=document.createElement("canvas");
-    canvas.width=800;
-    canvas.height=800;
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 800;
 
-    const size=Math.min(img.width,img.height);
-    const ctx=canvas.getContext("2d");
+    const size = Math.min(img.width, img.height);
+    const ctx = canvas.getContext("2d");
 
-    ctx.drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,800,800);
+    ctx.drawImage(
+      img,
+      (img.width - size) / 2,
+      (img.height - size) / 2,
+      size,
+      size,
+      0,
+      0,
+      800,
+      800
+    );
 
     canvas.toBlob(b=>{
-      croppedBlob=b;
-      previewBox.style.display="block";
-      dropzone.style.display="none";
-      previewBox.innerHTML=`<img src="${URL.createObjectURL(b)}">`;
+      croppedBlob = b;
+
+      previewBox.style.display = "block";
+      dropzone.style.display = "none";
+
+      previewBox.innerHTML = `<img src="${URL.createObjectURL(b)}" alt="preview">`;
     },"image/jpeg",0.7);
   };
 
   reader.readAsDataURL(f);
-};
+}
 
-/* =========================
-   MUSIC SEARCH FIXED
-========================= */
+/* JSONP helper for Deezer */
+function deezerJsonp(url){
+  return new Promise((resolve, reject)=>{
+    if(currentJsonpScript){
+      currentJsonpScript.remove();
+      currentJsonpScript = null;
+    }
 
-let debounce;
+    const callbackName = `dz_cb_${Date.now()}_${Math.random().toString(36).slice(2)}`;
 
+    const script = document.createElement("script");
+    currentJsonpScript = script;
+
+    const cleanup = ()=>{
+      try{ delete window[callbackName]; }catch(_){}
+      if(script.parentNode) script.parentNode.removeChild(script);
+      if(currentJsonpScript === script) currentJsonpScript = null;
+      clearTimeout(timer);
+    };
+
+    window[callbackName] = (data)=>{
+      cleanup();
+      resolve(data);
+    };
+
+    script.onerror = ()=>{
+      cleanup();
+      reject(new Error("Deezer JSONP request failed"));
+    };
+
+    const sep = url.includes("?") ? "&" : "?";
+    script.src = `${url}${sep}output=jsonp&callback=${callbackName}`;
+
+    const timer = setTimeout(()=>{
+      cleanup();
+      reject(new Error("Deezer JSONP timeout"));
+    }, 10000);
+
+    document.body.appendChild(script);
+  });
+}
+
+/* SONG SEARCH */
 songInput.addEventListener("input", async e=>{
   clearTimeout(debounce);
 
   const q = e.target.value.trim();
   if(q.length < 2){
-    suggestions.innerHTML="";
+    suggestions.innerHTML = "";
+    suggestions.style.display = "none";
     return;
   }
 
   debounce = setTimeout(async ()=>{
-
     try{
-      const res = await fetch(
-        `https://corsproxy.io/?https://api.deezer.com/search?q=${encodeURIComponent(q)}`
+      const data = await deezerJsonp(
+        `https://api.deezer.com/search?q=${encodeURIComponent(q)}`
       );
 
-      const data = await res.json();
+      const items = (data?.data || []).filter(track => track && track.preview);
 
-      suggestions.innerHTML="";
+      suggestions.innerHTML = "";
 
-      (data.data || []).slice(0,6).forEach(track=>{
+      if(items.length === 0){
+        suggestions.innerHTML = `<div class="song-item">No results</div>`;
+        suggestions.style.display = "block";
+        return;
+      }
 
-        if(!track.preview) return;
-
+      items.slice(0, 6).forEach(track=>{
         const div = document.createElement("div");
-        div.className="song-item";
-        div.textContent=`${track.title} - ${track.artist.name}`;
+        div.className = "song-item";
+        div.innerHTML = `
+          ${track.title}
+          <small>${track.artist?.name || "Unknown artist"}</small>
+        `;
 
-        div.onclick=()=>{
-          selectedSong={
-            title:`${track.title} - ${track.artist.name}`,
-            preview:track.preview
+        div.onclick = ()=>{
+          selectedSong = {
+            title: track.title,
+            artist: track.artist?.name || "",
+            preview: track.preview,
+            cover: track.album?.cover_medium || track.album?.cover || "",
+            id: track.id
           };
 
-          songList.innerHTML=`<div class="song-item">✓ ${selectedSong.title}</div>`;
-          suggestions.innerHTML="";
-          songInput.value="";
+          songList.innerHTML = `
+            <div class="selected-song">
+              <div>
+                <div>✓ ${selectedSong.title}</div>
+                <span>${selectedSong.artist}</span>
+              </div>
+              <div class="icon" id="clearSong">close</div>
+            </div>
+          `;
 
-          audio.src = selectedSong.preview;
-          audio.play().catch(()=>{});
+          suggestions.innerHTML = "";
+          suggestions.style.display = "none";
+          songInput.value = "";
+
+          const clearSong = document.getElementById("clearSong");
+          if(clearSong){
+            clearSong.onclick = ()=>{
+              selectedSong = null;
+              songList.innerHTML = "";
+            };
+          }
+
+          if(selectedSong.preview){
+            globalAudio.src = selectedSong.preview;
+            globalAudio.play().catch(()=>{});
+          }
         };
 
         suggestions.appendChild(div);
       });
 
+      suggestions.style.display = "block";
     }catch(err){
-      console.error("music error", err);
+      console.error("music search error", err);
+      suggestions.innerHTML = `<div class="song-item">Search failed</div>`;
+      suggestions.style.display = "block";
     }
-
-  },250);
+  }, 250);
 });
 
-/* close dropdown */
-document.addEventListener("click",(e)=>{
+document.addEventListener("click", (e)=>{
   if(!e.target.closest(".song-wrapper")){
-    suggestions.innerHTML="";
+    suggestions.style.display = "none";
   }
 });
 
 /* UPLOAD */
 document.getElementById("uploadBtn").onclick = async ()=>{
+  if(!croppedBlob){
+    alert("Image required");
+    return;
+  }
 
-  if(!croppedBlob) return alert("Image required");
-  if(!caption.value.trim()) return alert("Caption required");
-  if(!selectedSong) return alert("Select a song");
+  if(!caption.value.trim()){
+    alert("Caption required");
+    return;
+  }
+
+  if(!selectedSong){
+    alert("Select a song");
+    return;
+  }
 
   const path = `${user.id}/${Date.now()}.jpg`;
 
-  await supabase.storage.from("shared").upload(path,croppedBlob);
+  const {error:upErr} = await supabase.storage
+    .from("shared")
+    .upload(path, croppedBlob);
 
-  const {data}=supabase.storage.from("shared").getPublicUrl(path);
+  if(upErr){
+    alert("Upload failed");
+    return;
+  }
 
-  await supabase.from("posts").insert([{
-    user_id:user.id,
-    image_url:data.publicUrl,
-    caption:caption.value,
-    song_preview:selectedSong.preview,
-    song_title:selectedSong.title
+  const {data} = supabase.storage
+    .from("shared")
+    .getPublicUrl(path);
+
+  const {error:dbErr} = await supabase.from("posts").insert([{
+    user_id: user.id,
+    image_url: data.publicUrl,
+    caption: caption.value.trim(),
+    song_preview: selectedSong.preview,
+    song_title: selectedSong.title,
+    song_artist: selectedSong.artist,
+    song_cover: selectedSong.cover
   }]);
 
-  croppedBlob=null;
-  selectedSong=null;
+  if(dbErr){
+    alert("Post failed");
+    return;
+  }
 
-  previewBox.innerHTML="";
-  previewBox.style.display="none";
-  dropzone.style.display="flex";
+  croppedBlob = null;
+  selectedSong = null;
 
-  caption.value="";
-  songInput.value="";
-  songList.innerHTML="";
-  suggestions.innerHTML="";
+  previewBox.innerHTML = "";
+  previewBox.style.display = "none";
+  dropzone.style.display = "flex";
+
+  caption.value = "";
+  songInput.value = "";
+  songList.innerHTML = "";
+  suggestions.innerHTML = "";
+
+  await loadFeed();
 };
 
+/* FEED */
+async function loadFeed(){
+  const {data, error} = await supabase
+    .from("posts")
+    .select("*");
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const posts = (data || []).slice().reverse();
+  feed.innerHTML = "";
+
+  posts.forEach(post => feed.appendChild(renderPost(post)));
+}
+
+function renderPost(post){
+  const postDiv = document.createElement("div");
+  postDiv.className = "post";
+
+  postDiv.innerHTML = `
+    <img src="${post.image_url}" alt="post image">
+    <div class="post-header">
+      <div>Shared</div>
+      <div>${new Date(post.created_at || Date.now()).toLocaleString()}</div>
+    </div>
+    <div class="post-caption">${post.caption || ""}</div>
+
+    <div class="post-song">
+      <div class="meta">
+        <strong>${post.song_title || "Unknown song"}</strong>
+        <span>${post.song_artist || ""}</span>
+      </div>
+      <button class="playBtn" ${post.song_preview ? "" : "disabled"}>
+        ${post.song_preview ? "Play preview" : "No preview"}
+      </button>
+    </div>
+  `;
+
+  const btn = postDiv.querySelector(".playBtn");
+
+  if(post.song_preview){
+    btn.onclick = async ()=>{
+      if(activePlayButton && activePlayButton !== btn){
+        activePlayButton.textContent = "Play preview";
+      }
+
+      if(globalAudio.src !== post.song_preview){
+        globalAudio.pause();
+        globalAudio.src = post.song_preview;
+      }
+
+      if(globalAudio.paused){
+        await globalAudio.play().catch(()=>{});
+        btn.textContent = "Pause preview";
+        activePlayButton = btn;
+      }else{
+        globalAudio.pause();
+        btn.textContent = "Play preview";
+        if(activePlayButton === btn) activePlayButton = null;
+      }
+    };
+  }
+
+  return postDiv;
+}
+
+globalAudio.addEventListener("ended", ()=>{
+  if(activePlayButton){
+    activePlayButton.textContent = "Play preview";
+    activePlayButton = null;
+  }
+});
+
+async function realtime(){
+  supabase.channel("posts-realtime")
+    .on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "posts"
+    }, async ()=>{
+      await loadFeed();
+    })
+    .subscribe();
+}
 </script>
 
 </body>
