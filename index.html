@@ -77,10 +77,18 @@ button:disabled{
   color:#000;
 }
 
+.primary:hover:not(:disabled){
+  transform:scale(1.02);
+}
+
 .secondary{
   background:#000;
   color:#fff;
   border:1px solid #333;
+}
+
+.secondary:hover:not(:disabled){
+  background:#111;
 }
 
 .google{
@@ -88,13 +96,10 @@ button:disabled{
   color:#000;
 }
 
-.google:hover:not(:disabled),
-.primary:hover:not(:disabled),
-.secondary:hover:not(:disabled){
+.google:hover:not(:disabled){
   transform:scale(1.02);
 }
 
-/* 🔥 DIVIDER */
 .divider{
   display:flex;
   align-items:center;
@@ -134,17 +139,16 @@ button:disabled{
   <div class="card">
     <h1>Shared.</h1>
 
-    <input id="username" type="text" placeholder="Username">
-    <input id="email" type="email" placeholder="Email">
-    <input id="password" type="password" placeholder="Password">
+    <input id="username" type="text" placeholder="Username" autocomplete="username">
+    <input id="email" type="email" placeholder="Email" autocomplete="email">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
 
-    <button class="primary" id="signinBtn">SIGN IN</button>
-    <button class="secondary" id="signupBtn">SIGN UP</button>
+    <button type="button" class="primary" id="signinBtn">SIGN IN</button>
+    <button type="button" class="secondary" id="signupBtn">SIGN UP</button>
 
-    <!-- 🔥 DIVIDER -->
     <div class="divider">OR</div>
 
-    <button class="google" id="googleBtn">SIGN IN WITH GOOGLE</button>
+    <button type="button" class="google" id="googleBtn">SIGN IN WITH GOOGLE</button>
 
     <div class="small" id="status"></div>
   </div>
@@ -154,7 +158,15 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes",
+  {
+    auth: {
+      detectSessionInUrl: true,
+      flowType: "pkce",
+      persistSession: true,
+      autoRefreshToken: true
+    }
+  }
 );
 
 const status = document.getElementById("status");
@@ -162,34 +174,47 @@ const signInBtn = document.getElementById("signinBtn");
 const signUpBtn = document.getElementById("signupBtn");
 const googleBtn = document.getElementById("googleBtn");
 
-function setLoading(v){
-  signInBtn.disabled = v;
-  signUpBtn.disabled = v;
-  googleBtn.disabled = v;
+const usernameInput = () => document.getElementById("username");
+const emailInput = () => document.getElementById("email");
+const passwordInput = () => document.getElementById("password");
+
+function setLoading(loading) {
+  signInBtn.disabled = loading;
+  signUpBtn.disabled = loading;
+  googleBtn.disabled = loading;
 }
 
-function goHome(){
+function goHome() {
   window.location.replace("home.html");
 }
 
-async function checkSession(){
-  const { data } = await supabase.auth.getSession();
-  if(data.session) goHome();
+async function checkSessionAndRedirect() {
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    console.error(error);
+    return;
+  }
+  if (data.session) goHome();
 }
 
-await checkSession();
+await checkSessionAndRedirect();
 
-supabase.auth.onAuthStateChange((_event, session)=>{
-  if(session) goHome();
+supabase.auth.onAuthStateChange((_event, session) => {
+  if (session) goHome();
 });
 
-/* SIGN IN */
-async function signIn(){
+async function signIn() {
   status.textContent = "SIGNING IN...";
   setLoading(true);
 
   const email = emailInput().value.trim();
   const password = passwordInput().value;
+
+  if (!email || !password) {
+    status.textContent = "ENTER EMAIL AND PASSWORD";
+    setLoading(false);
+    return;
+  }
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -198,7 +223,7 @@ async function signIn(){
 
   setLoading(false);
 
-  if(error){
+  if (error) {
     status.textContent = error.message;
     return;
   }
@@ -206,8 +231,7 @@ async function signIn(){
   goHome();
 }
 
-/* SIGN UP */
-async function signUp(){
+async function signUp() {
   status.textContent = "CREATING ACCOUNT...";
   setLoading(true);
 
@@ -215,11 +239,17 @@ async function signUp(){
   const password = passwordInput().value;
   const username = usernameInput().value.trim();
 
-  const { error } = await supabase.auth.signUp({
+  if (!email || !password || !username) {
+    status.textContent = "ENTER USERNAME, EMAIL AND PASSWORD";
+    setLoading(false);
+    return;
+  }
+
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
-    options:{
-      data:{
+    options: {
+      data: {
         display_name: username
       }
     }
@@ -227,42 +257,39 @@ async function signUp(){
 
   setLoading(false);
 
-  if(error){
+  if (error) {
     status.textContent = error.message;
     return;
   }
 
-  status.textContent = "CHECK YOUR EMAIL / ACCOUNT CREATED";
+  if (data.session) {
+    goHome();
+    return;
+  }
+
+  status.textContent = "ACCOUNT CREATED";
 }
 
-/* GOOGLE */
-async function signInWithGoogle(){
+async function signInWithGoogle() {
   status.textContent = "REDIRECTING...";
   setLoading(true);
 
   const { error } = await supabase.auth.signInWithOAuth({
-    provider:"google",
-    options:{
+    provider: "google",
+    options: {
       redirectTo: window.location.origin
     }
   });
 
-  if(error){
+  if (error) {
     status.textContent = error.message;
     setLoading(false);
   }
 }
 
-/* helpers */
-const usernameInput = ()=>document.getElementById("username");
-const emailInput = ()=>document.getElementById("email");
-const passwordInput = ()=>document.getElementById("password");
-
-/* events */
-signInBtn.onclick = signIn;
-signUpBtn.onclick = signUp;
-googleBtn.onclick = signInWithGoogle;
-
+signInBtn.addEventListener("click", signIn);
+signUpBtn.addEventListener("click", signUp);
+googleBtn.addEventListener("click", signInWithGoogle);
 </script>
 </body>
 </html>
