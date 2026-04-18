@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Shared</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
@@ -41,23 +41,33 @@ body{
 }
 
 .dropzone{
+  width:100%;
   height:160px;
-  border:2px dashed #333;
   border-radius:18px;
+  border:2px dashed #333;
   display:flex;
   align-items:center;
   justify-content:center;
+  flex-direction:column;
   color:#777;
   cursor:pointer;
+  transition:0.2s;
+  user-select:none;
+}
+
+.dropzone.dragover{
+  border-color:#fff;
+  color:#fff;
 }
 
 .preview{
   width:100%;
   height:160px;
-  display:none;
   border-radius:18px;
   overflow:hidden;
+  display:none;
   margin-bottom:10px;
+  border:1px solid #222;
 }
 
 .preview img{
@@ -74,10 +84,20 @@ input,textarea{
   border:1px solid #222;
   background:#000;
   color:#fff;
+  outline:none;
+}
+
+textarea{
+  min-height:100px;
+  resize:vertical;
 }
 
 .song-wrapper{
   position:relative;
+}
+
+#songInput{
+  margin-top:10px;
 }
 
 #suggestions{
@@ -85,34 +105,137 @@ input,textarea{
   top:100%;
   left:0;
   right:0;
+  margin-top:6px;
   background:#0f0f0f;
   border:1px solid #222;
-  border-radius:12px;
-  max-height:220px;
+  border-radius:14px;
+  max-height:260px;
   overflow:auto;
-  z-index:10;
+  z-index:20;
+  display:none;
 }
 
 .song-item{
-  padding:10px;
+  padding:12px;
   border-bottom:1px solid #222;
   cursor:pointer;
   font-size:12px;
+}
+
+.song-item:last-child{
+  border-bottom:none;
 }
 
 .song-item:hover{
   background:#111;
 }
 
+.song-item small{
+  display:block;
+  margin-top:4px;
+  opacity:.7;
+  font-family:inherit;
+  font-size:11px;
+}
+
+.selected-song{
+  margin-top:10px;
+  border:1px solid #222;
+  border-radius:16px;
+  background:#111;
+  padding:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.selected-song .meta{
+  min-width:0;
+}
+
+.selected-song .title{
+  font-size:12px;
+  line-height:1.3;
+}
+
+.selected-song .artist{
+  display:block;
+  margin-top:4px;
+  font-size:11px;
+  opacity:.7;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.selected-song-actions{
+  display:flex;
+  gap:8px;
+  align-items:center;
+  flex:0 0 auto;
+}
+
 button{
+  border:none;
+  cursor:pointer;
+  font-family:inherit;
+}
+
+.primary-btn{
   width:100%;
   margin-top:12px;
   padding:14px;
   border-radius:16px;
-  border:none;
+  background:linear-gradient(135deg,#fff,#cfcfcf);
+  color:#000;
+  font-size:14px;
+}
+
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:10px 12px;
+  border-radius:999px;
   background:#fff;
   color:#000;
-  cursor:pointer;
+  font-size:12px;
+}
+
+.icon-btn.secondary{
+  background:#1a1a1a;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.material-symbols-outlined{
+  font-variation-settings:
+    'FILL' 0,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+  line-height:1;
+  font-size:20px;
+}
+
+.icon-btn.liked{
+  background:#fff;
+  color:#ff2d55;
+}
+
+.icon-btn.liked .material-symbols-outlined{
+  font-variation-settings:
+    'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
+}
+
+#feed{
+  display:grid;
+  gap:16px;
 }
 
 .post{
@@ -120,7 +243,6 @@ button{
   border:1px solid #222;
   border-radius:20px;
   padding:14px;
-  margin-bottom:16px;
 }
 
 .post img{
@@ -128,215 +250,707 @@ button{
   aspect-ratio:1/1;
   object-fit:cover;
   border-radius:16px;
+  margin-bottom:10px;
 }
 
-.post-song{
-  margin-top:10px;
+.post-header{
   display:flex;
   justify-content:space-between;
+  gap:10px;
+  align-items:flex-start;
+  margin-bottom:10px;
+}
+
+.post-user{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+}
+
+.post-user .name{
+  font-size:13px;
+}
+
+.post-user .time{
+  font-size:11px;
+  opacity:.7;
+  display:flex;
+  gap:6px;
   align-items:center;
 }
 
-.playBtn{
-  padding:8px 12px;
-  border-radius:999px;
-  border:none;
-  cursor:pointer;
+.post-caption{
+  font-size:14px;
+  line-height:1.4;
+  margin-top:8px;
+  white-space:pre-wrap;
+}
+
+.post-song{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #222;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+
+.song-meta{
+  min-width:0;
+}
+
+.song-meta .song-title{
+  font-size:12px;
+  line-height:1.35;
+}
+
+.song-meta .song-sub{
+  margin-top:4px;
+  font-size:11px;
+  opacity:.7;
+}
+
+.post-actions{
+  margin-top:12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.like-wrap{
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.like-count{
+  font-size:12px;
+  opacity:.85;
+  min-width:16px;
+  text-align:center;
+}
+
+.empty-state{
+  opacity:.6;
+  font-size:13px;
+  text-align:center;
+  padding:24px 0;
+}
+
+@media (max-width:520px){
+  .post-actions,
+  .post-song{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .icon-btn{
+    width:100%;
+  }
+
+  .selected-song{
+    align-items:flex-start;
+    flex-direction:column;
+  }
+
+  .selected-song-actions{
+    width:100%;
+    justify-content:space-between;
+  }
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
+  <div class="header">Shared.</div>
 
-<div class="header">Shared.</div>
+  <div class="upload-box">
+    <div class="dropzone" id="dropzone">
+      <span class="material-symbols-outlined" style="font-size:30px;margin-bottom:8px;">upload</span>
+      Drag & drop or click
+    </div>
 
-<div class="upload-box">
+    <div class="preview" id="previewBox"></div>
 
-  <div class="dropzone" id="dropzone">Click or Drop</div>
+    <input type="file" id="file" hidden accept="image/png,image/jpeg,image/jpg,image/gif">
 
-  <div class="preview" id="previewBox"></div>
+    <textarea id="caption" placeholder="Write a caption..."></textarea>
 
-  <input type="file" id="file" hidden>
+    <div class="song-wrapper">
+      <input id="songInput" placeholder="Search song...">
+      <div id="suggestions"></div>
+    </div>
 
-  <textarea id="caption" placeholder="caption..."></textarea>
+    <div id="songList"></div>
 
-  <div class="song-wrapper">
-    <input id="songInput" placeholder="search song...">
-    <div id="suggestions"></div>
+    <button id="uploadBtn" class="primary-btn">UPLOAD</button>
   </div>
 
-  <div id="songList"></div>
-
-  <button id="uploadBtn">UPLOAD</button>
-
-</div>
-
-<div id="feed"></div>
-
+  <div id="feed"></div>
 </div>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
-"https://cnhaonawapuahzoctqav.supabase.co",
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
-let user;
+let user = null;
+let username = "user";
 let croppedBlob = null;
 let selectedSong = null;
-let audio = new Audio();
+let debounce = null;
+let globalAudio = new Audio();
+let activePlayButton = null;
+let jsonpScript = null;
 
-/* INIT */
-(async()=>{
-  const {data:{session}} = await supabase.auth.getSession();
-  if(!session) location.href="index.html";
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("file");
+const previewBox = document.getElementById("previewBox");
+const caption = document.getElementById("caption");
+const songInput = document.getElementById("songInput");
+const suggestions = document.getElementById("suggestions");
+const songList = document.getElementById("songList");
+const feed = document.getElementById("feed");
+const uploadBtn = document.getElementById("uploadBtn");
+
+function getUsernameFromSession(sessionUser){
+  return (
+    sessionUser?.user_metadata?.username ||
+    sessionUser?.user_metadata?.name ||
+    sessionUser?.email?.split("@")?.[0] ||
+    "user"
+  );
+}
+
+function formatDateTime(value){
+  const d = value ? new Date(value) : null;
+  if(!d || Number.isNaN(d.getTime())) return "";
+  return new Intl.DateTimeFormat("it-IT", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(d);
+}
+
+function setAudioButtonState(button, playing){
+  const icon = button.querySelector(".material-symbols-outlined");
+  const label = button.querySelector(".btn-label");
+  if(!icon || !label) return;
+
+  if(playing){
+    icon.textContent = "pause";
+    label.textContent = button.dataset.pauseLabel || "Pause preview";
+    button.dataset.playing = "1";
+  }else{
+    icon.textContent = "play_arrow";
+    label.textContent = button.dataset.playLabel || "Play preview";
+    button.dataset.playing = "0";
+  }
+}
+
+async function playPreview(url, button){
+  if(!url || !button) return;
+
+  if(activePlayButton && activePlayButton !== button){
+    setAudioButtonState(activePlayButton, false);
+  }
+
+  if(globalAudio.src !== url){
+    globalAudio.pause();
+    globalAudio.src = url;
+  }
+
+  if(globalAudio.paused){
+    try{
+      await globalAudio.play();
+      setAudioButtonState(button, true);
+      activePlayButton = button;
+    }catch(err){
+      console.error("audio play error", err);
+    }
+  }else{
+    globalAudio.pause();
+    setAudioButtonState(button, false);
+    if(activePlayButton === button) activePlayButton = null;
+  }
+}
+
+globalAudio.addEventListener("ended", ()=>{
+  if(activePlayButton){
+    setAudioButtonState(activePlayButton, false);
+    activePlayButton = null;
+  }
+});
+
+(async ()=>{
+  const { data: { session } } = await supabase.auth.getSession();
+  if(!session) location.href = "index.html";
   user = session.user;
-  loadFeed();
+  username = getUsernameFromSession(user);
+  await loadFeed();
+  realtime();
 })();
 
-/* IMAGE */
-document.getElementById("dropzone").onclick = ()=>fileInput.click();
+/* IMAGE INPUT */
+dropzone.onclick = ()=> fileInput.click();
 
-const fileInput = document.getElementById("file");
+dropzone.ondragover = e=>{
+  e.preventDefault();
+  dropzone.classList.add("dragover");
+};
+
+dropzone.ondragleave = ()=>{
+  dropzone.classList.remove("dragover");
+};
+
+dropzone.ondrop = e=>{
+  e.preventDefault();
+  dropzone.classList.remove("dragover");
+  handleFile(e.dataTransfer.files[0]);
+};
 
 fileInput.onchange = e=>{
-  const f = e.target.files[0];
-  if(!f) return;
+  handleFile(e.target.files[0]);
+};
+
+async function handleFile(file){
+  if(!file) return;
 
   const reader = new FileReader();
   const img = new Image();
 
-  reader.onload = e=>img.src=e.target.result;
+  reader.onload = e=> img.src = e.target.result;
 
   img.onload = ()=>{
-    const canvas=document.createElement("canvas");
-    canvas.width=800;
-    canvas.height=800;
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 800;
 
-    const size=Math.min(img.width,img.height);
-    const ctx=canvas.getContext("2d");
+    const size = Math.min(img.width, img.height);
+    const ctx = canvas.getContext("2d");
 
-    ctx.drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,800,800);
+    ctx.drawImage(
+      img,
+      (img.width - size) / 2,
+      (img.height - size) / 2,
+      size,
+      size,
+      0,
+      0,
+      800,
+      800
+    );
 
-    canvas.toBlob(b=>{
-      croppedBlob=b;
-      document.getElementById("previewBox").style.display="block";
-      document.getElementById("previewBox").innerHTML=`<img src="${URL.createObjectURL(b)}">`;
-    },"image/jpeg",0.7);
+    canvas.toBlob(blob=>{
+      croppedBlob = blob;
+      previewBox.style.display = "block";
+      dropzone.style.display = "none";
+      previewBox.innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="preview">`;
+    }, "image/jpeg", 0.75);
   };
 
-  reader.readAsDataURL(f);
-};
+  reader.readAsDataURL(file);
+}
 
 /* DEEZER JSONP */
-function deezerSearch(q){
-  return new Promise((resolve)=>{
-    const cb = "cb_"+Math.random().toString(36).slice(2);
+function deezerSearch(query){
+  return new Promise((resolve, reject)=>{
+    if(jsonpScript){
+      jsonpScript.remove();
+      jsonpScript = null;
+    }
 
-    window[cb] = (data)=>{
+    const callbackName = `dz_cb_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+    const timeout = setTimeout(()=>{
+      cleanup();
+      reject(new Error("Deezer request timeout"));
+    }, 10000);
+
+    function cleanup(){
+      clearTimeout(timeout);
+      try{ delete window[callbackName]; }catch(_){}
+      if(jsonpScript && jsonpScript.parentNode){
+        jsonpScript.parentNode.removeChild(jsonpScript);
+      }
+      jsonpScript = null;
+    }
+
+    window[callbackName] = (data)=>{
+      cleanup();
       resolve(data);
-      delete window[cb];
-      script.remove();
     };
 
     const script = document.createElement("script");
-    script.src = `https://api.deezer.com/search?q=${encodeURIComponent(q)}&output=jsonp&callback=${cb}`;
+    jsonpScript = script;
+    script.onerror = ()=>{
+      cleanup();
+      reject(new Error("Deezer request failed"));
+    };
+
+    script.src = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&output=jsonp&callback=${callbackName}`;
     document.body.appendChild(script);
   });
 }
 
 /* SONG SEARCH */
 songInput.addEventListener("input", async e=>{
-  const q = e.target.value;
-  if(q.length < 2) return;
+  clearTimeout(debounce);
+  const q = e.target.value.trim();
 
-  const data = await deezerSearch(q);
+  if(q.length < 2){
+    suggestions.innerHTML = "";
+    suggestions.style.display = "none";
+    return;
+  }
 
-  suggestions.innerHTML="";
+  debounce = setTimeout(async ()=>{
+    try{
+      const data = await deezerSearch(q);
+      const tracks = (data?.data || []).filter(track => track && track.preview);
 
-  (data.data || []).slice(0,6).forEach(track=>{
-    const div = document.createElement("div");
-    div.className="song-item";
-    div.textContent = track.title + " - " + track.artist.name;
+      suggestions.innerHTML = "";
 
-    div.onclick = ()=>{
-      selectedSong = {
-        title: track.title + " - " + track.artist.name,
-        preview: track.preview
-      };
+      if(tracks.length === 0){
+        suggestions.innerHTML = `<div class="song-item">No results</div>`;
+        suggestions.style.display = "block";
+        return;
+      }
 
-      suggestions.innerHTML="";
-      songInput.value="";
+      tracks.slice(0, 6).forEach(track=>{
+        const row = document.createElement("div");
+        row.className = "song-item";
+        row.innerHTML = `
+          ${track.title}
+          <small>${track.artist?.name || "Unknown artist"}</small>
+        `;
 
-      audio.src = selectedSong.preview;
-      audio.play();
-    };
+        row.onclick = ()=>{
+          selectedSong = {
+            title: track.title,
+            artist: track.artist?.name || "",
+            preview: track.preview,
+            id: track.id
+          };
 
-    suggestions.appendChild(div);
-  });
+          renderSelectedSong();
+          suggestions.innerHTML = "";
+          suggestions.style.display = "none";
+          songInput.value = "";
+        };
+
+        suggestions.appendChild(row);
+      });
+
+      suggestions.style.display = "block";
+    }catch(err){
+      console.error(err);
+      suggestions.innerHTML = `<div class="song-item">Search failed</div>`;
+      suggestions.style.display = "block";
+    }
+  }, 250);
 });
 
-/* UPLOAD */
-document.getElementById("uploadBtn").onclick = async ()=>{
+document.addEventListener("click", e=>{
+  if(!e.target.closest(".song-wrapper")){
+    suggestions.style.display = "none";
+  }
+});
 
-  if(!croppedBlob || !selectedSong) return alert("missing data");
+function renderSelectedSong(){
+  if(!selectedSong){
+    songList.innerHTML = "";
+    return;
+  }
+
+  songList.innerHTML = `
+    <div class="selected-song">
+      <div class="meta">
+        <div class="title">Selected: ${selectedSong.title}</div>
+        <span class="artist">${selectedSong.artist || ""}</span>
+      </div>
+
+      <div class="selected-song-actions">
+        <button type="button" class="icon-btn secondary" id="selectedPlayBtn">
+          <span class="material-symbols-outlined">play_arrow</span>
+          <span class="btn-label">Play preview</span>
+        </button>
+
+        <button type="button" class="icon-btn secondary" id="clearSongBtn" title="Remove song">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  const selectedPlayBtn = document.getElementById("selectedPlayBtn");
+  const clearSongBtn = document.getElementById("clearSongBtn");
+
+  selectedPlayBtn.onclick = ()=>{
+    playPreview(selectedSong.preview, selectedPlayBtn);
+  };
+
+  clearSongBtn.onclick = ()=>{
+    selectedSong = null;
+    songList.innerHTML = "";
+  };
+}
+
+/* UPLOAD */
+uploadBtn.onclick = async ()=>{
+  if(!croppedBlob){
+    alert("Image required");
+    return;
+  }
+
+  if(!caption.value.trim()){
+    alert("Caption required");
+    return;
+  }
+
+  if(!selectedSong){
+    alert("Select a song");
+    return;
+  }
 
   const path = `${user.id}/${Date.now()}.jpg`;
 
-  await supabase.storage.from("shared").upload(path, croppedBlob);
+  const { error: uploadError } = await supabase.storage
+    .from("shared")
+    .upload(path, croppedBlob, {
+      contentType: "image/jpeg",
+      upsert: false
+    });
 
-  const {data} = supabase.storage.from("shared").getPublicUrl(path);
+  if(uploadError){
+    console.error(uploadError);
+    alert(uploadError.message || "Upload failed");
+    return;
+  }
 
-  await supabase.from("posts").insert([{
+  const { data } = supabase.storage.from("shared").getPublicUrl(path);
+
+  const { error: insertError } = await supabase.from("posts").insert([{
     user_id: user.id,
+    username,
     image_url: data.publicUrl,
-    caption: document.getElementById("caption").value,
+    caption: caption.value.trim(),
     song_title: selectedSong.title,
     song_preview: selectedSong.preview
   }]);
 
-  loadFeed();
+  if(insertError){
+    console.error(insertError);
+    alert(insertError.message || "Post failed");
+    return;
+  }
+
+  croppedBlob = null;
+  selectedSong = null;
+
+  previewBox.innerHTML = "";
+  previewBox.style.display = "none";
+  dropzone.style.display = "flex";
+
+  caption.value = "";
+  songInput.value = "";
+  songList.innerHTML = "";
+  suggestions.innerHTML = "";
+  suggestions.style.display = "none";
+
+  await loadFeed();
 };
+
+/* LIKE TOGGLE */
+async function toggleLike(postId){
+  const { data: { session } } = await supabase.auth.getSession();
+  if(!session) return;
+
+  const uid = session.user.id;
+
+  const { data: existing, error: findError } = await supabase
+    .from("likes")
+    .select("id")
+    .eq("post_id", postId)
+    .eq("user_id", uid)
+    .maybeSingle();
+
+  if(findError){
+    console.error(findError);
+    return;
+  }
+
+  if(existing){
+    const { error: delError } = await supabase
+      .from("likes")
+      .delete()
+      .eq("id", existing.id);
+
+    if(delError){
+      console.error(delError);
+      alert(delError.message || "Unlike failed");
+      return;
+    }
+  }else{
+    const { error: insError } = await supabase
+      .from("likes")
+      .insert([{ post_id: postId, user_id: uid }]);
+
+    if(insError){
+      console.error(insError);
+      alert(insError.message || "Like failed");
+      return;
+    }
+  }
+
+  await loadFeed();
+}
 
 /* FEED */
 async function loadFeed(){
-  const {data} = await supabase.from("posts").select("*");
-  const feed = document.getElementById("feed");
-  feed.innerHTML="";
+  const { data: posts, error: postsError } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at", { ascending: false });
 
-  (data || []).reverse().forEach(post=>{
-    const div = document.createElement("div");
-    div.className="post";
+  if(postsError){
+    console.error(postsError);
+    feed.innerHTML = `<div class="empty-state">Unable to load feed.</div>`;
+    return;
+  }
 
-    const a = new Audio(post.song_preview);
+  const rows = posts || [];
+  feed.innerHTML = "";
 
-    div.innerHTML = `
-      <img src="${post.image_url}">
-      <div>${post.caption}</div>
-      <div class="post-song">
-        <div>${post.song_title}</div>
-        <button class="playBtn">Play</button>
-      </div>
-    `;
+  if(rows.length === 0){
+    feed.innerHTML = `<div class="empty-state">No posts yet.</div>`;
+    return;
+  }
 
-    div.querySelector(".playBtn").onclick = ()=>{
-      if(a.paused){
-        a.play();
-        div.querySelector(".playBtn").textContent="Pause";
-      }else{
-        a.pause();
-        div.querySelector(".playBtn").textContent="Play";
-      }
-    };
+  const postIds = rows.map(p => p.id);
+  let likes = [];
 
-    feed.appendChild(div);
+  if(postIds.length){
+    const { data: likesData, error: likesError } = await supabase
+      .from("likes")
+      .select("post_id,user_id")
+      .in("post_id", postIds);
+
+    if(likesError){
+      console.error(likesError);
+    }else{
+      likes = likesData || [];
+    }
+  }
+
+  const likeCountMap = new Map();
+  const likedByMeSet = new Set();
+
+  likes.forEach(row=>{
+    likeCountMap.set(row.post_id, (likeCountMap.get(row.post_id) || 0) + 1);
+    if(row.user_id === user.id){
+      likedByMeSet.add(row.post_id);
+    }
   });
+
+  for(const post of rows){
+    feed.appendChild(renderPost(post, likeCountMap, likedByMeSet.has(post.id)));
+  }
+}
+
+function renderPost(post, likeCountMap, likedByMe){
+  const postDiv = document.createElement("div");
+  postDiv.className = "post";
+
+  const formattedDate = formatDateTime(post.created_at);
+  const likeCount = likeCountMap.get(post.id) || 0;
+
+  postDiv.innerHTML = `
+    <img src="${post.image_url}" alt="post image">
+
+    <div class="post-header">
+      <div class="post-user">
+        <div class="name">${post.username || "user"}</div>
+        <div class="time">
+          <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
+          <span>${formattedDate || ""}</span>
+        </div>
+      </div>
+
+      <span class="material-symbols-outlined" style="opacity:.6;">more_horiz</span>
+    </div>
+
+    <div class="post-caption">${post.caption || ""}</div>
+
+    <div class="post-song">
+      <div class="song-meta">
+        <div class="song-title">
+          <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;">music_note</span>
+          ${post.song_title || "Unknown song"}
+        </div>
+        <div class="song-sub">Preview available</div>
+      </div>
+
+      <button type="button" class="icon-btn secondary playBtn" data-play-label="Play preview" data-pause-label="Pause preview">
+        <span class="material-symbols-outlined">play_arrow</span>
+        <span class="btn-label">Play preview</span>
+      </button>
+    </div>
+
+    <div class="post-actions">
+      <div class="like-wrap">
+        <button type="button" class="icon-btn likeBtn ${likedByMe ? "liked" : ""}">
+          <span class="material-symbols-outlined">${likedByMe ? "favorite" : "favorite_border"}</span>
+          <span>Like</span>
+        </button>
+        <div class="like-count">
+          <span class="likeCount">${likeCount}</span>
+          <span style="opacity:.75;">likes</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  const playBtn = postDiv.querySelector(".playBtn");
+  const likeBtn = postDiv.querySelector(".likeBtn");
+  const likeCountEl = postDiv.querySelector(".likeCount");
+
+  playBtn.onclick = ()=>{
+    playPreview(post.song_preview, playBtn);
+  };
+
+  likeBtn.onclick = async ()=>{
+    await toggleLike(post.id);
+  };
+
+  return postDiv;
+}
+
+/* REALTIME */
+function realtime(){
+  supabase
+    .channel("shared-posts-likes")
+    .on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "posts"
+    }, async ()=>{
+      await loadFeed();
+    })
+    .on("postgres_changes", {
+      event: "*",
+      schema: "public",
+      table: "likes"
+    }, async ()=>{
+      await loadFeed();
+    })
+    .subscribe();
 }
 </script>
-
 </body>
 </html>
