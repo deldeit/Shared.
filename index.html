@@ -23,25 +23,22 @@ body{
   font-family:'Archivo Black', sans-serif;
 }
 
-/* CARD */
 .card{
   width:340px;
   background:#0f0f0f;
   border:1px solid #222;
   border-radius:20px;
   padding:22px;
+  box-shadow:0 20px 60px rgba(0,0,0,.35);
 }
 
-/* TITLE */
 h1{
-  margin:0;
+  margin:0 0 16px;
   text-align:center;
   font-size:28px;
   letter-spacing:1px;
-  margin-bottom:16px;
 }
 
-/* INPUTS */
 input{
   width:100%;
   padding:12px;
@@ -58,7 +55,6 @@ input:focus{
   border-color:#444;
 }
 
-/* BUTTON BASE */
 button{
   width:100%;
   padding:14px;
@@ -71,111 +67,152 @@ button{
   letter-spacing:1px;
 }
 
-/* PRIMARY */
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
 .primary{
   background:linear-gradient(135deg,#ffffff,#d0d0d0);
   color:#000;
 }
 
-.primary:hover{
+.primary:hover:not(:disabled){
   transform:scale(1.02);
 }
 
-/* SECONDARY */
 .secondary{
   background:#000;
   color:#fff;
   border:1px solid #333;
 }
 
-.secondary:hover{
+.secondary:hover:not(:disabled){
   background:#111;
 }
 
-/* STATUS */
 .small{
   font-size:11px;
-  opacity:0.6;
+  opacity:0.7;
   margin-top:12px;
   text-align:center;
+  min-height:14px;
 }
 </style>
 </head>
 
 <body>
+  <div class="card">
+    <h1>Shared.</h1>
 
-<div class="card">
+    <input id="email" type="email" placeholder="Email" autocomplete="email">
+    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
 
-  <h1>Shared.</h1>
+    <button class="primary" id="signinBtn">SIGN IN</button>
+    <button class="secondary" id="signupBtn">SIGN UP</button>
 
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
+    <div class="small" id="status"></div>
+  </div>
 
-  <button class="primary" onclick="signIn()">SIGN IN</button>
-  <button class="secondary" onclick="signUp()">SIGN UP</button>
+  <script type="module">
+    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-  <div class="small" id="status"></div>
+    const supabase = createClient(
+      "https://cnhaonawapuahzoctqav.supabase.co",
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+    );
 
-</div>
+    const status = document.getElementById("status");
+    const signInBtn = document.getElementById("signinBtn");
+    const signUpBtn = document.getElementById("signupBtn");
 
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+    function setLoading(loading) {
+      signInBtn.disabled = loading;
+      signUpBtn.disabled = loading;
+    }
 
-const supabase = createClient(
-  "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
-);
+    function goHome() {
+      window.location.replace("home.html");
+    }
 
-/* AUTO REDIRECT */
-const { data:{session} } = await supabase.auth.getSession();
-if(session){
-  window.location.href = "home.html";
-}
+    async function checkSessionAndRedirect() {
+      const { data, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error(error);
+        return;
+      }
+      if (data.session) goHome();
+    }
 
-const status = document.getElementById("status");
+    await checkSessionAndRedirect();
 
-/* SIGN IN */
-window.signIn = async () => {
+    supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) goHome();
+    });
 
-  status.innerText = "SIGNING IN...";
+    async function signIn() {
+      status.textContent = "SIGNING IN...";
+      setLoading(true);
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-  const { error } = await supabase.auth.signInWithPassword({
-    email,
-    password
-  });
+      if (!email || !password) {
+        status.textContent = "ENTER EMAIL AND PASSWORD";
+        setLoading(false);
+        return;
+      }
 
-  if(error){
-    status.innerText = error.message;
-    return;
-  }
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
 
-  window.location.href = "home.html";
-};
+      setLoading(false);
 
-/* SIGN UP */
-window.signUp = async () => {
+      if (error) {
+        status.textContent = error.message;
+        return;
+      }
 
-  status.innerText = "CREATING ACCOUNT...";
+      goHome();
+    }
 
-  const email = document.getElementById("email").value;
-  const password = document.getElementById("password").value;
+    async function signUp() {
+      status.textContent = "CREATING ACCOUNT...";
+      setLoading(true);
 
-  const { error } = await supabase.auth.signUp({
-    email,
-    password
-  });
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
 
-  if(error){
-    status.innerText = error.message;
-    return;
-  }
+      if (!email || !password) {
+        status.textContent = "ENTER EMAIL AND PASSWORD";
+        setLoading(false);
+        return;
+      }
 
-  status.innerText = "CHECK EMAIL TO CONFIRM";
-};
-</script>
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password
+      });
 
+      setLoading(false);
+
+      if (error) {
+        status.textContent = error.message;
+        return;
+      }
+
+      if (data.session) {
+        goHome();
+        return;
+      }
+
+      status.textContent = "ACCOUNT CREATED";
+    }
+
+    signInBtn.addEventListener("click", signIn);
+    signUpBtn.addEventListener("click", signUp);
+  </script>
 </body>
 </html>
