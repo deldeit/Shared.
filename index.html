@@ -8,9 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{ box-sizing:border-box; }
 
 body{
   margin:0;
@@ -91,6 +89,15 @@ button:disabled{
   background:#111;
 }
 
+.google{
+  background:#fff;
+  color:#000;
+}
+
+.google:hover:not(:disabled){
+  transform:scale(1.02);
+}
+
 .small{
   font-size:11px;
   opacity:0.7;
@@ -105,114 +112,138 @@ button:disabled{
   <div class="card">
     <h1>Shared.</h1>
 
-    <input id="email" type="email" placeholder="Email" autocomplete="email">
-    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
+    <input id="username" type="text" placeholder="Username">
+    <input id="email" type="email" placeholder="Email">
+    <input id="password" type="password" placeholder="Password">
 
     <button class="primary" id="signinBtn">SIGN IN</button>
     <button class="secondary" id="signupBtn">SIGN UP</button>
+    <button class="google" id="googleBtn">SIGN IN WITH GOOGLE</button>
 
     <div class="small" id="status"></div>
   </div>
 
-  <script type="module">
-    import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<script type="module">
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-    const supabase = createClient(
-      "https://cnhaonawapuahzoctqav.supabase.co",
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
-    );
+const supabase = createClient(
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+);
 
-    const status = document.getElementById("status");
-    const signInBtn = document.getElementById("signinBtn");
-    const signUpBtn = document.getElementById("signupBtn");
+const status = document.getElementById("status");
+const signInBtn = document.getElementById("signinBtn");
+const signUpBtn = document.getElementById("signupBtn");
+const googleBtn = document.getElementById("googleBtn");
 
-    function setLoading(loading) {
-      signInBtn.disabled = loading;
-      signUpBtn.disabled = loading;
+function setLoading(loading){
+  signInBtn.disabled = loading;
+  signUpBtn.disabled = loading;
+  googleBtn.disabled = loading;
+}
+
+function goHome(){
+  window.location.replace("home.html");
+}
+
+async function checkSession(){
+  const { data } = await supabase.auth.getSession();
+  if(data.session) goHome();
+}
+
+await checkSession();
+
+supabase.auth.onAuthStateChange((_event, session)=>{
+  if(session) goHome();
+});
+
+async function signIn(){
+  status.textContent = "SIGNING IN...";
+  setLoading(true);
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+
+  if(!email || !password){
+    status.textContent = "ENTER EMAIL AND PASSWORD";
+    setLoading(false);
+    return;
+  }
+
+  const { error } = await supabase.auth.signInWithPassword({
+    email,
+    password
+  });
+
+  setLoading(false);
+
+  if(error){
+    status.textContent = error.message;
+    return;
+  }
+
+  goHome();
+}
+
+async function signUp(){
+  status.textContent = "CREATING ACCOUNT...";
+  setLoading(true);
+
+  const email = document.getElementById("email").value.trim();
+  const password = document.getElementById("password").value;
+  const username = document.getElementById("username").value.trim();
+
+  if(!email || !password || !username){
+    status.textContent = "ENTER USERNAME, EMAIL AND PASSWORD";
+    setLoading(false);
+    return;
+  }
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options:{
+      data:{
+        display_name: username
+      }
     }
+  });
 
-    function goHome() {
-      window.location.replace("home.html");
+  setLoading(false);
+
+  if(error){
+    status.textContent = error.message;
+    return;
+  }
+
+  if(data.session){
+    goHome();
+    return;
+  }
+
+  status.textContent = "ACCOUNT CREATED";
+}
+
+async function signInWithGoogle(){
+  status.textContent = "REDIRECTING...";
+  setLoading(true);
+
+  const { error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options:{
+      redirectTo: `${window.location.origin}/home.html`
     }
+  });
 
-    async function checkSessionAndRedirect() {
-      const { data, error } = await supabase.auth.getSession();
-      if (error) {
-        console.error(error);
-        return;
-      }
-      if (data.session) goHome();
-    }
+  if(error){
+    status.textContent = error.message;
+    setLoading(false);
+  }
+}
 
-    await checkSessionAndRedirect();
-
-    supabase.auth.onAuthStateChange((_event, session) => {
-      if (session) goHome();
-    });
-
-    async function signIn() {
-      status.textContent = "SIGNING IN...";
-      setLoading(true);
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      if (!email || !password) {
-        status.textContent = "ENTER EMAIL AND PASSWORD";
-        setLoading(false);
-        return;
-      }
-
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-
-      setLoading(false);
-
-      if (error) {
-        status.textContent = error.message;
-        return;
-      }
-
-      goHome();
-    }
-
-    async function signUp() {
-      status.textContent = "CREATING ACCOUNT...";
-      setLoading(true);
-
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      if (!email || !password) {
-        status.textContent = "ENTER EMAIL AND PASSWORD";
-        setLoading(false);
-        return;
-      }
-
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password
-      });
-
-      setLoading(false);
-
-      if (error) {
-        status.textContent = error.message;
-        return;
-      }
-
-      if (data.session) {
-        goHome();
-        return;
-      }
-
-      status.textContent = "ACCOUNT CREATED";
-    }
-
-    signInBtn.addEventListener("click", signIn);
-    signUpBtn.addEventListener("click", signUp);
-  </script>
+signInBtn.addEventListener("click", signIn);
+signUpBtn.addEventListener("click", signUp);
+googleBtn.addEventListener("click", signInWithGoogle);
+</script>
 </body>
 </html>
