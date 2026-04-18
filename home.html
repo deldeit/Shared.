@@ -33,9 +33,7 @@ body{
   margin-bottom:24px;
 }
 
-/* =========================
-   UPLOAD AREA (REDESIGN)
-========================= */
+/* UPLOAD */
 .upload-box{
   background:#0f0f0f;
   border:1px solid #222;
@@ -44,7 +42,7 @@ body{
   margin-bottom:18px;
 }
 
-/* DROPZONE MODERNA */
+/* DROPZONE */
 .dropzone{
   width:100%;
   height:160px;
@@ -54,16 +52,8 @@ body{
   align-items:center;
   justify-content:center;
   flex-direction:column;
-  gap:6px;
   color:#777;
   cursor:pointer;
-  transition:0.2s;
-  overflow:hidden;
-}
-
-.dropzone:hover{
-  border-color:#555;
-  color:#aaa;
 }
 
 .dropzone.dragover{
@@ -71,7 +61,7 @@ body{
   color:#fff;
 }
 
-/* PREVIEW ELEGANTE */
+/* PREVIEW */
 .preview{
   width:100%;
   height:160px;
@@ -88,7 +78,7 @@ body{
   object-fit:cover;
 }
 
-/* INPUTS */
+/* INPUT */
 input,textarea{
   width:100%;
   margin-top:10px;
@@ -99,7 +89,7 @@ input,textarea{
   color:#fff;
 }
 
-/* SONG */
+/* SONG LIST */
 .song-item{
   padding:10px;
   border:1px solid #222;
@@ -125,9 +115,7 @@ button{
   cursor:pointer;
 }
 
-/* =========================
-   POSTS
-========================= */
+/* POST */
 .post{
   background:#0f0f0f;
   border:1px solid #222;
@@ -168,16 +156,6 @@ button{
 .liked{
   color:#ff3b3b;
 }
-
-.delete-btn{
-  background:#ff3b3b;
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
 </style>
 </head>
 
@@ -191,8 +169,7 @@ button{
 <div class="upload-box">
 
   <div class="dropzone" id="dropzone">
-    <div>⬆ Upload image</div>
-    <div style="font-size:12px;opacity:0.6">Drag & drop or click</div>
+    Drag & drop or click
   </div>
 
   <div class="preview" id="previewBox"></div>
@@ -236,13 +213,16 @@ let globalAudio = new Audio();
   realtime();
 })();
 
-/* =========================
-   DROPZONE
-========================= */
+/* DOM */
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
 const previewBox = document.getElementById("previewBox");
+const caption = document.getElementById("caption");
+const songInput = document.getElementById("songInput");
+const suggestions = document.getElementById("suggestions");
+const songList = document.getElementById("songList");
 
+/* DROPZONE */
 dropzone.onclick = ()=>fileInput.click();
 
 dropzone.ondragover = e=>{
@@ -264,9 +244,7 @@ fileInput.onchange = e=>{
   handleFile(e.target.files[0]);
 };
 
-/* =========================
-   IMAGE PROCESS + MODERATION
-========================= */
+/* IMAGE + MODERATION */
 async function handleFile(f){
   if(!f) return;
 
@@ -307,9 +285,7 @@ async function handleFile(f){
       previewBox.style.display="block";
       dropzone.style.display="none";
 
-      previewBox.innerHTML=`
-        <img src="${URL.createObjectURL(b)}">
-      `;
+      previewBox.innerHTML=`<img src="${URL.createObjectURL(b)}">`;
     },"image/jpeg",0.7);
   };
 
@@ -317,15 +293,18 @@ async function handleFile(f){
 }
 
 /* =========================
-   DEEZER SEARCH
+   DEEZER (FIX STABLE API)
 ========================= */
-window.handleDeezer = function(data){
+songInput.addEventListener("input", async e=>{
+  const q = e.target.value.trim();
+  if(q.length < 2) return;
 
-  const box = document.getElementById("suggestions");
-  box.innerHTML="";
+  const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent("https://api.deezer.com/search?q="+q)}`);
+  const data = await res.json();
 
-  data.data?.slice(0,5).forEach(t=>{
+  suggestions.innerHTML="";
 
+  data.data.slice(0,5).forEach(t=>{
     const div=document.createElement("div");
     div.className="song-item";
     div.textContent=`${t.title} - ${t.artist.name}`;
@@ -337,31 +316,18 @@ window.handleDeezer = function(data){
       };
 
       songList.innerHTML=`<div class="song-item">✓ ${selectedSong.title}</div>`;
-      box.innerHTML="";
+      suggestions.innerHTML="";
       songInput.value="";
     };
 
-    box.appendChild(div);
+    suggestions.appendChild(div);
   });
-};
-
-let debounce;
-songInput.addEventListener("input",e=>{
-  clearTimeout(debounce);
-  if(e.target.value.length<2) return;
-
-  debounce=setTimeout(()=>{
-    const s=document.createElement("script");
-    s.src=`https://api.deezer.com/search?q=${encodeURIComponent(e.target.value)}&output=jsonp&callback=handleDeezer`;
-    document.body.appendChild(s);
-    setTimeout(()=>s.remove(),2000);
-  },250);
 });
 
 /* =========================
-   UPLOAD VALIDATION
+   UPLOAD (SAFE)
 ========================= */
-uploadBtn.onclick = async ()=>{
+document.getElementById("uploadBtn").onclick = async ()=>{
 
   if(!croppedBlob){
     alert("Image required");
@@ -380,10 +346,12 @@ uploadBtn.onclick = async ()=>{
 
   const path = `${user.id}/${Date.now()}.jpg`;
 
-  await supabase.storage.from("shared").upload(path,croppedBlob);
+  const {error:upErr} = await supabase.storage.from("shared").upload(path,croppedBlob);
+  if(upErr) return alert("Upload failed");
+
   const {data}=supabase.storage.from("shared").getPublicUrl(path);
 
-  await supabase.from("posts").insert([{
+  const {error:dbErr} = await supabase.from("posts").insert([{
     user_id:user.id,
     image_url:data.publicUrl,
     caption:caption.value,
@@ -391,6 +359,9 @@ uploadBtn.onclick = async ()=>{
     song_title:selectedSong.title
   }]);
 
+  if(dbErr) return alert("Post failed");
+
+  /* RESET */
   croppedBlob=null;
   selectedSong=null;
 
@@ -399,12 +370,15 @@ uploadBtn.onclick = async ()=>{
   dropzone.style.display="flex";
 
   caption.value="";
+  songInput.value="";
   songList.innerHTML="";
-});
+  suggestions.innerHTML="";
+};
 
 /* FEED + REALTIME */
-async function loadFeed(){ /* unchanged from your version */ }
-function realtime(){ /* unchanged */ }
+async function loadFeed(){ /* tua funzione invariata */ }
+function realtime(){ /* tua funzione invariata */ }
+
 </script>
 
 </body>
