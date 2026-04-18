@@ -31,7 +31,6 @@ body{
   margin-bottom:20px;
 }
 
-/* CARD */
 .card{
   background:#0f0f0f;
   border:1px solid #222;
@@ -49,23 +48,23 @@ body{
   display:flex;
   align-items:center;
   justify-content:center;
-  text-align:center;
   color:#777;
-  margin-bottom:12px;
   cursor:pointer;
+  margin-bottom:10px;
 }
 
-/* PREVIEW */
+/* PREVIEW FIXED SQUARE */
 .preview{
-  width:110px;
-  height:110px;
-  border-radius:24px;
+  width:140px;
+  height:140px;
+  border-radius:18px;
   background:#111;
+  overflow:hidden;
   display:flex;
   align-items:center;
   justify-content:center;
   margin-bottom:10px;
-  overflow:hidden;
+  border:1px solid #222;
 }
 
 .preview img{
@@ -74,7 +73,7 @@ body{
   object-fit:cover;
 }
 
-/* INPUT */
+/* INPUTS */
 input,textarea{
   width:100%;
   margin-top:10px;
@@ -85,20 +84,7 @@ input,textarea{
   color:#fff;
 }
 
-/* BUTTON */
-.btn{
-  width:100%;
-  margin-top:12px;
-  padding:14px;
-  border-radius:16px;
-  border:none;
-  background:linear-gradient(135deg,#fff,#cfcfcf);
-  color:#000;
-  cursor:pointer;
-  font-family:'Archivo Black';
-}
-
-/* SONG */
+/* SONG LIST */
 .song-item{
   padding:10px;
   border:1px solid #222;
@@ -112,58 +98,17 @@ input,textarea{
   background:#111;
 }
 
-/* POST */
-.post{
-  background:#0f0f0f;
-  border:1px solid #222;
-  border-radius:20px;
-  padding:14px;
-  margin-bottom:16px;
-}
-
-.post img{
+/* BUTTON */
+button{
   width:100%;
-  aspect-ratio:1/1;
-  object-fit:cover;
+  margin-top:12px;
+  padding:14px;
   border-radius:16px;
-  margin-bottom:10px;
-}
-
-.post-header{
-  display:flex;
-  justify-content:space-between;
-  font-size:12px;
-  opacity:0.7;
-  margin-bottom:8px;
-}
-
-/* ICONS */
-.icon{
-  font-family:'Material Symbols Outlined';
-  font-size:22px;
+  border:none;
+  background:linear-gradient(135deg,#fff,#cfcfcf);
+  color:#000;
   cursor:pointer;
-}
-
-.delete-btn{
-  background:#ff3b3b;
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-/* LIKE */
-.like-row{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  margin-top:10px;
-}
-
-.liked{
-  color:#ff3b3b;
+  font-family:'Archivo Black';
 }
 </style>
 </head>
@@ -176,12 +121,9 @@ input,textarea{
 
 <div class="card">
 
-<!-- DROPZONE -->
-<div class="dropzone" id="dropzone">
-  Drag & drop image here<br>or click to upload
-</div>
+<div class="dropzone" id="dropzone">Drag & drop or click</div>
 
-<input type="file" id="file" accept="image/png,image/jpeg,image/jpg,image/gif" hidden>
+<input type="file" id="file" hidden accept="image/png,image/jpeg,image/jpg,image/gif">
 
 <div class="preview" id="previewBox">+</div>
 
@@ -191,7 +133,7 @@ input,textarea{
 <div id="suggestions"></div>
 <div id="songList"></div>
 
-<button class="btn" id="uploadBtn">UPLOAD IMAGE</button>
+<button id="uploadBtn">UPLOAD</button>
 
 </div>
 
@@ -208,9 +150,8 @@ const supabase = createClient(
 );
 
 let user;
-let croppedBlob;
-let selectedSong;
-let globalAudio = new Audio();
+let croppedBlob = null;
+let selectedSong = null;
 
 /* INIT */
 (async()=>{
@@ -218,7 +159,6 @@ let globalAudio = new Audio();
   if(!session) location.href="index.html";
   user = session.user;
   loadFeed();
-  realtime();
 })();
 
 /* DROPZONE */
@@ -226,6 +166,10 @@ const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
 
 dropzone.onclick = ()=>fileInput.click();
+
+dropzone.ondragover = e=>{
+  e.preventDefault();
+};
 
 dropzone.ondrop = e=>{
   e.preventDefault();
@@ -236,19 +180,9 @@ fileInput.onchange = e=>{
   handleFile(e.target.files[0]);
 };
 
-dropzone.ondragover = e=>{
-  e.preventDefault();
-};
-
-/* FILE + MODERATION */
+/* IMAGE + MODERATION */
 async function handleFile(f){
   if(!f) return;
-
-  const allowed = ["image/jpeg","image/png","image/gif"];
-  if(!allowed.includes(f.type)){
-    alert("Only JPG, PNG or GIF allowed");
-    return;
-  }
 
   const formData = new FormData();
   formData.append("file", f);
@@ -261,7 +195,7 @@ async function handleFile(f){
   const result = await res.json();
 
   if(!result.ok){
-    alert("Image rejected by moderation");
+    alert("Image rejected");
     return;
   }
 
@@ -271,8 +205,10 @@ async function handleFile(f){
   reader.onload = e=>img.src=e.target.result;
 
   img.onload = ()=>{
+
     const canvas=document.createElement("canvas");
-    canvas.width=800;canvas.height=800;
+    canvas.width=800;
+    canvas.height=800;
 
     const size=Math.min(img.width,img.height);
     const ctx=canvas.getContext("2d");
@@ -281,28 +217,96 @@ async function handleFile(f){
 
     canvas.toBlob(b=>{
       croppedBlob=b;
-      previewBox.innerHTML=`<img src="${URL.createObjectURL(b)}">`;
+
+      previewBox.innerHTML=`
+        <img src="${URL.createObjectURL(b)}">
+      `;
     },"image/jpeg",0.7);
   };
 
   reader.readAsDataURL(f);
 }
 
-/* UPLOAD */
+/* =========================
+   DEEZER SEARCH (FIXED UX)
+========================= */
+window.handleDeezer = function(data){
+
+  const box = document.getElementById("suggestions");
+  box.innerHTML="";
+
+  data.data?.slice(0,5).forEach(t=>{
+
+    const div=document.createElement("div");
+    div.className="song-item";
+    div.textContent=`${t.title} - ${t.artist.name}`;
+
+    div.onclick=()=>{
+      selectedSong={
+        title:`${t.title} - ${t.artist.name}`,
+        preview:t.preview
+      };
+
+      songList.innerHTML=`
+        <div class="song-item">
+          ✓ ${selectedSong.title}
+        </div>
+      `;
+
+      box.innerHTML="";
+      songInput.value="";
+    };
+
+    box.appendChild(div);
+  });
+};
+
+/* debounce */
+let debounce;
+songInput.addEventListener("input",e=>{
+  clearTimeout(debounce);
+  if(e.target.value.length<2) return;
+
+  debounce=setTimeout(()=>{
+    const s=document.createElement("script");
+    s.src=`https://api.deezer.com/search?q=${encodeURIComponent(e.target.value)}&output=jsonp&callback=handleDeezer`;
+    document.body.appendChild(s);
+    setTimeout(()=>s.remove(),2000);
+  },250);
+});
+
+/* =========================
+   UPLOAD VALIDATION (IMPORTANT)
+========================= */
 uploadBtn.onclick = async ()=>{
-  if(!croppedBlob) return;
+
+  if(!croppedBlob){
+    alert("Image required");
+    return;
+  }
+
+  if(!caption.value.trim()){
+    alert("Caption required");
+    return;
+  }
+
+  if(!selectedSong){
+    alert("Please select a song");
+    return;
+  }
 
   const path = `${user.id}/${Date.now()}.jpg`;
 
   await supabase.storage.from("shared").upload(path,croppedBlob);
+
   const {data}=supabase.storage.from("shared").getPublicUrl(path);
 
   await supabase.from("posts").insert([{
     user_id:user.id,
     image_url:data.publicUrl,
     caption:caption.value,
-    song_preview:selectedSong?.preview,
-    song_title:selectedSong?.title
+    song_preview:selectedSong.preview,
+    song_title:selectedSong.title
   }]);
 
   croppedBlob=null;
@@ -310,107 +314,8 @@ uploadBtn.onclick = async ()=>{
   previewBox.innerHTML="+";
   caption.value="";
   songList.innerHTML="";
+  suggestions.innerHTML="";
 };
-
-/* LIKE TOGGLE FIXED */
-async function toggleLike(post, icon, countEl, liked){
-
-  const newState = !liked;
-
-  icon.classList.toggle("liked", newState);
-  countEl.textContent = newState
-    ? Number(countEl.textContent) + 1
-    : Number(countEl.textContent) - 1;
-
-  if(newState){
-    await supabase.from("likes")
-      .insert([{post_id:post.id,user_id:user.id}]);
-  }else{
-    await supabase.from("likes")
-      .delete()
-      .eq("post_id",post.id)
-      .eq("user_id",user.id);
-  }
-}
-
-/* FEED */
-async function loadFeed(){
-
-  const {data:posts} = await supabase
-    .from("posts")
-    .select("*")
-    .order("created_at",{ascending:false});
-
-  const {data:likes} = await supabase
-    .from("likes")
-    .select("*");
-
-  feed.innerHTML="";
-
-  posts.forEach(p=>{
-
-    const userLikes = likes.filter(l=>l.post_id===p.id);
-    const liked = userLikes.some(l=>l.user_id===user.id);
-
-    const div=document.createElement("div");
-    div.className="post";
-
-    div.innerHTML=`
-      <div class="post-header">
-        <div>${p.user_id.slice(0,6)}</div>
-        <div>${new Date(p.created_at).toLocaleString()}</div>
-        ${p.user_id===user.id
-          ? `<div class="delete-btn"><span class="icon">delete</span></div>`
-          : ""
-        }
-      </div>
-
-      <img src="${p.image_url}">
-      <div>${p.caption||""}</div>
-
-      <div class="like-row">
-        <span class="icon ${liked?'liked':''}">favorite</span>
-        <span>${userLikes.length}</span>
-      </div>
-    `;
-
-    const img = div.querySelector("img");
-    const icon = div.querySelector(".icon");
-    const count = div.querySelector(".like-row span:last-child");
-
-    img.onclick = ()=>{
-      if(globalAudio.src===p.song_preview){
-        globalAudio.paused ? globalAudio.play() : globalAudio.pause();
-      }else{
-        globalAudio.src=p.song_preview;
-        globalAudio.play();
-      }
-    };
-
-    div.querySelector(".like-row").onclick = e=>{
-      e.stopPropagation();
-      toggleLike(p, icon, count, liked);
-    };
-
-    if(p.user_id===user.id){
-      div.querySelector(".delete-btn").onclick = e=>{
-        e.stopPropagation();
-        supabase.from("posts").delete().eq("id",p.id);
-        div.remove();
-      };
-    }
-
-    feed.appendChild(div);
-  });
-}
-
-/* realtime */
-function realtime(){
-  supabase.channel("rt")
-    .on("postgres_changes",{event:"*",schema:"public",table:"posts"},loadFeed)
-    .on("postgres_changes",{event:"*",schema:"public",table:"likes"},loadFeed)
-    .subscribe();
-}
 </script>
 
 </body>
