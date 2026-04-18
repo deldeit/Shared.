@@ -409,6 +409,7 @@ let debounce = null;
 let globalAudio = new Audio();
 let activePlayButton = null;
 let jsonpScript = null;
+let feedSyncTimer = null;
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
@@ -419,6 +420,8 @@ const suggestions = document.getElementById("suggestions");
 const songList = document.getElementById("songList");
 const feed = document.getElementById("feed");
 const uploadBtn = document.getElementById("uploadBtn");
+
+const postState = new Map();
 
 function getUsernameFromSession(sessionUser){
   return (
@@ -439,6 +442,7 @@ function formatDateTime(value){
 }
 
 function setAudioButtonState(button, playing){
+  if(!button) return;
   const icon = button.querySelector(".material-symbols-outlined");
   const label = button.querySelector(".btn-label");
   if(!icon || !label) return;
@@ -808,10 +812,10 @@ async function toggleLike(postId){
     }
   }
 
-  await loadFeed();
+  updatePostLikeUI(postId);
 }
 
-/* FEED */
+/* LOAD FEED */
 async function loadFeed(){
   const { data: posts, error: postsError } = await supabase
     .from("posts")
@@ -826,6 +830,7 @@ async function loadFeed(){
 
   const rows = posts || [];
   feed.innerHTML = "";
+  postState.clear();
 
   if(rows.length === 0){
     feed.innerHTML = `<div class="empty-state">No posts yet.</div>`;
@@ -849,26 +854,59 @@ async function loadFeed(){
   }
 
   const likeCountMap = new Map();
-  const likedByMeSet = new Set();
+  const likedByMeMap = new Map();
 
   likes.forEach(row=>{
     likeCountMap.set(row.post_id, (likeCountMap.get(row.post_id) || 0) + 1);
     if(row.user_id === user.id){
-      likedByMeSet.add(row.post_id);
+      likedByMeMap.set(row.post_id, true);
     }
   });
 
   for(const post of rows){
-    feed.appendChild(renderPost(post, likeCountMap, likedByMeSet.has(post.id)));
+    const count = likeCountMap.get(post.id) || 0;
+    const likedByMe = likedByMeMap.get(post.id) || false;
+    const postEl = renderPost(post, count, likedByMe);
+    feed.appendChild(postEl);
+
+    postState.set(post.id, {
+      count,
+      likedByMe,
+      element: postEl
+    });
   }
 }
 
-function renderPost(post, likeCountMap, likedByMe){
+function updatePostLikeUI(postId){
+  const state = postState.get(postId);
+  if(!state) return;
+
+  const row = state.element;
+  const likeBtn = row.querySelector(".likeBtn");
+  const likeCountEl = row.querySelector(".likeCount");
+
+  state.count = state.likedByMe ? Math.max(0, state.count - 1) : state.count + 1;
+  state.likedByMe = !state.likedByMe;
+
+  likeCountEl.textContent = String(state.count);
+
+  const icon = likeBtn.querySelector(".material-symbols-outlined");
+  if(state.likedByMe){
+    likeBtn.classList.add("liked");
+    icon.textContent = "favorite";
+  }else{
+    likeBtn.classList.remove("liked");
+    icon.textContent = "favorite_border";
+  }
+}
+
+/* RENDER POST */
+function renderPost(post, likeCount, likedByMe){
   const postDiv = document.createElement("div");
   postDiv.className = "post";
+  postDiv.dataset.postId = post.id;
 
   const formattedDate = formatDateTime(post.created_at);
-  const likeCount = likeCountMap.get(post.id) || 0;
 
   postDiv.innerHTML = `
     <img src="${post.image_url}" alt="post image">
@@ -893,7 +931,7 @@ function renderPost(post, likeCountMap, likedByMe){
           <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;">music_note</span>
           ${post.song_title || "Unknown song"}
         </div>
-        <div class="song-sub">Preview available</div>
+        <div class="song-sub">Hover to play preview</div>
       </div>
 
       <button type="button" class="icon-btn secondary playBtn" data-play-label="Play preview" data-pause-label="Pause preview">
@@ -918,23 +956,144 @@ function renderPost(post, likeCountMap, likedByMe){
 
   const playBtn = postDiv.querySelector(".playBtn");
   const likeBtn = postDiv.querySelector(".likeBtn");
-  const likeCountEl = postDiv.querySelector(".likeCount");
 
   playBtn.onclick = ()=>{
     playPreview(post.song_preview, playBtn);
   };
 
+  postDiv.addEventListener("mouseenter", ()=>{
+    if(post.song_preview){
+      playPreview(post.song_preview, playBtn);
+    }
+  });
+
+  postDiv.addEventListener("mouseleave", ()=>{
+    if(globalAudio.src === post.song_preview){
+      globalAudio.pause();
+      setAudioButtonState(playBtn, false);
+      if(activePlayButton === playBtn) activePlayButton = null;
+    }
+  });
+
   likeBtn.onclick = async ()=>{
-    await toggleLike(post.id);
+    const state = postState.get(post.id);
+    if(!state) return;
+
+    const wasLiked = state.likedByMe;
+
+    if(wasLiked){
+      state.count = Math.max(0, state.count - 1);
+      state.likedByMe = false;
+    }else{
+      state.count += 1;
+      state.likedByMe = true;
+    }
+
+    const countEl = postDiv.querySelector(".likeCount");
+    const iconEl = likeBtn.querySelector(".material-symbols-outlined");
+    countEl.textContent = String(state.count);
+
+    if(state.likedByMe){
+      likeBtn.classList.add("liked");
+      iconEl.textContent = "favorite";
+    }else{
+      likeBtn.classList.remove("liked");
+      iconEl.textContent = "favorite_border";
+    }
+
+    try{
+      const { data: { session } } = await supabase.auth.getSession();
+      const uid = session.user.id;
+
+      const { data: existing } = await supabase
+        .from("likes")
+        .select("id")
+        .eq("post_id", post.id)
+        .eq("user_id", uid)
+        .maybeSingle();
+
+      if(wasLiked && existing){
+        const { error } = await supabase
+          .from("likes")
+          .delete()
+          .eq("id", existing.id);
+        if(error) throw error;
+      }else if(!wasLiked && !existing){
+        const { error } = await supabase
+          .from("likes")
+          .insert([{ post_id: post.id, user_id: uid }]);
+        if(error) throw error;
+      }
+
+      syncLikeCountsDebounced();
+    }catch(err){
+      console.error(err);
+      await loadFeed();
+    }
   };
 
   return postDiv;
 }
 
+/* SYNC LIKE COUNTS WITHOUT RELOADING THE FEED */
+function syncLikeCountsDebounced(){
+  clearTimeout(feedSyncTimer);
+  feedSyncTimer = setTimeout(syncLikeCounts, 150);
+}
+
+async function syncLikeCounts(){
+  const postIds = [...postState.keys()];
+  if(postIds.length === 0) return;
+
+  const { data: likesData, error } = await supabase
+    .from("likes")
+    .select("post_id,user_id")
+    .in("post_id", postIds);
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  const newCounts = new Map();
+  const likedByMe = new Map();
+
+  likesData.forEach(row=>{
+    newCounts.set(row.post_id, (newCounts.get(row.post_id) || 0) + 1);
+    if(row.user_id === user.id){
+      likedByMe.set(row.post_id, true);
+    }
+  });
+
+  for(const [postId, state] of postState.entries()){
+    const count = newCounts.get(postId) || 0;
+    const liked = likedByMe.get(postId) || false;
+    state.count = count;
+    state.likedByMe = liked;
+
+    const row = state.element;
+    if(!row) continue;
+
+    const likeCountEl = row.querySelector(".likeCount");
+    const likeBtn = row.querySelector(".likeBtn");
+    const iconEl = likeBtn.querySelector(".material-symbols-outlined");
+
+    likeCountEl.textContent = String(count);
+
+    if(liked){
+      likeBtn.classList.add("liked");
+      iconEl.textContent = "favorite";
+    }else{
+      likeBtn.classList.remove("liked");
+      iconEl.textContent = "favorite_border";
+    }
+  }
+}
+
 /* REALTIME */
 function realtime(){
   supabase
-    .channel("shared-posts-likes")
+    .channel("shared-posts")
     .on("postgres_changes", {
       event: "*",
       schema: "public",
@@ -946,8 +1105,8 @@ function realtime(){
       event: "*",
       schema: "public",
       table: "likes"
-    }, async ()=>{
-      await loadFeed();
+    }, ()=>{
+      syncLikeCountsDebounced();
     })
     .subscribe();
 }
