@@ -54,6 +54,7 @@ body{
   flex-direction:column;
   color:#777;
   cursor:pointer;
+  transition:0.2s;
 }
 
 .dropzone.dragover{
@@ -293,39 +294,59 @@ async function handleFile(f){
 }
 
 /* =========================
-   DEEZER (FIX STABLE API)
+   SONG SEARCH (FIX STABLE)
 ========================= */
+let debounce;
+
 songInput.addEventListener("input", async e=>{
+  clearTimeout(debounce);
+
   const q = e.target.value.trim();
   if(q.length < 2) return;
 
-  const res = await fetch(`https://api.allorigins.win/raw?url=${encodeURIComponent("https://api.deezer.com/search?q="+q)}`);
-  const data = await res.json();
+  debounce = setTimeout(async ()=>{
 
-  suggestions.innerHTML="";
+    try{
+      const res = await fetch(
+        `https://api.deezer.com/search?q=${encodeURIComponent(q)}`
+      );
 
-  data.data.slice(0,5).forEach(t=>{
-    const div=document.createElement("div");
-    div.className="song-item";
-    div.textContent=`${t.title} - ${t.artist.name}`;
+      const data = await res.json();
 
-    div.onclick=()=>{
-      selectedSong={
-        title:`${t.title} - ${t.artist.name}`,
-        preview:t.preview
-      };
+      suggestions.innerHTML = "";
 
-      songList.innerHTML=`<div class="song-item">✓ ${selectedSong.title}</div>`;
-      suggestions.innerHTML="";
-      songInput.value="";
-    };
+      data.data?.slice(0,6).forEach(track=>{
 
-    suggestions.appendChild(div);
-  });
+        const div = document.createElement("div");
+        div.className = "song-item";
+        div.textContent = `${track.title} - ${track.artist.name}`;
+
+        div.onclick = ()=>{
+          selectedSong = {
+            title:`${track.title} - ${track.artist.name}`,
+            preview:track.preview
+          };
+
+          songList.innerHTML = `<div class="song-item">✓ ${selectedSong.title}</div>`;
+          suggestions.innerHTML = "";
+          songInput.value = "";
+
+          globalAudio.src = selectedSong.preview;
+          globalAudio.play().catch(()=>{});
+        };
+
+        suggestions.appendChild(div);
+      });
+
+    }catch(err){
+      console.error("song error",err);
+    }
+
+  },250);
 });
 
 /* =========================
-   UPLOAD (SAFE)
+   UPLOAD (FULL VALIDATION)
 ========================= */
 document.getElementById("uploadBtn").onclick = async ()=>{
 
@@ -346,10 +367,15 @@ document.getElementById("uploadBtn").onclick = async ()=>{
 
   const path = `${user.id}/${Date.now()}.jpg`;
 
-  const {error:upErr} = await supabase.storage.from("shared").upload(path,croppedBlob);
+  const {error:upErr} = await supabase.storage
+    .from("shared")
+    .upload(path,croppedBlob);
+
   if(upErr) return alert("Upload failed");
 
-  const {data}=supabase.storage.from("shared").getPublicUrl(path);
+  const {data}=supabase.storage
+    .from("shared")
+    .getPublicUrl(path);
 
   const {error:dbErr} = await supabase.from("posts").insert([{
     user_id:user.id,
@@ -375,9 +401,9 @@ document.getElementById("uploadBtn").onclick = async ()=>{
   suggestions.innerHTML="";
 };
 
-/* FEED + REALTIME */
-async function loadFeed(){ /* tua funzione invariata */ }
-function realtime(){ /* tua funzione invariata */ }
+/* FEED + REALTIME (YOUR ORIGINAL LOGIC) */
+async function loadFeed(){ /* unchanged */ }
+function realtime(){ /* unchanged */ }
 
 </script>
 
