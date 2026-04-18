@@ -6,6 +6,7 @@
 <title>Shared - feed</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
 <style>
 *{box-sizing:border-box;}
@@ -29,7 +30,6 @@ body{margin:0;background:#000;color:#fff;font-family:'Archivo Black', sans-serif
   display:flex;align-items:center;justify-content:center;
   border:1px solid #222;
 }
-
 .preview img{width:100%;height:100%;object-fit:cover;}
 
 input[type="file"]{display:none;}
@@ -68,20 +68,28 @@ button{
 
 .post-header{
   display:flex;justify-content:space-between;
+  align-items:center;
   font-size:12px;opacity:0.7;margin-bottom:6px;
 }
 
-.delete-btn{
-  width:28px;height:28px;border-radius:50%;
-  background:#ff3b3b;display:flex;
-  align-items:center;justify-content:center;
+.icon{
+  font-family:'Material Symbols Outlined';
+  font-size:22px;
   cursor:pointer;
 }
 
-.like{
-  margin-top:8px;
-  cursor:pointer;
+.delete-btn{
+  background:#ff3b3b;
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
 }
+
+.like-row{
+  display:flex;align-items:center;
+  gap:6px;margin-top:8px;
+}
+
+.liked{color:#ff3b3b;}
 
 .song-title{font-size:18px;margin-top:10px;}
 </style>
@@ -89,32 +97,34 @@ button{
 
 <body>
 <div class="container">
+
 <div class="header">Shared.</div>
 
 <div class="card">
-<div class="preview" id="previewBox">+</div>
+  <div class="preview" id="previewBox">+</div>
 
-<label class="file-btn">
-Choose Image
-<input type="file" id="file">
-</label>
+  <label class="file-btn">
+    Choose Image
+    <input type="file" id="file">
+  </label>
 
-<textarea id="caption" placeholder="Write caption..."></textarea>
+  <textarea id="caption" placeholder="Write caption..."></textarea>
 
-<input id="songInput" placeholder="Search song...">
-<div id="suggestions"></div>
-<div id="songList"></div>
+  <input id="songInput" placeholder="Search song...">
+  <div id="suggestions"></div>
+  <div id="songList"></div>
 
-<button id="uploadBtn">UPLOAD</button>
+  <button id="uploadBtn">UPLOAD</button>
 </div>
 
 <div id="feed"></div>
+
 </div>
 
 <script type="module">
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const supabase = createClient("https://cnhaonawapuahzoctqav.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes");
+const supabase = createClient("https://cnhaonawapuahzoctqav.supabase.co","YOUR_KEY");
 
 const BUCKET = "shared";
 
@@ -122,8 +132,8 @@ let user=null;
 let croppedBlob=null;
 let selectedSong=null;
 
+/* AUDIO PERSISTENTE */
 let globalAudio = new Audio();
-let currentPlayingId = localStorage.getItem("playingId");
 let savedPreview = localStorage.getItem("playingPreview");
 
 if(savedPreview){
@@ -131,6 +141,7 @@ if(savedPreview){
   globalAudio.play().catch(()=>{});
 }
 
+/* INIT */
 async function init(){
   const { data:{session} } = await supabase.auth.getSession();
   if(!session) location.href="index.html";
@@ -152,10 +163,10 @@ file.onchange = e=>{
 
   img.onload = ()=>{
     const canvas = document.createElement("canvas");
-    canvas.width = 800; canvas.height = 800;
+    canvas.width=800; canvas.height=800;
 
-    const size = Math.min(img.width,img.height);
-    const ctx = canvas.getContext("2d");
+    const size=Math.min(img.width,img.height);
+    const ctx=canvas.getContext("2d");
 
     ctx.drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,800,800);
 
@@ -217,8 +228,7 @@ uploadBtn.onclick=async()=>{
     image_url:data.publicUrl,
     caption:caption.value,
     song_title:selectedSong?.title,
-    song_preview:selectedSong?.preview,
-    likes:0
+    song_preview:selectedSong?.preview
   }]);
 
   /* RESET */
@@ -234,22 +244,38 @@ async function deletePost(id){
   await supabase.from("posts").delete().eq("id",id);
 }
 
-/* LIKE */
-async function toggleLike(post){
-  const liked = post.liked;
-
-  await supabase.from("posts")
-    .update({likes:(post.likes||0)+(liked?-1:1)})
-    .eq("id",post.id);
+/* LIKE TOGGLE */
+async function toggleLike(post,liked){
+  if(liked){
+    await supabase.from("likes")
+      .delete()
+      .eq("post_id",post.id)
+      .eq("user_id",user.id);
+  }else{
+    await supabase.from("likes")
+      .insert([{post_id:post.id,user_id:user.id}]);
+  }
 }
 
 /* FEED */
 async function loadFeed(){
-  const { data } = await supabase.from("posts").select("*").order("created_at",{ascending:false});
+
+  const { data: posts } = await supabase
+    .from("posts")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  const { data: likes } = await supabase
+    .from("likes")
+    .select("*");
 
   feed.innerHTML="";
 
-  data.forEach(p=>{
+  posts.forEach(p=>{
+
+    const userLikes = likes.filter(l=>l.post_id===p.id);
+    const likedByMe = userLikes.some(l=>l.user_id===user.id);
+
     const div=document.createElement("div");
     div.className="post";
 
@@ -259,7 +285,12 @@ async function loadFeed(){
     div.innerHTML=`
       <div class="post-header">
         <div>${isOwner?"You":p.user_id.slice(0,6)} • ${date}</div>
-        ${isOwner?`<div class="delete-btn">🗑</div>`:""}
+
+        ${isOwner?`
+          <div class="delete-btn">
+            <span class="icon">delete</span>
+          </div>
+        `:""}
       </div>
 
       <img src="${p.image_url}">
@@ -267,20 +298,21 @@ async function loadFeed(){
 
       ${p.song_title?`<div class="song-title">${p.song_title}</div>`:""}
 
-      <div class="like">❤️ ${p.likes||0}</div>
+      <div class="like-row">
+        <span class="icon ${likedByMe?'liked':''}">favorite</span>
+        <span>${userLikes.length}</span>
+      </div>
     `;
 
+    /* AUDIO */
     div.onclick=()=>{
       if(!p.song_preview) return;
-
-      currentPlayingId=p.id;
       globalAudio.src=p.song_preview;
       globalAudio.play();
-
-      localStorage.setItem("playingId",p.id);
       localStorage.setItem("playingPreview",p.song_preview);
     };
 
+    /* DELETE */
     if(isOwner){
       div.querySelector(".delete-btn").onclick=e=>{
         e.stopPropagation();
@@ -288,9 +320,10 @@ async function loadFeed(){
       };
     }
 
-    div.querySelector(".like").onclick=e=>{
+    /* LIKE */
+    div.querySelector(".like-row").onclick=e=>{
       e.stopPropagation();
-      toggleLike(p);
+      toggleLike(p,likedByMe);
     };
 
     feed.appendChild(div);
@@ -299,12 +332,12 @@ async function loadFeed(){
 
 /* REALTIME */
 function realtime(){
-  supabase.channel("posts")
-    .on("postgres_changes",{event:"*",schema:"public",table:"posts"},()=>{
-      loadFeed();
-    })
+  supabase.channel("realtime")
+    .on("postgres_changes",{event:"*",schema:"public",table:"posts"},loadFeed)
+    .on("postgres_changes",{event:"*",schema:"public",table:"likes"},loadFeed)
     .subscribe();
 }
 </script>
+
 </body>
 </html>
