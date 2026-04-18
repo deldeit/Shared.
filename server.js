@@ -1,83 +1,49 @@
 import express from "express";
+import multer from "multer";
 import cors from "cors";
-import { createClient } from "@supabase/supabase-js";
-import crypto from "crypto";
+import OpenAI from "openai";
 
 const app = express();
-
 app.use(cors());
-app.use(express.json());
 
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_KEY
-);
+const upload = multer({ storage: multer.memoryStorage() });
 
-app.get("/", (req, res) => {
-  res.send("API online");
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY
 });
 
-app.post("/signup", async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
+/* moderation endpoint */
+app.post("/moderate", upload.single("file"), async (req,res)=>{
+  try{
 
-    const { data: existing } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("email", email);
-
-    if (existing && existing.length > 0) {
-      return res.json({ message: "Email già registrata" });
+    if(!req.file){
+      return res.json({ ok:false });
     }
 
-    const { data, error } = await supabase
-      .from("profiles")
-      .insert([
+    const base64 = req.file.buffer.toString("base64");
+
+    const response = await openai.moderations.create({
+      model: "omni-moderation-latest",
+      input: [
         {
-          id: crypto.randomUUID(),
-          username,
-          email,
-          password
+          type: "input_image",
+          image_base64: base64
         }
-      ]);
+      ]
+    });
 
-    if (error) {
-      console.log(error);
-      return res.json({ message: "Errore Supabase" });
+    const flagged = response.results?.[0]?.flagged;
+
+    if(flagged){
+      return res.json({ ok:false });
     }
 
-    res.json({ message: "OK", data });
+    res.json({ ok:true });
 
-  } catch (err) {
-    console.log("SERVER ERROR:", err);
-    res.status(500).json({ message: "Server crash" });
+  }catch(err){
+    console.error(err);
+    res.json({ ok:false });
   }
 });
 
-app.post("/signin", async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .eq("email", email)
-      .eq("password", password);
-
-    if (!data || data.length === 0) {
-      return res.json({ message: "Credenziali errate" });
-    }
-
-    res.json({ message: "Login OK", user: data[0] });
-
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-const PORT = process.env.PORT || 3000;
-
-app.listen(PORT, () => {
-  console.log("Server running on", PORT);
-});
+app.listen(3000,()=>console.log("Server running"));
