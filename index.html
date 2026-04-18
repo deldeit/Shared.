@@ -8,7 +8,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 
 <style>
-*{ box-sizing:border-box; }
+*{
+  box-sizing:border-box;
+}
 
 body{
   margin:0;
@@ -75,18 +77,10 @@ button:disabled{
   color:#000;
 }
 
-.primary:hover:not(:disabled){
-  transform:scale(1.02);
-}
-
 .secondary{
   background:#000;
   color:#fff;
   border:1px solid #333;
-}
-
-.secondary:hover:not(:disabled){
-  background:#111;
 }
 
 .google{
@@ -94,8 +88,36 @@ button:disabled{
   color:#000;
 }
 
-.google:hover:not(:disabled){
+.google:hover:not(:disabled),
+.primary:hover:not(:disabled),
+.secondary:hover:not(:disabled){
   transform:scale(1.02);
+}
+
+/* 🔥 DIVIDER */
+.divider{
+  display:flex;
+  align-items:center;
+  text-align:center;
+  margin:18px 0 8px;
+  color:#666;
+  font-size:12px;
+}
+
+.divider::before,
+.divider::after{
+  content:"";
+  flex:1;
+  height:1px;
+  background:#333;
+}
+
+.divider::before{
+  margin-right:10px;
+}
+
+.divider::after{
+  margin-left:10px;
 }
 
 .small{
@@ -118,6 +140,10 @@ button:disabled{
 
     <button class="primary" id="signinBtn">SIGN IN</button>
     <button class="secondary" id="signupBtn">SIGN UP</button>
+
+    <!-- 🔥 DIVIDER -->
+    <div class="divider">OR</div>
+
     <button class="google" id="googleBtn">SIGN IN WITH GOOGLE</button>
 
     <div class="small" id="status"></div>
@@ -136,10 +162,10 @@ const signInBtn = document.getElementById("signinBtn");
 const signUpBtn = document.getElementById("signupBtn");
 const googleBtn = document.getElementById("googleBtn");
 
-function setLoading(loading){
-  signInBtn.disabled = loading;
-  signUpBtn.disabled = loading;
-  googleBtn.disabled = loading;
+function setLoading(v){
+  signInBtn.disabled = v;
+  signUpBtn.disabled = v;
+  googleBtn.disabled = v;
 }
 
 function goHome(){
@@ -157,18 +183,13 @@ supabase.auth.onAuthStateChange((_event, session)=>{
   if(session) goHome();
 });
 
+/* SIGN IN */
 async function signIn(){
   status.textContent = "SIGNING IN...";
   setLoading(true);
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-
-  if(!email || !password){
-    status.textContent = "ENTER EMAIL AND PASSWORD";
-    setLoading(false);
-    return;
-  }
+  const email = emailInput().value.trim();
+  const password = passwordInput().value;
 
   const { error } = await supabase.auth.signInWithPassword({
     email,
@@ -185,21 +206,16 @@ async function signIn(){
   goHome();
 }
 
+/* SIGN UP */
 async function signUp(){
   status.textContent = "CREATING ACCOUNT...";
   setLoading(true);
 
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value;
-  const username = document.getElementById("username").value.trim();
+  const email = emailInput().value.trim();
+  const password = passwordInput().value;
+  const username = usernameInput().value.trim();
 
-  if(!email || !password || !username){
-    status.textContent = "ENTER USERNAME, EMAIL AND PASSWORD";
-    setLoading(false);
-    return;
-  }
-
-  const { data, error } = await supabase.auth.signUp({
+  const { error } = await supabase.auth.signUp({
     email,
     password,
     options:{
@@ -216,22 +232,18 @@ async function signUp(){
     return;
   }
 
-  if(data.session){
-    goHome();
-    return;
-  }
-
-  status.textContent = "ACCOUNT CREATED";
+  status.textContent = "CHECK YOUR EMAIL / ACCOUNT CREATED";
 }
 
+/* GOOGLE */
 async function signInWithGoogle(){
   status.textContent = "REDIRECTING...";
   setLoading(true);
 
   const { error } = await supabase.auth.signInWithOAuth({
-    provider: "google",
+    provider:"google",
     options:{
-      redirectTo: `${window.location.origin}/home.html`
+      redirectTo: window.location.origin
     }
   });
 
@@ -241,9 +253,16 @@ async function signInWithGoogle(){
   }
 }
 
-signInBtn.addEventListener("click", signIn);
-signUpBtn.addEventListener("click", signUp);
-googleBtn.addEventListener("click", signInWithGoogle);
+/* helpers */
+const usernameInput = ()=>document.getElementById("username");
+const emailInput = ()=>document.getElementById("email");
+const passwordInput = ()=>document.getElementById("password");
+
+/* events */
+signInBtn.onclick = signIn;
+signUpBtn.onclick = signUp;
+googleBtn.onclick = signInWithGoogle;
+
 </script>
 </body>
 </html>
