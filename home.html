@@ -10,15 +10,13 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box;}
 
 body{
   margin:0;
   background:#000;
   color:#fff;
-  font-family:'Archivo Black', sans-serif;
+  font-family:'Archivo Black';
 }
 
 .container{
@@ -27,12 +25,10 @@ body{
   padding:20px;
 }
 
-/* HEADER */
 .header{
   text-align:center;
   font-size:30px;
-  letter-spacing:1px;
-  margin-bottom:22px;
+  margin-bottom:20px;
 }
 
 /* CARD */
@@ -41,20 +37,34 @@ body{
   border:1px solid #222;
   border-radius:20px;
   padding:16px;
-  margin-bottom:18px;
+  margin-bottom:16px;
+}
+
+/* DROPZONE */
+.dropzone{
+  width:100%;
+  height:140px;
+  border:2px dashed #333;
+  border-radius:18px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  color:#777;
+  margin-bottom:12px;
+  cursor:pointer;
 }
 
 /* PREVIEW */
 .preview{
   width:110px;
   height:110px;
-  border-radius:28px;
+  border-radius:24px;
   background:#111;
   display:flex;
   align-items:center;
   justify-content:center;
-  margin-bottom:12px;
-  border:1px solid #222;
+  margin-bottom:10px;
   overflow:hidden;
 }
 
@@ -73,11 +83,10 @@ input,textarea{
   border:1px solid #222;
   background:#000;
   color:#fff;
-  font-family:'Archivo Black', sans-serif;
 }
 
 /* BUTTON */
-button{
+.btn{
   width:100%;
   margin-top:12px;
   padding:14px;
@@ -85,17 +94,22 @@ button{
   border:none;
   background:linear-gradient(135deg,#fff,#cfcfcf);
   color:#000;
-  font-family:'Archivo Black';
   cursor:pointer;
-  transition:0.15s ease;
+  font-family:'Archivo Black';
 }
 
-button:hover{
-  transform:scale(1.02);
+/* SONG */
+.song-item{
+  padding:10px;
+  border:1px solid #222;
+  border-radius:12px;
+  margin-top:6px;
+  cursor:pointer;
+  font-size:12px;
 }
 
-button:active{
-  transform:scale(0.98);
+.song-item:hover{
+  background:#111;
 }
 
 /* POST */
@@ -107,7 +121,6 @@ button:active{
   margin-bottom:16px;
 }
 
-/* IMAGE */
 .post img{
   width:100%;
   aspect-ratio:1/1;
@@ -116,7 +129,6 @@ button:active{
   margin-bottom:10px;
 }
 
-/* HEADER POST */
 .post-header{
   display:flex;
   justify-content:space-between;
@@ -130,7 +142,6 @@ button:active{
   font-family:'Material Symbols Outlined';
   font-size:22px;
   cursor:pointer;
-  user-select:none;
 }
 
 .delete-btn{
@@ -154,21 +165,6 @@ button:active{
 .liked{
   color:#ff3b3b;
 }
-
-/* SONG LIST */
-#suggestions .song-item,
-#songList .song-item{
-  padding:10px;
-  border:1px solid #222;
-  border-radius:12px;
-  margin-top:6px;
-  cursor:pointer;
-  font-size:12px;
-}
-
-#suggestions .song-item:hover{
-  background:#111;
-}
 </style>
 </head>
 
@@ -176,27 +172,30 @@ button:active{
 
 <div class="container">
 
-  <div class="header">Shared.</div>
+<div class="header">Shared.</div>
 
-  <!-- UPLOAD -->
-  <div class="card">
+<div class="card">
 
-    <div class="preview" id="previewBox">+</div>
+<!-- DROPZONE -->
+<div class="dropzone" id="dropzone">
+  Drag & drop image here<br>or click to upload
+</div>
 
-    <input type="file" id="file" accept="image/png,image/jpeg,image/jpg,image/gif">
+<input type="file" id="file" accept="image/png,image/jpeg,image/jpg,image/gif" hidden>
 
-    <textarea id="caption" placeholder="Write a caption..."></textarea>
+<div class="preview" id="previewBox">+</div>
 
-    <input id="songInput" placeholder="Search for a song...">
-    <div id="suggestions"></div>
-    <div id="songList"></div>
+<textarea id="caption" placeholder="Write a caption..."></textarea>
 
-    <button id="uploadBtn">UPLOAD</button>
+<input id="songInput" placeholder="Search song...">
+<div id="suggestions"></div>
+<div id="songList"></div>
 
-  </div>
+<button class="btn" id="uploadBtn">UPLOAD IMAGE</button>
 
-  <!-- FEED -->
-  <div id="feed"></div>
+</div>
+
+<div id="feed"></div>
 
 </div>
 
@@ -204,24 +203,16 @@ button:active{
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
-  "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+"https://cnhaonawapuahzoctqav.supabase.co",
+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
 let user;
 let croppedBlob;
 let selectedSong;
-
 let globalAudio = new Audio();
 
-/* restore audio */
-const saved = localStorage.getItem("playingPreview");
-if(saved){
-  globalAudio.src = saved;
-  globalAudio.play().catch(()=>{});
-}
-
-/* init */
+/* INIT */
 (async()=>{
   const {data:{session}} = await supabase.auth.getSession();
   if(!session) location.href="index.html";
@@ -230,16 +221,32 @@ if(saved){
   realtime();
 })();
 
-/* FILE + MODERATION */
-file.onchange = async e => {
+/* DROPZONE */
+const dropzone = document.getElementById("dropzone");
+const fileInput = document.getElementById("file");
 
-  const f = e.target.files[0];
+dropzone.onclick = ()=>fileInput.click();
+
+dropzone.ondrop = e=>{
+  e.preventDefault();
+  handleFile(e.dataTransfer.files[0]);
+};
+
+fileInput.onchange = e=>{
+  handleFile(e.target.files[0]);
+};
+
+dropzone.ondragover = e=>{
+  e.preventDefault();
+};
+
+/* FILE + MODERATION */
+async function handleFile(f){
   if(!f) return;
 
   const allowed = ["image/jpeg","image/png","image/gif"];
   if(!allowed.includes(f.type)){
     alert("Only JPG, PNG or GIF allowed");
-    file.value="";
     return;
   }
 
@@ -255,48 +262,40 @@ file.onchange = async e => {
 
   if(!result.ok){
     alert("Image rejected by moderation");
-    file.value="";
     return;
   }
 
   const reader = new FileReader();
   const img = new Image();
 
-  reader.onload = ev => img.src = ev.target.result;
+  reader.onload = e=>img.src=e.target.result;
 
-  img.onload = () => {
-    const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 800;
+  img.onload = ()=>{
+    const canvas=document.createElement("canvas");
+    canvas.width=800;canvas.height=800;
 
-    const size = Math.min(img.width, img.height);
-    const ctx = canvas.getContext("2d");
+    const size=Math.min(img.width,img.height);
+    const ctx=canvas.getContext("2d");
 
-    ctx.drawImage(
-      img,
-      (img.width-size)/2,
-      (img.height-size)/2,
-      size,size,
-      0,0,800,800
-    );
+    ctx.drawImage(img,(img.width-size)/2,(img.height-size)/2,size,size,0,0,800,800);
 
     canvas.toBlob(b=>{
-      croppedBlob = b;
-      previewBox.innerHTML = `<img src="${URL.createObjectURL(b)}">`;
+      croppedBlob=b;
+      previewBox.innerHTML=`<img src="${URL.createObjectURL(b)}">`;
     },"image/jpeg",0.7);
   };
 
   reader.readAsDataURL(f);
-};
+}
 
-/* upload */
-uploadBtn.onclick = async () => {
+/* UPLOAD */
+uploadBtn.onclick = async ()=>{
   if(!croppedBlob) return;
 
   const path = `${user.id}/${Date.now()}.jpg`;
 
   await supabase.storage.from("shared").upload(path,croppedBlob);
-  const {data} = supabase.storage.from("shared").getPublicUrl(path);
+  const {data}=supabase.storage.from("shared").getPublicUrl(path);
 
   await supabase.from("posts").insert([{
     user_id:user.id,
@@ -313,28 +312,28 @@ uploadBtn.onclick = async () => {
   songList.innerHTML="";
 };
 
-/* delete */
-async function deletePost(id,el){
-  el.remove();
-  await supabase.from("posts").delete().eq("id",id);
-}
+/* LIKE TOGGLE FIXED */
+async function toggleLike(post, icon, countEl, liked){
 
-/* like */
-async function toggleLike(p,liked,icon,countEl){
-  if(liked){
-    icon.classList.remove("liked");
-    countEl.textContent--;
+  const newState = !liked;
+
+  icon.classList.toggle("liked", newState);
+  countEl.textContent = newState
+    ? Number(countEl.textContent) + 1
+    : Number(countEl.textContent) - 1;
+
+  if(newState){
     await supabase.from("likes")
-      .delete().eq("post_id",p.id).eq("user_id",user.id);
+      .insert([{post_id:post.id,user_id:user.id}]);
   }else{
-    icon.classList.add("liked");
-    countEl.textContent++;
     await supabase.from("likes")
-      .insert([{post_id:p.id,user_id:user.id}]);
+      .delete()
+      .eq("post_id",post.id)
+      .eq("user_id",user.id);
   }
 }
 
-/* feed */
+/* FEED */
 async function loadFeed(){
 
   const {data:posts} = await supabase
@@ -346,19 +345,20 @@ async function loadFeed(){
     .from("likes")
     .select("*");
 
-  feed.innerHTML = "";
+  feed.innerHTML="";
 
   posts.forEach(p=>{
 
     const userLikes = likes.filter(l=>l.post_id===p.id);
     const liked = userLikes.some(l=>l.user_id===user.id);
 
-    const div = document.createElement("div");
-    div.className = "post";
+    const div=document.createElement("div");
+    div.className="post";
 
-    div.innerHTML = `
+    div.innerHTML=`
       <div class="post-header">
         <div>${p.user_id.slice(0,6)}</div>
+        <div>${new Date(p.created_at).toLocaleString()}</div>
         ${p.user_id===user.id
           ? `<div class="delete-btn"><span class="icon">delete</span></div>`
           : ""
@@ -378,38 +378,27 @@ async function loadFeed(){
     const icon = div.querySelector(".icon");
     const count = div.querySelector(".like-row span:last-child");
 
-    let clickTimeout;
-
-    img.onclick = () => {
-      if(clickTimeout){
-        clearTimeout(clickTimeout);
-        clickTimeout=null;
-        toggleLike(p,icon.classList.contains("liked"),icon,count);
+    img.onclick = ()=>{
+      if(globalAudio.src===p.song_preview){
+        globalAudio.paused ? globalAudio.play() : globalAudio.pause();
       }else{
-        clickTimeout=setTimeout(()=>{
-          if(globalAudio.src===p.song_preview){
-            globalAudio.paused ? globalAudio.play() : globalAudio.pause();
-          }else{
-            globalAudio.src=p.song_preview;
-            globalAudio.play();
-            localStorage.setItem("playingPreview",p.song_preview);
-          }
-          clickTimeout=null;
-        },250);
+        globalAudio.src=p.song_preview;
+        globalAudio.play();
       }
     };
 
+    div.querySelector(".like-row").onclick = e=>{
+      e.stopPropagation();
+      toggleLike(p, icon, count, liked);
+    };
+
     if(p.user_id===user.id){
-      div.querySelector(".delete-btn").onclick=e=>{
+      div.querySelector(".delete-btn").onclick = e=>{
         e.stopPropagation();
-        deletePost(p.id,div);
+        supabase.from("posts").delete().eq("id",p.id);
+        div.remove();
       };
     }
-
-    div.querySelector(".like-row").onclick=e=>{
-      e.stopPropagation();
-      toggleLike(p,liked,icon,count);
-    };
 
     feed.appendChild(div);
   });
