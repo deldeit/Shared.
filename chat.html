@@ -3,60 +3,106 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Chat</title>
+<title>Shared - Chat</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;font-family:'Archivo Black',sans-serif;}
+*{
+  box-sizing:border-box;
+  font-family:'Archivo Black',sans-serif;
+}
+
+:root{
+  --bg:#000;
+  --panel:#0f0f0f;
+  --border:#222;
+  --text:#fff;
+  --muted:rgba(255,255,255,.6);
+}
 
 body{
   margin:0;
-  background:#000;
-  color:#fff;
+  background:var(--bg);
+  color:var(--text);
 }
 
 .container{
-  max-width:900px;
-  margin:auto;
+  max-width:920px;
+  margin:0 auto;
   height:100vh;
   display:flex;
   flex-direction:column;
-  padding:20px;
+  padding:18px;
 }
 
-.header{
+/* HEADER */
+.topbar{
   text-align:center;
   margin-bottom:10px;
 }
 
-.status{
-  font-size:11px;
-  opacity:.6;
+.logo{
+  font-size:28px;
+  letter-spacing:-1px;
 }
 
+.contact{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  margin-top:8px;
+  gap:6px;
+}
+
+.avatar{
+  width:52px;
+  height:52px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#444,#111);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+}
+
+.name{
+  font-size:14px;
+}
+
+/* CHAT */
 .chat{
   flex:1;
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:14px;
   overflow-y:auto;
   display:flex;
   flex-direction:column;
   gap:10px;
-  background:#0f0f0f;
-  border-radius:20px;
-  padding:15px;
-  border:1px solid #222;
 }
 
 .msg{
-  max-width:70%;
+  max-width:75%;
   padding:10px 14px;
   border-radius:16px;
   font-size:13px;
 }
 
-.me{background:#fff;color:#000;align-self:flex-end;}
-.other{background:#1a1a1a;border:1px solid #333;}
+.me{
+  align-self:flex-end;
+  background:#fff;
+  color:#000;
+}
+
+.other{
+  align-self:flex-start;
+  background:#1a1a1a;
+  border:1px solid #333;
+}
 
 .meta{
   font-size:10px;
@@ -64,12 +110,7 @@ body{
   margin-top:4px;
 }
 
-.typing{
-  font-size:11px;
-  opacity:.6;
-  margin:5px 0;
-}
-
+/* INPUT */
 .input{
   display:flex;
   gap:10px;
@@ -83,6 +124,7 @@ input{
   border:1px solid #333;
   background:#0a0a0a;
   color:#fff;
+  outline:none;
 }
 
 button{
@@ -98,18 +140,26 @@ button{
 <body>
 
 <div class="container">
-  <div class="header">
-    <div id="name"></div>
-    <div id="status" class="status"></div>
+
+  <!-- LOGO -->
+  <div class="topbar">
+    <div class="logo">Shared.</div>
+
+    <div class="contact">
+      <div id="avatar" class="avatar">U</div>
+      <div id="contactName" class="name">User</div>
+    </div>
   </div>
 
+  <!-- CHAT -->
   <div id="chat" class="chat"></div>
-  <div id="typing" class="typing"></div>
 
+  <!-- INPUT -->
   <div class="input">
-    <input id="input" placeholder="Scrivi..." />
-    <button onclick="send()">Invia</button>
+    <input id="input" placeholder="Scrivi un messaggio..." />
+    <button id="sendBtn">Invia</button>
   </div>
+
 </div>
 
 <script>
@@ -119,8 +169,8 @@ const supabase = window.supabase.createClient(
 );
 
 let user, otherId, otherName;
+
 const chat = document.getElementById("chat");
-const typingDiv = document.getElementById("typing");
 
 function getParams(){
   const p = new URLSearchParams(location.search);
@@ -130,25 +180,21 @@ function getParams(){
   };
 }
 
-function fallbackName(name, email){
-  if(name) return name;
-  if(email) return email.split("@")[0];
-  return "User";
-}
+function addMsg(m, isMe){
+  const div = document.createElement("div");
+  div.className = "msg " + (isMe ? "me" : "other");
 
-function addMsg(m, me, name){
-  const d = document.createElement("div");
-  d.className = "msg " + (me ? "me":"other");
-  d.innerHTML = `
+  div.innerHTML = `
     ${m.content}
-    <div class="meta">${name}</div>
+    <div class="meta">${new Date(m.created_at).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</div>
   `;
-  chat.appendChild(d);
+
+  chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
 
-async function load(){
-  const {data} = await supabase
+async function loadMessages(){
+  const { data } = await supabase
     .from("messages")
     .select("*")
     .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${user.id})`)
@@ -156,17 +202,9 @@ async function load(){
 
   chat.innerHTML = "";
 
-  for(let m of data){
-    addMsg(m, m.sender_id===user.id, m.sender_id===user.id?"You":otherName);
+  for(const m of data){
+    addMsg(m, m.sender_id === user.id);
   }
-
-  // mark as seen
-  await supabase
-    .from("messages")
-    .update({seen_at: new Date()})
-    .eq("receiver_id", user.id)
-    .eq("sender_id", otherId)
-    .is("seen_at", null);
 }
 
 async function send(){
@@ -185,59 +223,32 @@ async function send(){
 
 function realtime(){
   supabase.channel("chat")
-  .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>{
-    const m = p.new;
+    .on("postgres_changes",
+      { event:"INSERT", schema:"public", table:"messages" },
+      payload => {
+        const m = payload.new;
 
-    if(
-      (m.sender_id===user.id && m.receiver_id===otherId) ||
-      (m.sender_id===otherId && m.receiver_id===user.id)
-    ){
-      addMsg(m, m.sender_id===user.id, m.sender_id===user.id?"You":otherName);
-    }
-  })
-  .subscribe();
+        if(
+          (m.sender_id === user.id && m.receiver_id === otherId) ||
+          (m.sender_id === otherId && m.receiver_id === user.id)
+        ){
+          addMsg(m, m.sender_id === user.id);
+        }
+      }
+    )
+    .subscribe();
 }
 
-function typing(){
-  const channel = supabase.channel("typing");
+function setupUI(){
+  document.getElementById("sendBtn").addEventListener("click", send);
 
-  document.getElementById("input").addEventListener("input", ()=>{
-    channel.send({
-      type:"broadcast",
-      event:"typing",
-      payload:{user:user.id}
-    });
-  });
-
-  channel.on("broadcast",{event:"typing"},payload=>{
-    if(payload.payload.user !== user.id){
-      typingDiv.innerText = otherName + " sta scrivendo...";
-      clearTimeout(window.t);
-      window.t = setTimeout(()=>typingDiv.innerText="",1500);
-    }
-  });
-
-  channel.subscribe();
-}
-
-async function presence(){
-  const ch = supabase.channel("presence",{config:{presence:{key:user.id}}});
-
-  ch.on("presence",{event:"sync"},()=>{
-    const state = ch.presenceState();
-    const online = !!state[otherId];
-    document.getElementById("status").innerText = online ? "online" : "offline";
-  });
-
-  ch.subscribe(async (status)=>{
-    if(status==="SUBSCRIBED"){
-      await ch.track({online:true});
-    }
+  document.getElementById("input").addEventListener("keydown", e=>{
+    if(e.key === "Enter") send();
   });
 }
 
 async function init(){
-  const {data} = await supabase.auth.getUser();
+  const { data } = await supabase.auth.getUser();
   user = data.user;
 
   if(!user){
@@ -249,12 +260,12 @@ async function init(){
   otherId = p.id;
   otherName = p.name || "User";
 
-  document.getElementById("name").innerText = otherName;
+  document.getElementById("contactName").innerText = otherName;
+  document.getElementById("avatar").innerText = otherName?.[0]?.toUpperCase() || "U";
 
-  await load();
+  await loadMessages();
   realtime();
-  typing();
-  presence();
+  setupUI();
 }
 
 init();
