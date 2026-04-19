@@ -7,6 +7,7 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
 *{
@@ -43,9 +44,8 @@ body{
 
 .topbar{
   display:flex;
+  justify-content:center;
   align-items:center;
-  justify-content:space-between;
-  gap:12px;
   margin-bottom:20px;
 }
 
@@ -54,37 +54,13 @@ body{
   color:#fff;
   display:inline-flex;
   align-items:center;
-  gap:8px;
 }
 
 .header{
   font-size:30px;
   line-height:1;
   text-align:center;
-  flex:1;
   letter-spacing:-.5px;
-}
-
-.icon-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  border:none;
-  border-radius:999px;
-  padding:10px 14px;
-  cursor:pointer;
-  font-size:12px;
-  background:#fff;
-  color:#000;
-  white-space:nowrap;
-  text-decoration:none;
-}
-
-.icon-btn.secondary{
-  background:#1a1a1a;
-  color:#fff;
-  border:1px solid #333;
 }
 
 .profile-card{
@@ -147,24 +123,46 @@ body{
   align-items:center;
 }
 
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:none;
+  border-radius:999px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+.icon-btn.follow{
+  background:#fff;
+  color:#000;
+}
+
+.icon-btn.message{
+  background:#1a1a1a;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.material-symbols-outlined{
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+  line-height:1;
+  font-size:20px;
+}
+
 .profile-name{
   font-size:24px;
-  line-height:1;
+  line-height:1.05;
   margin:0;
 }
 
-.profile-username{
-  margin-top:6px;
-  font-size:12px;
-  opacity:.72;
-}
-
-.profile-bio{
-  margin-top:14px;
-  font-size:13px;
-  line-height:1.5;
-  white-space:pre-wrap;
-  color:rgba(255,255,255,.88);
+.profile-id{
+  margin-top:8px;
+  font-size:11px;
+  opacity:.65;
 }
 
 .stats{
@@ -207,49 +205,78 @@ body{
   opacity:.9;
 }
 
-.grid{
+.feed{
   display:grid;
-  gap:12px;
+  gap:14px;
 }
 
-.post-preview{
+.post{
   background:#000;
   border:1px solid #222;
-  border-radius:18px;
+  border-radius:20px;
+  overflow:hidden;
+}
+
+.post img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:cover;
+  display:block;
+}
+
+.post-body{
   padding:12px;
 }
 
-.post-preview .title{
-  font-size:12px;
+.post-top{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
 }
 
-.post-preview .sub{
-  margin-top:6px;
+.post-date{
+  font-size:11px;
+  opacity:.65;
+  white-space:nowrap;
+}
+
+.post-caption{
+  font-size:13px;
+  line-height:1.45;
+  margin-top:10px;
+  white-space:pre-wrap;
+}
+
+.post-song{
+  margin-top:12px;
+  padding-top:12px;
+  border-top:1px solid #222;
+}
+
+.song-title{
+  font-size:12px;
+  line-height:1.35;
+}
+
+.song-sub{
+  margin-top:4px;
   font-size:11px;
   opacity:.7;
-  line-height:1.4;
 }
 
-.icon-btn.big{
-  padding:12px 16px;
+.empty-state{
+  padding:22px 10px;
+  text-align:center;
+  opacity:.6;
   font-size:13px;
 }
 
-.icon-btn.follow{
-  background:#fff;
-  color:#000;
-}
-
-.icon-btn.message{
-  background:#1a1a1a;
-  color:#fff;
-  border:1px solid #333;
-}
-
-.material-symbols-outlined{
-  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
-  line-height:1;
-  font-size:20px;
+.error-state{
+  padding:22px 10px;
+  text-align:center;
+  opacity:.8;
+  font-size:13px;
 }
 
 @media (max-width:520px){
@@ -281,7 +308,7 @@ body{
 <body>
   <div class="container">
     <div class="topbar">
-      <a class="logo-link" href="homepage.html" aria-label="Go to homepage">
+      <a class="logo-link" href="home.html" aria-label="Go to home">
         <div class="header">Shared.</div>
       </a>
     </div>
@@ -291,41 +318,34 @@ body{
 
       <div class="profile-main">
         <div class="profile-top">
-          <div class="avatar" aria-hidden="true">
-            S
-          </div>
+          <div class="avatar" id="avatar">S</div>
 
           <div class="profile-actions">
-            <button class="icon-btn big follow" id="followBtn">
+            <button class="icon-btn follow" id="followBtn">
               <span class="material-symbols-outlined">person_add</span>
               Follow
             </button>
-            <button class="icon-btn big message" id="messageBtn">
+            <button class="icon-btn message" id="messageBtn">
               <span class="material-symbols-outlined">chat_bubble</span>
               Message
             </button>
           </div>
         </div>
 
-        <h1 class="profile-name">Username</h1>
-        <div class="profile-username">@username</div>
+        <h1 class="profile-name" id="displayName">User</h1>
+        <div class="profile-id" id="profileId">ID</div>
 
-        <div class="profile-bio">
-          This is a profile page in the Shared style.
-          Put here bio, interests or short description.
-        </div>
-
-        <div class="stats">
+        <div class="stats" id="stats">
           <div class="stat">
-            <div class="value">124</div>
+            <div class="value" id="postsCount">0</div>
             <div class="label">Posts</div>
           </div>
           <div class="stat">
-            <div class="value">2.1K</div>
+            <div class="value" id="followersCount">0</div>
             <div class="label">Followers</div>
           </div>
           <div class="stat">
-            <div class="value">318</div>
+            <div class="value" id="followingCount">0</div>
             <div class="label">Following</div>
           </div>
         </div>
@@ -333,36 +353,186 @@ body{
     </div>
 
     <div class="section">
-      <div class="section-title">Recent posts</div>
-      <div class="grid">
-        <div class="post-preview">
-          <div class="title">Post title</div>
-          <div class="sub">Preview of the user content goes here.</div>
-        </div>
-        <div class="post-preview">
-          <div class="title">Another post</div>
-          <div class="sub">You can replace these blocks with real posts.</div>
-        </div>
+      <div class="section-title">Posts</div>
+      <div class="feed" id="feed">
+        <div class="empty-state">Loading posts...</div>
       </div>
     </div>
   </div>
 
 <script>
-  const followBtn = document.getElementById('followBtn');
-  const messageBtn = document.getElementById('messageBtn');
+  // =========================
+  // CONFIG SUPABASE
+  // =========================
+  const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+  // =========================
+  // URL PARAMS
+  // =========================
+  const params = new URLSearchParams(window.location.search);
+  const userId = params.get("id") || "";
+  const userName = params.get("name") || "User";
+
+  // =========================
+  // ELEMENTS
+  // =========================
+  const avatarEl = document.getElementById("avatar");
+  const displayNameEl = document.getElementById("displayName");
+  const profileIdEl = document.getElementById("profileId");
+  const feedEl = document.getElementById("feed");
+  const postsCountEl = document.getElementById("postsCount");
+  const followersCountEl = document.getElementById("followersCount");
+  const followingCountEl = document.getElementById("followingCount");
+  const followBtn = document.getElementById("followBtn");
+  const messageBtn = document.getElementById("messageBtn");
+
+  // =========================
+  // HEADER / PROFILE
+  // =========================
+  displayNameEl.textContent = userName;
+  profileIdEl.textContent = userId ? userId : "Unknown ID";
+  avatarEl.textContent = userName.charAt(0).toUpperCase();
+
+  // =========================
+  // OPTIONAL FOLLOW TOGGLE
+  // =========================
   let following = false;
-
-  followBtn.addEventListener('click', () => {
+  followBtn.addEventListener("click", () => {
     following = !following;
     followBtn.innerHTML = following
       ? '<span class="material-symbols-outlined">person_check</span> Following'
       : '<span class="material-symbols-outlined">person_add</span> Follow';
   });
 
-  messageBtn.addEventListener('click', () => {
-    alert('Message button clicked');
+  messageBtn.addEventListener("click", () => {
+    alert("Message button clicked");
   });
+
+  // =========================
+  // HELPERS
+  // =========================
+  function escapeHtml(str) {
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function formatDate(value) {
+    if (!value) return "";
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return "";
+    return d.toLocaleDateString("it-IT", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric"
+    });
+  }
+
+  function renderEmpty(message) {
+    feedEl.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+  }
+
+  function renderError(message) {
+    feedEl.innerHTML = `<div class="error-state">${escapeHtml(message)}</div>`;
+  }
+
+  function renderPost(post) {
+    const imageHtml = post.image_url
+      ? `<img src="${escapeHtml(post.image_url)}" alt="Post image">`
+      : "";
+
+    const captionHtml = post.caption
+      ? `<div class="post-caption">${escapeHtml(post.caption)}</div>`
+      : "";
+
+    const songHtml = (post.song_title || post.song_artist)
+      ? `
+        <div class="post-song">
+          <div class="song-title">${escapeHtml(post.song_title || "Unknown song")}</div>
+          <div class="song-sub">${escapeHtml(post.song_artist || "")}</div>
+        </div>
+      `
+      : "";
+
+    const dateHtml = post.created_at
+      ? `<div class="post-date">${escapeHtml(formatDate(post.created_at))}</div>`
+      : "";
+
+    return `
+      <article class="post">
+        ${imageHtml}
+        <div class="post-body">
+          <div class="post-top">
+            <div></div>
+            ${dateHtml}
+          </div>
+          ${captionHtml}
+          ${songHtml}
+        </div>
+      </article>
+    `;
+  }
+
+  async function loadProfileStats() {
+    try {
+      // Prova a leggere statistiche base da una tabella profiles, se esiste.
+      // Se i nomi colonne sono diversi, lascia i fallback a 0.
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("followers_count, following_count")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (!error && data) {
+        followersCountEl.textContent = Number(data.followers_count ?? 0);
+        followingCountEl.textContent = Number(data.following_count ?? 0);
+      }
+    } catch (_) {
+      // fallback silenzioso
+    }
+  }
+
+  async function loadPosts() {
+    if (!userId) {
+      renderError("Missing user id in URL.");
+      return;
+    }
+
+    feedEl.innerHTML = `<div class="empty-state">Loading posts...</div>`;
+
+    try {
+      const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        renderError("Unable to load posts.");
+        return;
+      }
+
+      const posts = data || [];
+      postsCountEl.textContent = posts.length;
+
+      if (!posts.length) {
+        renderEmpty("No posts yet.");
+        return;
+      }
+
+      feedEl.innerHTML = posts.map(renderPost).join("");
+    } catch (err) {
+      renderError("Unable to load posts.");
+    }
+  }
+
+  loadProfileStats();
+  loadPosts();
 </script>
 </body>
 </html>
