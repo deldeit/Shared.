@@ -24,10 +24,15 @@
   --muted:rgba(255,255,255,.65);
 }
 
-body{
+html, body{
   margin:0;
   background:var(--bg);
   color:var(--text);
+  overflow-x:hidden;
+}
+
+body{
+  min-height:100vh;
 }
 
 .container{
@@ -47,6 +52,8 @@ body{
 .header{
   font-size:30px;
   line-height:1;
+  text-align:center;
+  flex:1;
 }
 
 .icon-btn{
@@ -61,6 +68,7 @@ body{
   font-size:12px;
   background:#fff;
   color:#000;
+  white-space:nowrap;
 }
 
 .icon-btn.secondary{
@@ -347,9 +355,96 @@ textarea{
   padding:24px 0;
 }
 
+/* Sidebar */
+#overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:50;
+  display:none;
+}
+
+#overlay.show{
+  display:block;
+}
+
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-340px;
+  width:300px;
+  max-width:88vw;
+  height:100vh;
+  background:#0f0f0f;
+  border-right:1px solid #222;
+  z-index:60;
+  transition:left .25s ease;
+  padding:18px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+#sidebar.open{
+  left:0;
+}
+
+.sidebar-title{
+  font-size:18px;
+  margin-bottom:4px;
+}
+
+.search-box{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.search-box input{
+  margin-top:0;
+}
+
+#userResults{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  max-height:55vh;
+  overflow:auto;
+}
+
+.user-item{
+  border:1px solid #222;
+  background:#000;
+  border-radius:14px;
+  padding:12px;
+  cursor:pointer;
+  transition:.15s ease;
+}
+
+.user-item:hover{
+  background:#111;
+}
+
+.user-item .display-name{
+  font-size:12px;
+  line-height:1.35;
+}
+
+.user-item .meta{
+  display:block;
+  margin-top:4px;
+  opacity:.7;
+  font-size:11px;
+  font-family:inherit;
+}
+
+.sidebar-spacer{
+  flex:1;
+}
+
 @media (max-width:520px){
   .topbar{
-    align-items:flex-start;
+    align-items:center;
   }
 
   .post-actions,
@@ -365,21 +460,49 @@ textarea{
   }
 
   .icon-btn{
-    width:100%;
+    width:auto;
+  }
+
+  .header{
+    font-size:26px;
+  }
+
+  #sidebar{
+    width:86vw;
   }
 }
 </style>
 </head>
 
 <body>
+<div id="overlay"></div>
+
+<aside id="sidebar" aria-label="Sidebar menu">
+  <div class="sidebar-title">Menu</div>
+
+  <div class="search-box">
+    <input id="userSearch" type="text" placeholder="Search profiles..." autocomplete="off">
+    <div id="userResults"></div>
+  </div>
+
+  <div class="sidebar-spacer"></div>
+
+  <button id="logoutSidebarBtn" class="icon-btn secondary" type="button">
+    <span class="material-symbols-outlined">logout</span>
+    Logout
+  </button>
+</aside>
+
 <div class="container">
 
   <div class="topbar">
-    <div class="header">Shared.</div>
-    <button id="logoutBtn" class="icon-btn secondary" type="button">
-      <span class="material-symbols-outlined">logout</span>
-      Logout
+    <button id="menuBtn" class="icon-btn secondary" type="button" aria-label="Open menu">
+      <span class="material-symbols-outlined">menu</span>
     </button>
+
+    <div class="header">Shared.</div>
+
+    <div style="width:44px;"></div>
   </div>
 
   <div class="upload-box">
@@ -424,13 +547,19 @@ const suggestions = document.getElementById("suggestions");
 const songList = document.getElementById("songList");
 const feed = document.getElementById("feed");
 const uploadBtn = document.getElementById("uploadBtn");
-const logoutBtn = document.getElementById("logoutBtn");
+const menuBtn = document.getElementById("menuBtn");
+const sidebar = document.getElementById("sidebar");
+const overlay = document.getElementById("overlay");
+const userSearch = document.getElementById("userSearch");
+const userResults = document.getElementById("userResults");
+const logoutSidebarBtn = document.getElementById("logoutSidebarBtn");
 
 let user = null;
 let displayName = "user";
 let croppedBlob = null;
 let selectedSong = null;
-let debounce = null;
+let debounceSong = null;
+let debounceUser = null;
 let globalAudio = new Audio();
 let activePlayButton = null;
 let jsonpScript = null;
@@ -439,6 +568,7 @@ let canSaveUsername = false;
 
 function getFallbackName(sessionUser){
   return (
+    sessionUser?.user_metadata?.display_name ||
     sessionUser?.user_metadata?.username ||
     sessionUser?.user_metadata?.name ||
     sessionUser?.email?.split("@")?.[0] ||
@@ -506,6 +636,24 @@ globalAudio.addEventListener("ended", ()=>{
   }
 });
 
+function openSidebar(){
+  sidebar.classList.add("open");
+  overlay.classList.add("show");
+}
+
+function closeSidebar(){
+  sidebar.classList.remove("open");
+  overlay.classList.remove("show");
+}
+
+menuBtn.onclick = openSidebar;
+overlay.onclick = closeSidebar;
+
+logoutSidebarBtn.onclick = async ()=>{
+  await supabase.auth.signOut();
+  location.href = "index.html";
+};
+
 (async ()=>{
   const { data: { session } } = await supabase.auth.getSession();
   if(!session) location.href = "index.html";
@@ -520,7 +668,7 @@ globalAudio.addEventListener("ended", ()=>{
 
 async function detectUsernameColumn(){
   try{
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from("posts")
       .select("username")
       .limit(1);
@@ -531,12 +679,6 @@ async function detectUsernameColumn(){
     canSaveUsername = false;
   }
 }
-
-/* logout */
-logoutBtn.onclick = async ()=>{
-  await supabase.auth.signOut();
-  location.href = "index.html";
-};
 
 /* image picker */
 dropzone.onclick = ()=> fileInput.click();
@@ -683,7 +825,7 @@ function renderSelectedSong(){
 
 /* search songs */
 songInput.addEventListener("input", async e=>{
-  clearTimeout(debounce);
+  clearTimeout(debounceSong);
   const q = e.target.value.trim();
 
   if(q.length < 2){
@@ -692,7 +834,7 @@ songInput.addEventListener("input", async e=>{
     return;
   }
 
-  debounce = setTimeout(async ()=>{
+  debounceSong = setTimeout(async ()=>{
     try{
       const data = await deezerSearch(q);
       const tracks = (data?.data || []).filter(track => track && track.preview);
@@ -742,6 +884,56 @@ document.addEventListener("click", e=>{
   if(!e.target.closest(".song-wrapper")){
     suggestions.style.display = "none";
   }
+});
+
+/* search users in sidebar */
+userSearch.addEventListener("input", async e=>{
+  clearTimeout(debounceUser);
+  const q = e.target.value.trim();
+
+  if(q.length < 2){
+    userResults.innerHTML = "";
+    return;
+  }
+
+  debounceUser = setTimeout(async ()=>{
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, display_name")
+      .ilike("display_name", `%${q}%`)
+      .order("display_name", { ascending: true })
+      .limit(8);
+
+    if(error){
+      console.error(error);
+      userResults.innerHTML = `<div class="empty-state">Search unavailable.</div>`;
+      return;
+    }
+
+    const rows = data || [];
+    if(rows.length === 0){
+      userResults.innerHTML = `<div class="empty-state">No profiles found.</div>`;
+      return;
+    }
+
+    userResults.innerHTML = "";
+
+    rows.forEach(profile=>{
+      const item = document.createElement("div");
+      item.className = "user-item";
+      item.innerHTML = `
+        <div class="display-name">${profile.display_name || "Unnamed profile"}</div>
+        <small class="meta">Tap to use this name</small>
+      `;
+
+      item.onclick = ()=>{
+        userSearch.value = profile.display_name || "";
+        userResults.innerHTML = "";
+      };
+
+      userResults.appendChild(item);
+    });
+  }, 250);
 });
 
 /* upload */
