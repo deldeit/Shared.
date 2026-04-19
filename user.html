@@ -74,14 +74,14 @@
 
     .cover {
       position: relative;
-      height: 180px;
+      height: 220px;
       border-bottom: 1px solid var(--border);
       background:
         radial-gradient(circle at 20% 20%, rgba(255,255,255,.16), transparent 32%),
         radial-gradient(circle at 80% 30%, rgba(0,0,0,.18), transparent 28%),
         linear-gradient(135deg, color-mix(in srgb, var(--cover-color) 92%, #ffffff 8%), var(--cover-color));
       background-color: var(--cover-color);
-      transition: transform .15s ease, filter .15s ease;
+      transition: filter .15s ease;
       overflow: hidden;
     }
 
@@ -153,7 +153,7 @@
     }
 
     .profile-main {
-      padding: 18px;
+      padding: 0 18px 18px;
     }
 
     .profile-top {
@@ -161,25 +161,103 @@
       align-items: flex-end;
       justify-content: space-between;
       gap: 16px;
-      margin-top: -54px;
+      margin-top: -78px;
       margin-bottom: 14px;
+      position: relative;
+      z-index: 2;
     }
 
     .avatar {
-      width: 108px;
-      height: 108px;
+      position: relative;
+      width: 132px;
+      height: 132px;
       border-radius: 50%;
-      border: 4px solid #000;
+      border: 6px solid #000;
       background: linear-gradient(135deg,#444,#111);
-      box-shadow: 0 8px 30px rgba(0,0,0,.45);
+      box-shadow: 0 10px 34px rgba(0,0,0,.5);
       overflow: hidden;
       flex: 0 0 auto;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 34px;
+      color: #fff;
+      user-select: none;
+    }
+
+    .avatar-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .avatar-fallback {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 38px;
       letter-spacing: -2px;
       color: #fff;
+      z-index: 1;
+    }
+
+    .avatar-edit {
+      position: absolute;
+      inset: auto 10px 10px auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 999px;
+      padding: 8px 10px;
+      background: rgba(0,0,0,.52);
+      color: #fff;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 22px rgba(0,0,0,.25);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease, transform .15s ease;
+      z-index: 2;
+      font-size: 11px;
+      line-height: 1;
+    }
+
+    .avatar:hover .avatar-edit,
+    .avatar:focus-within .avatar-edit {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (hover: none) {
+      .avatar-edit {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    .avatar-edit:hover {
+      transform: translateY(-1px);
+    }
+
+    .avatar-edit .material-symbols-outlined {
+      font-size: 17px;
+    }
+
+    .avatar-file-input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border: 0;
+      padding: 0;
+      margin: 0;
     }
 
     .profile-actions {
@@ -188,6 +266,7 @@
       flex-wrap: wrap;
       justify-content: flex-end;
       align-items: center;
+      margin-bottom: 4px;
     }
 
     .icon-btn {
@@ -342,18 +421,6 @@
       display: block;
     }
 
-    .post-placeholder {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255,255,255,.35);
-      font-size: 12px;
-      text-align: center;
-      padding: 10px;
-    }
-
     .empty-state,
     .error-state,
     .loading-state {
@@ -459,11 +526,19 @@
       border-radius: 50%;
       background: linear-gradient(135deg, #444, #111);
       flex: 0 0 auto;
+      overflow: hidden;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 14px;
       color: #fff;
+      font-size: 14px;
+    }
+
+    .user-row-badge img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
     }
 
     .user-row-name {
@@ -505,13 +580,13 @@
       }
 
       .cover {
-        height: 150px;
+        height: 170px;
       }
 
       .profile-top {
         flex-direction: column;
         align-items: flex-start;
-        margin-top: -44px;
+        margin-top: -58px;
       }
 
       .profile-actions {
@@ -525,6 +600,11 @@
 
       .feed {
         grid-template-columns: 1fr;
+      }
+
+      .avatar {
+        width: 120px;
+        height: 120px;
       }
     }
   </style>
@@ -556,7 +636,21 @@
 
       <div class="profile-main">
         <div class="profile-top">
-          <div class="avatar" id="avatar">U</div>
+          <div class="avatar" id="avatar">
+            <img id="avatarImg" class="avatar-img hidden" alt="Profile picture">
+            <span id="avatarFallback" class="avatar-fallback">U</span>
+            <label class="avatar-edit hidden" id="avatarEdit">
+              <span class="material-symbols-outlined">photo_camera</span>
+              <span>Photo</span>
+              <input
+                type="file"
+                id="avatarFileInput"
+                class="avatar-file-input"
+                accept="image/*"
+                aria-label="Upload profile photo"
+              >
+            </label>
+          </div>
 
           <div class="profile-actions" id="profileActions">
             <button class="icon-btn follow" id="followBtn">
@@ -626,7 +720,13 @@
     const coverEl = document.getElementById("cover");
     const coverToolsEl = document.getElementById("coverTools");
     const bannerColorInput = document.getElementById("bannerColorInput");
+
     const avatarEl = document.getElementById("avatar");
+    const avatarImgEl = document.getElementById("avatarImg");
+    const avatarFallbackEl = document.getElementById("avatarFallback");
+    const avatarEditEl = document.getElementById("avatarEdit");
+    const avatarFileInput = document.getElementById("avatarFileInput");
+
     const displayNameEl = document.getElementById("displayName");
     const subtitleEl = document.getElementById("subtitle");
     const feedEl = document.getElementById("feed");
@@ -682,9 +782,19 @@
       `;
     }
 
-    function setAvatar(name) {
+    function setAvatar(name, avatarUrl) {
       const initial = (name || "U").trim().charAt(0).toUpperCase() || "U";
-      avatarEl.textContent = initial;
+
+      if (avatarUrl) {
+        avatarImgEl.src = avatarUrl;
+        avatarImgEl.classList.remove("hidden");
+        avatarFallbackEl.classList.add("hidden");
+      } else {
+        avatarImgEl.removeAttribute("src");
+        avatarImgEl.classList.add("hidden");
+        avatarFallbackEl.textContent = initial;
+        avatarFallbackEl.classList.remove("hidden");
+      }
     }
 
     function setBannerColor(color) {
@@ -725,6 +835,11 @@
       if (e.key === "Escape") closeModal();
     });
 
+    avatarImgEl.addEventListener("error", () => {
+      avatarImgEl.classList.add("hidden");
+      avatarFallbackEl.classList.remove("hidden");
+    });
+
     async function getCurrentUser() {
       const { data, error } = await supabaseClient.auth.getUser();
       if (error || !data?.user) {
@@ -738,18 +853,19 @@
     async function loadProfile() {
       if (!profileId) {
         displayNameEl.textContent = fallbackName;
-        setAvatar(fallbackName);
+        setAvatar(fallbackName, "");
         subtitleEl.textContent = "Missing profile id in URL";
         renderError("Missing user id in the URL.");
         followBtn.disabled = true;
         messageBtn.disabled = true;
         coverToolsEl.classList.add("hidden");
+        avatarEditEl.classList.add("hidden");
         return false;
       }
 
       const { data, error } = await supabaseClient
         .from("profiles")
-        .select("id, display_name, verified, banner_color")
+        .select("id, display_name, verified, banner_color, avatar_url")
         .eq("id", profileId)
         .maybeSingle();
 
@@ -761,13 +877,14 @@
         id: profileId,
         display_name: fallbackName,
         verified: false,
-        banner_color: DEFAULT_BANNER_COLOR
+        banner_color: DEFAULT_BANNER_COLOR,
+        avatar_url: ""
       };
 
       const display = profile.display_name || fallbackName;
       displayNameEl.innerHTML = renderName(display, !!profile.verified);
       subtitleEl.textContent = "";
-      setAvatar(display);
+      setAvatar(display, profile.avatar_url || "");
       setBannerColor(profile.banner_color || DEFAULT_BANNER_COLOR);
 
       isOwnProfile = !!currentUser && currentUser.id === profileId;
@@ -775,13 +892,72 @@
       if (isOwnProfile) {
         profileActions.classList.add("hidden");
         coverToolsEl.classList.remove("hidden");
+        avatarEditEl.classList.remove("hidden");
       } else {
         profileActions.classList.remove("hidden");
         coverToolsEl.classList.add("hidden");
+        avatarEditEl.classList.add("hidden");
       }
 
       return true;
     }
+
+    async function uploadAvatar(file) {
+      if (!currentUser || !isOwnProfile || !file) return;
+
+      if (!file.type || !file.type.startsWith("image/")) {
+        alert("Please choose an image file.");
+        return;
+      }
+
+      avatarFileInput.disabled = true;
+      avatarEditEl.style.opacity = "0.65";
+
+      try {
+        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
+        const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
+        const path = `${currentUser.id}/${Date.now()}.${safeExt}`;
+
+        const { error: uploadError } = await supabaseClient.storage
+          .from("avatars")
+          .upload(path, file, {
+            upsert: true,
+            contentType: file.type
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: publicData } = supabaseClient.storage
+          .from("avatars")
+          .getPublicUrl(path);
+
+        const publicUrl = publicData?.publicUrl;
+        if (!publicUrl) throw new Error("Could not generate public URL.");
+
+        const { error: updateError } = await supabaseClient
+          .from("profiles")
+          .update({ avatar_url: publicUrl })
+          .eq("id", currentUser.id);
+
+        if (updateError) throw updateError;
+
+        if (profile) profile.avatar_url = publicUrl;
+        setAvatar(profile?.display_name || fallbackName, publicUrl);
+      } catch (err) {
+        console.error("AVATAR UPLOAD ERROR:", err);
+        alert(err?.message || "Unable to upload profile photo.");
+      } finally {
+        avatarFileInput.disabled = false;
+        avatarEditEl.style.opacity = "";
+        avatarFileInput.value = "";
+      }
+    }
+
+    avatarFileInput.addEventListener("change", async () => {
+      const file = avatarFileInput.files && avatarFileInput.files[0];
+      if (!file) return;
+      await uploadAvatar(file);
+    });
 
     async function loadStats() {
       if (!profileId) return;
@@ -909,13 +1085,21 @@
       }
     });
 
+    function avatarHtml(url, name) {
+      const initial = (name || "U").trim().charAt(0).toUpperCase() || "U";
+      if (url) {
+        return `<img src="${escapeHtml(url)}" alt="${escapeHtml(name || "User")}">`;
+      }
+      return `<span>${escapeHtml(initial)}</span>`;
+    }
+
     async function fetchProfilesByIds(ids) {
       const cleanIds = [...new Set((ids || []).filter(Boolean))];
       if (!cleanIds.length) return {};
 
       const { data, error } = await supabaseClient
         .from("profiles")
-        .select("id, display_name, verified")
+        .select("id, display_name, verified, avatar_url")
         .in("id", cleanIds);
 
       if (error) throw error;
@@ -965,7 +1149,9 @@
           return `
             <div class="user-row">
               <div class="user-row-left">
-                <div class="user-row-badge">${escapeHtml(initial)}</div>
+                <div class="user-row-badge">
+                  ${user.avatar_url ? `<img src="${escapeHtml(user.avatar_url)}" alt="${escapeHtml(displayName)}">` : escapeHtml(initial)}
+                </div>
                 <div style="min-width:0">
                   <div class="user-row-name">
                     ${renderName(displayName, !!user.verified)}
