@@ -286,6 +286,16 @@ textarea{
   font-size:13px;
 }
 
+/* clickable usernames */
+.post-user .name a{
+  color:#fff;
+  text-decoration:none;
+}
+
+.post-user .name a:hover{
+  text-decoration:underline;
+}
+
 .post-user .time{
   font-size:11px;
   opacity:.72;
@@ -428,14 +438,6 @@ textarea{
 .user-item .display-name{
   font-size:12px;
   line-height:1.35;
-}
-
-.user-item .meta{
-  display:block;
-  margin-top:4px;
-  opacity:.7;
-  font-size:11px;
-  font-family:inherit;
 }
 
 .sidebar-spacer{
@@ -891,7 +893,7 @@ document.addEventListener("click", e=>{
   }
 });
 
-/* profile search with fallback */
+/* profile search */
 userSearch.addEventListener("input", async e=>{
   clearTimeout(debounceUser);
   const q = e.target.value.trim();
@@ -921,8 +923,8 @@ userSearch.addEventListener("input", async e=>{
       if(rows.length === 0){
         const { data: postUsers, error: postsError } = await supabase
           .from("posts")
-          .select("username")
-          .ilike("username", `%${q}%`)
+          .select("user_id, username")
+          .or(`username.ilike.%${q}%`)
           .limit(20);
 
         if(postsError){
@@ -930,7 +932,10 @@ userSearch.addEventListener("input", async e=>{
         }else{
           const seen = new Set();
           rows = (postUsers || [])
-            .map(r => ({ display_name: r.username }))
+            .map(r => ({
+              id: r.user_id || "",
+              display_name: r.username
+            }))
             .filter(r => {
               const name = (r.display_name || "").trim();
               if(!name) return false;
@@ -954,12 +959,10 @@ userSearch.addEventListener("input", async e=>{
         item.className = "user-item";
         item.innerHTML = `
           <div class="display-name">${profile.display_name || "Unnamed profile"}</div>
-          <small class="meta">Tap to use this name</small>
         `;
 
         item.onclick = ()=>{
-          userSearch.value = profile.display_name || "";
-          userResults.innerHTML = "";
+          location.href = `user.html?id=${encodeURIComponent(profile.id || "")}&name=${encodeURIComponent(profile.display_name || "")}`;
         };
 
         userResults.appendChild(item);
@@ -1212,7 +1215,11 @@ function renderPost(post, likeCount, likedByMe){
 
     <div class="post-header">
       <div class="post-user">
-        <div class="name">${author}</div>
+        <div class="name">
+          <a href="user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(author)}">
+            ${author}
+          </a>
+        </div>
         <div class="time">
           <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
           <span>${formattedDate || ""}</span>
