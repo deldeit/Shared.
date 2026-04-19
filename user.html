@@ -603,7 +603,7 @@
 
       const { data, error } = await supabaseClient
         .from("profiles")
-        .select("id, username")
+        .select("id, display_name")
         .eq("id", profileId)
         .maybeSingle();
 
@@ -613,12 +613,12 @@
 
       profile = data || {
         id: profileId,
-        username: fallbackName
+        display_name: fallbackName
       };
 
-      displayNameEl.textContent = profile.username || fallbackName;
+      displayNameEl.textContent = profile.display_name || fallbackName;
       subtitleEl.textContent = "";
-      setAvatar(profile.username || fallbackName);
+      setAvatar(profile.display_name || fallbackName);
 
       isOwnProfile = !!currentUser && currentUser.id === profileId;
 
@@ -730,7 +730,7 @@
 
     messageBtn.addEventListener("click", () => {
       if (!profileId) return;
-      const name = encodeURIComponent(profile?.username || fallbackName);
+      const name = encodeURIComponent(profile?.display_name || fallbackName);
       window.location.href = `chat.html?id=${encodeURIComponent(profileId)}&name=${name}`;
     });
 
@@ -740,7 +740,7 @@
 
       const { data, error } = await supabaseClient
         .from("profiles")
-        .select("id, username")
+        .select("id, display_name")
         .in("id", cleanIds);
 
       if (error) throw error;
@@ -784,19 +784,19 @@
 
         userListEl.innerHTML = rows.map(row => {
           const user = profileMap[row[columnToRead]] || {};
-          const username = user.username || "User";
-          const initial = username.trim().charAt(0).toUpperCase() || "U";
+          const displayName = user.display_name || "User";
+          const initial = displayName.trim().charAt(0).toUpperCase() || "U";
 
           return `
             <div class="user-row">
               <div class="user-row-left">
                 <div class="user-row-badge">${escapeHtml(initial)}</div>
                 <div style="min-width:0">
-                  <div class="user-row-name">${escapeHtml(username)}</div>
+                  <div class="user-row-name">${escapeHtml(displayName)}</div>
                   <div class="user-row-meta">${isFollowers ? "Follower" : "Following"}</div>
                 </div>
               </div>
-              <button class="user-row-action" data-user-id="${escapeHtml(user.id || row[columnToRead])}" data-user-name="${escapeHtml(username)}">
+              <button class="user-row-action" data-user-id="${escapeHtml(user.id || row[columnToRead])}" data-user-name="${escapeHtml(displayName)}">
                 Open
               </button>
             </div>
