@@ -708,8 +708,9 @@
 
   <script>
     const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawGQ6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const DEFAULT_BANNER_COLOR = "#111111";
 
@@ -1085,14 +1086,6 @@
       }
     });
 
-    function avatarHtml(url, name) {
-      const initial = (name || "U").trim().charAt(0).toUpperCase() || "U";
-      if (url) {
-        return `<img src="${escapeHtml(url)}" alt="${escapeHtml(name || "User")}">`;
-      }
-      return `<span>${escapeHtml(initial)}</span>`;
-    }
-
     async function fetchProfilesByIds(ids) {
       const cleanIds = [...new Set((ids || []).filter(Boolean))];
       if (!cleanIds.length) return {};
@@ -1186,9 +1179,11 @@
     followersStat.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") openRelationshipList("followers");
     });
+
     followingStat.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") openRelationshipList("following");
     });
+
     postsStat.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
     });
