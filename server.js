@@ -16,7 +16,7 @@ const openai = new OpenAI({
 });
 
 /* =========================
-   HEALTH CHECK ROOT
+   HEALTH CHECK
 ========================= */
 app.get("/", (req, res) => {
   res.json({
@@ -27,26 +27,23 @@ app.get("/", (req, res) => {
 });
 
 /* =========================
-   STATUS PAGE /moderate (GET)
-   👉 ora esiste davvero
+   MODERATION STATUS
 ========================= */
 app.get("/moderate", (req, res) => {
   res.json({
     ok: true,
     endpoint: "/moderate",
-    method: "POST",
-    status: "active",
-    service: "image moderation ready"
+    model: "omni-moderation-latest",
+    status: "active"
   });
 });
 
 /* =========================
-   MODERATION ENDPOINT (POST)
+   IMAGE MODERATION
 ========================= */
 app.post("/moderate", upload.single("file"), async (req, res) => {
   try {
-
-    console.log("📥 /moderate called");
+    console.log("📥 moderation request received");
 
     if (!req.file) {
       return res.json({
@@ -67,32 +64,34 @@ app.post("/moderate", upload.single("file"), async (req, res) => {
       ]
     });
 
-    console.log("🔍 moderation response:", JSON.stringify(response, null, 2));
-
     const result = response.results?.[0];
 
-    // 🔥 SAFE DEFAULT: non bloccare se API è incerta
     if (!result) {
       return res.json({
         ok: true,
-        warning: "no moderation result returned, allowed by default"
+        flagged: false,
+        warning: "no moderation result (fail-open)"
       });
     }
 
     const flagged = result.flagged === true;
 
+    console.log("🔍 flagged:", flagged);
+
     return res.json({
       ok: !flagged,
       flagged,
-      categories: result.categories || {}
+      categories: result.categories || {},
+      scores: result.category_scores || {}
     });
 
   } catch (err) {
-    console.error("❌ MODERATION ERROR:", err);
+    console.error("❌ moderation error:", err);
 
-    // 🔥 FAIL OPEN (non blocca tutto il sistema)
+    // FAIL OPEN (non blocca upload se OpenAI fallisce)
     return res.json({
       ok: true,
+      flagged: false,
       warning: "moderation failed, allowed by fallback",
       error: err.message
     });
@@ -100,7 +99,7 @@ app.post("/moderate", upload.single("file"), async (req, res) => {
 });
 
 /* =========================
-   START SERVER (RENDER SAFE)
+   START SERVER
 ========================= */
 const PORT = process.env.PORT || 3000;
 
