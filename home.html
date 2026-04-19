@@ -535,7 +535,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
-  "YOUR_ANON_KEY"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
 window.supabase = supabase;
@@ -549,12 +549,12 @@ const suggestions = document.getElementById("suggestions");
 const songList = document.getElementById("songList");
 const feed = document.getElementById("feed");
 const uploadBtn = document.getElementById("uploadBtn");
+const logoutSidebarBtn = document.getElementById("logoutSidebarBtn");
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const userSearch = document.getElementById("userSearch");
 const userResults = document.getElementById("userResults");
-const logoutSidebarBtn = document.getElementById("logoutSidebarBtn");
 
 let user = null;
 let displayName = "user";
@@ -638,6 +638,7 @@ globalAudio.addEventListener("ended", ()=>{
   }
 });
 
+/* sidebar */
 function openSidebar(){
   sidebar.classList.add("open");
   overlay.classList.add("show");
@@ -651,11 +652,7 @@ function closeSidebar(){
 menuBtn.onclick = openSidebar;
 overlay.onclick = closeSidebar;
 
-logoutSidebarBtn.onclick = async ()=>{
-  await supabase.auth.signOut();
-  location.href = "index.html";
-};
-
+/* session */
 (async ()=>{
   const { data: { session } } = await supabase.auth.getSession();
   if(!session) location.href = "index.html";
@@ -681,6 +678,12 @@ async function detectUsernameColumn(){
     canSaveUsername = false;
   }
 }
+
+/* logout */
+logoutSidebarBtn.onclick = async ()=>{
+  await supabase.auth.signOut();
+  location.href = "index.html";
+};
 
 /* image picker */
 dropzone.onclick = ()=> fileInput.click();
@@ -825,7 +828,7 @@ function renderSelectedSong(){
   };
 }
 
-/* search songs */
+/* song search */
 songInput.addEventListener("input", async e=>{
   clearTimeout(debounceSong);
   const q = e.target.value.trim();
@@ -888,7 +891,7 @@ document.addEventListener("click", e=>{
   }
 });
 
-/* search users in sidebar */
+/* profile search with fallback */
 userSearch.addEventListener("input", async e=>{
   clearTimeout(debounceUser);
   const q = e.target.value.trim();
@@ -899,42 +902,72 @@ userSearch.addEventListener("input", async e=>{
   }
 
   debounceUser = setTimeout(async ()=>{
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, display_name")
-      .ilike("display_name", `%${q}%`)
-      .order("display_name", { ascending: true })
-      .limit(8);
+    userResults.innerHTML = `<div class="empty-state">Searching...</div>`;
 
-    if(error){
-      console.error("Profile search error:", error);
-      userResults.innerHTML = `<div class="empty-state">Search failed.</div>`;
-      return;
+    try{
+      const { data: profiles, error: profilesError } = await supabase
+        .from("profiles")
+        .select("id, display_name")
+        .ilike("display_name", `%${q}%`)
+        .order("display_name", { ascending: true })
+        .limit(8);
+
+      let rows = Array.isArray(profiles) ? profiles : [];
+
+      if(profilesError){
+        console.warn("profiles search error:", profilesError);
+      }
+
+      if(rows.length === 0){
+        const { data: postUsers, error: postsError } = await supabase
+          .from("posts")
+          .select("username")
+          .ilike("username", `%${q}%`)
+          .limit(20);
+
+        if(postsError){
+          console.warn("posts fallback search error:", postsError);
+        }else{
+          const seen = new Set();
+          rows = (postUsers || [])
+            .map(r => ({ display_name: r.username }))
+            .filter(r => {
+              const name = (r.display_name || "").trim();
+              if(!name) return false;
+              const key = name.toLowerCase();
+              if(seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+        }
+      }
+
+      if(rows.length === 0){
+        userResults.innerHTML = `<div class="empty-state">No profiles found.</div>`;
+        return;
+      }
+
+      userResults.innerHTML = "";
+
+      rows.forEach(profile=>{
+        const item = document.createElement("div");
+        item.className = "user-item";
+        item.innerHTML = `
+          <div class="display-name">${profile.display_name || "Unnamed profile"}</div>
+          <small class="meta">Tap to use this name</small>
+        `;
+
+        item.onclick = ()=>{
+          userSearch.value = profile.display_name || "";
+          userResults.innerHTML = "";
+        };
+
+        userResults.appendChild(item);
+      });
+    }catch(err){
+      console.error("Profile search failed:", err);
+      userResults.innerHTML = `<div class="empty-state">Search unavailable.</div>`;
     }
-
-    const rows = data || [];
-    if(rows.length === 0){
-      userResults.innerHTML = `<div class="empty-state">No profiles found.</div>`;
-      return;
-    }
-
-    userResults.innerHTML = "";
-
-    rows.forEach(profile=>{
-      const item = document.createElement("div");
-      item.className = "user-item";
-      item.innerHTML = `
-        <div class="display-name">${profile.display_name || "Unnamed profile"}</div>
-        <small class="meta">Tap to use this name</small>
-      `;
-
-      item.onclick = ()=>{
-        userSearch.value = profile.display_name || "";
-        userResults.innerHTML = "";
-      };
-
-      userResults.appendChild(item);
-    });
   }, 250);
 });
 
