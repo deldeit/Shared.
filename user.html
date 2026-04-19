@@ -842,13 +842,36 @@
     });
 
     async function getCurrentUser() {
-      const { data, error } = await supabaseClient.auth.getUser();
-      if (error || !data?.user) {
-        window.location.replace("index.html");
-        return null;
+      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+
+      if (!sessionError && sessionData?.session?.user) {
+        currentUser = sessionData.session.user;
+        return currentUser;
       }
-      currentUser = data.user;
-      return currentUser;
+
+      const savedSessionRaw = sessionStorage.getItem("shared-session");
+      if (savedSessionRaw) {
+        try {
+          const savedSession = JSON.parse(savedSessionRaw);
+
+          if (savedSession?.access_token && savedSession?.refresh_token) {
+            const { data, error } = await supabaseClient.auth.setSession({
+              access_token: savedSession.access_token,
+              refresh_token: savedSession.refresh_token
+            });
+
+            if (!error && data?.user) {
+              currentUser = data.user;
+              return currentUser;
+            }
+          }
+        } catch (err) {
+          console.error("SESSION RESTORE ERROR:", err);
+        }
+      }
+
+      currentUser = null;
+      return null;
     }
 
     async function loadProfile() {
