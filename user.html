@@ -23,6 +23,7 @@
       --border-2: #333;
       --text: #fff;
       --muted: rgba(255,255,255,.68);
+      --cover-color: #111111;
     }
 
     html, body {
@@ -72,12 +73,83 @@
     }
 
     .cover {
+      position: relative;
       height: 180px;
-      background:
-        radial-gradient(circle at 20% 20%, rgba(255,255,255,.18), transparent 32%),
-        radial-gradient(circle at 80% 30%, rgba(255,255,255,.12), transparent 28%),
-        linear-gradient(135deg, #111, #050505 60%, #111);
       border-bottom: 1px solid var(--border);
+      background:
+        radial-gradient(circle at 20% 20%, rgba(255,255,255,.16), transparent 32%),
+        radial-gradient(circle at 80% 30%, rgba(0,0,0,.18), transparent 28%),
+        linear-gradient(135deg, color-mix(in srgb, var(--cover-color) 92%, #ffffff 8%), var(--cover-color));
+      background-color: var(--cover-color);
+      transition: transform .15s ease, filter .15s ease;
+      overflow: hidden;
+    }
+
+    .cover:hover {
+      filter: brightness(1.03);
+    }
+
+    .cover-tools {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .15s ease;
+    }
+
+    .cover:hover .cover-tools,
+    .cover:focus-within .cover-tools {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @media (hover: none) {
+      .cover-tools {
+        opacity: 1;
+        pointer-events: auto;
+      }
+    }
+
+    .cover-edit {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      padding: 10px 12px;
+      background: rgba(0,0,0,.45);
+      color: #fff;
+      cursor: pointer;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.25);
+      font-size: 11px;
+      line-height: 1;
+      user-select: none;
+    }
+
+    .cover-edit:hover {
+      transform: translateY(-1px);
+    }
+
+    .cover-edit .material-symbols-outlined {
+      font-size: 18px;
+    }
+
+    .cover-color-input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+      border: 0;
+      padding: 0;
+      margin: 0;
     }
 
     .profile-main {
@@ -164,6 +236,26 @@
       line-height: 1.05;
       margin: 0;
       word-break: break-word;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      transform: translateY(-1px);
+    }
+
+    .verified-badge svg {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
 
     .profile-subtitle {
@@ -378,6 +470,10 @@
       font-size: 13px;
       line-height: 1.25;
       word-break: break-word;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .user-row-meta {
@@ -442,7 +538,21 @@
     </div>
 
     <div class="profile-card">
-      <div class="cover"></div>
+      <div class="cover" id="cover">
+        <div class="cover-tools hidden" id="coverTools">
+          <label class="cover-edit" title="Change banner color">
+            <span class="material-symbols-outlined">palette</span>
+            <span>Banner</span>
+            <input
+              type="color"
+              id="bannerColorInput"
+              class="cover-color-input"
+              aria-label="Choose banner color"
+              value="#111111"
+            />
+          </label>
+        </div>
+      </div>
 
       <div class="profile-main">
         <div class="profile-top">
@@ -507,10 +617,15 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+    const DEFAULT_BANNER_COLOR = "#111111";
+
     const params = new URLSearchParams(window.location.search);
     const profileId = params.get("id") || "";
     const fallbackName = params.get("name") || "User";
 
+    const coverEl = document.getElementById("cover");
+    const coverToolsEl = document.getElementById("coverTools");
+    const bannerColorInput = document.getElementById("bannerColorInput");
     const avatarEl = document.getElementById("avatar");
     const displayNameEl = document.getElementById("displayName");
     const subtitleEl = document.getElementById("subtitle");
@@ -544,9 +659,39 @@
         .replaceAll("'", "&#039;");
     }
 
+    function normalizeHexColor(value) {
+      const match = /^#([0-9a-fA-F]{6})$/.exec(String(value || ""));
+      return match ? `#${match[1].toUpperCase()}` : DEFAULT_BANNER_COLOR;
+    }
+
+    function verifiedBadgeHtml() {
+      return `
+        <span class="verified-badge" aria-label="Verified" title="Verified">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <circle cx="12" cy="12" r="11" fill="#FFFFFF"></circle>
+            <path d="M10.1 15.0L6.6 11.5 5.2 12.9l4.9 4.9 8.1-8.1-1.4-1.4z" fill="#000000"></path>
+          </svg>
+        </span>
+      `;
+    }
+
+    function renderName(name, verified) {
+      return `
+        ${escapeHtml(name || "User")}
+        ${verified ? verifiedBadgeHtml() : ""}
+      `;
+    }
+
     function setAvatar(name) {
       const initial = (name || "U").trim().charAt(0).toUpperCase() || "U";
       avatarEl.textContent = initial;
+    }
+
+    function setBannerColor(color) {
+      const safeColor = normalizeHexColor(color);
+      coverEl.style.setProperty("--cover-color", safeColor);
+      bannerColorInput.value = safeColor;
+      return safeColor;
     }
 
     function renderEmpty(message) {
@@ -598,12 +743,13 @@
         renderError("Missing user id in the URL.");
         followBtn.disabled = true;
         messageBtn.disabled = true;
+        coverToolsEl.classList.add("hidden");
         return false;
       }
 
       const { data, error } = await supabaseClient
         .from("profiles")
-        .select("id, display_name")
+        .select("id, display_name, verified, banner_color")
         .eq("id", profileId)
         .maybeSingle();
 
@@ -613,19 +759,25 @@
 
       profile = data || {
         id: profileId,
-        display_name: fallbackName
+        display_name: fallbackName,
+        verified: false,
+        banner_color: DEFAULT_BANNER_COLOR
       };
 
-      displayNameEl.textContent = profile.display_name || fallbackName;
+      const display = profile.display_name || fallbackName;
+      displayNameEl.innerHTML = renderName(display, !!profile.verified);
       subtitleEl.textContent = "";
-      setAvatar(profile.display_name || fallbackName);
+      setAvatar(display);
+      setBannerColor(profile.banner_color || DEFAULT_BANNER_COLOR);
 
       isOwnProfile = !!currentUser && currentUser.id === profileId;
 
       if (isOwnProfile) {
         profileActions.classList.add("hidden");
+        coverToolsEl.classList.remove("hidden");
       } else {
         profileActions.classList.remove("hidden");
+        coverToolsEl.classList.add("hidden");
       }
 
       return true;
@@ -734,13 +886,36 @@
       window.location.href = `chat.html?id=${encodeURIComponent(profileId)}&name=${name}`;
     });
 
+    bannerColorInput.addEventListener("change", async () => {
+      if (!currentUser || !isOwnProfile || !profileId) return;
+
+      const nextColor = normalizeHexColor(bannerColorInput.value);
+      setBannerColor(nextColor);
+
+      try {
+        const { error } = await supabaseClient
+          .from("profiles")
+          .update({ banner_color: nextColor })
+          .eq("id", currentUser.id);
+
+        if (error) throw error;
+
+        if (profile) profile.banner_color = nextColor;
+      } catch (err) {
+        console.error("BANNER COLOR UPDATE ERROR:", err);
+        alert(err?.message || "Unable to update banner color.");
+        const fallback = normalizeHexColor(profile?.banner_color || DEFAULT_BANNER_COLOR);
+        setBannerColor(fallback);
+      }
+    });
+
     async function fetchProfilesByIds(ids) {
       const cleanIds = [...new Set((ids || []).filter(Boolean))];
       if (!cleanIds.length) return {};
 
       const { data, error } = await supabaseClient
         .from("profiles")
-        .select("id, display_name")
+        .select("id, display_name, verified")
         .in("id", cleanIds);
 
       if (error) throw error;
@@ -792,7 +967,9 @@
               <div class="user-row-left">
                 <div class="user-row-badge">${escapeHtml(initial)}</div>
                 <div style="min-width:0">
-                  <div class="user-row-name">${escapeHtml(displayName)}</div>
+                  <div class="user-row-name">
+                    ${renderName(displayName, !!user.verified)}
+                  </div>
                   <div class="user-row-meta">${isFollowers ? "Follower" : "Following"}</div>
                 </div>
               </div>
