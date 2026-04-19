@@ -10,7 +10,9 @@ app.use(express.json());
 
 const upload = multer({ storage: multer.memoryStorage() });
 
-/* OPENAI */
+/* =========================
+   OPENAI
+========================= */
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY
 });
@@ -39,16 +41,17 @@ app.get("/moderate", (req, res) => {
 });
 
 /* =========================
-   IMAGE MODERATION
+   IMAGE MODERATION (STRICT)
 ========================= */
 app.post("/moderate", upload.single("file"), async (req, res) => {
   try {
-    console.log("📥 moderation request received");
+    console.log("📥 moderation request");
 
     if (!req.file) {
-      return res.json({
+      return res.status(400).json({
         ok: false,
-        error: "no file received"
+        flagged: true,
+        reason: "no file received"
       });
     }
 
@@ -56,43 +59,59 @@ app.post("/moderate", upload.single("file"), async (req, res) => {
 
     const response = await openai.moderations.create({
       model: "omni-moderation-latest",
-      input: [
-        {
-          type: "input_image",
-          image_base64: base64
-        }
-      ]
+      input: {
+        image: base64
+      }
     });
 
-    const result = response.results?.[0];
+    const result = response.results?.[0] || response.output?.[0];
 
+    /* =========================
+       FAIL CLOSED (IMPORTANT)
+    ========================= */
     if (!result) {
-      return res.json({
-        ok: true,
-        flagged: false,
-        warning: "no moderation result (fail-open)"
+      return res.status(200).json({
+        ok: false,
+        flagged: true,
+        reason: "no moderation result"
       });
     }
 
-    const flagged = result.flagged === true;
+    const categories = result.categories || {};
+    const scores = result.category_scores || {};
+
+    /* =========================
+       SAFE THRESHOLD SYSTEM
+    ========================= */
+    let flagged = result.flagged === true;
+
+    // extra safety layer (fallback heuristic)
+    const dangerousScore = Object.values(scores)
+      .some(score => typeof score === "number" && score > 0.6);
+
+    if (dangerousScore) {
+      flagged = true;
+    }
 
     console.log("🔍 flagged:", flagged);
 
     return res.json({
       ok: !flagged,
       flagged,
-      categories: result.categories || {},
-      scores: result.category_scores || {}
+      categories,
+      scores
     });
 
   } catch (err) {
     console.error("❌ moderation error:", err);
 
-    // FAIL OPEN (non blocca upload se OpenAI fallisce)
-    return res.json({
-      ok: true,
-      flagged: false,
-      warning: "moderation failed, allowed by fallback",
+    /* =========================
+       FAIL CLOSED ON ERROR
+    ========================= */
+    return res.status(200).json({
+      ok: false,
+      flagged: true,
+      reason: "moderation error (blocked by default)",
       error: err.message
     });
   }
