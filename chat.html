@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shared - Chat</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+  font-family: 'Archivo Black', sans-serif;
+}
+
+:root {
+  --bg: #000;
+  --panel: #0f0f0f;
+  --panel-2: #111;
+  --border: #222;
+  --border-2: #333;
+  --text: #fff;
+  --muted: rgba(255,255,255,.6);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+.container {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.topbar {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.header {
+  font-size: 28px;
+}
+
+.chat-box {
+  flex: 1;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 16px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.message {
+  max-width: 70%;
+  padding: 12px 14px;
+  border-radius: 18px;
+  font-size: 13px;
+  line-height: 1.3;
+}
+
+.message.me {
+  align-self: flex-end;
+  background: #fff;
+  color: #000;
+}
+
+.message.other {
+  align-self: flex-start;
+  background: #1a1a1a;
+  border: 1px solid #333;
+}
+
+.meta {
+  font-size: 10px;
+  opacity: .6;
+  margin-top: 4px;
+}
+
+.input-bar {
+  display: flex;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.input-bar input {
+  flex: 1;
+  padding: 12px;
+  border-radius: 999px;
+  border: 1px solid #333;
+  background: #0a0a0a;
+  color: #fff;
+  outline: none;
+}
+
+.input-bar button {
+  border: none;
+  border-radius: 999px;
+  padding: 0 16px;
+  background: #fff;
+  color: #000;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <div class="topbar">
+    <div class="header">Chat</div>
+  </div>
+
+  <div id="chat" class="chat-box"></div>
+
+  <div class="input-bar">
+    <input id="messageInput" placeholder="Scrivi un messaggio..." />
+    <button onclick="sendMessage()">Invia</button>
+  </div>
+</div>
+
+<script>
+const supabase = window.supabase.createClient(
+  "https://YOUR_PROJECT.supabase.co",
+  "YOUR_PUBLIC_ANON_KEY"
+);
+
+let user = null;
+let otherUserId = null; // preso da URL
+
+const chat = document.getElementById("chat");
+
+function getOtherUser() {
+  const params = new URLSearchParams(window.location.search);
+  return params.get("id");
+}
+
+function formatTime(date) {
+  return new Date(date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+}
+
+function createMessage(msg, isMe, name) {
+  const div = document.createElement("div");
+  div.className = "message " + (isMe ? "me" : "other");
+
+  div.innerHTML = `
+    ${msg.content}
+    <div class="meta">${name} • ${formatTime(msg.created_at)}</div>
+  `;
+
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+async function loadMessages() {
+  const { data } = await supabase
+    .from("messages")
+    .select("*")
+    .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
+    .order("created_at", { ascending: true });
+
+  chat.innerHTML = "";
+
+  for (let msg of data) {
+    const isMe = msg.sender_id === user.id;
+    createMessage(msg, isMe, isMe ? "You" : "User");
+  }
+}
+
+async function sendMessage() {
+  const input = document.getElementById("messageInput");
+  const text = input.value.trim();
+  if (!text) return;
+
+  await supabase.from("messages").insert({
+    sender_id: user.id,
+    receiver_id: otherUserId,
+    content: text
+  });
+
+  input.value = "";
+}
+
+function subscribeMessages() {
+  supabase
+    .channel("chat")
+    .on(
+      "postgres_changes",
+      {
+        event: "INSERT",
+        schema: "public",
+        table: "messages"
+      },
+      payload => {
+        const msg = payload.new;
+
+        if (
+          (msg.sender_id === user.id && msg.receiver_id === otherUserId) ||
+          (msg.sender_id === otherUserId && msg.receiver_id === user.id)
+        ) {
+          createMessage(msg, msg.sender_id === user.id, msg.sender_id === user.id ? "You" : "User");
+        }
+      }
+    )
+    .subscribe();
+}
+
+async function init() {
+  const { data } = await supabase.auth.getUser();
+  user = data.user;
+
+  if (!user) {
+    window.location.href = "index.html";
+    return;
+  }
+
+  otherUserId = getOtherUser();
+
+  await loadMessages();
+  subscribeMessages();
+}
+
+init();
+</script>
+
+</body>
+</html>
