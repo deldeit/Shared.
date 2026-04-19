@@ -494,6 +494,7 @@ textarea{
 </aside>
 
 <div class="container">
+
   <div class="topbar">
     <button id="menuBtn" class="icon-btn secondary" type="button" aria-label="Open menu">
       <span class="material-symbols-outlined">menu</span>
@@ -534,8 +535,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const supabase = createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
+  "YOUR_ANON_KEY"
 );
+
+window.supabase = supabase;
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
@@ -905,7 +908,7 @@ userSearch.addEventListener("input", async e=>{
 
     if(error){
       console.error("Profile search error:", error);
-      userResults.innerHTML = `<div class="empty-state">Search unavailable.</div>`;
+      userResults.innerHTML = `<div class="empty-state">Search failed.</div>`;
       return;
     }
 
