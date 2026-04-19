@@ -24,7 +24,7 @@ body{
   height:100vh;
 }
 
-/* BOX CENTRATA */
+/* APP CONTAINER */
 .app{
   width:420px;
   height:650px;
@@ -48,7 +48,6 @@ body{
 
 .back{
   cursor:pointer;
-  font-size:18px;
   padding:6px 10px;
   border-radius:10px;
   background:#1a1a1a;
@@ -58,9 +57,14 @@ body{
   opacity:.8;
 }
 
+.header-center{
+  display:flex;
+  flex-direction:column;
+  cursor:pointer;
+}
+
 .name{
   font-size:13px;
-  cursor:pointer;
 }
 
 .status{
@@ -112,6 +116,7 @@ input{
   border:1px solid #333;
   background:#0a0a0a;
   color:#fff;
+  outline:none;
 }
 
 button{
@@ -130,10 +135,10 @@ button{
 
   <!-- HEADER -->
   <div class="header">
-    <div class="back" onclick="goHome()">←</div>
+    <div class="back" id="backBtn">←</div>
 
-    <div>
-      <div id="name" class="name"></div>
+    <div class="header-center" id="profileBtn">
+      <div id="name" class="name">User</div>
       <div id="status" class="status">offline</div>
     </div>
   </div>
@@ -144,13 +149,13 @@ button{
   <!-- INPUT -->
   <div class="input">
     <input id="input" placeholder="Scrivi..." />
-    <button onclick="send()">Invia</button>
+    <button id="sendBtn">Invia</button>
   </div>
 
 </div>
 
 <script>
-/* SUPABASE SINGLETON (FIX ERRORE DUPLICATO) */
+/* SUPABASE SINGLETON (FIX ERRORI DUPLICATI) */
 window.supabaseClient = window.supabaseClient || window.supabase.createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
@@ -163,7 +168,7 @@ let user, otherId, otherName;
 const chat = document.getElementById("chat");
 
 /* PARAMS */
-function params(){
+function getParams(){
   const p = new URLSearchParams(location.search);
   return {
     id: p.get("id"),
@@ -171,21 +176,21 @@ function params(){
   };
 }
 
-/* REDIRECT HOME */
-function goHome(){
+/* NAV */
+document.getElementById("backBtn").onclick = () => {
   location.href = "home.html";
-}
+};
 
-/* PROFILO DESTINATARIO */
-function openProfile(){
+document.getElementById("profileBtn").onclick = () => {
   location.href = `user.html?id=${otherId}`;
-}
+};
 
-/* MESSAGE UI */
+/* ADD MESSAGE */
 function addMsg(m){
   const div = document.createElement("div");
   div.className = "msg " + (m.sender_id === user.id ? "me" : "other");
   div.innerText = m.content;
+
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
 }
@@ -218,6 +223,13 @@ async function send(){
 
   input.value="";
 }
+
+/* EVENTS */
+document.getElementById("sendBtn").addEventListener("click", send);
+
+document.getElementById("input").addEventListener("keydown", e=>{
+  if(e.key === "Enter") send();
+});
 
 /* REALTIME */
 function realtime(){
@@ -263,20 +275,17 @@ async function init(){
   const { data } = await supabase.auth.getUser();
   user = data.user;
 
-  /* 🔴 NON LOGGATO → INDEX */
+  /* 🔴 NON LOGGATO */
   if(!user){
     location.href = "index.html";
     return;
   }
 
-  const p = params();
+  const p = getParams();
   otherId = p.id;
   otherName = p.name || "User";
 
   document.getElementById("name").innerText = otherName;
-
-  /* click nome → profilo */
-  document.getElementById("name").onclick = openProfile;
 
   await load();
   realtime();
