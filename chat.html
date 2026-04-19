@@ -18,38 +18,49 @@ body{
   margin:0;
   background:#000;
   color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
 }
 
-/* HEADER WHATSAPP STYLE */
+/* BOX CENTRATA */
+.app{
+  width:420px;
+  height:650px;
+  background:#0f0f0f;
+  border:1px solid #222;
+  border-radius:24px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+
+/* HEADER */
 .header{
   display:flex;
   align-items:center;
-  gap:12px;
-  padding:12px 14px;
+  gap:10px;
+  padding:12px;
   border-bottom:1px solid #222;
-  background:#0f0f0f;
-  position:sticky;
-  top:0;
+  background:#0b0b0b;
 }
 
-.avatar{
-  width:42px;
-  height:42px;
-  border-radius:50%;
-  background:linear-gradient(135deg,#444,#111);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:14px;
+.back{
+  cursor:pointer;
+  font-size:18px;
+  padding:6px 10px;
+  border-radius:10px;
+  background:#1a1a1a;
 }
 
-.header-info{
-  display:flex;
-  flex-direction:column;
+.back:hover{
+  opacity:.8;
 }
 
 .name{
   font-size:13px;
+  cursor:pointer;
 }
 
 .status{
@@ -59,16 +70,16 @@ body{
 
 /* CHAT */
 .chat{
-  height:calc(100vh - 120px);
+  flex:1;
   overflow-y:auto;
-  padding:14px;
+  padding:12px;
   display:flex;
   flex-direction:column;
   gap:10px;
 }
 
 .msg{
-  max-width:70%;
+  max-width:75%;
   padding:10px 12px;
   border-radius:14px;
   font-size:13px;
@@ -92,7 +103,6 @@ body{
   gap:10px;
   padding:10px;
   border-top:1px solid #222;
-  background:#0f0f0f;
 }
 
 input{
@@ -102,7 +112,6 @@ input{
   border:1px solid #333;
   background:#0a0a0a;
   color:#fff;
-  outline:none;
 }
 
 button{
@@ -117,34 +126,43 @@ button{
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div id="avatar" class="avatar">U</div>
+<div class="app">
 
-  <div class="header-info">
-    <div id="name" class="name">User</div>
-    <div id="status" class="status">offline</div>
+  <!-- HEADER -->
+  <div class="header">
+    <div class="back" onclick="goHome()">←</div>
+
+    <div>
+      <div id="name" class="name"></div>
+      <div id="status" class="status">offline</div>
+    </div>
   </div>
-</div>
 
-<!-- CHAT -->
-<div id="chat" class="chat"></div>
+  <!-- CHAT -->
+  <div id="chat" class="chat"></div>
 
-<!-- INPUT -->
-<div class="input">
-  <input id="input" placeholder="Message..." />
-  <button id="sendBtn">Send</button>
+  <!-- INPUT -->
+  <div class="input">
+    <input id="input" placeholder="Scrivi..." />
+    <button onclick="send()">Invia</button>
+  </div>
+
 </div>
 
 <script>
-const supabase = window.supabase.createClient(
+/* SUPABASE SINGLETON (FIX ERRORE DUPLICATO) */
+window.supabaseClient = window.supabaseClient || window.supabase.createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
+const supabase = window.supabaseClient;
+
 let user, otherId, otherName;
+
 const chat = document.getElementById("chat");
 
+/* PARAMS */
 function params(){
   const p = new URLSearchParams(location.search);
   return {
@@ -153,9 +171,20 @@ function params(){
   };
 }
 
+/* REDIRECT HOME */
+function goHome(){
+  location.href = "home.html";
+}
+
+/* PROFILO DESTINATARIO */
+function openProfile(){
+  location.href = `user.html?id=${otherId}`;
+}
+
+/* MESSAGE UI */
 function addMsg(m){
   const div = document.createElement("div");
-  div.className = "msg " + (m.sender_id === user.id ? "me":"other");
+  div.className = "msg " + (m.sender_id === user.id ? "me" : "other");
   div.innerText = m.content;
   chat.appendChild(div);
   chat.scrollTop = chat.scrollHeight;
@@ -190,13 +219,7 @@ async function send(){
   input.value="";
 }
 
-document.getElementById("sendBtn").onclick = send;
-
-document.getElementById("input").addEventListener("keydown", e=>{
-  if(e.key==="Enter") send();
-});
-
-/* REALTIME MESSAGES */
+/* REALTIME */
 function realtime(){
   supabase.channel("chat")
     .on("postgres_changes",
@@ -215,32 +238,34 @@ function realtime(){
     .subscribe();
 }
 
-/* PRESENCE (ONLINE/OFFLINE) */
+/* PRESENCE */
 function presence(){
-  const channel = supabase.channel("presence");
+  const ch = supabase.channel("presence");
 
-  channel.on("presence",{event:"sync"},()=>{
-    const state = channel.presenceState();
-    const isOnline = !!state[otherId];
+  ch.on("presence",{event:"sync"},()=>{
+    const state = ch.presenceState();
+    const online = !!state[otherId];
 
     document.getElementById("status").innerText =
-      isOnline ? "online" : "offline";
+      online ? "online" : "offline";
   });
 
-  channel.subscribe(async (status)=>{
+  ch.subscribe(async (status)=>{
     if(status==="SUBSCRIBED"){
-      await channel.track({ user:user.id });
+      await ch.track({ user:user.id });
     }
   });
 }
 
 /* INIT */
 async function init(){
+
   const { data } = await supabase.auth.getUser();
   user = data.user;
 
+  /* 🔴 NON LOGGATO → INDEX */
   if(!user){
-    location.href="index.html";
+    location.href = "index.html";
     return;
   }
 
@@ -249,7 +274,9 @@ async function init(){
   otherName = p.name || "User";
 
   document.getElementById("name").innerText = otherName;
-  document.getElementById("avatar").innerText = otherName?.[0]?.toUpperCase() || "U";
+
+  /* click nome → profilo */
+  document.getElementById("name").onclick = openProfile;
 
   await load();
   realtime();
