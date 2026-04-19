@@ -494,7 +494,6 @@ textarea{
 </aside>
 
 <div class="container">
-
   <div class="topbar">
     <button id="menuBtn" class="icon-btn secondary" type="button" aria-label="Open menu">
       <span class="material-symbols-outlined">menu</span>
@@ -905,7 +904,7 @@ userSearch.addEventListener("input", async e=>{
       .limit(8);
 
     if(error){
-      console.error(error);
+      console.error("Profile search error:", error);
       userResults.innerHTML = `<div class="empty-state">Search unavailable.</div>`;
       return;
     }
