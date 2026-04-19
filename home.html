@@ -247,6 +247,12 @@ textarea{
   font-size:14px;
 }
 
+.primary-btn:disabled,
+.icon-btn:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
 #feed{
   display:grid;
   gap:16px;
@@ -286,7 +292,6 @@ textarea{
   font-size:13px;
 }
 
-/* clickable usernames */
 .post-user .name a{
   color:#fff;
   text-decoration:none;
@@ -365,7 +370,6 @@ textarea{
   padding:24px 0;
 }
 
-/* Sidebar */
 #overlay{
   position:fixed;
   inset:0;
@@ -541,6 +545,9 @@ const supabase = createClient(
 );
 
 window.supabase = supabase;
+
+/* CHANGE THIS */
+const BACKEND_URL = "https://TUO-BACKEND.onrender.com";
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
@@ -748,6 +755,26 @@ async function handleFile(file){
   };
 
   reader.readAsDataURL(file);
+}
+
+/* moderation */
+async function moderateImage(blob){
+  const formData = new FormData();
+  formData.append("file", blob, "image.jpg");
+
+  const res = await fetch(`${BACKEND_URL}/moderate`, {
+    method: "POST",
+    body: formData
+  });
+
+  let data = null;
+  try{
+    data = await res.json();
+  }catch(_){
+    data = { ok: false, flagged: false, warning: "invalid moderation response" };
+  }
+
+  return data;
 }
 
 /* Deezer JSONP */
@@ -991,58 +1018,77 @@ uploadBtn.onclick = async ()=>{
     return;
   }
 
-  const path = `${user.id}/${Date.now()}.jpg`;
+  uploadBtn.disabled = true;
+  uploadBtn.textContent = "CHECKING...";
 
-  const { error: uploadError } = await supabase.storage
-    .from("shared")
-    .upload(path, croppedBlob, {
-      contentType: "image/jpeg",
-      upsert: false
-    });
+  try{
+    const mod = await moderateImage(croppedBlob);
 
-  if(uploadError){
-    console.error(uploadError);
-    alert(uploadError.message || "Upload failed");
-    return;
+    if(mod && mod.flagged){
+      alert("Image blocked by moderation");
+      return;
+    }
+
+    const path = `${user.id}/${Date.now()}.jpg`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("shared")
+      .upload(path, croppedBlob, {
+        contentType: "image/jpeg",
+        upsert: false
+      });
+
+    if(uploadError){
+      console.error(uploadError);
+      alert(uploadError.message || "Upload failed");
+      return;
+    }
+
+    const { data } = supabase.storage.from("shared").getPublicUrl(path);
+
+    const payload = {
+      user_id: user.id,
+      image_url: data.publicUrl,
+      caption: captionInput.value.trim(),
+      song_title: selectedSong.title,
+      song_preview: selectedSong.preview,
+      created_at: new Date().toISOString()
+    };
+
+    if(canSaveUsername){
+      payload.username = displayName;
+    }
+
+    const { error: insertError } = await supabase.from("posts").insert([payload]);
+
+    if(insertError){
+      console.error(insertError);
+      alert(insertError.message || "Post failed");
+      return;
+    }
+
+    croppedBlob = null;
+    selectedSong = null;
+
+    previewBox.innerHTML = "";
+    previewBox.style.display = "none";
+    dropzone.style.display = "flex";
+
+    captionInput.value = "";
+    songInput.value = "";
+    songList.innerHTML = "";
+    suggestions.innerHTML = "";
+    suggestions.style.display = "none";
+    fileInput.value = "";
+
+    await loadFeed();
+  }catch(err){
+    console.error("upload/moderation error:", err);
+    alert(err?.message || "Moderation failed");
+  }finally{
+    uploadBtn.disabled = false;
+    uploadBtn.textContent = "UPLOAD";
   }
-
-  const { data } = supabase.storage.from("shared").getPublicUrl(path);
-
-  const payload = {
-    user_id: user.id,
-    image_url: data.publicUrl,
-    caption: captionInput.value.trim(),
-    song_title: selectedSong.title,
-    song_preview: selectedSong.preview,
-    created_at: new Date().toISOString()
-  };
-
-  if(canSaveUsername){
-    payload.username = displayName;
-  }
-
-  const { error: insertError } = await supabase.from("posts").insert([payload]);
-
-  if(insertError){
-    console.error(insertError);
-    alert(insertError.message || "Post failed");
-    return;
-  }
-
-  croppedBlob = null;
-  selectedSong = null;
-
-  previewBox.innerHTML = "";
-  previewBox.style.display = "none";
-  dropzone.style.display = "flex";
-
-  captionInput.value = "";
-  songInput.value = "";
-  songList.innerHTML = "";
-  suggestions.innerHTML = "";
-  suggestions.style.display = "none";
-
-  await loadFeed();
 };
 
 /* likes */
