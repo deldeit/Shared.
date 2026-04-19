@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shared - Profile</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:'Archivo Black', sans-serif;
+}
+
+:root{
+  --bg:#000;
+  --panel:#0f0f0f;
+  --panel-2:#111;
+  --border:#222;
+  --border-2:#333;
+  --text:#fff;
+  --muted:rgba(255,255,255,.65);
+}
+
+html, body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  overflow-x:hidden;
+}
+
+body{
+  min-height:100vh;
+}
+
+.container{
+  max-width:720px;
+  margin:0 auto;
+  padding:20px;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:20px;
+}
+
+.logo-link{
+  text-decoration:none;
+  color:#fff;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
+
+.header{
+  font-size:30px;
+  line-height:1;
+  text-align:center;
+  flex:1;
+  letter-spacing:-.5px;
+}
+
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  border:none;
+  border-radius:999px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-size:12px;
+  background:#fff;
+  color:#000;
+  white-space:nowrap;
+  text-decoration:none;
+}
+
+.icon-btn.secondary{
+  background:#1a1a1a;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.profile-card{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:24px;
+  overflow:hidden;
+  margin-bottom:18px;
+}
+
+.cover{
+  height:180px;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(255,255,255,.18), transparent 32%),
+    radial-gradient(circle at 80% 30%, rgba(255,255,255,.12), transparent 28%),
+    linear-gradient(135deg, #111, #050505 60%, #111);
+  border-bottom:1px solid var(--border);
+}
+
+.profile-main{
+  padding:18px;
+}
+
+.profile-top{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:16px;
+  margin-top:-54px;
+  margin-bottom:14px;
+}
+
+.avatar{
+  width:108px;
+  height:108px;
+  border-radius:50%;
+  border:4px solid #000;
+  background:linear-gradient(135deg,#444,#111);
+  box-shadow:0 8px 30px rgba(0,0,0,.45);
+  overflow:hidden;
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:34px;
+  letter-spacing:-2px;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.profile-actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  justify-content:flex-end;
+  align-items:center;
+}
+
+.profile-name{
+  font-size:24px;
+  line-height:1;
+  margin:0;
+}
+
+.profile-username{
+  margin-top:6px;
+  font-size:12px;
+  opacity:.72;
+}
+
+.profile-bio{
+  margin-top:14px;
+  font-size:13px;
+  line-height:1.5;
+  white-space:pre-wrap;
+  color:rgba(255,255,255,.88);
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin-top:18px;
+}
+
+.stat{
+  background:var(--panel-2);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:14px;
+  text-align:center;
+}
+
+.stat .value{
+  font-size:18px;
+  line-height:1;
+}
+
+.stat .label{
+  margin-top:6px;
+  font-size:11px;
+  opacity:.68;
+}
+
+.section{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:24px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+.section-title{
+  font-size:14px;
+  margin-bottom:12px;
+  opacity:.9;
+}
+
+.grid{
+  display:grid;
+  gap:12px;
+}
+
+.post-preview{
+  background:#000;
+  border:1px solid #222;
+  border-radius:18px;
+  padding:12px;
+}
+
+.post-preview .title{
+  font-size:12px;
+}
+
+.post-preview .sub{
+  margin-top:6px;
+  font-size:11px;
+  opacity:.7;
+  line-height:1.4;
+}
+
+.icon-btn.big{
+  padding:12px 16px;
+  font-size:13px;
+}
+
+.icon-btn.follow{
+  background:#fff;
+  color:#000;
+}
+
+.icon-btn.message{
+  background:#1a1a1a;
+  color:#fff;
+  border:1px solid #333;
+}
+
+.material-symbols-outlined{
+  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+  line-height:1;
+  font-size:20px;
+}
+
+@media (max-width:520px){
+  .header{
+    font-size:26px;
+  }
+
+  .cover{
+    height:150px;
+  }
+
+  .profile-top{
+    flex-direction:column;
+    align-items:flex-start;
+    margin-top:-44px;
+  }
+
+  .profile-actions{
+    width:100%;
+    justify-content:flex-start;
+  }
+
+  .stats{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <a class="logo-link" href="homepage.html" aria-label="Go to homepage">
+        <div class="header">Shared.</div>
+      </a>
+    </div>
+
+    <div class="profile-card">
+      <div class="cover"></div>
+
+      <div class="profile-main">
+        <div class="profile-top">
+          <div class="avatar" aria-hidden="true">
+            S
+          </div>
+
+          <div class="profile-actions">
+            <button class="icon-btn big follow" id="followBtn">
+              <span class="material-symbols-outlined">person_add</span>
+              Follow
+            </button>
+            <button class="icon-btn big message" id="messageBtn">
+              <span class="material-symbols-outlined">chat_bubble</span>
+              Message
+            </button>
+          </div>
+        </div>
+
+        <h1 class="profile-name">Username</h1>
+        <div class="profile-username">@username</div>
+
+        <div class="profile-bio">
+          This is a profile page in the Shared style.
+          Put here bio, interests or short description.
+        </div>
+
+        <div class="stats">
+          <div class="stat">
+            <div class="value">124</div>
+            <div class="label">Posts</div>
+          </div>
+          <div class="stat">
+            <div class="value">2.1K</div>
+            <div class="label">Followers</div>
+          </div>
+          <div class="stat">
+            <div class="value">318</div>
+            <div class="label">Following</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Recent posts</div>
+      <div class="grid">
+        <div class="post-preview">
+          <div class="title">Post title</div>
+          <div class="sub">Preview of the user content goes here.</div>
+        </div>
+        <div class="post-preview">
+          <div class="title">Another post</div>
+          <div class="sub">You can replace these blocks with real posts.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const followBtn = document.getElementById('followBtn');
+  const messageBtn = document.getElementById('messageBtn');
+
+  let following = false;
+
+  followBtn.addEventListener('click', () => {
+    following = !following;
+    followBtn.innerHTML = following
+      ? '<span class="material-symbols-outlined">person_check</span> Following'
+      : '<span class="material-symbols-outlined">person_add</span> Follow';
+  });
+
+  messageBtn.addEventListener('click', () => {
+    alert('Message button clicked');
+  });
+</script>
+</body>
+</html>
