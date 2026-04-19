@@ -24,7 +24,7 @@ body{
   height:100vh;
 }
 
-/* APP CONTAINER */
+/* APP */
 .app{
   width:420px;
   height:650px;
@@ -57,7 +57,7 @@ body{
   opacity:.8;
 }
 
-.header-center{
+.header-info{
   display:flex;
   flex-direction:column;
   cursor:pointer;
@@ -137,7 +137,7 @@ button{
   <div class="header">
     <div class="back" id="backBtn">←</div>
 
-    <div class="header-center" id="profileBtn">
+    <div class="header-info" id="profileBtn">
       <div id="name" class="name">User</div>
       <div id="status" class="status">offline</div>
     </div>
@@ -148,14 +148,16 @@ button{
 
   <!-- INPUT -->
   <div class="input">
-    <input id="input" placeholder="Scrivi..." />
-    <button id="sendBtn">Invia</button>
+    <input id="input" placeholder="Write a message..." />
+    <button id="sendBtn">Send</button>
   </div>
 
 </div>
 
 <script>
-/* SUPABASE SINGLETON (FIX ERRORI DUPLICATI) */
+/* =========================
+   SUPABASE INIT (SAFE SINGLETON)
+========================= */
 window.supabaseClient = window.supabaseClient || window.supabase.createClient(
   "https://cnhaonawapuahzoctqav.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
@@ -163,11 +165,16 @@ window.supabaseClient = window.supabaseClient || window.supabase.createClient(
 
 const supabase = window.supabaseClient;
 
+/* =========================
+   STATE
+========================= */
 let user, otherId, otherName;
 
 const chat = document.getElementById("chat");
 
-/* PARAMS */
+/* =========================
+   URL PARAMS
+========================= */
 function getParams(){
   const p = new URLSearchParams(location.search);
   return {
@@ -176,7 +183,9 @@ function getParams(){
   };
 }
 
-/* NAV */
+/* =========================
+   NAVIGATION
+========================= */
 document.getElementById("backBtn").onclick = () => {
   location.href = "home.html";
 };
@@ -185,8 +194,10 @@ document.getElementById("profileBtn").onclick = () => {
   location.href = `user.html?id=${otherId}`;
 };
 
-/* ADD MESSAGE */
-function addMsg(m){
+/* =========================
+   RENDER MESSAGE
+========================= */
+function renderMessage(m){
   const div = document.createElement("div");
   div.className = "msg " + (m.sender_id === user.id ? "me" : "other");
   div.innerText = m.content;
@@ -195,8 +206,10 @@ function addMsg(m){
   chat.scrollTop = chat.scrollHeight;
 }
 
-/* LOAD CHAT */
-async function load(){
+/* =========================
+   LOAD CHAT HISTORY
+========================= */
+async function loadChat(){
   const { data } = await supabase
     .from("messages")
     .select("*")
@@ -206,90 +219,104 @@ async function load(){
     .order("created_at");
 
   chat.innerHTML = "";
-  data.forEach(addMsg);
+  data.forEach(renderMessage);
 }
 
-/* SEND */
-async function send(){
+/* =========================
+   SEND MESSAGE
+========================= */
+async function sendMessage(){
   const input = document.getElementById("input");
   const text = input.value.trim();
   if(!text) return;
 
-  await supabase.from("messages").insert({
-    sender_id:user.id,
-    receiver_id:otherId,
-    content:text
+  const { error } = await supabase.from("messages").insert({
+    sender_id: user.id,
+    receiver_id: otherId,
+    content: text
   });
 
-  input.value="";
+  if(error){
+    console.error("Send error:", error);
+    return;
+  }
+
+  input.value = "";
 }
 
-/* EVENTS */
-document.getElementById("sendBtn").addEventListener("click", send);
+/* =========================
+   EVENTS
+========================= */
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
 
-document.getElementById("input").addEventListener("keydown", e=>{
-  if(e.key === "Enter") send();
+document.getElementById("input").addEventListener("keydown", (e) => {
+  if(e.key === "Enter") sendMessage();
 });
 
-/* REALTIME */
-function realtime(){
+/* =========================
+   REALTIME MESSAGES
+========================= */
+function subscribeMessages(){
   supabase.channel("chat")
     .on("postgres_changes",
       { event:"INSERT", schema:"public", table:"messages" },
-      payload=>{
+      payload => {
         const m = payload.new;
 
         if(
-          (m.sender_id===user.id && m.receiver_id===otherId) ||
-          (m.sender_id===otherId && m.receiver_id===user.id)
+          (m.sender_id === user.id && m.receiver_id === otherId) ||
+          (m.sender_id === otherId && m.receiver_id === user.id)
         ){
-          addMsg(m);
+          renderMessage(m);
         }
       }
     )
     .subscribe();
 }
 
-/* PRESENCE */
-function presence(){
-  const ch = supabase.channel("presence");
+/* =========================
+   PRESENCE (ONLINE / OFFLINE)
+========================= */
+function subscribePresence(){
+  const channel = supabase.channel("presence");
 
-  ch.on("presence",{event:"sync"},()=>{
-    const state = ch.presenceState();
+  channel.on("presence", { event:"sync" }, () => {
+    const state = channel.presenceState();
     const online = !!state[otherId];
 
     document.getElementById("status").innerText =
       online ? "online" : "offline";
   });
 
-  ch.subscribe(async (status)=>{
-    if(status==="SUBSCRIBED"){
-      await ch.track({ user:user.id });
+  channel.subscribe(async (status) => {
+    if(status === "SUBSCRIBED"){
+      await channel.track({ user: user.id });
     }
   });
 }
 
-/* INIT */
+/* =========================
+   INIT APP
+========================= */
 async function init(){
-
   const { data } = await supabase.auth.getUser();
   user = data.user;
 
-  /* 🔴 NON LOGGATO */
+  /* redirect if NOT logged in */
   if(!user){
     location.href = "index.html";
     return;
   }
 
-  const p = getParams();
-  otherId = p.id;
-  otherName = p.name || "User";
+  const params = getParams();
+  otherId = params.id;
+  otherName = params.name || "User";
 
   document.getElementById("name").innerText = otherName;
 
-  await load();
-  realtime();
-  presence();
+  await loadChat();
+  subscribeMessages();
+  subscribePresence();
 }
 
 init();
