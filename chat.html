@@ -2,114 +2,95 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Shared - Chat</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Chat</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-  font-family: 'Archivo Black', sans-serif;
+*{box-sizing:border-box;font-family:'Archivo Black',sans-serif;}
+
+body{
+  margin:0;
+  background:#000;
+  color:#fff;
 }
 
-:root {
-  --bg: #000;
-  --panel: #0f0f0f;
-  --panel-2: #111;
-  --border: #222;
-  --border-2: #333;
-  --text: #fff;
-  --muted: rgba(255,255,255,.6);
+.container{
+  max-width:900px;
+  margin:auto;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:20px;
 }
 
-body {
-  margin: 0;
-  background: var(--bg);
-  color: var(--text);
+.header{
+  text-align:center;
+  margin-bottom:10px;
 }
 
-.container {
-  max-width: 920px;
-  margin: 0 auto;
-  padding: 20px;
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+.status{
+  font-size:11px;
+  opacity:.6;
 }
 
-.topbar {
-  text-align: center;
-  margin-bottom: 10px;
+.chat{
+  flex:1;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  background:#0f0f0f;
+  border-radius:20px;
+  padding:15px;
+  border:1px solid #222;
 }
 
-.header {
-  font-size: 28px;
+.msg{
+  max-width:70%;
+  padding:10px 14px;
+  border-radius:16px;
+  font-size:13px;
 }
 
-.chat-box {
-  flex: 1;
-  background: var(--panel);
-  border: 1px solid var(--border);
-  border-radius: 24px;
-  padding: 16px;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.me{background:#fff;color:#000;align-self:flex-end;}
+.other{background:#1a1a1a;border:1px solid #333;}
+
+.meta{
+  font-size:10px;
+  opacity:.6;
+  margin-top:4px;
 }
 
-.message {
-  max-width: 70%;
-  padding: 12px 14px;
-  border-radius: 18px;
-  font-size: 13px;
-  line-height: 1.3;
+.typing{
+  font-size:11px;
+  opacity:.6;
+  margin:5px 0;
 }
 
-.message.me {
-  align-self: flex-end;
-  background: #fff;
-  color: #000;
+.input{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
 }
 
-.message.other {
-  align-self: flex-start;
-  background: #1a1a1a;
-  border: 1px solid #333;
+input{
+  flex:1;
+  padding:12px;
+  border-radius:999px;
+  border:1px solid #333;
+  background:#0a0a0a;
+  color:#fff;
 }
 
-.meta {
-  font-size: 10px;
-  opacity: .6;
-  margin-top: 4px;
-}
-
-.input-bar {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.input-bar input {
-  flex: 1;
-  padding: 12px;
-  border-radius: 999px;
-  border: 1px solid #333;
-  background: #0a0a0a;
-  color: #fff;
-  outline: none;
-}
-
-.input-bar button {
-  border: none;
-  border-radius: 999px;
-  padding: 0 16px;
-  background: #fff;
-  color: #000;
-  cursor: pointer;
+button{
+  border:none;
+  border-radius:999px;
+  padding:0 16px;
+  background:#fff;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -117,117 +98,163 @@ body {
 <body>
 
 <div class="container">
-  <div class="topbar">
-    <div class="header">Chat</div>
+  <div class="header">
+    <div id="name"></div>
+    <div id="status" class="status"></div>
   </div>
 
-  <div id="chat" class="chat-box"></div>
+  <div id="chat" class="chat"></div>
+  <div id="typing" class="typing"></div>
 
-  <div class="input-bar">
-    <input id="messageInput" placeholder="Scrivi un messaggio..." />
-    <button onclick="sendMessage()">Invia</button>
+  <div class="input">
+    <input id="input" placeholder="Scrivi..." />
+    <button onclick="send()">Invia</button>
   </div>
 </div>
 
 <script>
 const supabase = window.supabase.createClient(
-  "https://YOUR_PROJECT.supabase.co",
-  "YOUR_PUBLIC_ANON_KEY"
+  "https://cnhaonawapuahzoctqav.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
 );
 
-let user = null;
-let otherUserId = null; // preso da URL
-
+let user, otherId, otherName;
 const chat = document.getElementById("chat");
+const typingDiv = document.getElementById("typing");
 
-function getOtherUser() {
-  const params = new URLSearchParams(window.location.search);
-  return params.get("id");
+function getParams(){
+  const p = new URLSearchParams(location.search);
+  return {
+    id: p.get("id"),
+    name: p.get("name")
+  };
 }
 
-function formatTime(date) {
-  return new Date(date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+function fallbackName(name, email){
+  if(name) return name;
+  if(email) return email.split("@")[0];
+  return "User";
 }
 
-function createMessage(msg, isMe, name) {
-  const div = document.createElement("div");
-  div.className = "message " + (isMe ? "me" : "other");
-
-  div.innerHTML = `
-    ${msg.content}
-    <div class="meta">${name} • ${formatTime(msg.created_at)}</div>
+function addMsg(m, me, name){
+  const d = document.createElement("div");
+  d.className = "msg " + (me ? "me":"other");
+  d.innerHTML = `
+    ${m.content}
+    <div class="meta">${name}</div>
   `;
-
-  chat.appendChild(div);
+  chat.appendChild(d);
   chat.scrollTop = chat.scrollHeight;
 }
 
-async function loadMessages() {
-  const { data } = await supabase
+async function load(){
+  const {data} = await supabase
     .from("messages")
     .select("*")
-    .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherUserId}),and(sender_id.eq.${otherUserId},receiver_id.eq.${user.id})`)
-    .order("created_at", { ascending: true });
+    .or(`and(sender_id.eq.${user.id},receiver_id.eq.${otherId}),and(sender_id.eq.${otherId},receiver_id.eq.${user.id})`)
+    .order("created_at");
 
   chat.innerHTML = "";
 
-  for (let msg of data) {
-    const isMe = msg.sender_id === user.id;
-    createMessage(msg, isMe, isMe ? "You" : "User");
+  for(let m of data){
+    addMsg(m, m.sender_id===user.id, m.sender_id===user.id?"You":otherName);
   }
+
+  // mark as seen
+  await supabase
+    .from("messages")
+    .update({seen_at: new Date()})
+    .eq("receiver_id", user.id)
+    .eq("sender_id", otherId)
+    .is("seen_at", null);
 }
 
-async function sendMessage() {
-  const input = document.getElementById("messageInput");
+async function send(){
+  const input = document.getElementById("input");
   const text = input.value.trim();
-  if (!text) return;
+  if(!text) return;
 
   await supabase.from("messages").insert({
-    sender_id: user.id,
-    receiver_id: otherUserId,
-    content: text
+    sender_id:user.id,
+    receiver_id:otherId,
+    content:text
   });
 
-  input.value = "";
+  input.value="";
 }
 
-function subscribeMessages() {
-  supabase
-    .channel("chat")
-    .on(
-      "postgres_changes",
-      {
-        event: "INSERT",
-        schema: "public",
-        table: "messages"
-      },
-      payload => {
-        const msg = payload.new;
+function realtime(){
+  supabase.channel("chat")
+  .on("postgres_changes",{event:"INSERT",schema:"public",table:"messages"},p=>{
+    const m = p.new;
 
-        if (
-          (msg.sender_id === user.id && msg.receiver_id === otherUserId) ||
-          (msg.sender_id === otherUserId && msg.receiver_id === user.id)
-        ) {
-          createMessage(msg, msg.sender_id === user.id, msg.sender_id === user.id ? "You" : "User");
-        }
-      }
-    )
-    .subscribe();
+    if(
+      (m.sender_id===user.id && m.receiver_id===otherId) ||
+      (m.sender_id===otherId && m.receiver_id===user.id)
+    ){
+      addMsg(m, m.sender_id===user.id, m.sender_id===user.id?"You":otherName);
+    }
+  })
+  .subscribe();
 }
 
-async function init() {
-  const { data } = await supabase.auth.getUser();
+function typing(){
+  const channel = supabase.channel("typing");
+
+  document.getElementById("input").addEventListener("input", ()=>{
+    channel.send({
+      type:"broadcast",
+      event:"typing",
+      payload:{user:user.id}
+    });
+  });
+
+  channel.on("broadcast",{event:"typing"},payload=>{
+    if(payload.payload.user !== user.id){
+      typingDiv.innerText = otherName + " sta scrivendo...";
+      clearTimeout(window.t);
+      window.t = setTimeout(()=>typingDiv.innerText="",1500);
+    }
+  });
+
+  channel.subscribe();
+}
+
+async function presence(){
+  const ch = supabase.channel("presence",{config:{presence:{key:user.id}}});
+
+  ch.on("presence",{event:"sync"},()=>{
+    const state = ch.presenceState();
+    const online = !!state[otherId];
+    document.getElementById("status").innerText = online ? "online" : "offline";
+  });
+
+  ch.subscribe(async (status)=>{
+    if(status==="SUBSCRIBED"){
+      await ch.track({online:true});
+    }
+  });
+}
+
+async function init(){
+  const {data} = await supabase.auth.getUser();
   user = data.user;
 
-  if (!user) {
-    window.location.href = "index.html";
+  if(!user){
+    location.href="index.html";
     return;
   }
 
-  otherUserId = getOtherUser();
+  const p = getParams();
+  otherId = p.id;
+  otherName = p.name || "User";
 
-  await loadMessages();
-  subscribeMessages();
+  document.getElementById("name").innerText = otherName;
+
+  await load();
+  realtime();
+  typing();
+  presence();
 }
 
 init();
