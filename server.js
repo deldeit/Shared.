@@ -3,6 +3,9 @@ import cors from "cors";
 import multer from "multer";
 import OpenAI from "openai";
 import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const app = express();
 
@@ -13,12 +16,16 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 /* ENV */
 const {
-  OPENAI_API_KEY = "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",
-  SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co",
-  SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjM0NDI1MCwiZXhwIjoyMDkxOTIwMjUwfQ.fDWYg41rMk5X0IpH8sYOr6WPhxOakYFaFFAhMslxoZY",
-  SUPABASE_BUCKET = "shared",
+  OPENAI_API_KEY,
+  SUPABASE_URL,
+  SUPABASE_SERVICE_ROLE_KEY,
   PORT = 3000
 } = process.env;
+
+/* VALIDAZIONE ENV */
+if (!OPENAI_API_KEY || !SUPABASE_URL || !SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error("Missing environment variables");
+}
 
 /* OPENAI */
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
@@ -27,24 +34,30 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const supabaseAdmin = createClient(
   SUPABASE_URL,
   SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { persistSession: false, autoRefreshToken: false } }
+  {
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false
+    }
+  }
 );
 
 /* =========================
-   CHAT HELPERS
+   HELPERS
 ========================= */
 async function getProfile(user_id) {
-  const { data } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from("profiles")
     .select("id, display_name, avatar_url")
     .eq("id", user_id)
     .single();
 
+  if (error) throw error;
   return data;
 }
 
 /* =========================
-   SEND MESSAGE (CHAT API)
+   SEND MESSAGE
 ========================= */
 app.post("/send-message", async (req, res) => {
   try {
@@ -66,19 +79,23 @@ app.post("/send-message", async (req, res) => {
 
     if (error) throw error;
 
-    return res.json({ ok: true, message: data });
+    res.json({ ok: true, message: data });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ ok: false, error: err.message });
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 
 /* =========================
-   GET CHAT HISTORY
+   GET CHAT
 ========================= */
 app.get("/get-chat", async (req, res) => {
   try {
     const { user1, user2 } = req.query;
+
+    if (!user1 || !user2) {
+      return res.status(400).json({ ok: false, error: "missing_users" });
+    }
 
     const { data, error } = await supabaseAdmin
       .from("messages")
@@ -90,96 +107,95 @@ app.get("/get-chat", async (req, res) => {
 
     if (error) throw error;
 
-    return res.json({ ok: true, messages: data });
+    res.json({ ok: true, messages: data });
   } catch (err) {
-    return res.status(500).json({ ok: false, error: err.message });
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 
 /* =========================
-   GET USER PROFILE (CHAT HEADER)
+   USER PROFILE
 ========================= */
 app.get("/user", async (req, res) => {
   try {
     const { id } = req.query;
 
+    if (!id) {
+      return res.status(400).json({ ok: false, error: "missing_id" });
+    }
+
     const profile = await getProfile(id);
 
-    return res.json({
-      ok: true,
-      profile
-    });
+    res.json({ ok: true, profile });
   } catch (err) {
-    return res.status(500).json({ ok: false, error: err.message });
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 
 /* =========================
-   PRESENCE (LAST SEEN)
+   PRESENCE
 ========================= */
 app.post("/presence", async (req, res) => {
   try {
     const { user_id } = req.body;
 
-    await supabaseAdmin
+    if (!user_id) {
+      return res.status(400).json({ ok: false, error: "missing_user_id" });
+    }
+
+    const { error } = await supabaseAdmin
       .from("presence")
       .upsert({
         user_id,
         last_seen: new Date().toISOString()
       });
 
-    return res.json({ ok: true });
+    if (error) throw error;
+
+    res.json({ ok: true });
   } catch (err) {
-    return res.status(500).json({ ok: false, error: err.message });
+    res.status(500).json({ ok: false, error: err.message });
   }
 });
 
 /* =========================
-   EVERYTHING BELOW = YOUR ORIGINAL CODE
-   (unchanged)
+   MODERATION
 ========================= */
-
-/* HEALTH CHECK */
-app.get("/", (req, res) => {
-  res.json({ ok: true, service: "shared-backend" });
-});
-
-/* MODERATION STATUS */
-app.get("/moderate", (req, res) => {
-  res.json({ ok: true });
-});
-
-/* IMAGE MODERATION */
 app.post("/moderate", upload.single("file"), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ ok: false, flagged: true });
     }
 
+    const base64 = req.file.buffer.toString("base64");
+
     const response = await openai.moderations.create({
       model: "omni-moderation-latest",
       input: [
         {
-          type: "image_url",
-          image_url: {
-            url: `data:${req.file.mimetype};base64,${req.file.buffer.toString("base64")}`
-          }
+          type: "input_image",
+          image_base64: base64
         }
       ]
     });
 
     const result = response.results?.[0];
 
-    return res.json({
+    res.json({
       ok: !result?.flagged,
       flagged: result?.flagged
     });
   } catch (e) {
-    return res.status(500).json({ ok: false, error: e.message });
+    res.status(500).json({ ok: false, error: e.message });
   }
+});
+
+/* HEALTH */
+app.get("/", (req, res) => {
+  res.json({ ok: true });
 });
 
 /* START */
 app.listen(PORT, () => {
-  console.log("🚀 Server running on", PORT);
+  console.log(`🚀 Server running on ${PORT}`);
 });
