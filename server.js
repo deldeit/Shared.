@@ -13,9 +13,9 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 /* ENV */
 const {
-  OPENAI_API_KEY,
-  SUPABASE_URL,
-  SUPABASE_SERVICE_ROLE_KEY,
+  OPENAI_API_KEY = "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",
+  SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co",
+  SUPABASE_SERVICE_ROLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3NjM0NDI1MCwiZXhwIjoyMDkxOTIwMjUwfQ.fDWYg41rMk5X0IpH8sYOr6WPhxOakYFaFFAhMslxoZY",
   SUPABASE_BUCKET = "shared",
   PORT = 3000
 } = process.env;
