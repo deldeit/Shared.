@@ -481,25 +481,22 @@
     }
 
     .post-modal {
-      width: min(1100px, 100%);
-      height: min(92vh, 920px);
+      width: 100%;
+      height: 100%;
+      background: #000;
+      position: relative;
       overflow: hidden;
-      background: #0d0d0d;
-      border: 1px solid #2a2a2a;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.5);
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
+      border-radius: 0;
     }
 
     .post-modal-media {
+      position: absolute;
+      inset: 0;
       background: #000;
-      border-right: 1px solid #222;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
-      min-width: 0;
     }
 
     .post-modal-media img {
@@ -511,12 +508,19 @@
     }
 
     .post-modal-side {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 2;
+      padding: 18px;
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.92));
+      border-top: 1px solid rgba(255,255,255,.08);
       display: flex;
       flex-direction: column;
-      min-width: 0;
-      overflow: auto;
-      padding: 16px;
       gap: 14px;
+      max-height: 42vh;
+      overflow: auto;
     }
 
     .post-modal-head {
@@ -558,7 +562,7 @@
       white-space: pre-wrap;
       color: rgba(255,255,255,.88);
       padding-bottom: 6px;
-      border-bottom: 1px solid #222;
+      border-bottom: 1px solid rgba(255,255,255,.1);
     }
 
     .post-modal-music {
@@ -567,8 +571,9 @@
       gap: 10px;
       padding: 14px;
       border-radius: 18px;
-      border: 1px solid #222;
-      background: #090909;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(10,10,10,.78);
+      backdrop-filter: blur(8px);
     }
 
     .post-modal-song-title {
@@ -595,7 +600,7 @@
 
     .modal-close {
       border: none;
-      background: #171717;
+      background: rgba(23,23,23,.92);
       color: #fff;
       width: 38px;
       height: 38px;
@@ -686,17 +691,6 @@
       .feed {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
-
-      .post-modal {
-        grid-template-columns: 1fr;
-        height: min(94vh, 1000px);
-      }
-
-      .post-modal-media {
-        border-right: none;
-        border-bottom: 1px solid #222;
-        min-height: 44vh;
-      }
     }
 
     @media (max-width: 520px) {
@@ -734,6 +728,7 @@
 
       .post-modal-side {
         padding: 14px;
+        max-height: 48vh;
       }
     }
   </style>
@@ -741,7 +736,7 @@
 <body>
   <div class="container">
     <div class="topbar">
-      <a class="back-link" href="homepage.html" aria-label="Back to homepage">
+      <a class="back-link" href="home.html" aria-label="Back to homepage">
         <span class="material-symbols-outlined">arrow_back</span>
       </a>
 
@@ -942,7 +937,6 @@
     let profile = null;
     let isOwnProfile = false;
     let isFollowingTarget = false;
-
     let postsMap = new Map();
 
     let modalCurrentPost = null;
@@ -950,7 +944,6 @@
     let modalCurrentLikedByMe = false;
     let modalAudio = new Audio();
     let modalAudioButton = null;
-    let modalLoadToken = 0;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -1074,7 +1067,6 @@
         try {
           await modalAudio.play();
           setModalAudioButtonState(true);
-          modalAudioButton = postModalPlayBtn;
         } catch (err) {
           console.error("MODAL AUDIO PLAY ERROR:", err);
         }
@@ -1194,6 +1186,64 @@
       return true;
     }
 
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onerror = () => reject(new Error("Unable to read file."));
+        reader.onload = () => resolve(reader.result);
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function imageFromDataUrl(dataUrl) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error("Unable to load image."));
+        img.src = dataUrl;
+      });
+    }
+
+    async function squareCropToJpegBlob(file) {
+      const dataUrl = await fileToDataUrl(file);
+      const img = await imageFromDataUrl(dataUrl);
+
+      const size = Math.min(img.width, img.height);
+      const sourceX = (img.width - size) / 2;
+      const sourceY = (img.height - size) / 2;
+
+      const canvas = document.createElement("canvas");
+      canvas.width = 1024;
+      canvas.height = 1024;
+
+      const ctx = canvas.getContext("2d");
+      ctx.drawImage(
+        img,
+        sourceX,
+        sourceY,
+        size,
+        size,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      return new Promise((resolve, reject) => {
+        canvas.toBlob(
+          blob => {
+            if (!blob) {
+              reject(new Error("Unable to convert image."));
+              return;
+            }
+            resolve(blob);
+          },
+          "image/jpeg",
+          0.9
+        );
+      });
+    }
+
     async function uploadAvatar(file) {
       if (!currentUser || !isOwnProfile || !file) return;
 
@@ -1206,15 +1256,14 @@
       avatarEditEl.style.opacity = "0.65";
 
       try {
-        const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-        const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
-        const path = `${currentUser.id}/${Date.now()}.${safeExt}`;
+        const jpegBlob = await squareCropToJpegBlob(file);
+        const path = `${currentUser.id}/${Date.now()}.jpg`;
 
         const { error: uploadError } = await supabaseClient.storage
           .from("avatars")
-          .upload(path, file, {
+          .upload(path, jpegBlob, {
             upsert: true,
-            contentType: file.type
+            contentType: "image/jpeg"
           });
 
         if (uploadError) throw uploadError;
@@ -1513,12 +1562,9 @@
       if (!post) return;
 
       modalCurrentPost = post;
-      modalLoadToken += 1;
-      const token = modalLoadToken;
-
       postModalTitle.textContent = "Post";
       postModalImage.src = post.image_url || "";
-      postModalAuthorLink.href = `user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(profile?.display_name || fallbackName)}`;
+      postModalAuthorLink.href = `user.html?id=${encodeURIComponent(profileId || "")}&name=${encodeURIComponent(profile?.display_name || fallbackName)}`;
       postModalAuthorName.innerHTML = renderName(profile?.display_name || fallbackName, !!profile?.verified);
       postModalDate.textContent = post.created_at ? new Intl.DateTimeFormat("it-IT", { dateStyle: "medium", timeStyle: "short" }).format(new Date(post.created_at)) : "";
       postModalCaption.textContent = post.caption || "No caption.";
@@ -1526,28 +1572,19 @@
 
       modalCurrentLikeCount = 0;
       modalCurrentLikedByMe = false;
-      renderModalLikeButton();
+      modalAudio.pause();
+      modalAudio.src = "";
+      modalAudioButton = postModalPlayBtn;
+      setModalAudioButtonState(false);
+
+      postModalPlayBtn.disabled = !post.song_preview;
+      postModalPlayBtn.querySelector(".material-symbols-outlined").textContent = post.song_preview ? "play_arrow" : "music_off";
+      postModalPlayBtn.querySelector(".btn-label").textContent = post.song_preview ? "Play preview" : "No preview";
 
       openPostModal();
-      setModalAudioButtonState(false);
-      modalAudioButton = postModalPlayBtn;
-
-      if (!post.song_preview) {
-        postModalPlayBtn.disabled = true;
-        postModalPlayBtn.querySelector(".btn-label").textContent = "No preview";
-        postModalPlayBtn.querySelector(".material-symbols-outlined").textContent = "music_off";
-      } else {
-        postModalPlayBtn.disabled = false;
-        postModalPlayBtn.querySelector(".btn-label").textContent = "Play preview";
-        postModalPlayBtn.querySelector(".material-symbols-outlined").textContent = "play_arrow";
-        try {
-          await playModalPreview(post.song_preview);
-        } catch (_) {}
-      }
 
       try {
         const likeState = await getPostLikeState(post.id);
-        if (token !== modalLoadToken) return;
         modalCurrentLikeCount = likeState.count;
         modalCurrentLikedByMe = likeState.likedByMe;
         renderModalLikeButton();
