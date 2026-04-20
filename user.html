@@ -710,46 +710,52 @@
     const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
     const { createClient } = supabase;
-    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // ─── FIX 1: nome univoco per il client, nessun conflitto con la lib ───
+    const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const DEFAULT_BANNER_COLOR = "#111111";
+    // Dimensione massima avatar: 5 MB
+    const MAX_AVATAR_BYTES = 5 * 1024 * 1024;
 
     const params = new URLSearchParams(window.location.search);
     const profileId = params.get("id") || "";
     const fallbackName = params.get("name") || "User";
 
-    const coverEl = document.getElementById("cover");
-    const coverToolsEl = document.getElementById("coverTools");
+    const coverEl          = document.getElementById("cover");
+    const coverToolsEl     = document.getElementById("coverTools");
     const bannerColorInput = document.getElementById("bannerColorInput");
 
-    const avatarEl = document.getElementById("avatar");
-    const avatarImgEl = document.getElementById("avatarImg");
-    const avatarFallbackEl = document.getElementById("avatarFallback");
-    const avatarEditEl = document.getElementById("avatarEdit");
+    const avatarEl        = document.getElementById("avatar");
+    const avatarImgEl     = document.getElementById("avatarImg");
+    const avatarFallbackEl= document.getElementById("avatarFallback");
+    const avatarEditEl    = document.getElementById("avatarEdit");
     const avatarFileInput = document.getElementById("avatarFileInput");
 
-    const displayNameEl = document.getElementById("displayName");
-    const subtitleEl = document.getElementById("subtitle");
-    const feedEl = document.getElementById("feed");
-    const postsCountEl = document.getElementById("postsCount");
+    const displayNameEl    = document.getElementById("displayName");
+    const subtitleEl       = document.getElementById("subtitle");
+    const feedEl           = document.getElementById("feed");
+    const postsCountEl     = document.getElementById("postsCount");
     const followersCountEl = document.getElementById("followersCount");
     const followingCountEl = document.getElementById("followingCount");
-    const followBtn = document.getElementById("followBtn");
-    const messageBtn = document.getElementById("messageBtn");
-    const profileActions = document.getElementById("profileActions");
-    const followersStat = document.getElementById("followersStat");
-    const followingStat = document.getElementById("followingStat");
-    const postsStat = document.getElementById("postsStat");
+    const followBtn        = document.getElementById("followBtn");
+    const messageBtn       = document.getElementById("messageBtn");
+    const profileActions   = document.getElementById("profileActions");
+    const followersStat    = document.getElementById("followersStat");
+    const followingStat    = document.getElementById("followingStat");
+    const postsStat        = document.getElementById("postsStat");
 
-    const modalBackdrop = document.getElementById("listModalBackdrop");
-    const modalCloseBtn = document.getElementById("modalCloseBtn");
+    const modalBackdrop  = document.getElementById("listModalBackdrop");
+    const modalCloseBtn  = document.getElementById("modalCloseBtn");
     const listModalTitle = document.getElementById("listModalTitle");
-    const userListEl = document.getElementById("userList");
+    const userListEl     = document.getElementById("userList");
 
-    let currentUser = null;
-    let profile = null;
-    let isOwnProfile = false;
-    let isFollowingTarget = false;
+    let currentUser      = null;
+    let profile          = null;
+    let isOwnProfile     = false;
+    let isFollowingTarget= false;
+
+    // ─── Helpers ────────────────────────────────────────────────────────────
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -777,15 +783,11 @@
     }
 
     function renderName(name, verified) {
-      return `
-        ${escapeHtml(name || "User")}
-        ${verified ? verifiedBadgeHtml() : ""}
-      `;
+      return `${escapeHtml(name || "User")}${verified ? verifiedBadgeHtml() : ""}`;
     }
 
     function setAvatar(name, avatarUrl) {
       const initial = (name || "U").trim().charAt(0).toUpperCase() || "U";
-
       if (avatarUrl) {
         avatarImgEl.src = avatarUrl;
         avatarImgEl.classList.remove("hidden");
@@ -805,17 +807,11 @@
       return safeColor;
     }
 
-    function renderEmpty(message) {
-      feedEl.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
-    }
+    function renderEmpty(message)  { feedEl.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`; }
+    function renderError(message)  { feedEl.innerHTML = `<div class="error-state">${escapeHtml(message)}</div>`; }
+    function renderLoading(message){ feedEl.innerHTML = `<div class="loading-state">${escapeHtml(message)}</div>`; }
 
-    function renderError(message) {
-      feedEl.innerHTML = `<div class="error-state">${escapeHtml(message)}</div>`;
-    }
-
-    function renderLoading(message) {
-      feedEl.innerHTML = `<div class="loading-state">${escapeHtml(message)}</div>`;
-    }
+    // ─── Modal ──────────────────────────────────────────────────────────────
 
     function openModal() {
       modalBackdrop.classList.add("open");
@@ -829,50 +825,53 @@
     }
 
     modalCloseBtn.addEventListener("click", closeModal);
-    modalBackdrop.addEventListener("click", (e) => {
-      if (e.target === modalBackdrop) closeModal();
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeModal();
-    });
+    modalBackdrop.addEventListener("click", (e) => { if (e.target === modalBackdrop) closeModal(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
     avatarImgEl.addEventListener("error", () => {
       avatarImgEl.classList.add("hidden");
       avatarFallbackEl.classList.remove("hidden");
     });
 
-    async function getCurrentUser() {
-      const { data: sessionData, error: sessionError } = await supabaseClient.auth.getSession();
+    // ─── Auth ───────────────────────────────────────────────────────────────
 
-      if (!sessionError && sessionData?.session?.user) {
-        currentUser = sessionData.session.user;
-        return currentUser;
+    async function getCurrentUser() {
+      // Prova prima la sessione attiva
+      try {
+        const { data: sessionData, error } = await db.auth.getSession();
+        if (!error && sessionData?.session?.user) {
+          currentUser = sessionData.session.user;
+          return currentUser;
+        }
+      } catch (err) {
+        console.warn("getSession failed:", err);
       }
 
+      // Fallback: sessione salvata in sessionStorage
       const savedSessionRaw = sessionStorage.getItem("shared-session");
       if (savedSessionRaw) {
         try {
-          const savedSession = JSON.parse(savedSessionRaw);
-
-          if (savedSession?.access_token && savedSession?.refresh_token) {
-            const { data, error } = await supabaseClient.auth.setSession({
-              access_token: savedSession.access_token,
-              refresh_token: savedSession.refresh_token
+          const saved = JSON.parse(savedSessionRaw);
+          if (saved?.access_token && saved?.refresh_token) {
+            const { data, error } = await db.auth.setSession({
+              access_token: saved.access_token,
+              refresh_token: saved.refresh_token
             });
-
             if (!error && data?.user) {
               currentUser = data.user;
               return currentUser;
             }
           }
         } catch (err) {
-          console.error("SESSION RESTORE ERROR:", err);
+          console.error("Session restore error:", err);
         }
       }
 
       currentUser = null;
       return null;
     }
+
+    // ─── Profile ────────────────────────────────────────────────────────────
 
     async function loadProfile() {
       if (!profileId) {
@@ -887,15 +886,13 @@
         return false;
       }
 
-      const { data, error } = await supabaseClient
+      const { data, error } = await db
         .from("profiles")
         .select("id, display_name, verified, banner_color, avatar_url")
         .eq("id", profileId)
         .maybeSingle();
 
-      if (error) {
-        console.error("PROFILE LOAD ERROR:", error);
-      }
+      if (error) console.error("Profile load error:", error);
 
       profile = data || {
         id: profileId,
@@ -926,11 +923,23 @@
       return true;
     }
 
+    // ─── Avatar upload ───────────────────────────────────────────────────────
+    // FIX 2: il path è sempre <uid>/avatar.<ext> (upsert sovrascrive il file
+    //         esistente invece di accumulare file con timestamp diversi).
+    //         Questo è necessario affinché la RLS policy
+    //         (storage.foldername(name))[1] = auth.uid() funzioni correttamente.
+
     async function uploadAvatar(file) {
       if (!currentUser || !isOwnProfile || !file) return;
 
-      if (!file.type || !file.type.startsWith("image/")) {
+      if (!file.type?.startsWith("image/")) {
         alert("Please choose an image file.");
+        return;
+      }
+
+      // FIX 3: controllo dimensione lato client prima dell'upload
+      if (file.size > MAX_AVATAR_BYTES) {
+        alert("Image too large. Maximum size is 5 MB.");
         return;
       }
 
@@ -940,36 +949,51 @@
       try {
         const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
         const safeExt = ["jpg", "jpeg", "png", "webp", "gif"].includes(ext) ? ext : "jpg";
-        const path = `${currentUser.id}/${Date.now()}.${safeExt}`;
 
-        const { error: uploadError } = await supabaseClient.storage
+        // FIX 2 (continua): path fisso → upsert funziona, la RLS matcha sempre
+        const path = `${currentUser.id}/avatar.${safeExt}`;
+
+        const { error: uploadError } = await db.storage
           .from("avatars")
           .upload(path, file, {
             upsert: true,
-            contentType: file.type
+            contentType: file.type,
+            // FIX 4: cache-control breve così il browser ricarica la nuova foto
+            cacheControl: "3600"
           });
 
         if (uploadError) throw uploadError;
 
-        const { data: publicData } = supabaseClient.storage
+        const { data: publicData } = db.storage
           .from("avatars")
           .getPublicUrl(path);
 
         const publicUrl = publicData?.publicUrl;
         if (!publicUrl) throw new Error("Could not generate public URL.");
 
-        const { error: updateError } = await supabaseClient
+        // FIX 5: aggiungi timestamp come cache-buster nell'URL visualizzato
+        const bustUrl = `${publicUrl}?t=${Date.now()}`;
+
+        const { error: updateError } = await db
           .from("profiles")
-          .update({ avatar_url: publicUrl })
+          .update({ avatar_url: publicUrl })   // salva l'URL pulito in DB
           .eq("id", currentUser.id);
 
         if (updateError) throw updateError;
 
         if (profile) profile.avatar_url = publicUrl;
-        setAvatar(profile?.display_name || fallbackName, publicUrl);
+        // Mostra subito la nuova foto con il cache-buster
+        setAvatar(profile?.display_name || fallbackName, bustUrl);
+
       } catch (err) {
-        console.error("AVATAR UPLOAD ERROR:", err);
-        alert(err?.message || "Unable to upload profile photo.");
+        console.error("Avatar upload error:", err);
+        // FIX 6: messaggio di errore più leggibile per problemi RLS
+        const msg = err?.message || "Unable to upload profile photo.";
+        if (msg.toLowerCase().includes("row-level security") || msg.toLowerCase().includes("policy")) {
+          alert("Upload bloccato: controlla le RLS policy del bucket 'avatars' su Supabase.");
+        } else {
+          alert(msg);
+        }
       } finally {
         avatarFileInput.disabled = false;
         avatarEditEl.style.opacity = "";
@@ -978,28 +1002,26 @@
     }
 
     avatarFileInput.addEventListener("change", async () => {
-      const file = avatarFileInput.files && avatarFileInput.files[0];
+      const file = avatarFileInput.files?.[0];
       if (!file) return;
       await uploadAvatar(file);
     });
+
+    // ─── Stats ───────────────────────────────────────────────────────────────
 
     async function loadStats() {
       if (!profileId) return;
 
       const [{ count: followersCount }, { count: followingCount }] = await Promise.all([
-        supabaseClient
-          .from("follows")
-          .select("*", { count: "exact", head: true })
-          .eq("following_id", profileId),
-        supabaseClient
-          .from("follows")
-          .select("*", { count: "exact", head: true })
-          .eq("follower_id", profileId)
+        db.from("follows").select("*", { count: "exact", head: true }).eq("following_id", profileId),
+        db.from("follows").select("*", { count: "exact", head: true }).eq("follower_id", profileId)
       ]);
 
       followersCountEl.textContent = followersCount || 0;
       followingCountEl.textContent = followingCount || 0;
     }
+
+    // ─── Follow ──────────────────────────────────────────────────────────────
 
     async function checkFollowState() {
       if (!currentUser || !profileId || isOwnProfile) {
@@ -1007,17 +1029,14 @@
         return;
       }
 
-      const { data, error } = await supabaseClient
+      const { data, error } = await db
         .from("follows")
         .select("id")
         .eq("follower_id", currentUser.id)
         .eq("following_id", profileId)
         .maybeSingle();
 
-      if (error) {
-        console.error("FOLLOW STATE ERROR:", error);
-      }
-
+      if (error) console.error("Follow state error:", error);
       isFollowingTarget = !!data;
     }
 
@@ -1027,13 +1046,11 @@
         followBtn.innerHTML = `<span class="material-symbols-outlined">person</span> You`;
         return;
       }
-
       if (!currentUser) {
         followBtn.disabled = true;
         followBtn.innerHTML = `<span class="material-symbols-outlined">lock</span> Login`;
         return;
       }
-
       followBtn.disabled = false;
       followBtn.innerHTML = isFollowingTarget
         ? `<span class="material-symbols-outlined">person_check</span> Following`
@@ -1042,38 +1059,31 @@
 
     followBtn.addEventListener("click", async () => {
       if (!currentUser || isOwnProfile || !profileId) return;
-
       followBtn.disabled = true;
 
       try {
         if (isFollowingTarget) {
-          const { error } = await supabaseClient
+          const { error } = await db
             .from("follows")
             .delete()
             .eq("follower_id", currentUser.id)
             .eq("following_id", profileId);
-
           if (error) throw error;
           isFollowingTarget = false;
         } else {
-          const { error } = await supabaseClient
+          const { error } = await db
             .from("follows")
             .upsert(
-              {
-                follower_id: currentUser.id,
-                following_id: profileId
-              },
+              { follower_id: currentUser.id, following_id: profileId },
               { onConflict: "follower_id,following_id" }
             );
-
           if (error) throw error;
           isFollowingTarget = true;
         }
-
         updateFollowButton();
         await loadStats();
       } catch (err) {
-        console.error("FOLLOW TOGGLE ERROR:", err);
+        console.error("Follow toggle error:", err);
         alert(err?.message || "Unable to update follow state.");
       } finally {
         updateFollowButton();
@@ -1086,6 +1096,8 @@
       window.location.href = `chat.html?id=${encodeURIComponent(profileId)}&name=${name}`;
     });
 
+    // ─── Banner color ─────────────────────────────────────────────────────────
+
     bannerColorInput.addEventListener("change", async () => {
       if (!currentUser || !isOwnProfile || !profileId) return;
 
@@ -1093,27 +1105,26 @@
       setBannerColor(nextColor);
 
       try {
-        const { error } = await supabaseClient
+        const { error } = await db
           .from("profiles")
           .update({ banner_color: nextColor })
           .eq("id", currentUser.id);
-
         if (error) throw error;
-
         if (profile) profile.banner_color = nextColor;
       } catch (err) {
-        console.error("BANNER COLOR UPDATE ERROR:", err);
+        console.error("Banner color update error:", err);
         alert(err?.message || "Unable to update banner color.");
-        const fallback = normalizeHexColor(profile?.banner_color || DEFAULT_BANNER_COLOR);
-        setBannerColor(fallback);
+        setBannerColor(normalizeHexColor(profile?.banner_color || DEFAULT_BANNER_COLOR));
       }
     });
+
+    // ─── Relationship lists ───────────────────────────────────────────────────
 
     async function fetchProfilesByIds(ids) {
       const cleanIds = [...new Set((ids || []).filter(Boolean))];
       if (!cleanIds.length) return {};
 
-      const { data, error } = await supabaseClient
+      const { data, error } = await db
         .from("profiles")
         .select("id, display_name, verified, avatar_url")
         .in("id", cleanIds);
@@ -1121,9 +1132,7 @@
       if (error) throw error;
 
       const map = {};
-      for (const row of data || []) {
-        map[row.id] = row;
-      }
+      for (const row of data || []) map[row.id] = row;
       return map;
     }
 
@@ -1138,9 +1147,9 @@
 
       try {
         const columnToMatch = isFollowers ? "following_id" : "follower_id";
-        const columnToRead = isFollowers ? "follower_id" : "following_id";
+        const columnToRead  = isFollowers ? "follower_id"  : "following_id";
 
-        const { data, error } = await supabaseClient
+        const { data, error } = await db
           .from("follows")
           .select(`id, ${columnToRead}, created_at`)
           .eq(columnToMatch, profileId)
@@ -1149,7 +1158,7 @@
         if (error) throw error;
 
         const rows = data || [];
-        const ids = rows.map(r => r[columnToRead]);
+        const ids  = rows.map(r => r[columnToRead]);
         const profileMap = await fetchProfilesByIds(ids);
 
         if (!rows.length) {
@@ -1166,54 +1175,49 @@
             <div class="user-row">
               <div class="user-row-left">
                 <div class="user-row-badge">
-                  ${user.avatar_url ? `<img src="${escapeHtml(user.avatar_url)}" alt="${escapeHtml(displayName)}">` : escapeHtml(initial)}
+                  ${user.avatar_url
+                    ? `<img src="${escapeHtml(user.avatar_url)}" alt="${escapeHtml(displayName)}">`
+                    : escapeHtml(initial)}
                 </div>
                 <div style="min-width:0">
-                  <div class="user-row-name">
-                    ${renderName(displayName, !!user.verified)}
-                  </div>
+                  <div class="user-row-name">${renderName(displayName, !!user.verified)}</div>
                   <div class="user-row-meta">${isFollowers ? "Follower" : "Following"}</div>
                 </div>
               </div>
-              <button class="user-row-action" data-user-id="${escapeHtml(user.id || row[columnToRead])}" data-user-name="${escapeHtml(displayName)}">
-                Open
-              </button>
+              <button
+                class="user-row-action"
+                data-user-id="${escapeHtml(user.id || row[columnToRead])}"
+                data-user-name="${escapeHtml(displayName)}"
+              >Open</button>
             </div>
           `;
         }).join("");
 
         userListEl.querySelectorAll(".user-row-action").forEach(btn => {
           btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-user-id");
+            const id   = btn.getAttribute("data-user-id");
             const name = btn.getAttribute("data-user-name");
             if (!id) return;
             window.location.href = `user.html?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name || "User")}`;
           });
         });
+
       } catch (err) {
-        console.error("RELATION LIST ERROR:", err);
+        console.error("Relation list error:", err);
         userListEl.innerHTML = `<div class="error-state">Unable to load ${escapeHtml(title.toLowerCase())}.<br>${escapeHtml(err?.message || "Unknown error")}</div>`;
       }
     }
 
     followersStat.addEventListener("click", () => openRelationshipList("followers"));
-    followingStat.addEventListener("click", () => openRelationshipList("following"));
+    followingStat.addEventListener("click",  () => openRelationshipList("following"));
+    followersStat.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") openRelationshipList("followers"); });
+    followingStat.addEventListener("keydown",  (e) => { if (e.key === "Enter" || e.key === " ") openRelationshipList("following"); });
+    postsStat.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") feedEl.scrollIntoView({ behavior: "smooth", block: "start" }); });
 
-    followersStat.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") openRelationshipList("followers");
-    });
-
-    followingStat.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") openRelationshipList("following");
-    });
-
-    postsStat.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
-    });
+    // ─── Posts ────────────────────────────────────────────────────────────────
 
     function renderPost(post) {
       if (!post.image_url) return "";
-
       return `
         <article class="post">
           <div class="post-thumb">
@@ -1232,7 +1236,7 @@
       renderLoading("Loading posts...");
 
       try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await db
           .from("posts")
           .select("id, image_url, created_at")
           .eq("user_id", profileId)
@@ -1251,10 +1255,12 @@
 
         feedEl.innerHTML = posts.map(renderPost).join("");
       } catch (err) {
-        console.error("POST LOAD ERROR:", err);
+        console.error("Post load error:", err);
         renderError("Unable to load posts.");
       }
     }
+
+    // ─── Init ─────────────────────────────────────────────────────────────────
 
     async function init() {
       await getCurrentUser();
