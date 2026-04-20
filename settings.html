@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Settings - Shared</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+*{
+  box-sizing:border-box;
+  font-family:'Archivo Black',sans-serif;
+}
+
+:root{
+  --bg:#000;
+  --panel:#0f0f0f;
+  --border:#222;
+  --text:#fff;
+  --muted:rgba(255,255,255,.6);
+}
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+}
+
+.container{
+  max-width:900px;
+  margin:0 auto;
+  padding:20px;
+}
+
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:20px;
+}
+
+.back{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  color:#fff;
+  text-decoration:none;
+}
+
+.title{
+  font-size:22px;
+}
+
+.section{
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:16px;
+  margin-bottom:16px;
+}
+
+.section h3{
+  margin:0 0 12px 0;
+  font-size:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+}
+
+.topic{
+  background:#111;
+  border:1px solid #222;
+  border-radius:16px;
+  padding:12px;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transition:.15s;
+  user-select:none;
+}
+
+.topic:hover{
+  transform:translateY(-2px);
+}
+
+.topic.selected{
+  border-color:#fff;
+  background:#1a1a1a;
+}
+
+.material-symbols-outlined{
+  font-size:20px;
+}
+
+.actions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.btn{
+  border:none;
+  border-radius:999px;
+  padding:10px 14px;
+  cursor:pointer;
+  font-size:12px;
+}
+
+.save{
+  background:#fff;
+  color:#000;
+}
+
+.danger{
+  background:#ff2a2a;
+  color:#fff;
+}
+
+.small{
+  opacity:.6;
+  font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="topbar">
+    <a class="back" href="home.html">
+      <span class="material-symbols-outlined">arrow_back</span>
+      Home
+    </a>
+    <div class="title">Settings</div>
+  </div>
+
+  <div class="section">
+    <h3>Choose up to 3 interests</h3>
+    <div class="small">These will personalize your feed</div>
+
+    <div class="grid" id="topics"></div>
+  </div>
+
+  <div class="section">
+    <h3>Account</h3>
+    <div class="actions">
+      <button class="btn save" id="saveBtn">Save changes</button>
+      <button class="btn danger" id="deleteBtn">Delete account</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let user = null;
+let selected = [];
+
+const topics = [
+  { id:"music", label:"Music", icon:"music_note" },
+  { id:"gaming", label:"Gaming", icon:"sports_esports" },
+  { id:"sports", label:"Sports", icon:"sports_soccer" },
+  { id:"tech", label:"Tech", icon:"devices" },
+  { id:"ai", label:"AI", icon:"smart_toy" },
+  { id:"art", label:"Art", icon:"brush" },
+  { id:"fashion", label:"Fashion", icon:"styler" },
+  { id:"travel", label:"Travel", icon:"flight" },
+  { id:"food", label:"Food", icon:"restaurant" },
+  { id:"movies", label:"Movies", icon:"movie" },
+  { id:"anime", label:"Anime", icon:"auto_awesome" },
+  { id:"cars", label:"Cars", icon:"directions_car" },
+  { id:"finance", label:"Finance", icon:"trending_up" },
+  { id:"science", label:"Science", icon:"science" },
+  { id:"fitness", label:"Fitness", icon:"fitness_center" },
+  { id:"photography", label:"Photo", icon:"photo_camera" },
+  { id:"nature", label:"Nature", icon:"forest" },
+  { id:"books", label:"Books", icon:"menu_book" },
+  { id:"memes", label:"Memes", icon:"mood" },
+  { id:"coding", label:"Coding", icon:"code" }
+];
+
+function renderTopics(){
+  const el = document.getElementById("topics");
+  el.innerHTML = topics.map(t => `
+    <div class="topic ${selected.includes(t.id) ? "selected":""}" data-id="${t.id}">
+      <span class="material-symbols-outlined">${t.icon}</span>
+      ${t.label}
+    </div>
+  `).join("");
+
+  el.querySelectorAll(".topic").forEach(div=>{
+    div.onclick = ()=>{
+      const id = div.dataset.id;
+
+      if(selected.includes(id)){
+        selected = selected.filter(x=>x!==id);
+      } else {
+        if(selected.length >= 3) return;
+        selected.push(id);
+      }
+      renderTopics();
+    };
+  });
+}
+
+async function loadUser(){
+  const { data } = await supabaseClient.auth.getUser();
+  user = data.user;
+
+  if(!user) {
+    alert("Not logged in");
+    location.href="index.html";
+    return;
+  }
+
+  const { data: profile } = await supabaseClient
+    .from("profiles")
+    .select("interests")
+    .eq("id", user.id)
+    .single();
+
+  selected = profile?.interests || [];
+  renderTopics();
+}
+
+document.getElementById("saveBtn").onclick = async ()=>{
+  if(!user) return;
+
+  const { error } = await supabaseClient
+    .from("profiles")
+    .update({ interests: selected })
+    .eq("id", user.id);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  alert("Saved!");
+};
+
+document.getElementById("deleteBtn").onclick = async ()=>{
+  if(!user) return;
+
+  const ok = confirm("Delete account permanently?");
+  if(!ok) return;
+
+  await supabaseClient.from("profiles").delete().eq("id", user.id);
+  await supabaseClient.auth.signOut();
+
+  location.href="index.html";
+};
+
+loadUser();
+</script>
+
+</body>
+</html>
