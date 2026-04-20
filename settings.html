@@ -20,7 +20,6 @@
   --panel:#0f0f0f;
   --border:#222;
   --text:#fff;
-  --muted:rgba(255,255,255,.6);
 }
 
 body{
@@ -44,7 +43,6 @@ body{
   margin-bottom:25px;
 }
 
-/* back arrow */
 .back{
   display:flex;
   align-items:center;
@@ -53,19 +51,16 @@ body{
   color:#fff;
   text-decoration:none;
   font-size:12px;
-  opacity:.9;
 }
 
-/* centered logo */
 .logo{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
   font-size:22px;
-  letter-spacing:-.5px;
 }
 
-/* sections */
+/* SECTIONS */
 .section{
   background:var(--panel);
   border:1px solid var(--border);
@@ -85,7 +80,7 @@ body{
   margin-bottom:12px;
 }
 
-/* interests grid */
+/* TOPICS */
 .grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -101,12 +96,6 @@ body{
   display:flex;
   align-items:center;
   gap:10px;
-  transition:.15s;
-  user-select:none;
-}
-
-.topic:hover{
-  transform:translateY(-2px);
 }
 
 .topic.selected{
@@ -114,24 +103,19 @@ body{
   background:#1a1a1a;
 }
 
-.material-symbols-outlined{
-  font-size:20px;
-}
-
-/* buttons */
+/* BUTTONS */
 .actions{
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:10px;
 }
 
 .btn{
   border:none;
   border-radius:999px;
-  padding:12px 14px;
+  padding:12px;
   cursor:pointer;
   font-size:12px;
-  width:100%;
 }
 
 .save{
@@ -143,6 +127,17 @@ body{
   background:#ff2a2a;
   color:#fff;
 }
+
+/* password input */
+.input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #333;
+  background:#111;
+  color:#fff;
+  margin-bottom:10px;
+}
 </style>
 </head>
 
@@ -150,9 +145,7 @@ body{
 
 <div class="container">
 
-  <!-- TOP BAR -->
   <div class="topbar">
-
     <a class="back" href="home.html">
       <span class="material-symbols-outlined">arrow_back</span>
     </a>
@@ -166,16 +159,24 @@ body{
   <div class="section">
     <h3>Choose up to 3 interests</h3>
     <div class="small">Personalize your feed</div>
-
     <div class="grid" id="topics"></div>
   </div>
 
-  <!-- ACTIONS -->
+  <!-- PASSWORD -->
+  <div class="section">
+    <h3>Change password</h3>
+
+    <input type="password" id="newPassword" class="input" placeholder="New password">
+
+    <button class="btn save" id="passwordBtn">Update password</button>
+  </div>
+
+  <!-- ACCOUNT -->
   <div class="section">
     <h3>Account</h3>
 
     <div class="actions">
-      <button class="btn save" id="saveBtn">Save changes</button>
+      <button class="btn save" id="saveBtn">Save interests</button>
       <button class="btn danger" id="deleteBtn">Delete account</button>
     </div>
   </div>
@@ -226,12 +227,16 @@ function renderTopics(){
 
   el.querySelectorAll(".topic").forEach(div=>{
     div.onclick = ()=>{
+
       const id = div.dataset.id;
 
       if(selected.includes(id)){
         selected = selected.filter(x=>x!==id);
       } else {
-        if(selected.length >= 3) return;
+        if(selected.length >= 3){
+          alert("You can select max 3 interests");
+          return;
+        }
         selected.push(id);
       }
 
@@ -245,7 +250,6 @@ async function loadUser(){
   user = data.user;
 
   if(!user){
-    alert("Not logged in");
     location.href="index.html";
     return;
   }
@@ -266,12 +270,30 @@ document.getElementById("saveBtn").onclick = async ()=>{
     .update({ interests: selected })
     .eq("id", user.id);
 
+  if(error) return alert(error.message);
+
+  alert("Interests saved!");
+};
+
+document.getElementById("passwordBtn").onclick = async ()=>{
+  const pass = document.getElementById("newPassword").value;
+
+  if(pass.length < 6){
+    alert("Password too short");
+    return;
+  }
+
+  const { error } = await supabaseClient.auth.updateUser({
+    password: pass
+  });
+
   if(error){
     alert(error.message);
     return;
   }
 
-  alert("Saved!");
+  alert("Password updated!");
+  document.getElementById("newPassword").value = "";
 };
 
 document.getElementById("deleteBtn").onclick = async ()=>{
