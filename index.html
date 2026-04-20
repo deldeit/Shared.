@@ -12,17 +12,19 @@
 
 body{
   margin:0;
-  height:100vh;
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
   background:#000;
   color:#fff;
   font-family:'Archivo Black', sans-serif;
+  padding:24px;
 }
 
 .card{
-  width:340px;
+  width:100%;
+  max-width:340px;
   background:#0f0f0f;
   border:1px solid #222;
   border-radius:20px;
@@ -122,6 +124,7 @@ button:disabled{
   margin-top:12px;
   text-align:center;
   min-height:14px;
+  word-break:break-word;
 }
 </style>
 </head>
@@ -145,28 +148,27 @@ button:disabled{
 </div>
 
 <script type="module">
-import { createClient } from "@supabase/supabase-js";
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-const supabase = createClient(
-  "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes",
-  {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true
-    }
+const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
   }
-);
+});
 
 const status = document.getElementById("status");
 const signInBtn = document.getElementById("signinBtn");
 const signUpBtn = document.getElementById("signupBtn");
 const googleBtn = document.getElementById("googleBtn");
 
-const usernameInput = () => document.getElementById("username");
-const emailInput = () => document.getElementById("email");
-const passwordInput = () => document.getElementById("password");
+const usernameInput = document.getElementById("username");
+const emailInput = document.getElementById("email");
+const passwordInput = document.getElementById("password");
 
 function setLoading(state){
   signInBtn.disabled = state;
@@ -174,32 +176,40 @@ function setLoading(state){
   googleBtn.disabled = state;
 }
 
+function setStatus(text){
+  status.textContent = text || "";
+}
+
 function goHome(){
   window.location.replace("/home.html");
 }
 
 async function checkSession(){
-  const { data } = await supabase.auth.getSession();
+  const { data, error } = await supabase.auth.getSession();
+  if (error) {
+    console.error(error);
+    return;
+  }
   if (data?.session) goHome();
 }
 
 await checkSession();
 
 supabase.auth.onAuthStateChange((event, session) => {
-  if (event === "SIGNED_IN" && session) {
+  if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) {
     goHome();
   }
 });
 
 async function signIn(){
-  status.textContent = "SIGNING IN...";
+  setStatus("SIGNING IN...");
   setLoading(true);
 
-  const email = emailInput().value.trim();
-  const password = passwordInput().value;
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
 
   if (!email || !password){
-    status.textContent = "ENTER EMAIL AND PASSWORD";
+    setStatus("ENTER EMAIL AND PASSWORD");
     setLoading(false);
     return;
   }
@@ -212,7 +222,7 @@ async function signIn(){
   setLoading(false);
 
   if (error){
-    status.textContent = error.message;
+    setStatus(error.message);
     return;
   }
 
@@ -220,15 +230,15 @@ async function signIn(){
 }
 
 async function signUp(){
-  status.textContent = "CREATING ACCOUNT...";
+  setStatus("CREATING ACCOUNT...");
   setLoading(true);
 
-  const email = emailInput().value.trim();
-  const password = passwordInput().value;
-  const username = usernameInput().value.trim();
+  const email = emailInput.value.trim();
+  const password = passwordInput.value;
+  const username = usernameInput.value.trim();
 
   if (!email || !password || !username){
-    status.textContent = "ENTER USERNAME, EMAIL AND PASSWORD";
+    setStatus("ENTER USERNAME, EMAIL AND PASSWORD");
     setLoading(false);
     return;
   }
@@ -246,19 +256,19 @@ async function signUp(){
   setLoading(false);
 
   if (error){
-    status.textContent = error.message;
+    setStatus(error.message);
     return;
   }
 
-  if (data.session){
+  if (data?.session) {
     goHome();
   } else {
-    status.textContent = "ACCOUNT CREATED. CHECK EMAIL (IF CONFIRMATION ENABLED).";
+    setStatus("ACCOUNT CREATED. CHECK EMAIL IF CONFIRMATION IS ENABLED.");
   }
 }
 
 async function signInWithGoogle(){
-  status.textContent = "REDIRECTING...";
+  setStatus("REDIRECTING...");
   setLoading(true);
 
   const { error } = await supabase.auth.signInWithOAuth({
@@ -269,7 +279,7 @@ async function signInWithGoogle(){
   });
 
   if (error){
-    status.textContent = error.message;
+    setStatus(error.message);
     setLoading(false);
   }
 }
@@ -278,6 +288,5 @@ signInBtn.addEventListener("click", signIn);
 signUpBtn.addEventListener("click", signUp);
 googleBtn.addEventListener("click", signInWithGoogle);
 </script>
-
 </body>
 </html>
