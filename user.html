@@ -37,6 +37,10 @@
       min-height: 100vh;
     }
 
+    body.modal-open {
+      overflow: hidden;
+    }
+
     .container {
       max-width: 920px;
       margin: 0 auto;
@@ -45,16 +49,24 @@
 
     .topbar {
       display: flex;
-      justify-content: center;
+      justify-content: space-between;
       align-items: center;
+      gap: 12px;
       margin-bottom: 20px;
     }
 
-    .logo-link {
-      text-decoration: none;
-      color: #fff;
+    .back-link {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid #333;
+      text-decoration: none;
+      flex: 0 0 auto;
     }
 
     .header {
@@ -62,6 +74,7 @@
       line-height: 1;
       text-align: center;
       letter-spacing: -.5px;
+      flex: 1;
     }
 
     .profile-card {
@@ -298,6 +311,12 @@
       border: 1px solid #333;
     }
 
+    .icon-btn.secondary {
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid #333;
+    }
+
     .icon-btn:disabled {
       opacity: .45;
       cursor: not-allowed;
@@ -405,6 +424,14 @@
       overflow: hidden;
       display: block;
       min-width: 0;
+      cursor: pointer;
+      transition: transform .15s ease, border-color .15s ease, filter .15s ease;
+    }
+
+    .post:hover {
+      transform: translateY(-2px);
+      border-color: #333;
+      filter: brightness(1.04);
     }
 
     .post-thumb {
@@ -453,30 +480,117 @@
       display: flex;
     }
 
-    .modal {
-      width: min(520px, 100%);
-      max-height: min(78vh, 720px);
+    .post-modal {
+      width: min(1100px, 100%);
+      height: min(92vh, 920px);
       overflow: hidden;
       background: #0d0d0d;
       border: 1px solid #2a2a2a;
       border-radius: 24px;
       box-shadow: 0 20px 60px rgba(0,0,0,.5);
-      display: flex;
-      flex-direction: column;
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
     }
 
-    .modal-head {
-      padding: 16px 16px 12px;
-      border-bottom: 1px solid #222;
+    .post-modal-media {
+      background: #000;
+      border-right: 1px solid #222;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .post-modal-media img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      display: block;
+      background: #000;
+    }
+
+    .post-modal-side {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      overflow: auto;
+      padding: 16px;
+      gap: 14px;
+    }
+
+    .post-modal-head {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      align-items: flex-start;
       gap: 12px;
     }
 
-    .modal-title {
-      font-size: 15px;
+    .post-modal-author {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
       line-height: 1.1;
+    }
+
+    .post-modal-author-link {
+      color: #fff;
+      text-decoration: none;
+      font-size: 15px;
+      line-height: 1.2;
+    }
+
+    .post-modal-author-link:hover {
+      text-decoration: underline;
+    }
+
+    .post-modal-date {
+      margin-top: 8px;
+      font-size: 11px;
+      opacity: .68;
+      line-height: 1.4;
+    }
+
+    .post-modal-caption {
+      font-size: 13px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      color: rgba(255,255,255,.88);
+      padding-bottom: 6px;
+      border-bottom: 1px solid #222;
+    }
+
+    .post-modal-music {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid #222;
+      background: #090909;
+    }
+
+    .post-modal-song-title {
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .post-modal-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+      margin-top: auto;
+    }
+
+    .post-modal-like-btn {
+      background: #fff;
+      color: #000;
+    }
+
+    .post-modal-like-btn.liked {
+      color: #ff2d55;
     }
 
     .modal-close {
@@ -490,11 +604,11 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      flex: 0 0 auto;
     }
 
-    .modal-body {
-      padding: 8px;
-      overflow: auto;
+    .modal-close:hover {
+      transform: translateY(-1px);
     }
 
     .user-list {
@@ -572,6 +686,17 @@
       .feed {
         grid-template-columns: repeat(2, minmax(0, 1fr));
       }
+
+      .post-modal {
+        grid-template-columns: 1fr;
+        height: min(94vh, 1000px);
+      }
+
+      .post-modal-media {
+        border-right: none;
+        border-bottom: 1px solid #222;
+        min-height: 44vh;
+      }
     }
 
     @media (max-width: 520px) {
@@ -606,15 +731,23 @@
         width: 120px;
         height: 120px;
       }
+
+      .post-modal-side {
+        padding: 14px;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="topbar">
-      <a class="logo-link" href="home.html" aria-label="Go to home">
-        <div class="header">Shared.</div>
+      <a class="back-link" href="homepage.html" aria-label="Back to homepage">
+        <span class="material-symbols-outlined">arrow_back</span>
       </a>
+
+      <div class="header">Shared.</div>
+
+      <div style="width:44px;"></div>
     </div>
 
     <div class="profile-card">
@@ -706,6 +839,51 @@
     </div>
   </div>
 
+  <div class="modal-backdrop" id="postModalBackdrop" aria-hidden="true">
+    <div class="post-modal" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
+      <div class="post-modal-media">
+        <img id="postModalImage" alt="Post image">
+      </div>
+
+      <div class="post-modal-side">
+        <div class="post-modal-head">
+          <div style="min-width:0;">
+            <div class="section-title" id="postModalTitle">Post</div>
+            <div class="post-modal-author">
+              <a href="#" class="post-modal-author-link" id="postModalAuthorLink">
+                <span id="postModalAuthorName"></span>
+              </a>
+            </div>
+            <div class="post-modal-date" id="postModalDate"></div>
+          </div>
+
+          <button class="modal-close" id="postModalCloseBtn" aria-label="Close post">
+            <span class="material-symbols-outlined">close</span>
+          </button>
+        </div>
+
+        <div class="post-modal-caption" id="postModalCaption"></div>
+
+        <div class="post-modal-music">
+          <div class="section-title" style="margin:0;">Music</div>
+          <div class="post-modal-song-title" id="postModalSongTitle"></div>
+
+          <button type="button" class="icon-btn secondary" id="postModalPlayBtn">
+            <span class="material-symbols-outlined">play_arrow</span>
+            <span class="btn-label">Play preview</span>
+          </button>
+        </div>
+
+        <div class="post-modal-actions">
+          <button type="button" class="icon-btn post-modal-like-btn" id="postModalLikeBtn">
+            <span class="material-symbols-outlined">favorite_border</span>
+            <span class="post-modal-like-text">Like</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
     const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
@@ -746,10 +924,33 @@
     const listModalTitle = document.getElementById("listModalTitle");
     const userListEl = document.getElementById("userList");
 
+    const postModalBackdrop = document.getElementById("postModalBackdrop");
+    const postModalCloseBtn = document.getElementById("postModalCloseBtn");
+    const postModalTitle = document.getElementById("postModalTitle");
+    const postModalImage = document.getElementById("postModalImage");
+    const postModalAuthorLink = document.getElementById("postModalAuthorLink");
+    const postModalAuthorName = document.getElementById("postModalAuthorName");
+    const postModalDate = document.getElementById("postModalDate");
+    const postModalCaption = document.getElementById("postModalCaption");
+    const postModalSongTitle = document.getElementById("postModalSongTitle");
+    const postModalPlayBtn = document.getElementById("postModalPlayBtn");
+    const postModalLikeBtn = document.getElementById("postModalLikeBtn");
+    const postModalLikeText = postModalLikeBtn.querySelector(".post-modal-like-text");
+    const postModalLikeIcon = postModalLikeBtn.querySelector(".material-symbols-outlined");
+
     let currentUser = null;
     let profile = null;
     let isOwnProfile = false;
     let isFollowingTarget = false;
+
+    let postsMap = new Map();
+
+    let modalCurrentPost = null;
+    let modalCurrentLikeCount = 0;
+    let modalCurrentLikedByMe = false;
+    let modalAudio = new Audio();
+    let modalAudioButton = null;
+    let modalLoadToken = 0;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -828,12 +1029,79 @@
       userListEl.innerHTML = "";
     }
 
+    function openPostModal() {
+      postModalBackdrop.classList.add("open");
+      postModalBackdrop.setAttribute("aria-hidden", "false");
+      document.body.classList.add("modal-open");
+    }
+
+    function closePostModal() {
+      postModalBackdrop.classList.remove("open");
+      postModalBackdrop.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("modal-open");
+      modalAudio.pause();
+      modalAudio.src = "";
+      setModalAudioButtonState(false);
+      modalCurrentPost = null;
+    }
+
+    function setModalAudioButtonState(playing) {
+      if (!modalAudioButton) return;
+      const icon = modalAudioButton.querySelector(".material-symbols-outlined");
+      const label = modalAudioButton.querySelector(".btn-label");
+      if (!icon || !label) return;
+
+      if (playing) {
+        icon.textContent = "pause";
+        label.textContent = "Pause preview";
+        modalAudioButton.dataset.playing = "1";
+      } else {
+        icon.textContent = "play_arrow";
+        label.textContent = "Play preview";
+        modalAudioButton.dataset.playing = "0";
+      }
+    }
+
+    async function playModalPreview(url) {
+      if (!url || !modalAudioButton) return;
+
+      if (modalAudio.src !== url) {
+        modalAudio.pause();
+        modalAudio.src = url;
+      }
+
+      if (modalAudio.paused) {
+        try {
+          await modalAudio.play();
+          setModalAudioButtonState(true);
+          modalAudioButton = postModalPlayBtn;
+        } catch (err) {
+          console.error("MODAL AUDIO PLAY ERROR:", err);
+        }
+      } else {
+        modalAudio.pause();
+        setModalAudioButtonState(false);
+      }
+    }
+
+    modalAudio.addEventListener("ended", () => {
+      setModalAudioButtonState(false);
+    });
+
     modalCloseBtn.addEventListener("click", closeModal);
     modalBackdrop.addEventListener("click", (e) => {
       if (e.target === modalBackdrop) closeModal();
     });
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeModal();
+      if (e.key === "Escape") {
+        closeModal();
+        closePostModal();
+      }
+    });
+
+    postModalCloseBtn.addEventListener("click", closePostModal);
+    postModalBackdrop.addEventListener("click", (e) => {
+      if (e.target === postModalBackdrop) closePostModal();
     });
 
     avatarImgEl.addEventListener("error", () => {
@@ -1211,17 +1479,162 @@
       if (e.key === "Enter" || e.key === " ") feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
+    async function getPostLikeState(postId) {
+      const countPromise = supabaseClient
+        .from("likes")
+        .select("id", { count: "exact", head: true })
+        .eq("post_id", postId);
+
+      const likedPromise = currentUser
+        ? supabaseClient
+            .from("likes")
+            .select("id")
+            .eq("post_id", postId)
+            .eq("user_id", currentUser.id)
+            .maybeSingle()
+        : Promise.resolve({ data: null, error: null });
+
+      const [countRes, likedRes] = await Promise.all([countPromise, likedPromise]);
+
+      return {
+        count: countRes?.count || 0,
+        likedByMe: !!likedRes?.data
+      };
+    }
+
+    function renderModalLikeButton() {
+      postModalLikeBtn.classList.toggle("liked", modalCurrentLikedByMe);
+      postModalLikeIcon.textContent = modalCurrentLikedByMe ? "favorite" : "favorite_border";
+      postModalLikeText.textContent = `${modalCurrentLikeCount} ${modalCurrentLikeCount === 1 ? "like" : "likes"}`;
+      postModalLikeBtn.disabled = !currentUser;
+    }
+
+    async function openPostModal(post) {
+      if (!post) return;
+
+      modalCurrentPost = post;
+      modalLoadToken += 1;
+      const token = modalLoadToken;
+
+      postModalTitle.textContent = "Post";
+      postModalImage.src = post.image_url || "";
+      postModalAuthorLink.href = `user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(profile?.display_name || fallbackName)}`;
+      postModalAuthorName.innerHTML = renderName(profile?.display_name || fallbackName, !!profile?.verified);
+      postModalDate.textContent = post.created_at ? new Intl.DateTimeFormat("it-IT", { dateStyle: "medium", timeStyle: "short" }).format(new Date(post.created_at)) : "";
+      postModalCaption.textContent = post.caption || "No caption.";
+      postModalSongTitle.textContent = post.song_title || "Unknown song";
+
+      modalCurrentLikeCount = 0;
+      modalCurrentLikedByMe = false;
+      renderModalLikeButton();
+
+      openPostModal();
+      setModalAudioButtonState(false);
+      modalAudioButton = postModalPlayBtn;
+
+      if (!post.song_preview) {
+        postModalPlayBtn.disabled = true;
+        postModalPlayBtn.querySelector(".btn-label").textContent = "No preview";
+        postModalPlayBtn.querySelector(".material-symbols-outlined").textContent = "music_off";
+      } else {
+        postModalPlayBtn.disabled = false;
+        postModalPlayBtn.querySelector(".btn-label").textContent = "Play preview";
+        postModalPlayBtn.querySelector(".material-symbols-outlined").textContent = "play_arrow";
+        try {
+          await playModalPreview(post.song_preview);
+        } catch (_) {}
+      }
+
+      try {
+        const likeState = await getPostLikeState(post.id);
+        if (token !== modalLoadToken) return;
+        modalCurrentLikeCount = likeState.count;
+        modalCurrentLikedByMe = likeState.likedByMe;
+        renderModalLikeButton();
+      } catch (err) {
+        console.error("POST MODAL LIKE STATE ERROR:", err);
+      }
+    }
+
+    postModalPlayBtn.addEventListener("click", async () => {
+      if (!modalCurrentPost?.song_preview) return;
+      await playModalPreview(modalCurrentPost.song_preview);
+    });
+
+    postModalLikeBtn.addEventListener("click", async () => {
+      if (!currentUser || !modalCurrentPost) return;
+
+      postModalLikeBtn.disabled = true;
+
+      try {
+        const { data: existing, error: findError } = await supabaseClient
+          .from("likes")
+          .select("id")
+          .eq("post_id", modalCurrentPost.id)
+          .eq("user_id", currentUser.id)
+          .maybeSingle();
+
+        if (findError) throw findError;
+
+        if (existing) {
+          const { error } = await supabaseClient
+            .from("likes")
+            .delete()
+            .eq("id", existing.id);
+
+          if (error) throw error;
+
+          modalCurrentLikedByMe = false;
+          modalCurrentLikeCount = Math.max(0, modalCurrentLikeCount - 1);
+        } else {
+          const { error } = await supabaseClient
+            .from("likes")
+            .insert([{ post_id: modalCurrentPost.id, user_id: currentUser.id }]);
+
+          if (error) throw error;
+
+          modalCurrentLikedByMe = true;
+          modalCurrentLikeCount += 1;
+        }
+
+        renderModalLikeButton();
+      } catch (err) {
+        console.error("MODAL LIKE TOGGLE ERROR:", err);
+        alert(err?.message || "Unable to update like.");
+      } finally {
+        postModalLikeBtn.disabled = !currentUser;
+      }
+    });
+
     function renderPost(post) {
       if (!post.image_url) return "";
 
       return `
-        <article class="post">
+        <article class="post" data-post-id="${escapeHtml(post.id)}" tabindex="0" role="button" aria-label="Open post">
           <div class="post-thumb">
             <img src="${escapeHtml(post.image_url)}" alt="Post image">
           </div>
         </article>
       `;
     }
+
+    feedEl.addEventListener("click", (e) => {
+      const card = e.target.closest(".post");
+      if (!card) return;
+      const postId = card.getAttribute("data-post-id");
+      const post = postsMap.get(postId);
+      if (post) openPostModal(post);
+    });
+
+    feedEl.addEventListener("keydown", (e) => {
+      const card = e.target.closest(".post");
+      if (!card) return;
+      if (e.key === "Enter" || e.key === " ") {
+        const postId = card.getAttribute("data-post-id");
+        const post = postsMap.get(postId);
+        if (post) openPostModal(post);
+      }
+    });
 
     async function loadPosts() {
       if (!profileId) {
@@ -1234,7 +1647,7 @@
       try {
         const { data, error } = await supabaseClient
           .from("posts")
-          .select("id, image_url, created_at")
+          .select("id, image_url, created_at, caption, song_title, song_preview, user_id")
           .eq("user_id", profileId)
           .not("image_url", "is", null)
           .order("created_at", { ascending: false });
@@ -1243,6 +1656,7 @@
 
         const posts = data || [];
         postsCountEl.textContent = posts.length;
+        postsMap = new Map(posts.map(post => [post.id, post]));
 
         if (!posts.length) {
           renderEmpty("No image posts yet.");
