@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shared • About</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+  <style>
+    *{
+      box-sizing:border-box;
+      font-family:'Archivo Black', sans-serif;
+    }
+
+    :root{
+      --bg:#000;
+      --panel:#0f0f0f;
+      --panel-2:#111;
+      --border:#222;
+      --border-2:#333;
+      --text:#fff;
+      --muted:rgba(255,255,255,.68);
+      --accent:#fff;
+    }
+
+    html, body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+
+    body{
+      min-height:100vh;
+    }
+
+    a{
+      color:inherit;
+      text-decoration:none;
+    }
+
+    .container{
+      max-width:980px;
+      margin:0 auto;
+      padding:20px;
+    }
+
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:20px;
+    }
+
+    .header{
+      font-size:30px;
+      line-height:1;
+      text-align:center;
+      flex:1;
+    }
+
+    .icon-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      border:none;
+      border-radius:999px;
+      padding:10px 14px;
+      cursor:pointer;
+      font-size:12px;
+      background:#fff;
+      color:#000;
+      white-space:nowrap;
+    }
+
+    .icon-btn.secondary{
+      background:#1a1a1a;
+      color:#fff;
+      border:1px solid #333;
+    }
+
+    .material-symbols-outlined{
+      font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+      line-height:1;
+      font-size:20px;
+    }
+
+    .hero{
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
+      border:1px solid var(--border);
+      border-radius:28px;
+      padding:28px;
+      margin-bottom:18px;
+    }
+
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.3fr .9fr;
+      gap:18px;
+      align-items:stretch;
+    }
+
+    .hero-title{
+      font-size:42px;
+      line-height:1;
+      margin:0 0 14px;
+      letter-spacing:-.02em;
+    }
+
+    .hero-text{
+      color:var(--muted);
+      font-size:14px;
+      line-height:1.8;
+      margin:0;
+      white-space:pre-wrap;
+      font-family:inherit;
+    }
+
+    .hero-card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      justify-content:space-between;
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      width:fit-content;
+      background:#fff;
+      color:#000;
+      border-radius:999px;
+      padding:8px 12px;
+      font-size:12px;
+    }
+
+    .stats{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:12px;
+    }
+
+    .stat{
+      background:var(--panel-2);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .stat .value{
+      font-size:22px;
+      line-height:1;
+      margin-bottom:6px;
+    }
+
+    .stat .label{
+      font-size:11px;
+      color:var(--muted);
+      line-height:1.5;
+      font-family:inherit;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+      margin-top:18px;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:24px;
+      padding:20px;
+    }
+
+    .section-title{
+      font-size:18px;
+      line-height:1.2;
+      margin:0 0 12px;
+    }
+
+    .section-text{
+      margin:0;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:13px;
+      font-family:inherit;
+    }
+
+    .feature-list{
+      display:grid;
+      gap:10px;
+      margin-top:14px;
+    }
+
+    .feature-item{
+      display:flex;
+      gap:12px;
+      align-items:flex-start;
+      padding:12px 14px;
+      border-radius:16px;
+      background:#000;
+      border:1px solid #222;
+    }
+
+    .feature-item .icon{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#1a1a1a;
+      border:1px solid #2b2b2b;
+      flex:0 0 auto;
+    }
+
+    .feature-item .meta{
+      min-width:0;
+    }
+
+    .feature-item .name{
+      font-size:12px;
+      margin-bottom:4px;
+    }
+
+    .feature-item .desc{
+      font-size:11px;
+      line-height:1.6;
+      color:var(--muted);
+      font-family:inherit;
+    }
+
+    .timeline{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+
+    .timeline-item{
+      display:grid;
+      grid-template-columns:64px 1fr;
+      gap:12px;
+      align-items:start;
+      padding:12px 14px;
+      background:#000;
+      border:1px solid #222;
+      border-radius:16px;
+    }
+
+    .timeline-item .when{
+      font-size:11px;
+      color:var(--muted);
+      font-family:inherit;
+      padding-top:2px;
+    }
+
+    .timeline-item .what{
+      font-size:12px;
+      line-height:1.6;
+      font-family:inherit;
+    }
+
+    .full{
+      margin-top:16px;
+    }
+
+    .cta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top:16px;
+    }
+
+    .footnote{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.7;
+      font-family:inherit;
+    }
+
+    @media (max-width:760px){
+      .hero-grid,
+      .grid{
+        grid-template-columns:1fr;
+      }
+
+      .hero-title{
+        font-size:34px;
+      }
+
+      .stats{
+        grid-template-columns:1fr;
+      }
+
+      .topbar{
+        align-items:center;
+      }
+
+      .header{
+        font-size:26px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <a href="javascript:history.back()" class="icon-btn secondary" aria-label="Go back">
+        <span class="material-symbols-outlined">arrow_back</span>
+        Back
+      </a>
+
+      <div class="header">About</div>
+
+      <a href="index.html" class="icon-btn secondary" aria-label="Go home">
+        <span class="material-symbols-outlined">home</span>
+      </a>
+    </div>
+
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <div class="hero-badge">
+            <span class="material-symbols-outlined" style="font-size:18px;">star</span>
+            Shared
+          </div>
+          <h1 class="hero-title">A simple place to post, share, and discover.</h1>
+          <p class="hero-text">
+Shared is built around fast posting, profile discovery, and a feed that stays focused on the content.
+
+The experience is intentionally minimal: upload an image, add a caption, attach a song preview, and publish. Profiles stay visible, likes are interactive, and the menu keeps the most important actions one tap away.
+          </p>
+          <div class="cta-row">
+            <a href="index.html" class="icon-btn">Open app</a>
+            <a href="settings.html" class="icon-btn secondary">Settings</a>
+          </div>
+        </div>
+
+        <div class="hero-card">
+          <div>
+            <div class="section-title">What Shared focuses on</div>
+            <div class="section-text">
+              Clean layout, quick interactions, and an identity-first feed where author names are easy to see.
+            </div>
+          </div>
+
+          <div class="stats">
+            <div class="stat">
+              <div class="value">01</div>
+              <div class="label">Post images with captions and music previews.</div>
+            </div>
+            <div class="stat">
+              <div class="value">02</div>
+              <div class="label">Discover users from the sidebar search.</div>
+            </div>
+            <div class="stat">
+              <div class="value">03</div>
+              <div class="label">Open likes to see who interacted with a post.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2 class="section-title">Core features</h2>
+        <p class="section-text">Everything here is designed to stay lightweight and easy to navigate.</p>
+
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="icon"><span class="material-symbols-outlined">image</span></div>
+            <div class="meta">
+              <div class="name">Image posting</div>
+              <div class="desc">Upload a square image, write a caption, and publish it into the feed.</div>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="icon"><span class="material-symbols-outlined">music_note</span></div>
+            <div class="meta">
+              <div class="name">Song previews</div>
+              <div class="desc">Attach a track preview so posts feel more expressive and contextual.</div>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="icon"><span class="material-symbols-outlined">verified</span></div>
+            <div class="meta">
+              <div class="name">Verified authors</div>
+              <div class="desc">Verified profiles get a visible badge beside the display name.</div>
+            </div>
+          </div>
+
+          <div class="feature-item">
+            <div class="icon"><span class="material-symbols-outlined">favorite</span></div>
+            <div class="meta">
+              <div class="name">Like details</div>
+              <div class="desc">Click the like counter to open the full list of users who liked a post.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="section-title">How it works</h2>
+        <p class="section-text">A simple flow from login to posting.</p>
+
+        <div class="timeline">
+          <div class="timeline-item">
+            <div class="when">Step 1</div>
+            <div class="what">Sign in, then open your profile from the sidebar menu.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="when">Step 2</div>
+            <div class="what">Use the upload box to add an image, a caption, and a song preview.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="when">Step 3</div>
+            <div class="what">Publish the post and let others like, open the liker list, or visit your profile.</div>
+          </div>
+          <div class="timeline-item">
+            <div class="when">Step 4</div>
+            <div class="what">Open About or Settings from the menu to move around the app quickly.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel full">
+      <h2 class="section-title">Notes</h2>
+      <p class="section-text">
+        Shared is a compact social interface built to keep the important actions visible and fast.
+        If you want to extend it later, the best places are the profile page, settings page, and the post detail flow.
+      </p>
+      <div class="footnote">
+        Tip: keep the same black-and-white palette and rounded cards for a consistent experience across all pages.
+      </div>
+    </section>
+  </div>
+</body>
+</html>
