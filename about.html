@@ -1,601 +1,293 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Shared • About</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shared • About</title>
 
-  <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
-  <style>
-    *{
-      box-sizing:border-box;
-      font-family:'Archivo Black', sans-serif;
-    }
+<style>
+*{ box-sizing:border-box; font-family:'Archivo Black', sans-serif; }
 
-    :root{
-      --bg:#000;
-      --panel:#0f0f0f;
-      --panel-2:#111;
-      --border:#222;
-      --border-2:#333;
-      --text:#fff;
-      --muted:rgba(255,255,255,.68);
-      --soft:rgba(255,255,255,.08);
-    }
+:root{
+  --bg:#000;
+  --panel:#0f0f0f;
+  --panel-2:#111;
+  --border:#222;
+  --text:#fff;
+  --muted:rgba(255,255,255,.65);
+  --accent:linear-gradient(135deg,#fff,#888);
+}
 
-    html, body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      overflow-x:hidden;
-    }
+html, body{
+  margin:0;
+  background:radial-gradient(circle at 20% 0%, #111 0%, #000 60%);
+  color:var(--text);
+}
 
-    body{
-      min-height:100vh;
-    }
+.container{ max-width:720px; margin:0 auto; padding:20px; }
 
-    a{
-      color:inherit;
-      text-decoration:none;
-    }
+.topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:26px;
+}
 
-    .container{
-      max-width:980px;
-      margin:0 auto;
-      padding:20px;
-    }
+.header{
+  font-size:30px;
+  text-align:center;
+  flex:1;
+  letter-spacing:-1px;
+}
 
-    .topbar{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      margin-bottom:20px;
-    }
+.icon-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border:none;
+  border-radius:999px;
+  padding:10px;
+  background:#111;
+  color:#fff;
+  border:1px solid #333;
+  cursor:pointer;
+  transition:.2s;
+}
 
-    .header{
-      font-size:30px;
-      line-height:1;
-      text-align:center;
-      flex:1;
-    }
+.icon-btn:hover{
+  background:#1a1a1a;
+}
 
-    .icon-btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:8px;
-      border:none;
-      border-radius:999px;
-      padding:10px 14px;
-      cursor:pointer;
-      font-size:12px;
-      background:#fff;
-      color:#000;
-      white-space:nowrap;
-    }
+.material-symbols-outlined{ font-size:20px; }
 
-    .icon-btn.secondary{
-      background:#1a1a1a;
-      color:#fff;
-      border:1px solid #333;
-    }
+.hero{
+  position:relative;
+  border:1px solid var(--border);
+  border-radius:28px;
+  padding:28px;
+  margin-bottom:22px;
+  background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.01));
+  overflow:hidden;
+}
 
-    .material-symbols-outlined{
-      font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
-      line-height:1;
-      font-size:20px;
-    }
+.hero::after{
+  content:"";
+  position:absolute;
+  inset:-40%;
+  background:radial-gradient(circle, rgba(255,255,255,.08), transparent 60%);
+  opacity:.4;
+}
 
-    .hero{
-      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.01));
-      border:1px solid var(--border);
-      border-radius:28px;
-      padding:28px;
-      margin-bottom:18px;
-    }
+.hero-title{
+  font-size:42px;
+  margin:0 0 14px;
+  line-height:1.05;
+}
 
-    .hero-grid{
-      display:grid;
-      grid-template-columns:1.35fr .85fr;
-      gap:18px;
-      align-items:stretch;
-    }
+.hero-text{
+  font-size:14px;
+  line-height:1.8;
+  color:var(--muted);
+}
 
-    .hero-title{
-      font-size:42px;
-      line-height:1;
-      margin:0 0 14px;
-      letter-spacing:-.02em;
-    }
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
 
-    .hero-text{
-      color:var(--muted);
-      font-size:14px;
-      line-height:1.8;
-      margin:0;
-      white-space:pre-wrap;
-      font-family:inherit;
-    }
+.panel{
+  background:linear-gradient(180deg,#0f0f0f,#0a0a0a);
+  border:1px solid var(--border);
+  border-radius:22px;
+  padding:20px;
+  position:relative;
+}
 
-    .hero-card{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:24px;
-      padding:18px;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
-      justify-content:space-between;
-    }
+.panel::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  border-radius:22px;
+  background:linear-gradient(120deg, transparent, rgba(255,255,255,.06), transparent);
+  opacity:.15;
+}
 
-    .hero-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      width:fit-content;
-      background:#fff;
-      color:#000;
-      border-radius:999px;
-      padding:8px 12px;
-      font-size:12px;
-    }
+.section-title{
+  font-size:18px;
+  margin-bottom:10px;
+}
 
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:12px;
-    }
+.section-text{
+  font-size:13px;
+  color:var(--muted);
+  line-height:1.8;
+}
 
-    .stat{
-      background:var(--panel-2);
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:14px;
-    }
+.feature-item{
+  display:flex;
+  gap:12px;
+  padding:12px;
+  background:#000;
+  border:1px solid #222;
+  border-radius:16px;
+  margin-top:10px;
+  font-size:12px;
+  transition:.2s;
+}
 
-    .stat .value{
-      font-size:22px;
-      line-height:1;
-      margin-bottom:6px;
-    }
+.feature-item:hover{
+  transform:translateY(-2px);
+  border-color:#444;
+}
 
-    .stat .label{
-      font-size:11px;
-      color:var(--muted);
-      line-height:1.5;
-      font-family:inherit;
-    }
+.timeline-item{
+  padding:12px;
+  background:#000;
+  border:1px solid #222;
+  border-radius:16px;
+  margin-top:10px;
+  font-size:12px;
+  color:var(--muted);
+  position:relative;
+}
 
-    .grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:16px;
-      margin-top:18px;
-    }
+.timeline-item::before{
+  content:"";
+  position:absolute;
+  left:-6px;
+  top:50%;
+  width:6px;
+  height:6px;
+  background:#fff;
+  border-radius:50%;
+  transform:translateY(-50%);
+}
 
-    .panel{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:24px;
-      padding:20px;
-    }
+.full{ margin-top:20px; }
 
-    .section-title{
-      font-size:18px;
-      line-height:1.2;
-      margin:0 0 12px;
-    }
+.note-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+  margin-top:12px;
+}
 
-    .section-text{
-      margin:0;
-      color:var(--muted);
-      line-height:1.8;
-      font-size:13px;
-      font-family:inherit;
-    }
+.note-card{
+  background:#000;
+  border:1px solid #222;
+  border-radius:16px;
+  padding:14px;
+  transition:.2s;
+}
 
-    .feature-list{
-      display:grid;
-      gap:10px;
-      margin-top:14px;
-    }
+.note-card:hover{
+  border-color:#444;
+}
 
-    .feature-item{
-      display:flex;
-      gap:12px;
-      align-items:flex-start;
-      padding:12px 14px;
-      border-radius:16px;
-      background:#000;
-      border:1px solid #222;
-    }
+.note-card h3{ font-size:13px; margin-bottom:8px; }
 
-    .feature-item .icon{
-      width:34px;
-      height:34px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      background:#1a1a1a;
-      border:1px solid #2b2b2b;
-      flex:0 0 auto;
-    }
+.note-card li{
+  font-size:11px;
+  color:var(--muted);
+  margin-bottom:6px;
+  line-height:1.6;
+}
 
-    .feature-item .meta{
-      min-width:0;
-    }
+.footnote{
+  font-size:11px;
+  color:var(--muted);
+  margin-top:10px;
+  opacity:.8;
+}
 
-    .feature-item .name{
-      font-size:12px;
-      margin-bottom:4px;
-    }
-
-    .feature-item .desc{
-      font-size:11px;
-      line-height:1.6;
-      color:var(--muted);
-      font-family:inherit;
-    }
-
-    .timeline{
-      display:grid;
-      gap:12px;
-      margin-top:14px;
-    }
-
-    .timeline-item{
-      display:grid;
-      grid-template-columns:64px 1fr;
-      gap:12px;
-      align-items:start;
-      padding:12px 14px;
-      background:#000;
-      border:1px solid #222;
-      border-radius:16px;
-    }
-
-    .timeline-item .when{
-      font-size:11px;
-      color:var(--muted);
-      font-family:inherit;
-      padding-top:2px;
-    }
-
-    .timeline-item .what{
-      font-size:12px;
-      line-height:1.6;
-      font-family:inherit;
-    }
-
-    .full{
-      margin-top:16px;
-    }
-
-    .cta-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-      margin-top:16px;
-    }
-
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background:var(--soft);
-      border:1px solid #222;
-      font-size:11px;
-      color:#fff;
-    }
-
-    .note-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:16px;
-      margin-top:16px;
-    }
-
-    .note-card{
-      background:#000;
-      border:1px solid #222;
-      border-radius:18px;
-      padding:14px;
-    }
-
-    .note-card h3{
-      margin:0 0 10px;
-      font-size:13px;
-      line-height:1.2;
-    }
-
-    .note-card p,
-    .note-card li{
-      margin:0;
-      color:var(--muted);
-      font-size:11px;
-      line-height:1.8;
-      font-family:inherit;
-    }
-
-    .note-card ul{
-      margin:0;
-      padding-left:18px;
-      display:grid;
-      gap:8px;
-    }
-
-    .footnote{
-      margin-top:14px;
-      color:var(--muted);
-      font-size:11px;
-      line-height:1.7;
-      font-family:inherit;
-    }
-
-    @media (max-width:760px){
-      .hero-grid,
-      .grid,
-      .note-grid{
-        grid-template-columns:1fr;
-      }
-
-      .hero-title{
-        font-size:34px;
-      }
-
-      .stats{
-        grid-template-columns:1fr;
-      }
-
-      .topbar{
-        align-items:center;
-      }
-
-      .header{
-        font-size:26px;
-      }
-    }
-  </style>
+@media (max-width:700px){
+  .grid,
+  .note-grid{ grid-template-columns:1fr; }
+  .hero-title{ font-size:32px; }
+}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <a href="javascript:history.back()" class="icon-btn secondary" aria-label="Go back">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </a>
 
-      <div class="header">Shared.</div>
+<div class="container">
 
-      <div style="width:44px;"></div>
-    </div>
+  <div class="topbar">
+    <a href="javascript:history.back()" class="icon-btn">
+      <span class="material-symbols-outlined">arrow_back</span>
+    </a>
 
-      <a href="index.html" class="icon-btn secondary" aria-label="Go home">
-        <span class="material-symbols-outlined">home</span>
-      </a>
-    </div>
+    <div class="header">Shared.</div>
 
-    <section class="hero">
-      <div class="hero-grid">
-        <div>
-          <div class="hero-badge">
-            <span class="material-symbols-outlined" style="font-size:18px;">star</span>
-            Shared
-          </div>
-          <h1 class="hero-title">A place for everyone to post, discover, and connect.</h1>
-          <p class="hero-text">
-Shared is designed to be simple, readable, and usable by a wide audience.
-
-The app keeps the interface focused on the basics: a feed, profiles, likes, and quick navigation. The goal is to make the experience easy to understand without requiring technical knowledge.
-          </p>
-          <div class="cta-row">
-            <a href="index.html" class="icon-btn">Open app</a>
-            <a href="#privacy" class="icon-btn secondary">Privacy policy</a>
-            <a href="#disclaimers" class="icon-btn secondary">Disclaimers</a>
-          </div>
-        </div>
-
-        <div class="hero-card">
-          <div>
-            <div class="section-title">What Shared is built for</div>
-            <div class="section-text">
-              A lightweight social experience centered on posts, user identity, and quick interactions.
-            </div>
-          </div>
-
-          <div class="stats">
-            <div class="stat">
-              <div class="value">01</div>
-              <div class="label">Share a post with an image, caption, and music preview.</div>
-            </div>
-            <div class="stat">
-              <div class="value">02</div>
-              <div class="label">Visit profiles and move through the app with a minimal layout.</div>
-            </div>
-            <div class="stat">
-              <div class="value">03</div>
-              <div class="label">Check likes and author badges without clutter.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="grid">
-      <div class="panel">
-        <h2 class="section-title">Core features</h2>
-        <p class="section-text">The product experience stays intentionally simple and easy to follow.</p>
-
-        <div class="feature-list">
-          <div class="feature-item">
-            <div class="icon"><span class="material-symbols-outlined">image</span></div>
-            <div class="meta">
-              <div class="name">Posting</div>
-              <div class="desc">Upload a square image and add a caption and song preview.</div>
-            </div>
-          </div>
-
-          <div class="feature-item">
-            <div class="icon"><span class="material-symbols-outlined">person_search</span></div>
-            <div class="meta">
-              <div class="name">Profile discovery</div>
-              <div class="desc">Search users from the menu and open their profiles directly.</div>
-            </div>
-          </div>
-
-          <div class="feature-item">
-            <div class="icon"><span class="material-symbols-outlined">verified</span></div>
-            <div class="meta">
-              <div class="name">Verification</div>
-              <div class="desc">Verified accounts display a clear badge next to the author name.</div>
-            </div>
-          </div>
-
-          <div class="feature-item">
-            <div class="icon"><span class="material-symbols-outlined">favorite</span></div>
-            <div class="meta">
-              <div class="name">Likes</div>
-              <div class="desc">Open the like count to see who interacted with a post.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="panel">
-        <h2 class="section-title">How it works</h2>
-        <p class="section-text">A short overview of the main flow.</p>
-
-        <div class="timeline">
-          <div class="timeline-item">
-            <div class="when">Step 1</div>
-            <div class="what">Sign in and open the menu to access your profile, settings, or about page.</div>
-          </div>
-          <div class="timeline-item">
-            <div class="when">Step 2</div>
-            <div class="what">Create a post by choosing an image, writing a caption, and selecting a track preview.</div>
-          </div>
-          <div class="timeline-item">
-            <div class="when">Step 3</div>
-            <div class="what">Browse the feed, open profiles, and tap the like counter to view the list of likers.</div>
-          </div>
-          <div class="timeline-item">
-            <div class="when">Step 4</div>
-            <div class="what">Use the menu to navigate quickly without losing the main feed context.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel full" id="privacy">
-      <h2 class="section-title">Privacy policy</h2>
-      <p class="section-text">
-        This page explains, in plain language, how Shared handles information inside the app. It is a practical summary and not a substitute for a formal legal policy.
-      </p>
-
-      <div class="note-grid">
-        <div class="note-card">
-          <h3>Information collected</h3>
-          <ul>
-            <li>Account details used to sign in.</li>
-            <li>Profile information such as display name and avatar.</li>
-            <li>Content you publish, including posts, captions, and likes.</li>
-            <li>Basic technical data needed to run the service.</li>
-          </ul>
-        </div>
-
-        <div class="note-card">
-          <h3>How it is used</h3>
-          <ul>
-            <li>To create and show your profile and posts.</li>
-            <li>To display likes, authors, and verification status.</li>
-            <li>To help the app function, maintain sessions, and load content.</li>
-            <li>To improve usability and keep the app working correctly.</li>
-          </ul>
-        </div>
-
-        <div class="note-card">
-          <h3>Sharing and visibility</h3>
-          <ul>
-            <li>Posts and profile details may be visible to other users inside the app.</li>
-            <li>Like lists can show who interacted with a post.</li>
-            <li>Content you publish should be treated as public within the app environment.</li>
-          </ul>
-        </div>
-
-        <div class="note-card">
-          <h3>Retention and control</h3>
-          <ul>
-            <li>You may be able to update or remove some information through the app.</li>
-            <li>Deleted content may still remain in backups or logs for a limited time.</li>
-            <li>Account data is kept only as long as needed to operate the service and meet legal obligations.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footnote">
-        If you operate Shared for real users, replace this section with a formal privacy policy that matches the exact data flows, storage providers, retention periods, and contact details for the service owner.
-      </div>
-    </section>
-
-    <section class="panel full" id="disclaimers">
-      <h2 class="section-title">Disclaimers</h2>
-      <div class="note-grid">
-        <div class="note-card">
-          <h3>General use</h3>
-          <ul>
-            <li>Shared is provided as-is, without warranties of any kind.</li>
-            <li>Availability, speed, and features may change without notice.</li>
-            <li>We do not guarantee that the service will always be uninterrupted or error-free.</li>
-          </ul>
-        </div>
-
-        <div class="note-card">
-          <h3>Content responsibility</h3>
-          <ul>
-            <li>Users are responsible for the content they upload, share, and like.</li>
-            <li>Do not upload content you do not have the right to share.</li>
-            <li>Do not rely on the app as a source of professional, legal, medical, or financial advice.</li>
-          </ul>
-        </div>
-
-        <div class="note-card">
-          <h3>Third-party services</h3>
-          <ul>
-            <li>Shared may use external services for authentication, storage, moderation, or media previews.</li>
-            <li>Those services are governed by their own terms and policies.</li>
-          </ul>
-        </div>
-
-        <div class="note-card">
-          <h3>Accessibility and audience</h3>
-          <ul>
-            <li>The interface is designed to be straightforward and suitable for a broad audience.</li>
-            <li>Some features may depend on account status, device support, or server-side availability.</li>
-          </ul>
-        </div>
-      </div>
-
-      <div class="footnote">
-        This disclaimer text is intentionally general. For a production app, have it reviewed and adapted to your exact use case and jurisdiction.
-      </div>
-    </section>
-
-    <section class="panel full">
-      <h2 class="section-title">Notes</h2>
-      <p class="section-text">
-        Shared is meant to stay clear, minimal, and approachable for everyone. The same visual language is kept across pages so navigation feels consistent.
-      </p>
-      <div class="cta-row">
-        <span class="pill"><span class="material-symbols-outlined" style="font-size:16px;">shield</span>Privacy first</span>
-        <span class="pill"><span class="material-symbols-outlined" style="font-size:16px;">visibility</span>Transparent controls</span>
-        <span class="pill"><span class="material-symbols-outlined" style="font-size:16px;">groups</span>Built for everyone</span>
-      </div>
-    </section>
+    <div style="width:40px;"></div>
   </div>
+
+  <section class="hero">
+    <h1 class="hero-title">A place for everyone to post, discover, and connect.</h1>
+    <p class="hero-text">
+      Shared is designed to be simple, readable, and accessible. A minimal space where content, identity, and interaction stay at the center.
+    </p>
+  </section>
+
+  <section class="grid">
+
+    <div class="panel">
+      <div class="section-title">Core features</div>
+      <div class="feature-item">Post images with captions and music</div>
+      <div class="feature-item">Search and view profiles</div>
+      <div class="feature-item">Verified users with badges</div>
+      <div class="feature-item">Like posts and view interactions</div>
+    </div>
+
+    <div class="panel">
+      <div class="section-title">How it works</div>
+      <div class="timeline-item">Sign in and access the menu</div>
+      <div class="timeline-item">Create and upload posts</div>
+      <div class="timeline-item">Browse and interact with content</div>
+    </div>
+
+  </section>
+
+  <section class="panel full" id="privacy">
+    <div class="section-title">Privacy policy</div>
+
+    <div class="note-grid">
+      <div class="note-card">
+        <h3>Data collected</h3>
+        <ul>
+          <li>Account and profile info</li>
+          <li>Posts and interactions</li>
+        </ul>
+      </div>
+
+      <div class="note-card">
+        <h3>Usage</h3>
+        <ul>
+          <li>Display content and profiles</li>
+          <li>Run core app features</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footnote"></div>
+  </section>
+
+  <section class="panel full" id="disclaimers">
+    <div class="section-title">Disclaimers</div>
+
+    <div class="note-card">
+      <ul>
+        <li>Service provided as-is</li>
+        <li>Users are responsible for their content</li>
+        <li>Features may change at any time</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
 </body>
 </html>
