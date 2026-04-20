@@ -35,26 +35,37 @@ body{
   padding:20px;
 }
 
+/* TOP BAR */
 .topbar{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  margin-bottom:20px;
+  position:relative;
+  margin-bottom:25px;
 }
 
+/* back arrow */
 .back{
   display:flex;
   align-items:center;
-  gap:8px;
+  gap:6px;
   cursor:pointer;
   color:#fff;
   text-decoration:none;
+  font-size:12px;
+  opacity:.9;
 }
 
-.title{
+/* centered logo */
+.logo{
+  position:absolute;
+  left:50%;
+  transform:translateX(-50%);
   font-size:22px;
+  letter-spacing:-.5px;
 }
 
+/* sections */
 .section{
   background:var(--panel);
   border:1px solid var(--border);
@@ -68,6 +79,13 @@ body{
   font-size:14px;
 }
 
+.small{
+  opacity:.6;
+  font-size:12px;
+  margin-bottom:12px;
+}
+
+/* interests grid */
 .grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
@@ -100,18 +118,20 @@ body{
   font-size:20px;
 }
 
+/* buttons */
 .actions{
   display:flex;
-  gap:10px;
-  flex-wrap:wrap;
+  flex-direction:column;
+  gap:12px;
 }
 
 .btn{
   border:none;
   border-radius:999px;
-  padding:10px 14px;
+  padding:12px 14px;
   cursor:pointer;
   font-size:12px;
+  width:100%;
 }
 
 .save{
@@ -123,11 +143,6 @@ body{
   background:#ff2a2a;
   color:#fff;
 }
-
-.small{
-  opacity:.6;
-  font-size:12px;
-}
 </style>
 </head>
 
@@ -135,23 +150,30 @@ body{
 
 <div class="container">
 
+  <!-- TOP BAR -->
   <div class="topbar">
+
     <a class="back" href="home.html">
       <span class="material-symbols-outlined">arrow_back</span>
-      Home
     </a>
-    <div class="title">Settings</div>
+
+    <div class="logo">Shared.</div>
+
+    <div style="width:40px;"></div>
   </div>
 
+  <!-- INTERESTS -->
   <div class="section">
     <h3>Choose up to 3 interests</h3>
-    <div class="small">These will personalize your feed</div>
+    <div class="small">Personalize your feed</div>
 
     <div class="grid" id="topics"></div>
   </div>
 
+  <!-- ACTIONS -->
   <div class="section">
     <h3>Account</h3>
+
     <div class="actions">
       <button class="btn save" id="saveBtn">Save changes</button>
       <button class="btn danger" id="deleteBtn">Delete account</button>
@@ -176,7 +198,6 @@ const topics = [
   { id:"tech", label:"Tech", icon:"devices" },
   { id:"ai", label:"AI", icon:"smart_toy" },
   { id:"art", label:"Art", icon:"brush" },
-  { id:"fashion", label:"Fashion", icon:"styler" },
   { id:"travel", label:"Travel", icon:"flight" },
   { id:"food", label:"Food", icon:"restaurant" },
   { id:"movies", label:"Movies", icon:"movie" },
@@ -185,15 +206,17 @@ const topics = [
   { id:"finance", label:"Finance", icon:"trending_up" },
   { id:"science", label:"Science", icon:"science" },
   { id:"fitness", label:"Fitness", icon:"fitness_center" },
-  { id:"photography", label:"Photo", icon:"photo_camera" },
+  { id:"photo", label:"Photography", icon:"photo_camera" },
   { id:"nature", label:"Nature", icon:"forest" },
   { id:"books", label:"Books", icon:"menu_book" },
   { id:"memes", label:"Memes", icon:"mood" },
-  { id:"coding", label:"Coding", icon:"code" }
+  { id:"coding", label:"Coding", icon:"code" },
+  { id:"fashion", label:"Fashion", icon:"styler" }
 ];
 
 function renderTopics(){
   const el = document.getElementById("topics");
+
   el.innerHTML = topics.map(t => `
     <div class="topic ${selected.includes(t.id) ? "selected":""}" data-id="${t.id}">
       <span class="material-symbols-outlined">${t.icon}</span>
@@ -211,6 +234,7 @@ function renderTopics(){
         if(selected.length >= 3) return;
         selected.push(id);
       }
+
       renderTopics();
     };
   });
@@ -220,7 +244,7 @@ async function loadUser(){
   const { data } = await supabaseClient.auth.getUser();
   user = data.user;
 
-  if(!user) {
+  if(!user){
     alert("Not logged in");
     location.href="index.html";
     return;
@@ -237,8 +261,6 @@ async function loadUser(){
 }
 
 document.getElementById("saveBtn").onclick = async ()=>{
-  if(!user) return;
-
   const { error } = await supabaseClient
     .from("profiles")
     .update({ interests: selected })
@@ -253,8 +275,6 @@ document.getElementById("saveBtn").onclick = async ()=>{
 };
 
 document.getElementById("deleteBtn").onclick = async ()=>{
-  if(!user) return;
-
   const ok = confirm("Delete account permanently?");
   if(!ok) return;
 
