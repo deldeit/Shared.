@@ -28,19 +28,21 @@ body{
   color:var(--text);
 }
 
+/* RESPONSIVE CONTAINER */
 .container{
+  width:100%;
   max-width:900px;
   margin:0 auto;
-  padding:20px;
+  padding:16px;
 }
 
-/* TOP BAR */
+/* TOPBAR */
 .topbar{
   display:flex;
   align-items:center;
   justify-content:space-between;
   position:relative;
-  margin-bottom:25px;
+  margin-bottom:20px;
 }
 
 .back{
@@ -57,50 +59,65 @@ body{
   position:absolute;
   left:50%;
   transform:translateX(-50%);
-  font-size:22px;
+  font-size:20px;
 }
 
 /* SECTIONS */
 .section{
   background:var(--panel);
   border:1px solid var(--border);
-  border-radius:22px;
-  padding:16px;
-  margin-bottom:16px;
+  border-radius:18px;
+  padding:14px;
+  margin-bottom:14px;
 }
 
 .section h3{
-  margin:0 0 12px 0;
+  margin:0 0 10px 0;
   font-size:14px;
 }
 
 .small{
   opacity:.6;
   font-size:12px;
-  margin-bottom:12px;
+  margin-bottom:10px;
 }
 
-/* TOPICS */
+/* GRID RESPONSIVE */
 .grid{
   display:grid;
   grid-template-columns:repeat(3,1fr);
   gap:10px;
 }
 
+/* TOPIC CARD */
 .topic{
   background:#111;
   border:1px solid #222;
-  border-radius:16px;
+  border-radius:14px;
   padding:12px;
   cursor:pointer;
   display:flex;
   align-items:center;
-  gap:10px;
+  gap:8px;
+  font-size:12px;
+  transition:.15s;
 }
 
 .topic.selected{
   border-color:#fff;
   background:#1a1a1a;
+}
+
+/* INPUT */
+.input{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #333;
+  background:#111;
+  color:#fff;
+  margin-bottom:10px;
+  font-size:14px;
 }
 
 /* BUTTONS */
@@ -116,6 +133,7 @@ body{
   padding:12px;
   cursor:pointer;
   font-size:12px;
+  width:100%;
 }
 
 .save{
@@ -128,15 +146,44 @@ body{
   color:#fff;
 }
 
-/* password input */
-.input{
-  width:100%;
-  padding:12px;
-  border-radius:12px;
-  border:1px solid #333;
-  background:#111;
-  color:#fff;
-  margin-bottom:10px;
+/* RESPONSIVE BREAKPOINTS */
+@media (max-width: 768px){
+  .grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .logo{
+    font-size:18px;
+  }
+}
+
+@media (max-width: 480px){
+  .container{
+    padding:12px;
+  }
+
+  .grid{
+    grid-template-columns:1fr;
+  }
+
+  .topic{
+    padding:14px;
+    font-size:13px;
+  }
+
+  .section{
+    padding:12px;
+    border-radius:14px;
+  }
+
+  .logo{
+    font-size:16px;
+  }
+
+  .btn{
+    font-size:13px;
+    padding:14px;
+  }
 }
 </style>
 </head>
@@ -165,16 +212,13 @@ body{
   <!-- PASSWORD -->
   <div class="section">
     <h3>Change password</h3>
-
     <input type="password" id="newPassword" class="input" placeholder="New password">
-
     <button class="btn save" id="passwordBtn">Update password</button>
   </div>
 
   <!-- ACCOUNT -->
   <div class="section">
     <h3>Account</h3>
-
     <div class="actions">
       <button class="btn save" id="saveBtn">Save interests</button>
       <button class="btn danger" id="deleteBtn">Delete account</button>
@@ -227,7 +271,6 @@ function renderTopics(){
 
   el.querySelectorAll(".topic").forEach(div=>{
     div.onclick = ()=>{
-
       const id = div.dataset.id;
 
       if(selected.includes(id)){
@@ -271,7 +314,6 @@ document.getElementById("saveBtn").onclick = async ()=>{
     .eq("id", user.id);
 
   if(error) return alert(error.message);
-
   alert("Interests saved!");
 };
 
@@ -287,10 +329,7 @@ document.getElementById("passwordBtn").onclick = async ()=>{
     password: pass
   });
 
-  if(error){
-    alert(error.message);
-    return;
-  }
+  if(error) return alert(error.message);
 
   alert("Password updated!");
   document.getElementById("newPassword").value = "";
