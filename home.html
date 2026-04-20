@@ -290,6 +290,10 @@ textarea{
 
 .post-user .name{
   font-size:13px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
 }
 
 .post-user .name a{
@@ -299,6 +303,14 @@ textarea{
 
 .post-user .name a:hover{
   text-decoration:underline;
+}
+
+.verified-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-size:16px;
+  line-height:1;
 }
 
 .post-user .time{
@@ -354,11 +366,26 @@ textarea{
   display:flex;
   align-items:center;
   gap:8px;
+  flex-wrap:wrap;
+}
+
+.like-count-btn{
+  border:none;
+  background:transparent;
+  color:#fff;
+  cursor:pointer;
+  font-size:12px;
+  opacity:.85;
+  padding:0;
+  font-family:inherit;
+  text-align:left;
+}
+
+.like-count-btn:hover{
+  text-decoration:underline;
 }
 
 .like-count{
-  font-size:12px;
-  opacity:.85;
   min-width:16px;
   text-align:center;
 }
@@ -416,6 +443,13 @@ textarea{
   border:1px solid #222;
   border-radius:16px;
   background:#000;
+  color:#fff;
+  text-decoration:none;
+  cursor:pointer;
+}
+
+.sidebar-profile:hover{
+  background:#111;
 }
 
 .profile-avatar{
@@ -509,6 +543,108 @@ textarea{
   flex:1;
 }
 
+.sidebar-bottom-actions{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.sidebar-bottom-actions .icon-btn{
+  width:100%;
+  justify-content:flex-start;
+}
+
+#likersOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:70;
+  display:none;
+}
+
+#likersOverlay.show{
+  display:block;
+}
+
+#likersModal{
+  position:fixed;
+  z-index:80;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:min(92vw,420px);
+  max-height:78vh;
+  background:#0f0f0f;
+  border:1px solid #222;
+  border-radius:22px;
+  padding:16px;
+  display:none;
+  flex-direction:column;
+  gap:12px;
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+#likersModal.show{
+  display:flex;
+}
+
+.likers-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+}
+
+.likers-title{
+  font-size:16px;
+}
+
+.likers-list{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  overflow:auto;
+  padding-right:2px;
+}
+
+.liker-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 12px;
+  border:1px solid #222;
+  border-radius:14px;
+  background:#000;
+  text-decoration:none;
+  color:#fff;
+}
+
+.liker-item:hover{
+  background:#111;
+}
+
+.liker-item .meta{
+  min-width:0;
+  flex:1;
+}
+
+.liker-item .name{
+  font-size:12px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  flex-wrap:wrap;
+}
+
+.liker-item .sub{
+  margin-top:3px;
+  font-size:11px;
+  opacity:.7;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 @media (max-width:520px){
   .topbar{
     align-items:center;
@@ -537,23 +673,28 @@ textarea{
   #sidebar{
     width:86vw;
   }
+
+  #likersModal{
+    width:92vw;
+  }
 }
 </style>
 </head>
 
 <body>
 <div id="overlay"></div>
+<div id="likersOverlay"></div>
 
 <aside id="sidebar" aria-label="Sidebar menu">
   <div class="sidebar-title">Menu</div>
 
-  <div class="sidebar-profile" id="sidebarProfile">
+  <a href="#" class="sidebar-profile" id="sidebarProfileLink">
     <div class="profile-avatar" id="sidebarAvatar">U</div>
     <div class="profile-meta">
       <div class="name" id="sidebarName">Loading profile...</div>
       <div class="sub" id="sidebarSub">Signed in</div>
     </div>
-  </div>
+  </a>
 
   <div class="search-box">
     <input id="userSearch" type="text" placeholder="Search profiles..." autocomplete="off">
@@ -562,14 +703,35 @@ textarea{
 
   <div class="sidebar-spacer"></div>
 
-  <button id="logoutSidebarBtn" class="icon-btn secondary" type="button">
-    <span class="material-symbols-outlined">logout</span>
-    Logout
-  </button>
+  <div class="sidebar-bottom-actions">
+    <button id="aboutSidebarBtn" class="icon-btn secondary" type="button">
+      <span class="material-symbols-outlined">info</span>
+      About
+    </button>
+
+    <button id="settingsSidebarBtn" class="icon-btn secondary" type="button">
+      <span class="material-symbols-outlined">settings</span>
+      Settings
+    </button>
+
+    <button id="logoutSidebarBtn" class="icon-btn secondary" type="button">
+      <span class="material-symbols-outlined">logout</span>
+      Logout
+    </button>
+  </div>
 </aside>
 
-<div class="container">
+<div id="likersModal" role="dialog" aria-modal="true" aria-labelledby="likersTitle">
+  <div class="likers-header">
+    <div class="likers-title" id="likersTitle">Likes</div>
+    <button type="button" class="icon-btn secondary" id="closeLikersBtn">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+  </div>
+  <div class="likers-list" id="likersList"></div>
+</div>
 
+<div class="container">
   <div class="topbar">
     <button id="menuBtn" class="icon-btn secondary" type="button" aria-label="Open menu">
       <span class="material-symbols-outlined">menu</span>
@@ -628,6 +790,8 @@ const songList = document.getElementById("songList");
 const feed = document.getElementById("feed");
 const uploadBtn = document.getElementById("uploadBtn");
 const logoutSidebarBtn = document.getElementById("logoutSidebarBtn");
+const aboutSidebarBtn = document.getElementById("aboutSidebarBtn");
+const settingsSidebarBtn = document.getElementById("settingsSidebarBtn");
 const menuBtn = document.getElementById("menuBtn");
 const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
@@ -636,6 +800,13 @@ const userResults = document.getElementById("userResults");
 const sidebarAvatar = document.getElementById("sidebarAvatar");
 const sidebarName = document.getElementById("sidebarName");
 const sidebarSub = document.getElementById("sidebarSub");
+const sidebarProfileLink = document.getElementById("sidebarProfileLink");
+
+const likersOverlay = document.getElementById("likersOverlay");
+const likersModal = document.getElementById("likersModal");
+const likersList = document.getElementById("likersList");
+const likersTitle = document.getElementById("likersTitle");
+const closeLikersBtn = document.getElementById("closeLikersBtn");
 
 let user = null;
 let displayName = "user";
@@ -649,6 +820,7 @@ let activePlayButton = null;
 let jsonpScript = null;
 let postState = new Map();
 let canSaveUsername = false;
+let currentLikersPostId = null;
 
 function escapeHTML(value){
   return String(value ?? "")
@@ -747,39 +919,18 @@ function closeSidebar(){
   overlay.classList.remove("show");
 }
 
-function renderSidebarProfile(){
-  const name = currentProfile?.display_name || displayName || getFallbackName(user);
-  const avatarUrl = currentProfile?.avatar_url || user?.user_metadata?.avatar_url || "";
-
-  sidebarName.textContent = name;
-  sidebarSub.textContent = user?.email || "Signed in";
-
-  if(avatarUrl){
-    sidebarAvatar.innerHTML = `<img src="${escapeHTML(avatarUrl)}" alt="profile avatar">`;
-  }else{
-    sidebarAvatar.textContent = getInitials(name);
-  }
+function openLikersModal(){
+  likersOverlay.classList.add("show");
+  likersModal.classList.add("show");
 }
 
-menuBtn.onclick = ()=>{
-  renderSidebarProfile();
-  openSidebar();
-};
-overlay.onclick = closeSidebar;
-
-(async ()=>{
-  const { data: { session } } = await supabase.auth.getSession();
-  if(!session) location.href = "index.html";
-
-  user = session.user;
-  displayName = getFallbackName(user);
-
-  await detectUsernameColumn();
-  await loadCurrentProfile();
-  renderSidebarProfile();
-  await loadFeed();
-  realtime();
-})();
+function closeLikersModal(){
+  likersOverlay.classList.remove("show");
+  likersModal.classList.remove("show");
+  currentLikersPostId = null;
+  likersList.innerHTML = "";
+  likersTitle.textContent = "Likes";
+}
 
 async function loadCurrentProfile(){
   try{
@@ -801,6 +952,53 @@ async function loadCurrentProfile(){
     currentProfile = null;
   }
 }
+
+function renderSidebarProfile(){
+  const name = currentProfile?.display_name || displayName || getFallbackName(user);
+  const avatarUrl = currentProfile?.avatar_url || user?.user_metadata?.avatar_url || "";
+  const profileHref = `user.html?id=${encodeURIComponent(user.id)}&name=${encodeURIComponent(name)}`;
+
+  sidebarProfileLink.href = profileHref;
+  sidebarName.textContent = name;
+  sidebarSub.textContent = user?.email || "Signed in";
+
+  if(avatarUrl){
+    sidebarAvatar.innerHTML = `<img src="${escapeHTML(avatarUrl)}" alt="profile avatar">`;
+  }else{
+    sidebarAvatar.textContent = getInitials(name);
+  }
+}
+
+menuBtn.onclick = ()=>{
+  renderSidebarProfile();
+  openSidebar();
+};
+
+overlay.onclick = closeSidebar;
+likersOverlay.onclick = closeLikersModal;
+closeLikersBtn.onclick = closeLikersModal;
+
+aboutSidebarBtn.onclick = ()=>{
+  location.href = "about.html";
+};
+
+settingsSidebarBtn.onclick = ()=>{
+  location.href = "settings.html";
+};
+
+(async ()=>{
+  const { data: { session } } = await supabase.auth.getSession();
+  if(!session) location.href = "index.html";
+
+  user = session.user;
+  displayName = getFallbackName(user);
+
+  await detectUsernameColumn();
+  await loadCurrentProfile();
+  renderSidebarProfile();
+  await loadFeed();
+  realtime();
+})();
 
 async function detectUsernameColumn(){
   try{
@@ -1042,6 +1240,52 @@ document.addEventListener("click", e=>{
   }
 });
 
+async function fetchProfilesByIds(ids){
+  const uniqueIds = [...new Set((ids || []).filter(Boolean))];
+  if(uniqueIds.length === 0) return new Map();
+
+  let data = null;
+  let error = null;
+
+  try{
+    const res = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url, verified")
+      .in("id", uniqueIds);
+
+    data = res.data;
+    error = res.error;
+  }catch(err){
+    error = err;
+  }
+
+  if(error){
+    try{
+      const fallback = await supabase
+        .from("profiles")
+        .select("id, display_name, avatar_url")
+        .in("id", uniqueIds);
+
+      data = fallback.data || [];
+      error = fallback.error || null;
+    }catch(err){
+      error = err;
+    }
+  }
+
+  if(error){
+    console.warn("profile fetch error:", error);
+    return new Map();
+  }
+
+  const map = new Map();
+  (data || []).forEach(row=>{
+    map.set(row.id, row);
+  });
+
+  return map;
+}
+
 userSearch.addEventListener("input", async e=>{
   clearTimeout(debounceUser);
   const q = e.target.value.trim();
@@ -1247,6 +1491,7 @@ async function toggleLike(postId){
 
   const row = state.element;
   const likeBtn = row.querySelector(".likeBtn");
+  const likeCountBtn = row.querySelector(".likeCountBtn");
   const likeCountEl = row.querySelector(".likeCount");
   const iconEl = likeBtn.querySelector(".material-symbols-outlined");
 
@@ -1278,6 +1523,7 @@ async function toggleLike(postId){
   }
 
   likeCountEl.textContent = String(state.count);
+  likeCountBtn.textContent = `${state.count} ${state.count === 1 ? "like" : "likes"}`;
 
   if(state.likedByMe){
     likeBtn.classList.add("liked");
@@ -1286,6 +1532,66 @@ async function toggleLike(postId){
     likeBtn.classList.remove("liked");
     iconEl.textContent = "favorite_border";
   }
+}
+
+async function showLikers(postId){
+  currentLikersPostId = postId;
+  likersList.innerHTML = `<div class="empty-state">Loading...</div>`;
+  likersTitle.textContent = "Likes";
+  openLikersModal();
+
+  const { data, error } = await supabase
+    .from("likes")
+    .select("user_id, created_at")
+    .eq("post_id", postId)
+    .order("created_at", { ascending: false });
+
+  if(error){
+    console.error(error);
+    likersList.innerHTML = `<div class="empty-state">Unable to load likes.</div>`;
+    return;
+  }
+
+  const rows = data || [];
+  if(rows.length === 0){
+    likersList.innerHTML = `<div class="empty-state">No likes yet.</div>`;
+    return;
+  }
+
+  const profilesMap = await fetchProfilesByIds(rows.map(r => r.user_id));
+
+  likersList.innerHTML = "";
+
+  rows.forEach(row=>{
+    const profile = profilesMap.get(row.user_id);
+    const name = profile?.display_name || "Unknown user";
+    const avatarUrl = profile?.avatar_url || "";
+    const verified = !!profile?.verified;
+    const href = `user.html?id=${encodeURIComponent(row.user_id || "")}&name=${encodeURIComponent(name)}`;
+
+    const item = document.createElement("a");
+    item.className = "liker-item";
+    item.href = href;
+
+    item.innerHTML = `
+      <div class="profile-avatar">
+        ${
+          avatarUrl
+            ? `<img src="${escapeHTML(avatarUrl)}" alt="avatar">`
+            : `${escapeHTML(getInitials(name))}`
+        }
+      </div>
+      <div class="meta">
+        <div class="name">
+          <span>${escapeHTML(name)}</span>
+          ${verified ? `<span class="verified-badge"><span class="material-symbols-outlined" style="font-size:16px;">verified</span></span>` : ""}
+        </div>
+        <div class="sub">${escapeHTML(row.user_id || "")}</div>
+      </div>
+    `;
+
+    likersList.appendChild(item);
+  });
 }
 
 async function deletePost(postId){
@@ -1331,6 +1637,8 @@ async function loadFeed(){
     return;
   }
 
+  const authorMap = await fetchProfilesByIds(rows.map(p => p.user_id));
+
   const postIds = rows.map(p => p.id);
   let likes = [];
 
@@ -1366,7 +1674,8 @@ async function loadFeed(){
   for(const post of rows){
     const likeCount = likeCountMap.get(post.id) || 0;
     const likedByMe = likedByMeMap.get(post.id) || false;
-    const postEl = renderPost(post, likeCount, likedByMe);
+    const authorData = authorMap.get(post.user_id) || null;
+    const postEl = renderPost(post, likeCount, likedByMe, authorData);
     feed.appendChild(postEl);
 
     postState.set(post.id, {
@@ -1377,23 +1686,23 @@ async function loadFeed(){
   }
 }
 
-function renderPost(post, likeCount, likedByMe){
+function renderPost(post, likeCount, likedByMe, authorData){
   const postDiv = document.createElement("div");
   postDiv.className = "post";
   postDiv.dataset.postId = post.id;
 
-  const author = post.username || "user";
+  const authorName = authorData?.display_name || post.username || "user";
+  const authorVerified = !!authorData?.verified;
   const formattedDate = formatDateTime(post.created_at);
 
   postDiv.innerHTML = `
-    <img src="${escapeHTML(post.image_url)}" alt="post image">
-
     <div class="post-header">
       <div class="post-user">
         <div class="name">
-          <a href="user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(author)}">
-            ${escapeHTML(author)}
+          <a href="user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(authorName)}">
+            ${escapeHTML(authorName)}
           </a>
+          ${authorVerified ? `<span class="verified-badge" title="Verified"><span class="material-symbols-outlined" style="font-size:16px;">verified</span></span>` : ""}
         </div>
         <div class="time">
           <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
@@ -1410,6 +1719,8 @@ function renderPost(post, likeCount, likedByMe){
           : `<span class="material-symbols-outlined" style="opacity:.6;">more_horiz</span>`
       }
     </div>
+
+    <img src="${escapeHTML(post.image_url)}" alt="post image">
 
     <div class="post-caption">${escapeHTML(post.caption || "")}</div>
 
@@ -1435,15 +1746,16 @@ function renderPost(post, likeCount, likedByMe){
           <span>Like</span>
         </button>
 
-        <div class="like-count">
-          <span class="likeCount">${likeCount}</span> likes
-        </div>
+        <button type="button" class="like-count-btn likeCountBtn">
+          <span class="likeCount">${likeCount}</span> ${likeCount === 1 ? "like" : "likes"}
+        </button>
       </div>
     </div>
   `;
 
   const playBtn = postDiv.querySelector(".playBtn");
   const likeBtn = postDiv.querySelector(".likeBtn");
+  const likeCountBtn = postDiv.querySelector(".likeCountBtn");
   const deleteBtn = postDiv.querySelector(".deleteBtn");
 
   playBtn.onclick = ()=>{
@@ -1466,6 +1778,10 @@ function renderPost(post, likeCount, likedByMe){
 
   likeBtn.onclick = async ()=>{
     await toggleLike(post.id);
+  };
+
+  likeCountBtn.onclick = async ()=>{
+    await showLikers(post.id);
   };
 
   if(deleteBtn){
