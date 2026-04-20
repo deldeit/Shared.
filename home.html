@@ -306,11 +306,18 @@ textarea{
 }
 
 .verified-badge{
+  width:16px;
+  height:16px;
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  font-size:16px;
-  line-height:1;
+  flex:0 0 auto;
+}
+
+.verified-badge svg{
+  width:16px;
+  height:16px;
+  display:block;
 }
 
 .post-user .time{
@@ -532,13 +539,6 @@ textarea{
   line-height:1.35;
 }
 
-.user-item .handle{
-  margin-top:3px;
-  font-size:11px;
-  opacity:.7;
-  font-family:inherit;
-}
-
 .sidebar-spacer{
   flex:1;
 }
@@ -634,15 +634,6 @@ textarea{
   align-items:center;
   gap:6px;
   flex-wrap:wrap;
-}
-
-.liker-item .sub{
-  margin-top:3px;
-  font-size:11px;
-  opacity:.7;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
 }
 
 @media (max-width:520px){
@@ -821,6 +812,7 @@ let jsonpScript = null;
 let postState = new Map();
 let canSaveUsername = false;
 let currentLikersPostId = null;
+let verifiedBadgeId = 0;
 
 function escapeHTML(value){
   return String(value ?? "")
@@ -847,6 +839,28 @@ function getInitials(name){
   const parts = clean.split(/\s+/).filter(Boolean);
   if(parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+}
+
+function renderVerifiedBadge(){
+  const id = `checkcut-${verifiedBadgeId++}`;
+  return `
+    <span class="verified-badge" aria-label="Verified">
+      <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+        <defs>
+          <mask id="${id}">
+            <rect width="24" height="24" fill="white"></rect>
+            <path d="M6.5 12.5 L10.3 16.2 L17.6 8.8"
+                  fill="none"
+                  stroke="black"
+                  stroke-width="3.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"></path>
+          </mask>
+        </defs>
+        <circle cx="12" cy="12" r="11" fill="white" mask="url(#${id})"></circle>
+      </svg>
+    </span>
+  `;
 }
 
 function formatDateTime(value){
@@ -960,7 +974,7 @@ function renderSidebarProfile(){
 
   sidebarProfileLink.href = profileHref;
   sidebarName.textContent = name;
-  sidebarSub.textContent = user?.email || "Signed in";
+  sidebarSub.textContent = "Signed in";
 
   if(avatarUrl){
     sidebarAvatar.innerHTML = `<img src="${escapeHTML(avatarUrl)}" alt="profile avatar">`;
@@ -1362,7 +1376,6 @@ userSearch.addEventListener("input", async e=>{
           ${avatarHtml}
           <div style="min-width:0;flex:1;">
             <div class="display-name">${escapeHTML(name)}</div>
-            <div class="handle">${escapeHTML(profile.id || "")}</div>
           </div>
         `;
 
@@ -1584,9 +1597,8 @@ async function showLikers(postId){
       <div class="meta">
         <div class="name">
           <span>${escapeHTML(name)}</span>
-          ${verified ? `<span class="verified-badge"><span class="material-symbols-outlined" style="font-size:16px;">verified</span></span>` : ""}
+          ${verified ? renderVerifiedBadge() : ""}
         </div>
-        <div class="sub">${escapeHTML(row.user_id || "")}</div>
       </div>
     `;
 
@@ -1702,7 +1714,7 @@ function renderPost(post, likeCount, likedByMe, authorData){
           <a href="user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(authorName)}">
             ${escapeHTML(authorName)}
           </a>
-          ${authorVerified ? `<span class="verified-badge" title="Verified"><span class="material-symbols-outlined" style="font-size:16px;">verified</span></span>` : ""}
+          ${authorVerified ? renderVerifiedBadge() : ""}
         </div>
         <div class="time">
           <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
