@@ -408,6 +408,57 @@ textarea{
   margin-bottom:4px;
 }
 
+.sidebar-profile{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px;
+  border:1px solid #222;
+  border-radius:16px;
+  background:#000;
+}
+
+.profile-avatar{
+  width:40px;
+  height:40px;
+  border-radius:50%;
+  overflow:hidden;
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#1a1a1a;
+  border:1px solid #2b2b2b;
+  color:#fff;
+  font-size:13px;
+}
+
+.profile-avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:block;
+}
+
+.profile-meta{
+  min-width:0;
+  flex:1;
+}
+
+.profile-meta .name{
+  font-size:12px;
+  line-height:1.35;
+}
+
+.profile-meta .sub{
+  margin-top:4px;
+  font-size:11px;
+  opacity:.7;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
 .search-box{
   display:flex;
   flex-direction:column;
@@ -433,6 +484,9 @@ textarea{
   padding:12px;
   cursor:pointer;
   transition:.15s ease;
+  display:flex;
+  align-items:center;
+  gap:10px;
 }
 
 .user-item:hover{
@@ -442,6 +496,13 @@ textarea{
 .user-item .display-name{
   font-size:12px;
   line-height:1.35;
+}
+
+.user-item .handle{
+  margin-top:3px;
+  font-size:11px;
+  opacity:.7;
+  font-family:inherit;
 }
 
 .sidebar-spacer{
@@ -485,6 +546,14 @@ textarea{
 
 <aside id="sidebar" aria-label="Sidebar menu">
   <div class="sidebar-title">Menu</div>
+
+  <div class="sidebar-profile" id="sidebarProfile">
+    <div class="profile-avatar" id="sidebarAvatar">U</div>
+    <div class="profile-meta">
+      <div class="name" id="sidebarName">Loading profile...</div>
+      <div class="sub" id="sidebarSub">Signed in</div>
+    </div>
+  </div>
 
   <div class="search-box">
     <input id="userSearch" type="text" placeholder="Search profiles..." autocomplete="off">
@@ -564,9 +633,13 @@ const sidebar = document.getElementById("sidebar");
 const overlay = document.getElementById("overlay");
 const userSearch = document.getElementById("userSearch");
 const userResults = document.getElementById("userResults");
+const sidebarAvatar = document.getElementById("sidebarAvatar");
+const sidebarName = document.getElementById("sidebarName");
+const sidebarSub = document.getElementById("sidebarSub");
 
 let user = null;
 let displayName = "user";
+let currentProfile = null;
 let croppedBlob = null;
 let selectedSong = null;
 let debounceSong = null;
@@ -577,6 +650,15 @@ let jsonpScript = null;
 let postState = new Map();
 let canSaveUsername = false;
 
+function escapeHTML(value){
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function getFallbackName(sessionUser){
   return (
     sessionUser?.user_metadata?.display_name ||
@@ -585,6 +667,14 @@ function getFallbackName(sessionUser){
     sessionUser?.email?.split("@")?.[0] ||
     "user"
   );
+}
+
+function getInitials(name){
+  const clean = String(name || "U").trim();
+  if(!clean) return "U";
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if(parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
 }
 
 function formatDateTime(value){
@@ -647,7 +737,6 @@ globalAudio.addEventListener("ended", ()=>{
   }
 });
 
-/* sidebar */
 function openSidebar(){
   sidebar.classList.add("open");
   overlay.classList.add("show");
@@ -658,10 +747,26 @@ function closeSidebar(){
   overlay.classList.remove("show");
 }
 
-menuBtn.onclick = openSidebar;
+function renderSidebarProfile(){
+  const name = currentProfile?.display_name || displayName || getFallbackName(user);
+  const avatarUrl = currentProfile?.avatar_url || user?.user_metadata?.avatar_url || "";
+
+  sidebarName.textContent = name;
+  sidebarSub.textContent = user?.email || "Signed in";
+
+  if(avatarUrl){
+    sidebarAvatar.innerHTML = `<img src="${escapeHTML(avatarUrl)}" alt="profile avatar">`;
+  }else{
+    sidebarAvatar.textContent = getInitials(name);
+  }
+}
+
+menuBtn.onclick = ()=>{
+  renderSidebarProfile();
+  openSidebar();
+};
 overlay.onclick = closeSidebar;
 
-/* session */
 (async ()=>{
   const { data: { session } } = await supabase.auth.getSession();
   if(!session) location.href = "index.html";
@@ -670,9 +775,32 @@ overlay.onclick = closeSidebar;
   displayName = getFallbackName(user);
 
   await detectUsernameColumn();
+  await loadCurrentProfile();
+  renderSidebarProfile();
   await loadFeed();
   realtime();
 })();
+
+async function loadCurrentProfile(){
+  try{
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("id, display_name, avatar_url")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if(error){
+      console.warn("current profile load error:", error);
+      currentProfile = null;
+      return;
+    }
+
+    currentProfile = data || null;
+  }catch(err){
+    console.warn("current profile load failed:", err);
+    currentProfile = null;
+  }
+}
 
 async function detectUsernameColumn(){
   try{
@@ -688,13 +816,11 @@ async function detectUsernameColumn(){
   }
 }
 
-/* logout */
 logoutSidebarBtn.onclick = async ()=>{
   await supabase.auth.signOut();
   location.href = "index.html";
 };
 
-/* image picker */
 dropzone.onclick = ()=> fileInput.click();
 
 dropzone.ondragover = e=>{
@@ -757,7 +883,6 @@ async function handleFile(file){
   reader.readAsDataURL(file);
 }
 
-/* moderation */
 async function moderateImage(blob){
   const formData = new FormData();
   formData.append("file", blob, "image.jpg");
@@ -777,7 +902,6 @@ async function moderateImage(blob){
   return data;
 }
 
-/* Deezer JSONP */
 function deezerSearch(query){
   return new Promise((resolve, reject)=>{
     if(jsonpScript){
@@ -793,7 +917,7 @@ function deezerSearch(query){
 
     function cleanup(){
       clearTimeout(timeout);
-      try{ delete window[callbackName]; }catch(_){}
+      try{ delete window[callbackName]; }catch(_){ }
       if(jsonpScript && jsonpScript.parentNode){
         jsonpScript.parentNode.removeChild(jsonpScript);
       }
@@ -817,7 +941,6 @@ function deezerSearch(query){
   });
 }
 
-/* selected song */
 function renderSelectedSong(){
   if(!selectedSong){
     songList.innerHTML = "";
@@ -827,8 +950,8 @@ function renderSelectedSong(){
   songList.innerHTML = `
     <div class="selected-song">
       <div class="meta">
-        <div class="title">Selected: ${selectedSong.title}</div>
-        <span class="artist">${selectedSong.artist || ""}</span>
+        <div class="title">Selected: ${escapeHTML(selectedSong.title)}</div>
+        <span class="artist">${escapeHTML(selectedSong.artist || "")}</span>
       </div>
 
       <div class="selected-song-actions">
@@ -857,7 +980,6 @@ function renderSelectedSong(){
   };
 }
 
-/* song search */
 songInput.addEventListener("input", async e=>{
   clearTimeout(debounceSong);
   const q = e.target.value.trim();
@@ -885,8 +1007,8 @@ songInput.addEventListener("input", async e=>{
         const row = document.createElement("div");
         row.className = "song-item";
         row.innerHTML = `
-          ${track.title}
-          <small>${track.artist?.name || "Unknown artist"}</small>
+          ${escapeHTML(track.title)}
+          <small>${escapeHTML(track.artist?.name || "Unknown artist")}</small>
         `;
 
         row.onclick = ()=>{
@@ -920,7 +1042,6 @@ document.addEventListener("click", e=>{
   }
 });
 
-/* profile search */
 userSearch.addEventListener("input", async e=>{
   clearTimeout(debounceUser);
   const q = e.target.value.trim();
@@ -934,24 +1055,26 @@ userSearch.addEventListener("input", async e=>{
     userResults.innerHTML = `<div class="empty-state">Searching...</div>`;
 
     try{
+      let rows = [];
+
       const { data: profiles, error: profilesError } = await supabase
         .from("profiles")
-        .select("id, display_name")
+        .select("id, display_name, avatar_url")
         .ilike("display_name", `%${q}%`)
         .order("display_name", { ascending: true })
         .limit(8);
-
-      let rows = Array.isArray(profiles) ? profiles : [];
 
       if(profilesError){
         console.warn("profiles search error:", profilesError);
       }
 
+      rows = Array.isArray(profiles) ? profiles : [];
+
       if(rows.length === 0){
         const { data: postUsers, error: postsError } = await supabase
           .from("posts")
           .select("user_id, username")
-          .or(`username.ilike.%${q}%`)
+          .ilike("username", `%${q}%`)
           .limit(20);
 
         if(postsError){
@@ -961,12 +1084,13 @@ userSearch.addEventListener("input", async e=>{
           rows = (postUsers || [])
             .map(r => ({
               id: r.user_id || "",
-              display_name: r.username
+              display_name: r.username || "",
+              avatar_url: ""
             }))
             .filter(r => {
               const name = (r.display_name || "").trim();
               if(!name) return false;
-              const key = name.toLowerCase();
+              const key = `${String(r.id || "").trim()}|${name.toLowerCase()}`;
               if(seen.has(key)) return false;
               seen.add(key);
               return true;
@@ -984,12 +1108,23 @@ userSearch.addEventListener("input", async e=>{
       rows.forEach(profile=>{
         const item = document.createElement("div");
         item.className = "user-item";
+
+        const name = profile.display_name || "Unnamed profile";
+        const avatarHtml = profile.avatar_url
+          ? `<div class="profile-avatar"><img src="${escapeHTML(profile.avatar_url)}" alt="avatar"></div>`
+          : `<div class="profile-avatar">${escapeHTML(getInitials(name))}</div>`;
+
         item.innerHTML = `
-          <div class="display-name">${profile.display_name || "Unnamed profile"}</div>
+          ${avatarHtml}
+          <div style="min-width:0;flex:1;">
+            <div class="display-name">${escapeHTML(name)}</div>
+            <div class="handle">${escapeHTML(profile.id || "")}</div>
+          </div>
         `;
 
         item.onclick = ()=>{
-          location.href = `user.html?id=${encodeURIComponent(profile.id || "")}&name=${encodeURIComponent(profile.display_name || "")}`;
+          if(!profile.id) return;
+          location.href = `user.html?id=${encodeURIComponent(profile.id)}&name=${encodeURIComponent(name)}`;
         };
 
         userResults.appendChild(item);
@@ -1001,7 +1136,6 @@ userSearch.addEventListener("input", async e=>{
   }, 250);
 });
 
-/* upload */
 uploadBtn.onclick = async ()=>{
   if(!croppedBlob){
     alert("Image required");
@@ -1056,7 +1190,7 @@ uploadBtn.onclick = async ()=>{
     };
 
     if(canSaveUsername){
-      payload.username = displayName;
+      payload.username = currentProfile?.display_name || displayName;
     }
 
     const { error: insertError } = await supabase.from("posts").insert([payload]);
@@ -1091,7 +1225,6 @@ uploadBtn.onclick = async ()=>{
   }
 };
 
-/* likes */
 async function toggleLike(postId){
   const { data: { session } } = await supabase.auth.getSession();
   if(!session) return;
@@ -1119,9 +1252,7 @@ async function toggleLike(postId){
 
   if(existing){
     const { error } = await supabase
-      .from("likes")
-      .delete()
-      .eq("id", existing.id);
+      .from("likes").delete().eq("id", existing.id);
 
     if(error){
       console.error(error);
@@ -1157,7 +1288,6 @@ async function toggleLike(postId){
   }
 }
 
-/* delete own post */
 async function deletePost(postId){
   const { data: { session } } = await supabase.auth.getSession();
   if(!session) return;
@@ -1180,7 +1310,6 @@ async function deletePost(postId){
   await loadFeed();
 }
 
-/* feed */
 async function loadFeed(){
   const { data: posts, error: postsError } = await supabase
     .from("posts")
@@ -1257,18 +1386,18 @@ function renderPost(post, likeCount, likedByMe){
   const formattedDate = formatDateTime(post.created_at);
 
   postDiv.innerHTML = `
-    <img src="${post.image_url}" alt="post image">
+    <img src="${escapeHTML(post.image_url)}" alt="post image">
 
     <div class="post-header">
       <div class="post-user">
         <div class="name">
           <a href="user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(author)}">
-            ${author}
+            ${escapeHTML(author)}
           </a>
         </div>
         <div class="time">
           <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
-          <span>${formattedDate || ""}</span>
+          <span>${escapeHTML(formattedDate || "")}</span>
         </div>
       </div>
 
@@ -1282,13 +1411,13 @@ function renderPost(post, likeCount, likedByMe){
       }
     </div>
 
-    <div class="post-caption">${post.caption || ""}</div>
+    <div class="post-caption">${escapeHTML(post.caption || "")}</div>
 
     <div class="post-song">
       <div class="song-meta">
         <div class="song-title">
           <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;">music_note</span>
-          ${post.song_title || "Unknown song"}
+          ${escapeHTML(post.song_title || "Unknown song")}
         </div>
         <div class="song-sub">Hover to play preview</div>
       </div>
