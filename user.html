@@ -37,10 +37,6 @@
       min-height: 100vh;
     }
 
-    body.modal-open {
-      overflow: hidden;
-    }
-
     .container {
       max-width: 920px;
       margin: 0 auto;
@@ -480,127 +476,35 @@
       display: flex;
     }
 
-    .post-modal {
-      width: 100%;
-      height: 100%;
-      background: #000;
-      position: relative;
+    .modal {
+      width: min(520px, 100%);
+      max-height: min(78vh, 720px);
       overflow: hidden;
-      border-radius: 0;
-    }
-
-    .post-modal-media {
-      position: absolute;
-      inset: 0;
-      background: #000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .post-modal-media img {
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      display: block;
-      background: #000;
-    }
-
-    .post-modal-side {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      z-index: 2;
-      padding: 18px;
-      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.92));
-      border-top: 1px solid rgba(255,255,255,.08);
+      background: #0d0d0d;
+      border: 1px solid #2a2a2a;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.5);
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      max-height: 42vh;
-      overflow: auto;
     }
 
-    .post-modal-head {
+    .modal-head {
+      padding: 16px 16px 12px;
+      border-bottom: 1px solid #222;
       display: flex;
       justify-content: space-between;
-      align-items: flex-start;
+      align-items: center;
       gap: 12px;
     }
 
-    .post-modal-author {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      line-height: 1.1;
-    }
-
-    .post-modal-author-link {
-      color: #fff;
-      text-decoration: none;
+    .modal-title {
       font-size: 15px;
-      line-height: 1.2;
-    }
-
-    .post-modal-author-link:hover {
-      text-decoration: underline;
-    }
-
-    .post-modal-date {
-      margin-top: 8px;
-      font-size: 11px;
-      opacity: .68;
-      line-height: 1.4;
-    }
-
-    .post-modal-caption {
-      font-size: 13px;
-      line-height: 1.8;
-      white-space: pre-wrap;
-      color: rgba(255,255,255,.88);
-      padding-bottom: 6px;
-      border-bottom: 1px solid rgba(255,255,255,.1);
-    }
-
-    .post-modal-music {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      padding: 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: rgba(10,10,10,.78);
-      backdrop-filter: blur(8px);
-    }
-
-    .post-modal-song-title {
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
-    .post-modal-actions {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      align-items: center;
-      margin-top: auto;
-    }
-
-    .post-modal-like-btn {
-      background: #fff;
-      color: #000;
-    }
-
-    .post-modal-like-btn.liked {
-      color: #ff2d55;
+      line-height: 1.1;
     }
 
     .modal-close {
       border: none;
-      background: rgba(23,23,23,.92);
+      background: #171717;
       color: #fff;
       width: 38px;
       height: 38px;
@@ -609,11 +513,11 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      flex: 0 0 auto;
     }
 
-    .modal-close:hover {
-      transform: translateY(-1px);
+    .modal-body {
+      padding: 8px;
+      overflow: auto;
     }
 
     .user-list {
@@ -624,26 +528,34 @@
     .user-row {
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 18px;
+      gap: 10px;
+      padding: 10px 12px;
       border: 1px solid #222;
-      background: #0a0a0a;
+      border-radius: 14px;
+      background: #000;
+      color: #fff;
+      text-decoration: none;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+
+    .user-row:hover {
+      background: #111;
     }
 
     .user-row-left {
       min-width: 0;
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
+      flex: 1;
     }
 
     .user-row-badge {
       width: 42px;
       height: 42px;
       border-radius: 50%;
-      background: linear-gradient(135deg, #444, #111);
+      background: linear-gradient(135deg,#444,#111);
       flex: 0 0 auto;
       overflow: hidden;
       display: flex;
@@ -670,21 +582,9 @@
       flex-wrap: wrap;
     }
 
-    .user-row-meta {
-      font-size: 11px;
-      opacity: .65;
-      margin-top: 4px;
-    }
-
+    .user-row-meta,
     .user-row-action {
-      border: none;
-      background: #fff;
-      color: #000;
-      border-radius: 999px;
-      padding: 9px 12px;
-      font-size: 11px;
-      cursor: pointer;
-      flex: 0 0 auto;
+      display: none;
     }
 
     @media (max-width: 820px) {
@@ -724,11 +624,6 @@
       .avatar {
         width: 120px;
         height: 120px;
-      }
-
-      .post-modal-side {
-        padding: 14px;
-        max-height: 48vh;
       }
     }
   </style>
@@ -834,51 +729,6 @@
     </div>
   </div>
 
-  <div class="modal-backdrop" id="postModalBackdrop" aria-hidden="true">
-    <div class="post-modal" role="dialog" aria-modal="true" aria-labelledby="postModalTitle">
-      <div class="post-modal-media">
-        <img id="postModalImage" alt="Post image">
-      </div>
-
-      <div class="post-modal-side">
-        <div class="post-modal-head">
-          <div style="min-width:0;">
-            <div class="section-title" id="postModalTitle">Post</div>
-            <div class="post-modal-author">
-              <a href="#" class="post-modal-author-link" id="postModalAuthorLink">
-                <span id="postModalAuthorName"></span>
-              </a>
-            </div>
-            <div class="post-modal-date" id="postModalDate"></div>
-          </div>
-
-          <button class="modal-close" id="postModalCloseBtn" aria-label="Close post">
-            <span class="material-symbols-outlined">close</span>
-          </button>
-        </div>
-
-        <div class="post-modal-caption" id="postModalCaption"></div>
-
-        <div class="post-modal-music">
-          <div class="section-title" style="margin:0;">Music</div>
-          <div class="post-modal-song-title" id="postModalSongTitle"></div>
-
-          <button type="button" class="icon-btn secondary" id="postModalPlayBtn">
-            <span class="material-symbols-outlined">play_arrow</span>
-            <span class="btn-label">Play preview</span>
-          </button>
-        </div>
-
-        <div class="post-modal-actions">
-          <button type="button" class="icon-btn post-modal-like-btn" id="postModalLikeBtn">
-            <span class="material-symbols-outlined">favorite_border</span>
-            <span class="post-modal-like-text">Like</span>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <script>
     const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
@@ -919,31 +769,14 @@
     const listModalTitle = document.getElementById("listModalTitle");
     const userListEl = document.getElementById("userList");
 
-    const postModalBackdrop = document.getElementById("postModalBackdrop");
-    const postModalCloseBtn = document.getElementById("postModalCloseBtn");
-    const postModalTitle = document.getElementById("postModalTitle");
-    const postModalImage = document.getElementById("postModalImage");
-    const postModalAuthorLink = document.getElementById("postModalAuthorLink");
-    const postModalAuthorName = document.getElementById("postModalAuthorName");
-    const postModalDate = document.getElementById("postModalDate");
-    const postModalCaption = document.getElementById("postModalCaption");
-    const postModalSongTitle = document.getElementById("postModalSongTitle");
-    const postModalPlayBtn = document.getElementById("postModalPlayBtn");
-    const postModalLikeBtn = document.getElementById("postModalLikeBtn");
-    const postModalLikeText = postModalLikeBtn.querySelector(".post-modal-like-text");
-    const postModalLikeIcon = postModalLikeBtn.querySelector(".material-symbols-outlined");
-
     let currentUser = null;
     let profile = null;
     let isOwnProfile = false;
     let isFollowingTarget = false;
     let postsMap = new Map();
 
-    let modalCurrentPost = null;
-    let modalCurrentLikeCount = 0;
-    let modalCurrentLikedByMe = false;
-    let modalAudio = new Audio();
-    let modalAudioButton = null;
+    let feedAudio = new Audio();
+    let activeFeedButton = null;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -1022,78 +855,63 @@
       userListEl.innerHTML = "";
     }
 
-    function openPostModal() {
-      postModalBackdrop.classList.add("open");
-      postModalBackdrop.setAttribute("aria-hidden", "false");
-      document.body.classList.add("modal-open");
-    }
-
-    function closePostModal() {
-      postModalBackdrop.classList.remove("open");
-      postModalBackdrop.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("modal-open");
-      modalAudio.pause();
-      modalAudio.src = "";
-      setModalAudioButtonState(false);
-      modalCurrentPost = null;
-    }
-
-    function setModalAudioButtonState(playing) {
-      if (!modalAudioButton) return;
-      const icon = modalAudioButton.querySelector(".material-symbols-outlined");
-      const label = modalAudioButton.querySelector(".btn-label");
-      if (!icon || !label) return;
-
-      if (playing) {
-        icon.textContent = "pause";
-        label.textContent = "Pause preview";
-        modalAudioButton.dataset.playing = "1";
-      } else {
-        icon.textContent = "play_arrow";
-        label.textContent = "Play preview";
-        modalAudioButton.dataset.playing = "0";
-      }
-    }
-
-    async function playModalPreview(url) {
-      if (!url || !modalAudioButton) return;
-
-      if (modalAudio.src !== url) {
-        modalAudio.pause();
-        modalAudio.src = url;
-      }
-
-      if (modalAudio.paused) {
-        try {
-          await modalAudio.play();
-          setModalAudioButtonState(true);
-        } catch (err) {
-          console.error("MODAL AUDIO PLAY ERROR:", err);
-        }
-      } else {
-        modalAudio.pause();
-        setModalAudioButtonState(false);
-      }
-    }
-
-    modalAudio.addEventListener("ended", () => {
-      setModalAudioButtonState(false);
-    });
-
     modalCloseBtn.addEventListener("click", closeModal);
     modalBackdrop.addEventListener("click", (e) => {
       if (e.target === modalBackdrop) closeModal();
     });
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        closeModal();
-        closePostModal();
-      }
+      if (e.key === "Escape") closeModal();
     });
 
-    postModalCloseBtn.addEventListener("click", closePostModal);
-    postModalBackdrop.addEventListener("click", (e) => {
-      if (e.target === postModalBackdrop) closePostModal();
+    function setFeedAudioButtonState(button, playing) {
+      if (!button) return;
+      const icon = button.querySelector(".material-symbols-outlined");
+      const label = button.querySelector(".btn-label");
+      if (!icon || !label) return;
+
+      if (playing) {
+        icon.textContent = "pause";
+        label.textContent = "Pause preview";
+        button.dataset.playing = "1";
+      } else {
+        icon.textContent = "play_arrow";
+        label.textContent = "Play preview";
+        button.dataset.playing = "0";
+      }
+    }
+
+    async function playFeedPreview(url, button) {
+      if (!url || !button) return;
+
+      if (activeFeedButton && activeFeedButton !== button) {
+        setFeedAudioButtonState(activeFeedButton, false);
+      }
+
+      if (feedAudio.src !== url) {
+        feedAudio.pause();
+        feedAudio.src = url;
+      }
+
+      if (feedAudio.paused) {
+        try {
+          await feedAudio.play();
+          setFeedAudioButtonState(button, true);
+          activeFeedButton = button;
+        } catch (err) {
+          console.error("feed audio play error", err);
+        }
+      } else {
+        feedAudio.pause();
+        setFeedAudioButtonState(button, false);
+        if (activeFeedButton === button) activeFeedButton = null;
+      }
+    }
+
+    feedAudio.addEventListener("ended", () => {
+      if (activeFeedButton) {
+        setFeedAudioButtonState(activeFeedButton, false);
+        activeFeedButton = null;
+      }
     });
 
     avatarImgEl.addEventListener("error", () => {
@@ -1489,24 +1307,11 @@
                   <div class="user-row-name">
                     ${renderName(displayName, !!user.verified)}
                   </div>
-                  <div class="user-row-meta">${isFollowers ? "Follower" : "Following"}</div>
                 </div>
               </div>
-              <button class="user-row-action" data-user-id="${escapeHtml(user.id || row[columnToRead])}" data-user-name="${escapeHtml(displayName)}">
-                Open
-              </button>
             </div>
           `;
         }).join("");
-
-        userListEl.querySelectorAll(".user-row-action").forEach(btn => {
-          btn.addEventListener("click", () => {
-            const id = btn.getAttribute("data-user-id");
-            const name = btn.getAttribute("data-user-name");
-            if (!id) return;
-            window.location.href = `user.html?id=${encodeURIComponent(id)}&name=${encodeURIComponent(name || "User")}`;
-          });
-        });
       } catch (err) {
         console.error("RELATION LIST ERROR:", err);
         userListEl.innerHTML = `<div class="error-state">Unable to load ${escapeHtml(title.toLowerCase())}.<br>${escapeHtml(err?.message || "Unknown error")}</div>`;
@@ -1528,118 +1333,38 @@
       if (e.key === "Enter" || e.key === " ") feedEl.scrollIntoView({ behavior: "smooth", block: "start" });
     });
 
-    async function getPostLikeState(postId) {
-      const countPromise = supabaseClient
-        .from("likes")
-        .select("id", { count: "exact", head: true })
-        .eq("post_id", postId);
+    async function toggleFeedAudio(postId, button) {
+      const post = postsMap.get(postId);
+      if (!post || !post.song_preview) return;
 
-      const likedPromise = currentUser
-        ? supabaseClient
-            .from("likes")
-            .select("id")
-            .eq("post_id", postId)
-            .eq("user_id", currentUser.id)
-            .maybeSingle()
-        : Promise.resolve({ data: null, error: null });
+      if (activeFeedButton && activeFeedButton !== button) {
+        setFeedAudioButtonState(activeFeedButton, false);
+      }
 
-      const [countRes, likedRes] = await Promise.all([countPromise, likedPromise]);
+      if (feedAudio.src !== post.song_preview) {
+        feedAudio.pause();
+        feedAudio.src = post.song_preview;
+      }
 
-      return {
-        count: countRes?.count || 0,
-        likedByMe: !!likedRes?.data
-      };
-    }
-
-    function renderModalLikeButton() {
-      postModalLikeBtn.classList.toggle("liked", modalCurrentLikedByMe);
-      postModalLikeIcon.textContent = modalCurrentLikedByMe ? "favorite" : "favorite_border";
-      postModalLikeText.textContent = `${modalCurrentLikeCount} ${modalCurrentLikeCount === 1 ? "like" : "likes"}`;
-      postModalLikeBtn.disabled = !currentUser;
-    }
-
-    async function openPostModal(post) {
-      if (!post) return;
-
-      modalCurrentPost = post;
-      postModalTitle.textContent = "Post";
-      postModalImage.src = post.image_url || "";
-      postModalAuthorLink.href = `user.html?id=${encodeURIComponent(profileId || "")}&name=${encodeURIComponent(profile?.display_name || fallbackName)}`;
-      postModalAuthorName.innerHTML = renderName(profile?.display_name || fallbackName, !!profile?.verified);
-      postModalDate.textContent = post.created_at ? new Intl.DateTimeFormat("it-IT", { dateStyle: "medium", timeStyle: "short" }).format(new Date(post.created_at)) : "";
-      postModalCaption.textContent = post.caption || "No caption.";
-      postModalSongTitle.textContent = post.song_title || "Unknown song";
-
-      modalCurrentLikeCount = 0;
-      modalCurrentLikedByMe = false;
-      modalAudio.pause();
-      modalAudio.src = "";
-      modalAudioButton = postModalPlayBtn;
-      setModalAudioButtonState(false);
-
-      postModalPlayBtn.disabled = !post.song_preview;
-      postModalPlayBtn.querySelector(".material-symbols-outlined").textContent = post.song_preview ? "play_arrow" : "music_off";
-      postModalPlayBtn.querySelector(".btn-label").textContent = post.song_preview ? "Play preview" : "No preview";
-
-      openPostModal();
-
-      try {
-        const likeState = await getPostLikeState(post.id);
-        modalCurrentLikeCount = likeState.count;
-        modalCurrentLikedByMe = likeState.likedByMe;
-        renderModalLikeButton();
-      } catch (err) {
-        console.error("POST MODAL LIKE STATE ERROR:", err);
+      if (feedAudio.paused) {
+        try {
+          await feedAudio.play();
+          setFeedAudioButtonState(button, true);
+          activeFeedButton = button;
+        } catch (err) {
+          console.error("feed audio play error", err);
+        }
+      } else {
+        feedAudio.pause();
+        setFeedAudioButtonState(button, false);
+        if (activeFeedButton === button) activeFeedButton = null;
       }
     }
 
-    postModalPlayBtn.addEventListener("click", async () => {
-      if (!modalCurrentPost?.song_preview) return;
-      await playModalPreview(modalCurrentPost.song_preview);
-    });
-
-    postModalLikeBtn.addEventListener("click", async () => {
-      if (!currentUser || !modalCurrentPost) return;
-
-      postModalLikeBtn.disabled = true;
-
-      try {
-        const { data: existing, error: findError } = await supabaseClient
-          .from("likes")
-          .select("id")
-          .eq("post_id", modalCurrentPost.id)
-          .eq("user_id", currentUser.id)
-          .maybeSingle();
-
-        if (findError) throw findError;
-
-        if (existing) {
-          const { error } = await supabaseClient
-            .from("likes")
-            .delete()
-            .eq("id", existing.id);
-
-          if (error) throw error;
-
-          modalCurrentLikedByMe = false;
-          modalCurrentLikeCount = Math.max(0, modalCurrentLikeCount - 1);
-        } else {
-          const { error } = await supabaseClient
-            .from("likes")
-            .insert([{ post_id: modalCurrentPost.id, user_id: currentUser.id }]);
-
-          if (error) throw error;
-
-          modalCurrentLikedByMe = true;
-          modalCurrentLikeCount += 1;
-        }
-
-        renderModalLikeButton();
-      } catch (err) {
-        console.error("MODAL LIKE TOGGLE ERROR:", err);
-        alert(err?.message || "Unable to update like.");
-      } finally {
-        postModalLikeBtn.disabled = !currentUser;
+    feedAudio.addEventListener("ended", () => {
+      if (activeFeedButton) {
+        setFeedAudioButtonState(activeFeedButton, false);
+        activeFeedButton = null;
       }
     });
 
@@ -1647,7 +1372,7 @@
       if (!post.image_url) return "";
 
       return `
-        <article class="post" data-post-id="${escapeHtml(post.id)}" tabindex="0" role="button" aria-label="Open post">
+        <article class="post" data-post-id="${escapeHtml(post.id)}" tabindex="0" role="button" aria-label="Play post preview">
           <div class="post-thumb">
             <img src="${escapeHtml(post.image_url)}" alt="Post image">
           </div>
@@ -1658,18 +1383,26 @@
     feedEl.addEventListener("click", (e) => {
       const card = e.target.closest(".post");
       if (!card) return;
+
+      if (e.target.closest("button, a, input, label")) return;
+
       const postId = card.getAttribute("data-post-id");
-      const post = postsMap.get(postId);
-      if (post) openPostModal(post);
+      if (!postId) return;
+
+      const button = card;
+      toggleFeedAudio(postId, button);
     });
 
     feedEl.addEventListener("keydown", (e) => {
       const card = e.target.closest(".post");
       if (!card) return;
+
       if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
         const postId = card.getAttribute("data-post-id");
-        const post = postsMap.get(postId);
-        if (post) openPostModal(post);
+        if (!postId) return;
+        const button = card;
+        toggleFeedAudio(postId, button);
       }
     });
 
@@ -1684,7 +1417,7 @@
       try {
         const { data, error } = await supabaseClient
           .from("posts")
-          .select("id, image_url, created_at, caption, song_title, song_preview, user_id")
+          .select("id, image_url, created_at, user_id, song_preview")
           .eq("user_id", profileId)
           .not("image_url", "is", null)
           .order("created_at", { ascending: false });
