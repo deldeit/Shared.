@@ -22,7 +22,7 @@
       --border-2:#333;
       --text:#fff;
       --muted:rgba(255,255,255,.68);
-      --accent:#fff;
+      --soft:rgba(255,255,255,.08);
     }
 
     html, body{
@@ -99,7 +99,7 @@
 
     .hero-grid{
       display:grid;
-      grid-template-columns:1.3fr .9fr;
+      grid-template-columns:1.35fr .85fr;
       gap:18px;
       align-items:stretch;
     }
@@ -282,6 +282,54 @@
       margin-top:16px;
     }
 
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      background:var(--soft);
+      border:1px solid #222;
+      font-size:11px;
+      color:#fff;
+    }
+
+    .note-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:16px;
+      margin-top:16px;
+    }
+
+    .note-card{
+      background:#000;
+      border:1px solid #222;
+      border-radius:18px;
+      padding:14px;
+    }
+
+    .note-card h3{
+      margin:0 0 10px;
+      font-size:13px;
+      line-height:1.2;
+    }
+
+    .note-card p,
+    .note-card li{
+      margin:0;
+      color:var(--muted);
+      font-size:11px;
+      line-height:1.8;
+      font-family:inherit;
+    }
+
+    .note-card ul{
+      margin:0;
+      padding-left:18px;
+      display:grid;
+      gap:8px;
+    }
+
     .footnote{
       margin-top:14px;
       color:var(--muted);
@@ -292,7 +340,8 @@
 
     @media (max-width:760px){
       .hero-grid,
-      .grid{
+      .grid,
+      .note-grid{
         grid-template-columns:1fr;
       }
 
@@ -319,10 +368,12 @@
     <div class="topbar">
       <a href="javascript:history.back()" class="icon-btn secondary" aria-label="Go back">
         <span class="material-symbols-outlined">arrow_back</span>
-        Back
       </a>
 
-      <div class="header">About</div>
+      <div class="header">Shared.</div>
+
+      <div style="width:44px;"></div>
+    </div>
 
       <a href="index.html" class="icon-btn secondary" aria-label="Go home">
         <span class="material-symbols-outlined">home</span>
@@ -336,38 +387,39 @@
             <span class="material-symbols-outlined" style="font-size:18px;">star</span>
             Shared
           </div>
-          <h1 class="hero-title">A simple place to post, share, and discover.</h1>
+          <h1 class="hero-title">A place for everyone to post, discover, and connect.</h1>
           <p class="hero-text">
-Shared is built around fast posting, profile discovery, and a feed that stays focused on the content.
+Shared is designed to be simple, readable, and usable by a wide audience.
 
-The experience is intentionally minimal: upload an image, add a caption, attach a song preview, and publish. Profiles stay visible, likes are interactive, and the menu keeps the most important actions one tap away.
+The app keeps the interface focused on the basics: a feed, profiles, likes, and quick navigation. The goal is to make the experience easy to understand without requiring technical knowledge.
           </p>
           <div class="cta-row">
             <a href="index.html" class="icon-btn">Open app</a>
-            <a href="settings.html" class="icon-btn secondary">Settings</a>
+            <a href="#privacy" class="icon-btn secondary">Privacy policy</a>
+            <a href="#disclaimers" class="icon-btn secondary">Disclaimers</a>
           </div>
         </div>
 
         <div class="hero-card">
           <div>
-            <div class="section-title">What Shared focuses on</div>
+            <div class="section-title">What Shared is built for</div>
             <div class="section-text">
-              Clean layout, quick interactions, and an identity-first feed where author names are easy to see.
+              A lightweight social experience centered on posts, user identity, and quick interactions.
             </div>
           </div>
 
           <div class="stats">
             <div class="stat">
               <div class="value">01</div>
-              <div class="label">Post images with captions and music previews.</div>
+              <div class="label">Share a post with an image, caption, and music preview.</div>
             </div>
             <div class="stat">
               <div class="value">02</div>
-              <div class="label">Discover users from the sidebar search.</div>
+              <div class="label">Visit profiles and move through the app with a minimal layout.</div>
             </div>
             <div class="stat">
               <div class="value">03</div>
-              <div class="label">Open likes to see who interacted with a post.</div>
+              <div class="label">Check likes and author badges without clutter.</div>
             </div>
           </div>
         </div>
@@ -377,38 +429,38 @@ The experience is intentionally minimal: upload an image, add a caption, attach 
     <section class="grid">
       <div class="panel">
         <h2 class="section-title">Core features</h2>
-        <p class="section-text">Everything here is designed to stay lightweight and easy to navigate.</p>
+        <p class="section-text">The product experience stays intentionally simple and easy to follow.</p>
 
         <div class="feature-list">
           <div class="feature-item">
             <div class="icon"><span class="material-symbols-outlined">image</span></div>
             <div class="meta">
-              <div class="name">Image posting</div>
-              <div class="desc">Upload a square image, write a caption, and publish it into the feed.</div>
+              <div class="name">Posting</div>
+              <div class="desc">Upload a square image and add a caption and song preview.</div>
             </div>
           </div>
 
           <div class="feature-item">
-            <div class="icon"><span class="material-symbols-outlined">music_note</span></div>
+            <div class="icon"><span class="material-symbols-outlined">person_search</span></div>
             <div class="meta">
-              <div class="name">Song previews</div>
-              <div class="desc">Attach a track preview so posts feel more expressive and contextual.</div>
+              <div class="name">Profile discovery</div>
+              <div class="desc">Search users from the menu and open their profiles directly.</div>
             </div>
           </div>
 
           <div class="feature-item">
             <div class="icon"><span class="material-symbols-outlined">verified</span></div>
             <div class="meta">
-              <div class="name">Verified authors</div>
-              <div class="desc">Verified profiles get a visible badge beside the display name.</div>
+              <div class="name">Verification</div>
+              <div class="desc">Verified accounts display a clear badge next to the author name.</div>
             </div>
           </div>
 
           <div class="feature-item">
             <div class="icon"><span class="material-symbols-outlined">favorite</span></div>
             <div class="meta">
-              <div class="name">Like details</div>
-              <div class="desc">Click the like counter to open the full list of users who liked a post.</div>
+              <div class="name">Likes</div>
+              <div class="desc">Open the like count to see who interacted with a post.</div>
             </div>
           </div>
         </div>
@@ -416,37 +468,132 @@ The experience is intentionally minimal: upload an image, add a caption, attach 
 
       <div class="panel">
         <h2 class="section-title">How it works</h2>
-        <p class="section-text">A simple flow from login to posting.</p>
+        <p class="section-text">A short overview of the main flow.</p>
 
         <div class="timeline">
           <div class="timeline-item">
             <div class="when">Step 1</div>
-            <div class="what">Sign in, then open your profile from the sidebar menu.</div>
+            <div class="what">Sign in and open the menu to access your profile, settings, or about page.</div>
           </div>
           <div class="timeline-item">
             <div class="when">Step 2</div>
-            <div class="what">Use the upload box to add an image, a caption, and a song preview.</div>
+            <div class="what">Create a post by choosing an image, writing a caption, and selecting a track preview.</div>
           </div>
           <div class="timeline-item">
             <div class="when">Step 3</div>
-            <div class="what">Publish the post and let others like, open the liker list, or visit your profile.</div>
+            <div class="what">Browse the feed, open profiles, and tap the like counter to view the list of likers.</div>
           </div>
           <div class="timeline-item">
             <div class="when">Step 4</div>
-            <div class="what">Open About or Settings from the menu to move around the app quickly.</div>
+            <div class="what">Use the menu to navigate quickly without losing the main feed context.</div>
           </div>
         </div>
+      </div>
+    </section>
+
+    <section class="panel full" id="privacy">
+      <h2 class="section-title">Privacy policy</h2>
+      <p class="section-text">
+        This page explains, in plain language, how Shared handles information inside the app. It is a practical summary and not a substitute for a formal legal policy.
+      </p>
+
+      <div class="note-grid">
+        <div class="note-card">
+          <h3>Information collected</h3>
+          <ul>
+            <li>Account details used to sign in.</li>
+            <li>Profile information such as display name and avatar.</li>
+            <li>Content you publish, including posts, captions, and likes.</li>
+            <li>Basic technical data needed to run the service.</li>
+          </ul>
+        </div>
+
+        <div class="note-card">
+          <h3>How it is used</h3>
+          <ul>
+            <li>To create and show your profile and posts.</li>
+            <li>To display likes, authors, and verification status.</li>
+            <li>To help the app function, maintain sessions, and load content.</li>
+            <li>To improve usability and keep the app working correctly.</li>
+          </ul>
+        </div>
+
+        <div class="note-card">
+          <h3>Sharing and visibility</h3>
+          <ul>
+            <li>Posts and profile details may be visible to other users inside the app.</li>
+            <li>Like lists can show who interacted with a post.</li>
+            <li>Content you publish should be treated as public within the app environment.</li>
+          </ul>
+        </div>
+
+        <div class="note-card">
+          <h3>Retention and control</h3>
+          <ul>
+            <li>You may be able to update or remove some information through the app.</li>
+            <li>Deleted content may still remain in backups or logs for a limited time.</li>
+            <li>Account data is kept only as long as needed to operate the service and meet legal obligations.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footnote">
+        If you operate Shared for real users, replace this section with a formal privacy policy that matches the exact data flows, storage providers, retention periods, and contact details for the service owner.
+      </div>
+    </section>
+
+    <section class="panel full" id="disclaimers">
+      <h2 class="section-title">Disclaimers</h2>
+      <div class="note-grid">
+        <div class="note-card">
+          <h3>General use</h3>
+          <ul>
+            <li>Shared is provided as-is, without warranties of any kind.</li>
+            <li>Availability, speed, and features may change without notice.</li>
+            <li>We do not guarantee that the service will always be uninterrupted or error-free.</li>
+          </ul>
+        </div>
+
+        <div class="note-card">
+          <h3>Content responsibility</h3>
+          <ul>
+            <li>Users are responsible for the content they upload, share, and like.</li>
+            <li>Do not upload content you do not have the right to share.</li>
+            <li>Do not rely on the app as a source of professional, legal, medical, or financial advice.</li>
+          </ul>
+        </div>
+
+        <div class="note-card">
+          <h3>Third-party services</h3>
+          <ul>
+            <li>Shared may use external services for authentication, storage, moderation, or media previews.</li>
+            <li>Those services are governed by their own terms and policies.</li>
+          </ul>
+        </div>
+
+        <div class="note-card">
+          <h3>Accessibility and audience</h3>
+          <ul>
+            <li>The interface is designed to be straightforward and suitable for a broad audience.</li>
+            <li>Some features may depend on account status, device support, or server-side availability.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footnote">
+        This disclaimer text is intentionally general. For a production app, have it reviewed and adapted to your exact use case and jurisdiction.
       </div>
     </section>
 
     <section class="panel full">
       <h2 class="section-title">Notes</h2>
       <p class="section-text">
-        Shared is a compact social interface built to keep the important actions visible and fast.
-        If you want to extend it later, the best places are the profile page, settings page, and the post detail flow.
+        Shared is meant to stay clear, minimal, and approachable for everyone. The same visual language is kept across pages so navigation feels consistent.
       </p>
-      <div class="footnote">
-        Tip: keep the same black-and-white palette and rounded cards for a consistent experience across all pages.
+      <div class="cta-row">
+        <span class="pill"><span class="material-symbols-outlined" style="font-size:16px;">shield</span>Privacy first</span>
+        <span class="pill"><span class="material-symbols-outlined" style="font-size:16px;">visibility</span>Transparent controls</span>
+        <span class="pill"><span class="material-symbols-outlined" style="font-size:16px;">groups</span>Built for everyone</span>
       </div>
     </section>
   </div>
