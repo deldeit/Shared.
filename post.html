@@ -24,7 +24,6 @@
       --text: #fff;
       --muted: rgba(255,255,255,.68);
       --muted-2: rgba(255,255,255,.52);
-      --accent: #fff;
     }
 
     html, body {
@@ -79,10 +78,6 @@
       border-radius: 24px;
       overflow: hidden;
       box-shadow: 0 18px 40px rgba(0,0,0,.25);
-    }
-
-    .post {
-      padding: 0;
     }
 
     .post-header {
@@ -146,16 +141,31 @@
       flex-wrap: wrap;
     }
 
+    .post-media-wrap {
+      display: flex;
+      justify-content: center;
+      padding: 16px 16px 8px;
+    }
+
+    .post-media {
+      width: min(100%, 520px);
+      aspect-ratio: 1 / 1;
+      border-radius: 28px;
+      overflow: hidden;
+      background: #111;
+      border: 1px solid #232323;
+      box-shadow: 0 12px 28px rgba(0,0,0,.22);
+    }
+
     .post-image {
       width: 100%;
-      display: block;
-      aspect-ratio: 1 / 1;
+      height: 100%;
       object-fit: cover;
-      background: #111;
+      display: block;
     }
 
     .post-content {
-      padding: 14px 16px 16px;
+      padding: 10px 16px 16px;
       display: grid;
       gap: 14px;
     }
@@ -312,7 +322,8 @@
       }
 
       .post-header,
-      .post-content {
+      .post-content,
+      .post-media-wrap {
         padding-left: 14px;
         padding-right: 14px;
       }
@@ -324,6 +335,10 @@
 
       .icon-btn {
         width: 100%;
+      }
+
+      .post-media {
+        border-radius: 24px;
       }
     }
   </style>
@@ -353,7 +368,6 @@
     const postId = params.get("id") || "";
 
     const postCard = document.getElementById("postCard");
-    const loadingState = document.getElementById("loadingState");
 
     let currentUser = null;
     let postData = null;
@@ -476,38 +490,31 @@
     }
 
     async function fetchLikeState() {
-      likesCountValue = Number(
-        getFirstDefined(postData, ["likes_count", "like_count", "likes"], 0)
-      ) || 0;
+      likesCountValue = 0;
+      likedByMe = false;
 
-      likedByMe = Boolean(getFirstDefined(postData, ["liked"], false));
+      if (!postData?.id) return;
 
-      if (!currentUser || !postData?.id) {
-        return;
+      const { count, error: countError } = await supabaseClient
+        .from("likes")
+        .select("*", { count: "exact", head: true })
+        .eq("post_id", postData.id);
+
+      if (!countError && typeof count === "number") {
+        likesCountValue = count;
       }
 
-      try {
-        const { data, error } = await supabaseClient
-          .from("post_likes")
-          .select("id")
-          .eq("post_id", postData.id)
-          .eq("user_id", currentUser.id)
-          .maybeSingle();
+      if (!currentUser) return;
 
-        if (!error) {
-          likedByMe = !!data;
+      const { data, error } = await supabaseClient
+        .from("likes")
+        .select("id")
+        .eq("post_id", postData.id)
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
 
-          const { count, error: countError } = await supabaseClient
-            .from("post_likes")
-            .select("*", { count: "exact", head: true })
-            .eq("post_id", postData.id);
-
-          if (!countError && typeof count === "number") {
-            likesCountValue = count;
-          }
-        }
-      } catch (err) {
-        console.error("LIKE STATE ERROR:", err);
+      if (!error) {
+        likedByMe = !!data;
       }
     }
 
@@ -551,7 +558,7 @@
 
         if (likedByMe) {
           const { error } = await supabaseClient
-            .from("post_likes")
+            .from("likes")
             .delete()
             .eq("post_id", postIdValue)
             .eq("user_id", currentUser.id);
@@ -561,14 +568,11 @@
           likesCountValue = Math.max(0, likesCountValue - 1);
         } else {
           const { error } = await supabaseClient
-            .from("post_likes")
-            .upsert(
-              {
-                post_id: postIdValue,
-                user_id: currentUser.id
-              },
-              { onConflict: "post_id,user_id" }
-            );
+            .from("likes")
+            .insert({
+              post_id: postIdValue,
+              user_id: currentUser.id
+            });
 
           if (error) throw error;
           likedByMe = true;
@@ -633,7 +637,6 @@
       const authorName = getFirstDefined(authorData, ["display_name"], "User");
       const authorId = getFirstDefined(authorData, ["id"], getFirstDefined(postData, ["user_id"], ""));
       const verified = Boolean(getFirstDefined(authorData, ["verified"], false));
-      const avatarUrl = getFirstDefined(authorData, ["avatar_url"], "");
       const createdAt = getFirstDefined(postData, ["created_at", "inserted_at"], "");
       const caption = getFirstDefined(postData, ["caption", "text", "content"], "");
       const imageUrl = getFirstDefined(postData, ["image_url", "media_url"], "");
@@ -662,7 +665,13 @@
           <span class="material-symbols-outlined" style="opacity:.6;">more_horiz</span>
         </div>
 
-        ${imageUrl ? `<img class="post-image" src="${escapeHtml(imageUrl)}" alt="post image">` : ""}
+        ${imageUrl ? `
+          <div class="post-media-wrap">
+            <div class="post-media">
+              <img class="post-image" src="${escapeHtml(imageUrl)}" alt="post image">
+            </div>
+          </div>
+        ` : ""}
 
         <div class="post-content">
           ${caption ? `<div class="post-caption">${escapeHtml(caption)}</div>` : ""}
@@ -674,7 +683,7 @@
             </div>
           ` : ""}
 
-          ${songTitle || songPreview ? `
+          ${(songTitle || songPreview) ? `
             <div class="post-song">
               <div class="song-meta">
                 <div class="song-title">
@@ -711,7 +720,6 @@
       const likeBtn = document.querySelector(".likeBtn");
       const likeCountBtn = document.querySelector(".likeCountBtn");
       const playBtn = document.querySelector(".playBtn");
-      const postSong = document.querySelector(".post-song");
 
       if (likeBtn) {
         likeBtn.addEventListener("click", toggleLike);
@@ -731,22 +739,22 @@
         });
       }
 
-      if (postSong) {
-        const songPreview = getFirstDefined(postData, ["song_preview", "preview_url", "audio_preview"], "");
-        if (songPreview) {
-          postSong.addEventListener("mouseenter", () => {
-            if (!window.matchMedia("(hover: hover)").matches) return;
-            playAudio(songPreview);
-          });
+      const songPreview = getFirstDefined(postData, ["song_preview", "preview_url", "audio_preview"], "");
+      const postSong = document.querySelector(".post-song");
 
-          postSong.addEventListener("mouseleave", () => {
-            if (!audio.paused) {
-              audio.pause();
-              audioPlaying = false;
-              updatePlayButton();
-            }
-          });
-        }
+      if (postSong && songPreview) {
+        postSong.addEventListener("mouseenter", () => {
+          if (!window.matchMedia("(hover: hover)").matches) return;
+          playAudio(songPreview);
+        });
+
+        postSong.addEventListener("mouseleave", () => {
+          if (!audio.paused) {
+            audio.pause();
+            audioPlaying = false;
+            updatePlayButton();
+          }
+        });
       }
 
       updatePlayButton();
@@ -760,19 +768,11 @@
         await fetchAuthor(postData.user_id);
         await fetchLikeState();
 
-        const hasImage = !!getFirstDefined(postData, ["image_url", "media_url"], "");
-        const html = buildPostHtml();
-
         postCard.innerHTML = `
           <div class="post">
-            ${html}
+            ${buildPostHtml()}
           </div>
         `;
-
-        if (!hasImage) {
-          const img = document.querySelector(".post-image");
-          if (img) img.classList.add("hidden");
-        }
 
         attachPostEvents();
       } catch (err) {
