@@ -163,24 +163,24 @@ textarea{
 
 .grid{
   display:grid;
-  grid-template-columns:repeat(2, minmax(0, 1fr));
+  grid-template-columns:repeat(5, minmax(0, 1fr));
   gap:10px;
   margin-top:8px;
 }
 
 .topic{
+  aspect-ratio:1 / 1;
   display:flex;
   align-items:center;
-  gap:8px;
-  padding:12px;
-  border-radius:14px;
+  justify-content:center;
+  border-radius:16px;
   border:1px solid var(--border);
   background:#000;
   color:#fff;
   cursor:pointer;
   user-select:none;
-  font-size:12px;
   transition:.15s ease;
+  position:relative;
 }
 
 .topic:hover{
@@ -194,7 +194,20 @@ textarea{
 }
 
 .topic .material-symbols-outlined{
-  font-size:18px;
+  font-size:24px;
+}
+
+.topic::after{
+  content:attr(title);
+  position:absolute;
+  left:50%;
+  bottom:-18px;
+  transform:translateX(-50%);
+  font-size:10px;
+  line-height:1;
+  opacity:.65;
+  white-space:nowrap;
+  pointer-events:none;
 }
 
 .song-wrapper{
@@ -382,13 +395,15 @@ textarea{
   margin-top:10px;
   display:inline-flex;
   align-items:center;
-  gap:8px;
+  justify-content:center;
+  gap:0;
+  width:42px;
+  height:42px;
   border:1px solid var(--border);
   border-radius:999px;
-  padding:8px 12px;
-  font-size:11px;
   background:#000;
   color:#fff;
+  title:attr(title);
 }
 
 .post-song{
@@ -697,6 +712,14 @@ textarea{
     align-items:center;
   }
 
+  .grid{
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+  }
+
+  .topic::after{
+    display:none;
+  }
+
   .post-actions,
   .post-song,
   .selected-song{
@@ -803,104 +826,65 @@ textarea{
 
     <div class="topics-label">Choose 1 tag</div>
     <div class="grid" id="topics">
-      <div class="topic selected" data-id="gaming">
+      <div class="topic selected" data-id="gaming" title="Gaming" aria-label="Gaming">
         <span class="material-symbols-outlined">sports_esports</span>
-        Gaming
       </div>
-
-      <div class="topic" data-id="music">
+      <div class="topic" data-id="music" title="Music" aria-label="Music">
         <span class="material-symbols-outlined">music_note</span>
-        Music
       </div>
-
-      <div class="topic" data-id="sports">
+      <div class="topic" data-id="sports" title="Sports" aria-label="Sports">
         <span class="material-symbols-outlined">sports_soccer</span>
-        Sports
       </div>
-
-      <div class="topic" data-id="tech">
+      <div class="topic" data-id="tech" title="Tech" aria-label="Tech">
         <span class="material-symbols-outlined">devices</span>
-        Tech
       </div>
-
-      <div class="topic" data-id="ai">
+      <div class="topic" data-id="ai" title="AI" aria-label="AI">
         <span class="material-symbols-outlined">smart_toy</span>
-        AI
       </div>
-
-      <div class="topic" data-id="art">
+      <div class="topic" data-id="art" title="Art" aria-label="Art">
         <span class="material-symbols-outlined">brush</span>
-        Art
       </div>
-
-      <div class="topic" data-id="travel">
+      <div class="topic" data-id="travel" title="Travel" aria-label="Travel">
         <span class="material-symbols-outlined">flight</span>
-        Travel
       </div>
-
-      <div class="topic" data-id="food">
+      <div class="topic" data-id="food" title="Food" aria-label="Food">
         <span class="material-symbols-outlined">restaurant</span>
-        Food
       </div>
-
-      <div class="topic" data-id="movies">
+      <div class="topic" data-id="movies" title="Movies" aria-label="Movies">
         <span class="material-symbols-outlined">movie</span>
-        Movies
       </div>
-
-      <div class="topic" data-id="anime">
+      <div class="topic" data-id="anime" title="Anime" aria-label="Anime">
         <span class="material-symbols-outlined">auto_awesome</span>
-        Anime
       </div>
-
-      <div class="topic" data-id="cars">
+      <div class="topic" data-id="cars" title="Cars" aria-label="Cars">
         <span class="material-symbols-outlined">directions_car</span>
-        Cars
       </div>
-
-      <div class="topic" data-id="finance">
+      <div class="topic" data-id="finance" title="Finance" aria-label="Finance">
         <span class="material-symbols-outlined">trending_up</span>
-        Finance
       </div>
-
-      <div class="topic" data-id="science">
+      <div class="topic" data-id="science" title="Science" aria-label="Science">
         <span class="material-symbols-outlined">science</span>
-        Science
       </div>
-
-      <div class="topic" data-id="fitness">
+      <div class="topic" data-id="fitness" title="Fitness" aria-label="Fitness">
         <span class="material-symbols-outlined">fitness_center</span>
-        Fitness
       </div>
-
-      <div class="topic" data-id="photo">
+      <div class="topic" data-id="photo" title="Photography" aria-label="Photography">
         <span class="material-symbols-outlined">photo_camera</span>
-        Photography
       </div>
-
-      <div class="topic" data-id="nature">
+      <div class="topic" data-id="nature" title="Nature" aria-label="Nature">
         <span class="material-symbols-outlined">forest</span>
-        Nature
       </div>
-
-      <div class="topic" data-id="books">
+      <div class="topic" data-id="books" title="Books" aria-label="Books">
         <span class="material-symbols-outlined">menu_book</span>
-        Books
       </div>
-
-      <div class="topic" data-id="memes">
+      <div class="topic" data-id="memes" title="Memes" aria-label="Memes">
         <span class="material-symbols-outlined">mood</span>
-        Memes
       </div>
-
-      <div class="topic" data-id="coding">
+      <div class="topic" data-id="coding" title="Coding" aria-label="Coding">
         <span class="material-symbols-outlined">code</span>
-        Coding
       </div>
-
-      <div class="topic" data-id="fashion">
+      <div class="topic" data-id="fashion" title="Fashion" aria-label="Fashion">
         <span class="material-symbols-outlined">styler</span>
-        Fashion
       </div>
     </div>
 
@@ -928,7 +912,7 @@ const supabase = createClient(
 window.supabase = supabase;
 
 /* CHANGE THIS */
-const BACKEND_URL = "https://shared-bk4b.onrender.com.onrender.com";
+const BACKEND_URL = "https://shared-bk4b.onrender.com";
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
@@ -960,28 +944,35 @@ const closeLikersBtn = document.getElementById("closeLikersBtn");
 
 const topicItems = [...document.querySelectorAll("#topics .topic")];
 
-const TOPIC_LABELS = {
-  music: "Music",
-  gaming: "Gaming",
-  sports: "Sports",
-  tech: "Tech",
-  ai: "AI",
-  art: "Art",
-  travel: "Travel",
-  food: "Food",
-  movies: "Movies",
-  anime: "Anime",
-  cars: "Cars",
-  finance: "Finance",
-  science: "Science",
-  fitness: "Fitness",
-  photo: "Photography",
-  nature: "Nature",
-  books: "Books",
-  memes: "Memes",
-  coding: "Coding",
-  fashion: "Fashion"
+const TOPIC_CONFIG = {
+  music: { icon: "music_note", label: "Music" },
+  gaming: { icon: "sports_esports", label: "Gaming" },
+  sports: { icon: "sports_soccer", label: "Sports" },
+  tech: { icon: "devices", label: "Tech" },
+  ai: { icon: "smart_toy", label: "AI" },
+  art: { icon: "brush", label: "Art" },
+  travel: { icon: "flight", label: "Travel" },
+  food: { icon: "restaurant", label: "Food" },
+  movies: { icon: "movie", label: "Movies" },
+  anime: { icon: "auto_awesome", label: "Anime" },
+  cars: { icon: "directions_car", label: "Cars" },
+  finance: { icon: "trending_up", label: "Finance" },
+  science: { icon: "science", label: "Science" },
+  fitness: { icon: "fitness_center", label: "Fitness" },
+  photo: { icon: "photo_camera", label: "Photography" },
+  nature: { icon: "forest", label: "Nature" },
+  books: { icon: "menu_book", label: "Books" },
+  memes: { icon: "mood", label: "Memes" },
+  coding: { icon: "code", label: "Coding" },
+  fashion: { icon: "styler", label: "Fashion" }
 };
+
+const TOPIC_ALIAS = Object.fromEntries(
+  Object.entries(TOPIC_CONFIG).flatMap(([id, cfg]) => [
+    [id.toLowerCase(), id],
+    [cfg.label.toLowerCase(), id]
+  ])
+);
 
 let user = null;
 let displayName = "user";
@@ -1027,36 +1018,38 @@ function getInitials(name){
   return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
 }
 
-function normalizeInterests(value){
-  if(Array.isArray(value)){
-    return value.map(v => String(v).trim()).filter(Boolean);
-  }
+function normalizeTopicValue(value){
+  const raw = String(value ?? "").trim().toLowerCase();
+  if(!raw) return "";
+  return TOPIC_ALIAS[raw] || raw;
+}
 
-  if(typeof value === "string"){
+function normalizeInterests(value){
+  const arr = [];
+
+  if(Array.isArray(value)){
+    arr.push(...value);
+  }else if(typeof value === "string"){
     const raw = value.trim();
     if(!raw) return [];
 
     try{
       const parsed = JSON.parse(raw);
       if(Array.isArray(parsed)){
-        return parsed.map(v => String(v).trim()).filter(Boolean);
+        arr.push(...parsed);
+      }else{
+        arr.push(...raw.split(","));
       }
-    }catch(_){}
-
-    return raw
-      .split(",")
-      .map(v => v.trim())
-      .filter(Boolean);
+    }catch(_){
+      arr.push(...raw.split(","));
+    }
+  }else if(value && typeof value === "object"){
+    arr.push(...Object.values(value).flat());
   }
 
-  if(value && typeof value === "object"){
-    return Object.values(value)
-      .flat()
-      .map(v => String(v).trim())
-      .filter(Boolean);
-  }
-
-  return [];
+  return arr
+    .map(normalizeTopicValue)
+    .filter(Boolean);
 }
 
 function syncSelectedTopic(){
@@ -1188,7 +1181,7 @@ async function loadCurrentProfile(){
     currentProfile = data || null;
     userInterests = normalizeInterests(currentProfile?.interests);
 
-    if(userInterests.length > 0 && !userInterests.includes(selectedTopic)){
+    if(userInterests.length > 0 && TOPIC_CONFIG[userInterests[0]]){
       selectedTopic = userInterests[0];
     }
 
@@ -1876,17 +1869,25 @@ async function deletePost(postId){
   await loadFeed();
 }
 
+function getPostInterestScore(postTag){
+  const normalized = normalizeTopicValue(postTag);
+  if(!normalized) return 0;
+  return userInterests.includes(normalized) ? 1 : 0;
+}
+
+function getTopicIcon(tag){
+  return TOPIC_CONFIG[normalizeTopicValue(tag)]?.icon || "tag";
+}
+
+function getTopicLabel(tag){
+  return TOPIC_CONFIG[normalizeTopicValue(tag)]?.label || String(tag || "No tag");
+}
+
 async function loadFeed(){
-  let query = supabase
+  const { data: posts, error: postsError } = await supabase
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false });
-
-  if(userInterests.length > 0){
-    query = query.in("tags", userInterests);
-  }
-
-  const { data: posts, error: postsError } = await query;
 
   if(postsError){
     console.error(postsError);
@@ -1899,9 +1900,7 @@ async function loadFeed(){
   postState.clear();
 
   if(rows.length === 0){
-    feed.innerHTML = userInterests.length > 0
-      ? `<div class="empty-state">No posts for your interests yet.</div>`
-      : `<div class="empty-state">No posts yet.</div>`;
+    feed.innerHTML = `<div class="empty-state">No posts yet.</div>`;
     return;
   }
 
@@ -1934,8 +1933,13 @@ async function loadFeed(){
   });
 
   rows.sort((a, b)=>{
+    const aInterest = getPostInterestScore(a.tags);
+    const bInterest = getPostInterestScore(b.tags);
+    if(bInterest !== aInterest) return bInterest - aInterest;
+
     const diffLikes = (likeCountMap.get(b.id) || 0) - (likeCountMap.get(a.id) || 0);
     if(diffLikes !== 0) return diffLikes;
+
     return new Date(b.created_at || 0) - new Date(a.created_at || 0);
   });
 
@@ -1962,6 +1966,8 @@ function renderPost(post, likeCount, likedByMe, authorData){
   const authorName = authorData?.display_name || post.username || "user";
   const authorVerified = !!authorData?.verified;
   const formattedDate = formatDateTime(post.created_at);
+  const topicIcon = getTopicIcon(post.tags);
+  const topicLabel = getTopicLabel(post.tags);
 
   postDiv.innerHTML = `
     <div class="post-header">
@@ -1992,9 +1998,8 @@ function renderPost(post, likeCount, likedByMe, authorData){
 
     <div class="post-caption">${escapeHTML(post.caption || "")}</div>
 
-    <div class="post-tag">
-      <span class="material-symbols-outlined" style="font-size:16px;">tag</span>
-      ${escapeHTML(TOPIC_LABELS[post.tags] || post.tags || "No tag")}
+    <div class="post-tag" title="${escapeHTML(topicLabel)}" aria-label="${escapeHTML(topicLabel)}">
+      <span class="material-symbols-outlined" style="font-size:22px;">${escapeHTML(topicIcon)}</span>
     </div>
 
     <div class="post-song">
