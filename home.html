@@ -154,6 +154,49 @@ textarea{
   resize:vertical;
 }
 
+.topics-label{
+  margin-top:12px;
+  margin-bottom:8px;
+  font-size:12px;
+  opacity:.8;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2, minmax(0, 1fr));
+  gap:10px;
+  margin-top:8px;
+}
+
+.topic{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:12px;
+  border-radius:14px;
+  border:1px solid var(--border);
+  background:#000;
+  color:#fff;
+  cursor:pointer;
+  user-select:none;
+  font-size:12px;
+  transition:.15s ease;
+}
+
+.topic:hover{
+  background:#151515;
+}
+
+.topic.selected{
+  background:#fff;
+  color:#000;
+  border-color:#fff;
+}
+
+.topic .material-symbols-outlined{
+  font-size:18px;
+}
+
 .song-wrapper{
   position:relative;
 }
@@ -333,6 +376,19 @@ textarea{
   line-height:1.4;
   white-space:pre-wrap;
   margin-top:8px;
+}
+
+.post-tag{
+  margin-top:10px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  border:1px solid var(--border);
+  border-radius:999px;
+  padding:8px 12px;
+  font-size:11px;
+  background:#000;
+  color:#fff;
 }
 
 .post-song{
@@ -745,6 +801,109 @@ textarea{
 
     <textarea id="caption" placeholder="Write a caption..."></textarea>
 
+    <div class="topics-label">Choose 1 tag</div>
+    <div class="grid" id="topics">
+      <div class="topic selected" data-id="gaming">
+        <span class="material-symbols-outlined">sports_esports</span>
+        Gaming
+      </div>
+
+      <div class="topic" data-id="music">
+        <span class="material-symbols-outlined">music_note</span>
+        Music
+      </div>
+
+      <div class="topic" data-id="sports">
+        <span class="material-symbols-outlined">sports_soccer</span>
+        Sports
+      </div>
+
+      <div class="topic" data-id="tech">
+        <span class="material-symbols-outlined">devices</span>
+        Tech
+      </div>
+
+      <div class="topic" data-id="ai">
+        <span class="material-symbols-outlined">smart_toy</span>
+        AI
+      </div>
+
+      <div class="topic" data-id="art">
+        <span class="material-symbols-outlined">brush</span>
+        Art
+      </div>
+
+      <div class="topic" data-id="travel">
+        <span class="material-symbols-outlined">flight</span>
+        Travel
+      </div>
+
+      <div class="topic" data-id="food">
+        <span class="material-symbols-outlined">restaurant</span>
+        Food
+      </div>
+
+      <div class="topic" data-id="movies">
+        <span class="material-symbols-outlined">movie</span>
+        Movies
+      </div>
+
+      <div class="topic" data-id="anime">
+        <span class="material-symbols-outlined">auto_awesome</span>
+        Anime
+      </div>
+
+      <div class="topic" data-id="cars">
+        <span class="material-symbols-outlined">directions_car</span>
+        Cars
+      </div>
+
+      <div class="topic" data-id="finance">
+        <span class="material-symbols-outlined">trending_up</span>
+        Finance
+      </div>
+
+      <div class="topic" data-id="science">
+        <span class="material-symbols-outlined">science</span>
+        Science
+      </div>
+
+      <div class="topic" data-id="fitness">
+        <span class="material-symbols-outlined">fitness_center</span>
+        Fitness
+      </div>
+
+      <div class="topic" data-id="photo">
+        <span class="material-symbols-outlined">photo_camera</span>
+        Photography
+      </div>
+
+      <div class="topic" data-id="nature">
+        <span class="material-symbols-outlined">forest</span>
+        Nature
+      </div>
+
+      <div class="topic" data-id="books">
+        <span class="material-symbols-outlined">menu_book</span>
+        Books
+      </div>
+
+      <div class="topic" data-id="memes">
+        <span class="material-symbols-outlined">mood</span>
+        Memes
+      </div>
+
+      <div class="topic" data-id="coding">
+        <span class="material-symbols-outlined">code</span>
+        Coding
+      </div>
+
+      <div class="topic" data-id="fashion">
+        <span class="material-symbols-outlined">styler</span>
+        Fashion
+      </div>
+    </div>
+
     <div class="song-wrapper">
       <input id="songInput" placeholder="Search song...">
       <div id="suggestions"></div>
@@ -769,7 +928,7 @@ const supabase = createClient(
 window.supabase = supabase;
 
 /* CHANGE THIS */
-const BACKEND_URL = "https://TUO-BACKEND.onrender.com";
+const BACKEND_URL = "https://shared-bk4b.onrender.com.onrender.com";
 
 const dropzone = document.getElementById("dropzone");
 const fileInput = document.getElementById("file");
@@ -799,11 +958,38 @@ const likersList = document.getElementById("likersList");
 const likersTitle = document.getElementById("likersTitle");
 const closeLikersBtn = document.getElementById("closeLikersBtn");
 
+const topicItems = [...document.querySelectorAll("#topics .topic")];
+
+const TOPIC_LABELS = {
+  music: "Music",
+  gaming: "Gaming",
+  sports: "Sports",
+  tech: "Tech",
+  ai: "AI",
+  art: "Art",
+  travel: "Travel",
+  food: "Food",
+  movies: "Movies",
+  anime: "Anime",
+  cars: "Cars",
+  finance: "Finance",
+  science: "Science",
+  fitness: "Fitness",
+  photo: "Photography",
+  nature: "Nature",
+  books: "Books",
+  memes: "Memes",
+  coding: "Coding",
+  fashion: "Fashion"
+};
+
 let user = null;
 let displayName = "user";
 let currentProfile = null;
 let croppedBlob = null;
 let selectedSong = null;
+let selectedTopic = "gaming";
+let userInterests = [];
 let debounceSong = null;
 let debounceUser = null;
 let globalAudio = new Audio();
@@ -839,6 +1025,44 @@ function getInitials(name){
   const parts = clean.split(/\s+/).filter(Boolean);
   if(parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
   return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+}
+
+function normalizeInterests(value){
+  if(Array.isArray(value)){
+    return value.map(v => String(v).trim()).filter(Boolean);
+  }
+
+  if(typeof value === "string"){
+    const raw = value.trim();
+    if(!raw) return [];
+
+    try{
+      const parsed = JSON.parse(raw);
+      if(Array.isArray(parsed)){
+        return parsed.map(v => String(v).trim()).filter(Boolean);
+      }
+    }catch(_){}
+
+    return raw
+      .split(",")
+      .map(v => v.trim())
+      .filter(Boolean);
+  }
+
+  if(value && typeof value === "object"){
+    return Object.values(value)
+      .flat()
+      .map(v => String(v).trim())
+      .filter(Boolean);
+  }
+
+  return [];
+}
+
+function syncSelectedTopic(){
+  topicItems.forEach(el=>{
+    el.classList.toggle("selected", el.dataset.id === selectedTopic);
+  });
 }
 
 function renderVerifiedBadge(){
@@ -950,20 +1174,29 @@ async function loadCurrentProfile(){
   try{
     const { data, error } = await supabase
       .from("profiles")
-      .select("id, display_name, avatar_url")
+      .select("id, display_name, avatar_url, interests")
       .eq("id", user.id)
       .maybeSingle();
 
     if(error){
       console.warn("current profile load error:", error);
       currentProfile = null;
+      userInterests = [];
       return;
     }
 
     currentProfile = data || null;
+    userInterests = normalizeInterests(currentProfile?.interests);
+
+    if(userInterests.length > 0 && !userInterests.includes(selectedTopic)){
+      selectedTopic = userInterests[0];
+    }
+
+    syncSelectedTopic();
   }catch(err){
     console.warn("current profile load failed:", err);
     currentProfile = null;
+    userInterests = [];
   }
 }
 
@@ -999,6 +1232,15 @@ aboutSidebarBtn.onclick = ()=>{
 settingsSidebarBtn.onclick = ()=>{
   location.href = "settings.html";
 };
+
+topicItems.forEach(item=>{
+  item.addEventListener("click", ()=>{
+    selectedTopic = item.dataset.id;
+    syncSelectedTopic();
+  });
+});
+
+syncSelectedTopic();
 
 (async ()=>{
   const { data: { session } } = await supabase.auth.getSession();
@@ -1409,6 +1651,11 @@ uploadBtn.onclick = async ()=>{
     return;
   }
 
+  if(!selectedTopic){
+    alert("Select a tag");
+    return;
+  }
+
   uploadBtn.disabled = true;
   uploadBtn.textContent = "CHECKING...";
 
@@ -1443,6 +1690,7 @@ uploadBtn.onclick = async ()=>{
       caption: captionInput.value.trim(),
       song_title: selectedSong.title,
       song_preview: selectedSong.preview,
+      tags: selectedTopic,
       created_at: new Date().toISOString()
     };
 
@@ -1629,10 +1877,16 @@ async function deletePost(postId){
 }
 
 async function loadFeed(){
-  const { data: posts, error: postsError } = await supabase
+  let query = supabase
     .from("posts")
     .select("*")
     .order("created_at", { ascending: false });
+
+  if(userInterests.length > 0){
+    query = query.in("tags", userInterests);
+  }
+
+  const { data: posts, error: postsError } = await query;
 
   if(postsError){
     console.error(postsError);
@@ -1645,7 +1899,9 @@ async function loadFeed(){
   postState.clear();
 
   if(rows.length === 0){
-    feed.innerHTML = `<div class="empty-state">No posts yet.</div>`;
+    feed.innerHTML = userInterests.length > 0
+      ? `<div class="empty-state">No posts for your interests yet.</div>`
+      : `<div class="empty-state">No posts yet.</div>`;
     return;
   }
 
@@ -1735,6 +1991,11 @@ function renderPost(post, likeCount, likedByMe, authorData){
     <img src="${escapeHTML(post.image_url)}" alt="post image">
 
     <div class="post-caption">${escapeHTML(post.caption || "")}</div>
+
+    <div class="post-tag">
+      <span class="material-symbols-outlined" style="font-size:16px;">tag</span>
+      ${escapeHTML(TOPIC_LABELS[post.tags] || post.tags || "No tag")}
+    </div>
 
     <div class="post-song">
       <div class="song-meta">
