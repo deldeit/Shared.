@@ -18,9 +18,13 @@
     :root {
       --bg: #000;
       --panel: #0f0f0f;
+      --panel-2: #111;
       --border: #222;
+      --border-2: #2c2c2c;
       --text: #fff;
       --muted: rgba(255,255,255,.68);
+      --muted-2: rgba(255,255,255,.52);
+      --accent: #fff;
     }
 
     html, body {
@@ -28,6 +32,10 @@
       background: var(--bg);
       color: var(--text);
       overflow-x: hidden;
+    }
+
+    body {
+      min-height: 100vh;
     }
 
     .container {
@@ -70,50 +78,252 @@
       border: 1px solid var(--border);
       border-radius: 24px;
       overflow: hidden;
+      box-shadow: 0 18px 40px rgba(0,0,0,.25);
     }
 
-    .media {
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      background: #111;
+    .post {
+      padding: 0;
     }
 
-    .media img {
+    .post-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 16px 14px;
+      border-bottom: 1px solid #1f1f1f;
+    }
+
+    .post-user {
+      min-width: 0;
+      display: grid;
+      gap: 6px;
+    }
+
+    .name {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      min-width: 0;
+      line-height: 1.2;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .name a {
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .name a:hover {
+      text-decoration: underline;
+    }
+
+    .verified-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      flex: 0 0 auto;
+      transform: translateY(-1px);
+    }
+
+    .verified-badge svg {
       width: 100%;
       height: 100%;
-      object-fit: cover;
       display: block;
     }
 
-    .content {
-      padding: 16px;
-      display: grid;
-      gap: 10px;
-    }
-
-    .meta {
-      font-size: 12px;
+    .time {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
       color: var(--muted);
+      font-size: 11px;
+      line-height: 1;
+      flex-wrap: wrap;
     }
 
-    .caption {
+    .post-image {
+      width: 100%;
+      display: block;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      background: #111;
+    }
+
+    .post-content {
+      padding: 14px 16px 16px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .post-caption {
       font-size: 14px;
-      line-height: 1.4;
+      line-height: 1.45;
       word-break: break-word;
       white-space: pre-wrap;
     }
 
+    .post-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      max-width: 100%;
+      border: 1px solid #242424;
+      background: #090909;
+      border-radius: 999px;
+      padding: 9px 12px;
+      font-size: 12px;
+      line-height: 1;
+      color: #fff;
+      user-select: none;
+    }
+
+    .post-tag span:last-child {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .post-song {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      border: 1px solid #242424;
+      background: #090909;
+      border-radius: 18px;
+      padding: 12px 12px 12px 14px;
+    }
+
+    .song-meta {
+      min-width: 0;
+      display: grid;
+      gap: 5px;
+      flex: 1;
+    }
+
+    .song-title {
+      font-size: 13px;
+      line-height: 1.25;
+      word-break: break-word;
+    }
+
+    .song-sub {
+      font-size: 11px;
+      color: var(--muted-2);
+      line-height: 1.2;
+    }
+
+    .post-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .like-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 12px;
+      white-space: nowrap;
+      transition: transform .15s ease, opacity .15s ease, background .15s ease;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .icon-btn.secondary {
+      background: #1a1a1a;
+      color: #fff;
+      border: 1px solid #333;
+    }
+
+    .icon-btn.likeBtn {
+      background: #fff;
+      color: #000;
+    }
+
+    .icon-btn.liked {
+      background: #fff;
+      color: #000;
+    }
+
+    .like-count-btn {
+      border: none;
+      background: transparent;
+      color: #fff;
+      padding: 0;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: .9;
+    }
+
+    .like-count-btn:hover {
+      opacity: 1;
+      text-decoration: underline;
+    }
+
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+      line-height: 1;
+      font-size: 20px;
+    }
+
+    .loading-state,
     .error-state,
-    .loading-state {
+    .empty-state {
       padding: 22px 10px;
       text-align: center;
-      opacity: .8;
+      opacity: .78;
       font-size: 13px;
+    }
+
+    .error-state {
+      opacity: .95;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     @media (max-width: 520px) {
       .header {
         font-size: 26px;
+      }
+
+      .post-header,
+      .post-content {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .post-song {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .icon-btn {
+        width: 100%;
       }
     }
   </style>
@@ -143,6 +353,15 @@
     const postId = params.get("id") || "";
 
     const postCard = document.getElementById("postCard");
+    const loadingState = document.getElementById("loadingState");
+
+    let currentUser = null;
+    let postData = null;
+    let authorData = null;
+    let audio = new Audio();
+    let audioPlaying = false;
+    let likedByMe = false;
+    let likesCountValue = 0;
 
     function escapeHtml(value) {
       return String(value ?? "")
@@ -153,46 +372,421 @@
         .replaceAll("'", "&#039;");
     }
 
-    async function loadPost() {
+    function getFirstDefined(obj, keys, fallback = "") {
+      for (const key of keys) {
+        const value = obj?.[key];
+        if (value !== undefined && value !== null && value !== "") return value;
+      }
+      return fallback;
+    }
+
+    function formatDate(value) {
+      if (!value) return "";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return "";
+      return new Intl.DateTimeFormat("it-IT", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date);
+    }
+
+    function verifiedBadgeHtml() {
+      return `
+        <span class="verified-badge" aria-label="Verified" title="Verified">
+          <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
+            <defs>
+              <mask id="checkcut-post">
+                <rect width="24" height="24" fill="white"></rect>
+                <path d="M6.5 12.5 L10.3 16.2 L17.6 8.8" fill="none" stroke="black" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"></path>
+              </mask>
+            </defs>
+            <circle cx="12" cy="12" r="11" fill="white" mask="url(#checkcut-post)"></circle>
+          </svg>
+        </span>
+      `;
+    }
+
+    async function getCurrentUser() {
+      const { data: sessionData, error } = await supabaseClient.auth.getSession();
+
+      if (!error && sessionData?.session?.user) {
+        currentUser = sessionData.session.user;
+        return currentUser;
+      }
+
+      const savedSessionRaw = sessionStorage.getItem("shared-session");
+      if (!savedSessionRaw) return null;
+
+      try {
+        const savedSession = JSON.parse(savedSessionRaw);
+        if (!savedSession?.access_token || !savedSession?.refresh_token) return null;
+
+        const { data, error: setSessionError } = await supabaseClient.auth.setSession({
+          access_token: savedSession.access_token,
+          refresh_token: savedSession.refresh_token
+        });
+
+        if (!setSessionError && data?.user) {
+          currentUser = data.user;
+          return currentUser;
+        }
+      } catch (err) {
+        console.error("SESSION RESTORE ERROR:", err);
+      }
+
+      return null;
+    }
+
+    async function fetchPost() {
       if (!postId) {
-        postCard.innerHTML = `<div class="error-state">Missing post id in URL.</div>`;
+        throw new Error("Missing post id in URL.");
+      }
+
+      const { data, error } = await supabaseClient
+        .from("posts")
+        .select("*")
+        .eq("id", postId)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error("Post not found.");
+
+      postData = data;
+      return data;
+    }
+
+    async function fetchAuthor(userId) {
+      if (!userId) return null;
+
+      const { data, error } = await supabaseClient
+        .from("profiles")
+        .select("id, display_name, verified, avatar_url, bio")
+        .eq("id", userId)
+        .maybeSingle();
+
+      if (error) {
+        console.error("AUTHOR LOAD ERROR:", error);
+      }
+
+      authorData = data || null;
+      return authorData;
+    }
+
+    async function fetchLikeState() {
+      likesCountValue = Number(
+        getFirstDefined(postData, ["likes_count", "like_count", "likes"], 0)
+      ) || 0;
+
+      likedByMe = Boolean(getFirstDefined(postData, ["liked"], false));
+
+      if (!currentUser || !postData?.id) {
         return;
       }
 
       try {
         const { data, error } = await supabaseClient
-          .from("posts")
-          .select("id, image_url, caption, created_at, user_id, song_preview")
-          .eq("id", postId)
+          .from("post_likes")
+          .select("id")
+          .eq("post_id", postData.id)
+          .eq("user_id", currentUser.id)
           .maybeSingle();
 
-        if (error) throw error;
+        if (!error) {
+          likedByMe = !!data;
 
-        if (!data) {
-          postCard.innerHTML = `<div class="error-state">Post not found.</div>`;
-          return;
+          const { count, error: countError } = await supabaseClient
+            .from("post_likes")
+            .select("*", { count: "exact", head: true })
+            .eq("post_id", postData.id);
+
+          if (!countError && typeof count === "number") {
+            likesCountValue = count;
+          }
         }
-
-        postCard.innerHTML = `
-          <div class="media">
-            ${data.image_url ? `<img src="${escapeHtml(data.image_url)}" alt="Post image">` : ""}
-          </div>
-          <div class="content">
-            <div class="meta">
-              ${data.created_at ? new Date(data.created_at).toLocaleString() : ""}
-            </div>
-            <div class="caption">
-              ${escapeHtml(data.caption || "No caption")}
-            </div>
-          </div>
-        `;
       } catch (err) {
-        console.error("POST LOAD ERROR:", err);
-        postCard.innerHTML = `<div class="error-state">Unable to load post.</div>`;
+        console.error("LIKE STATE ERROR:", err);
       }
     }
 
-    loadPost();
+    function setLikeButtonState() {
+      const likeBtn = document.querySelector(".likeBtn");
+      const likeCountBtn = document.querySelector(".likeCountBtn");
+      const likeCountEl = document.querySelector(".likeCount");
+
+      if (!likeBtn || !likeCountBtn || !likeCountEl) return;
+
+      likeCountEl.textContent = String(likesCountValue);
+
+      if (likedByMe) {
+        likeBtn.classList.add("liked");
+        likeBtn.innerHTML = `
+          <span class="material-symbols-outlined">favorite</span>
+          <span>Liked</span>
+        `;
+      } else {
+        likeBtn.classList.remove("liked");
+        likeBtn.innerHTML = `
+          <span class="material-symbols-outlined">favorite_border</span>
+          <span>Like</span>
+        `;
+      }
+
+      likeCountBtn.textContent = `${likesCountValue} likes`;
+    }
+
+    async function toggleLike() {
+      if (!currentUser || !postData?.id) {
+        alert("Login required.");
+        return;
+      }
+
+      const likeBtn = document.querySelector(".likeBtn");
+      if (likeBtn) likeBtn.disabled = true;
+
+      try {
+        const postIdValue = postData.id;
+
+        if (likedByMe) {
+          const { error } = await supabaseClient
+            .from("post_likes")
+            .delete()
+            .eq("post_id", postIdValue)
+            .eq("user_id", currentUser.id);
+
+          if (error) throw error;
+          likedByMe = false;
+          likesCountValue = Math.max(0, likesCountValue - 1);
+        } else {
+          const { error } = await supabaseClient
+            .from("post_likes")
+            .upsert(
+              {
+                post_id: postIdValue,
+                user_id: currentUser.id
+              },
+              { onConflict: "post_id,user_id" }
+            );
+
+          if (error) throw error;
+          likedByMe = true;
+          likesCountValue += 1;
+        }
+
+        setLikeButtonState();
+      } catch (err) {
+        console.error("LIKE TOGGLE ERROR:", err);
+        alert(err?.message || "Unable to update like.");
+      } finally {
+        if (likeBtn) likeBtn.disabled = false;
+      }
+    }
+
+    function playAudio(url) {
+      if (!url) return;
+
+      if (audio.src !== url) {
+        audio.pause();
+        audio.src = url;
+      }
+
+      if (audio.paused) {
+        audio.play()
+          .then(() => {
+            audioPlaying = true;
+            updatePlayButton();
+          })
+          .catch(err => console.error("AUDIO PLAY ERROR:", err));
+      } else {
+        audio.pause();
+        audioPlaying = false;
+        updatePlayButton();
+      }
+    }
+
+    function updatePlayButton() {
+      const btn = document.querySelector(".playBtn");
+      if (!btn) return;
+
+      const icon = btn.querySelector(".material-symbols-outlined");
+      const label = btn.querySelector(".btn-label");
+
+      if (audioPlaying) {
+        icon.textContent = "pause";
+        label.textContent = "Pause preview";
+        btn.dataset.playing = "1";
+      } else {
+        icon.textContent = "play_arrow";
+        label.textContent = "Play preview";
+        btn.dataset.playing = "0";
+      }
+    }
+
+    audio.addEventListener("ended", () => {
+      audioPlaying = false;
+      updatePlayButton();
+    });
+
+    function buildPostHtml() {
+      const authorName = getFirstDefined(authorData, ["display_name"], "User");
+      const authorId = getFirstDefined(authorData, ["id"], getFirstDefined(postData, ["user_id"], ""));
+      const verified = Boolean(getFirstDefined(authorData, ["verified"], false));
+      const avatarUrl = getFirstDefined(authorData, ["avatar_url"], "");
+      const createdAt = getFirstDefined(postData, ["created_at", "inserted_at"], "");
+      const caption = getFirstDefined(postData, ["caption", "text", "content"], "");
+      const imageUrl = getFirstDefined(postData, ["image_url", "media_url"], "");
+      const tag = getFirstDefined(postData, ["tag", "category", "topic"], "");
+      const tagLabel = getFirstDefined(postData, ["tag_label", "category_label"], tag);
+      const songTitle = getFirstDefined(postData, ["song_title", "song_name", "track_title"], "");
+      const songPreview = getFirstDefined(postData, ["song_preview", "preview_url", "audio_preview"], "");
+
+      const authorLink = `user.html?id=${encodeURIComponent(authorId)}&name=${encodeURIComponent(authorName)}`;
+
+      return `
+        <div class="post-header">
+          <div class="post-user">
+            <div class="name">
+              <a href="${authorLink}">
+                ${escapeHtml(authorName)}
+              </a>
+              ${verified ? verifiedBadgeHtml() : ""}
+            </div>
+            <div class="time">
+              <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
+              <span>${escapeHtml(formatDate(createdAt))}</span>
+            </div>
+          </div>
+
+          <span class="material-symbols-outlined" style="opacity:.6;">more_horiz</span>
+        </div>
+
+        ${imageUrl ? `<img class="post-image" src="${escapeHtml(imageUrl)}" alt="post image">` : ""}
+
+        <div class="post-content">
+          ${caption ? `<div class="post-caption">${escapeHtml(caption)}</div>` : ""}
+
+          ${tag ? `
+            <div class="post-tag" title="${escapeHtml(tagLabel || tag)}" aria-label="${escapeHtml(tagLabel || tag)}">
+              <span class="material-symbols-outlined" style="font-size:18px;">photo_camera</span>
+              <span>${escapeHtml(tagLabel || tag)}</span>
+            </div>
+          ` : ""}
+
+          ${songTitle || songPreview ? `
+            <div class="post-song">
+              <div class="song-meta">
+                <div class="song-title">
+                  <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;">music_note</span>
+                  ${escapeHtml(songTitle || "Audio preview")}
+                </div>
+                <div class="song-sub">${songPreview ? "Hover to play preview" : "No preview available"}</div>
+              </div>
+
+              <button type="button" class="icon-btn secondary playBtn" ${songPreview ? "" : "disabled"} data-playing="0">
+                <span class="material-symbols-outlined">play_arrow</span>
+                <span class="btn-label">Play preview</span>
+              </button>
+            </div>
+          ` : ""}
+
+          <div class="post-actions">
+            <div class="like-wrap">
+              <button type="button" class="icon-btn likeBtn ${likedByMe ? "liked" : ""}">
+                <span class="material-symbols-outlined">${likedByMe ? "favorite" : "favorite_border"}</span>
+                <span>${likedByMe ? "Liked" : "Like"}</span>
+              </button>
+
+              <button type="button" class="like-count-btn likeCountBtn">
+                <span class="likeCount">${likesCountValue}</span> likes
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function attachPostEvents() {
+      const likeBtn = document.querySelector(".likeBtn");
+      const likeCountBtn = document.querySelector(".likeCountBtn");
+      const playBtn = document.querySelector(".playBtn");
+      const postSong = document.querySelector(".post-song");
+
+      if (likeBtn) {
+        likeBtn.addEventListener("click", toggleLike);
+      }
+
+      if (likeCountBtn) {
+        likeCountBtn.addEventListener("click", () => {
+          if (likeBtn) toggleLike();
+        });
+      }
+
+      if (playBtn) {
+        playBtn.addEventListener("click", () => {
+          const songPreview = getFirstDefined(postData, ["song_preview", "preview_url", "audio_preview"], "");
+          if (!songPreview) return;
+          playAudio(songPreview);
+        });
+      }
+
+      if (postSong) {
+        const songPreview = getFirstDefined(postData, ["song_preview", "preview_url", "audio_preview"], "");
+        if (songPreview) {
+          postSong.addEventListener("mouseenter", () => {
+            if (!window.matchMedia("(hover: hover)").matches) return;
+            playAudio(songPreview);
+          });
+
+          postSong.addEventListener("mouseleave", () => {
+            if (!audio.paused) {
+              audio.pause();
+              audioPlaying = false;
+              updatePlayButton();
+            }
+          });
+        }
+      }
+
+      updatePlayButton();
+      setLikeButtonState();
+    }
+
+    async function renderPostPage() {
+      try {
+        await getCurrentUser();
+        await fetchPost();
+        await fetchAuthor(postData.user_id);
+        await fetchLikeState();
+
+        const hasImage = !!getFirstDefined(postData, ["image_url", "media_url"], "");
+        const html = buildPostHtml();
+
+        postCard.innerHTML = `
+          <div class="post">
+            ${html}
+          </div>
+        `;
+
+        if (!hasImage) {
+          const img = document.querySelector(".post-image");
+          if (img) img.classList.add("hidden");
+        }
+
+        attachPostEvents();
+      } catch (err) {
+        console.error("POST LOAD ERROR:", err);
+        postCard.innerHTML = `
+          <div class="error-state">
+            Unable to load post.<br>
+            ${escapeHtml(err?.message || "Unknown error")}
+          </div>
+        `;
+      }
+    }
+
+    renderPostPage();
   </script>
 </body>
 </html>
