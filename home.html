@@ -10,60 +10,57 @@
 <style>
   :root{
     --bg:#000;
-    --panel:#0b0b0b;
-    --panel2:#111;
+    --panel:#0c0c0c;
     --line:#232323;
-    --muted:#9a9a9a;
     --text:#fff;
-    --soft:#d9d9d9;
-    --shadow: 0 24px 80px rgba(0,0,0,.45);
-    --radius: 28px;
+    --muted:#a0a0a0;
+    --shadow:0 24px 80px rgba(0,0,0,.48);
+    --radius:28px;
   }
 
   *{ box-sizing:border-box; }
-  html,body{
+  html, body{
     margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
     background:
-      radial-gradient(circle at 20% 20%, rgba(255,255,255,.06), transparent 26%),
-      radial-gradient(circle at 80% 10%, rgba(255,255,255,.05), transparent 22%),
-      radial-gradient(circle at 50% 100%, rgba(255,255,255,.05), transparent 28%),
+      radial-gradient(circle at 18% 20%, rgba(255,255,255,.06), transparent 24%),
+      radial-gradient(circle at 82% 12%, rgba(255,255,255,.05), transparent 20%),
+      radial-gradient(circle at 50% 100%, rgba(255,255,255,.04), transparent 26%),
       #000;
     color:var(--text);
     font-family:'Archivo Black', system-ui, sans-serif;
   }
 
   .app{
-    position:relative;
     width:100%;
     height:100%;
+    position:relative;
     overflow:hidden;
   }
 
-  /* top */
   .topbar{
     position:fixed;
     inset:0 0 auto 0;
     z-index:50;
-    padding:14px 14px 0;
+    padding:12px 12px 0;
     pointer-events:none;
   }
 
   .topbar-inner{
     pointer-events:auto;
+    max-width:1220px;
+    margin:0 auto;
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:12px;
     padding:12px 14px;
-    margin:0 auto;
-    max-width:1200px;
     border:1px solid rgba(255,255,255,.08);
-    background:rgba(8,8,8,.72);
-    backdrop-filter: blur(16px);
     border-radius:999px;
+    background:rgba(8,8,8,.72);
+    backdrop-filter:blur(16px);
     box-shadow:var(--shadow);
   }
 
@@ -71,20 +68,20 @@
     display:flex;
     align-items:baseline;
     gap:10px;
-    letter-spacing:.5px;
   }
 
   .brand .logo{
     font-size:20px;
-    line-height:1;
+    letter-spacing:.4px;
   }
 
   .brand .pill{
-    font-size:11px;
-    color:#000;
-    background:#fff;
-    padding:5px 8px;
+    font-size:10px;
+    line-height:1;
+    padding:6px 8px;
     border-radius:999px;
+    background:#fff;
+    color:#000;
   }
 
   .nav{
@@ -95,14 +92,14 @@
 
   .navbtn{
     border:1px solid rgba(255,255,255,.08);
-    background:#0e0e0e;
+    background:#0d0d0d;
     color:#fff;
     padding:10px 14px;
     border-radius:999px;
     font-family:inherit;
     font-size:12px;
     cursor:pointer;
-    transition:.18s ease;
+    transition:.16s ease;
   }
 
   .navbtn.active{
@@ -124,22 +121,49 @@
     height:42px;
     border-radius:50%;
     border:1px solid rgba(255,255,255,.08);
-    background:#0e0e0e;
+    background:#0d0d0d;
     color:#fff;
     display:grid;
     place-items:center;
     cursor:pointer;
-    transition:.18s ease;
+    transition:.16s ease;
   }
+
   .iconbtn:hover{ transform:translateY(-1px) scale(1.02); }
 
-  /* progress */
-  .progress-wrap{
+  .searchbar{
     position:fixed;
-    top:70px;
+    top:72px;
     left:50%;
     transform:translateX(-50%);
-    width:min(680px, calc(100vw - 24px));
+    width:min(760px, calc(100vw - 20px));
+    z-index:45;
+    display:flex;
+    gap:10px;
+    pointer-events:auto;
+  }
+
+  .searchbar input{
+    flex:1;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(9,9,9,.82);
+    color:#fff;
+    outline:none;
+    padding:14px 16px;
+    font-family:system-ui, sans-serif;
+    font-size:14px;
+    backdrop-filter:blur(16px);
+  }
+
+  .searchbar input::placeholder{ color:#7b7b7b; }
+
+  .progress-wrap{
+    position:fixed;
+    top:122px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(760px, calc(100vw - 20px));
     z-index:45;
     pointer-events:none;
   }
@@ -154,19 +178,18 @@
     flex:1;
     height:4px;
     border-radius:999px;
-    background:rgba(255,255,255,.10);
     overflow:hidden;
+    background:rgba(255,255,255,.10);
   }
 
   .segment > span{
     display:block;
-    height:100%;
     width:0%;
+    height:100%;
     border-radius:inherit;
     background:#fff;
   }
 
-  /* feed */
   .feed{
     height:100%;
     display:flex;
@@ -177,9 +200,10 @@
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
   }
+
   .feed::-webkit-scrollbar{ display:none; }
 
-  .post{
+  .item{
     flex:0 0 100vw;
     height:100vh;
     scroll-snap-align:start;
@@ -187,26 +211,18 @@
     isolation:isolate;
   }
 
-  .post::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:
-      radial-gradient(circle at 50% 35%, rgba(255,255,255,.15), transparent 22%),
-      linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.78) 80%, rgba(0,0,0,.95));
-    z-index:1;
-    pointer-events:none;
-  }
-
   .media{
     position:absolute;
     inset:0;
     z-index:0;
+    transform:scale(1.03);
+  }
+
+  .media.gradient{
     background:
-      radial-gradient(circle at 25% 20%, rgba(255,255,255,.18), transparent 18%),
-      radial-gradient(circle at 75% 30%, rgba(255,255,255,.12), transparent 20%),
+      radial-gradient(circle at 20% 18%, rgba(255,255,255,.18), transparent 18%),
+      radial-gradient(circle at 75% 26%, rgba(255,255,255,.10), transparent 20%),
       linear-gradient(135deg, var(--c1), var(--c2));
-    transform:scale(1.04);
   }
 
   .media::after{
@@ -214,10 +230,17 @@
     position:absolute;
     inset:0;
     background:
-      linear-gradient(115deg, rgba(255,255,255,.0) 0%, rgba(255,255,255,.08) 18%, rgba(255,255,255,.0) 36%),
-      radial-gradient(circle at center, transparent 30%, rgba(0,0,0,.18) 100%);
-    mix-blend-mode:screen;
-    opacity:.65;
+      linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.72) 76%, rgba(0,0,0,.95)),
+      linear-gradient(115deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.08) 18%, rgba(255,255,255,0) 36%);
+    pointer-events:none;
+  }
+
+  .media .file{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
   }
 
   .content{
@@ -227,17 +250,17 @@
     padding:24px;
     display:grid;
     grid-template-columns:minmax(0,1fr) auto;
-    gap:18px;
     align-items:end;
+    gap:18px;
   }
 
   .card{
-    width:min(720px, calc(100vw - 88px));
+    width:min(760px, calc(100vw - 92px));
     max-width:100%;
-    border:1px solid rgba(255,255,255,.10);
-    background:linear-gradient(180deg, rgba(12,12,12,.35), rgba(12,12,12,.78));
-    backdrop-filter: blur(16px);
     border-radius:var(--radius);
+    border:1px solid rgba(255,255,255,.10);
+    background:linear-gradient(180deg, rgba(12,12,12,.35), rgba(12,12,12,.82));
+    backdrop-filter:blur(16px);
     box-shadow:var(--shadow);
     padding:18px;
   }
@@ -253,18 +276,15 @@
     width:46px;
     height:46px;
     border-radius:50%;
+    flex:0 0 auto;
     display:grid;
     place-items:center;
-    color:#000;
     background:#fff;
-    font-size:16px;
-    flex:0 0 auto;
+    color:#000;
+    font-size:15px;
   }
 
-  .author-meta{
-    min-width:0;
-  }
-
+  .author-meta{ min-width:0; }
   .author{
     font-size:16px;
     line-height:1.1;
@@ -278,21 +298,21 @@
   }
 
   .headline{
-    font-size: clamp(28px, 5vw, 58px);
-    line-height:.95;
-    letter-spacing: .2px;
     margin:0 0 10px;
+    font-size:clamp(28px, 5vw, 58px);
+    line-height:.95;
+    letter-spacing:.2px;
     text-wrap:balance;
   }
 
   .caption{
-    font-size:13px;
-    line-height:1.65;
-    color:#e8e8e8;
-    opacity:.92;
     margin:0 0 16px;
     max-width:62ch;
-    font-family: system-ui, sans-serif;
+    color:#e9e9e9;
+    opacity:.95;
+    font-family:system-ui, sans-serif;
+    font-size:13px;
+    line-height:1.65;
     font-weight:600;
   }
 
@@ -304,29 +324,30 @@
   }
 
   .chip{
-    font-size:11px;
     padding:8px 10px;
     border-radius:999px;
     border:1px solid rgba(255,255,255,.10);
     background:rgba(255,255,255,.06);
     color:#fff;
+    font-size:11px;
   }
 
   .footerline{
+    padding-top:14px;
+    border-top:1px solid rgba(255,255,255,.08);
     display:flex;
     align-items:center;
     justify-content:space-between;
     gap:14px;
-    border-top:1px solid rgba(255,255,255,.08);
-    padding-top:14px;
   }
 
   .stats{
     display:flex;
+    flex-wrap:wrap;
     gap:14px;
-    color:#ededed;
+    color:#f0f0f0;
+    font-family:system-ui, sans-serif;
     font-size:11px;
-    font-family:system-ui,sans-serif;
     font-weight:700;
   }
 
@@ -342,7 +363,7 @@
     font-family:inherit;
     font-size:12px;
     cursor:pointer;
-    transition:.18s ease;
+    transition:.16s ease;
   }
 
   .primary{
@@ -356,7 +377,7 @@
     border:1px solid rgba(255,255,255,.12);
   }
 
-  .primary:hover,.secondary:hover{ transform:translateY(-1px); }
+  .cta button:hover{ transform:translateY(-1px); }
 
   .actions{
     display:flex;
@@ -371,18 +392,48 @@
     border-radius:18px;
     border:1px solid rgba(255,255,255,.10);
     background:rgba(10,10,10,.72);
-    backdrop-filter: blur(12px);
+    backdrop-filter:blur(12px);
     color:#fff;
     display:grid;
     place-items:center;
     font-size:18px;
     cursor:pointer;
     box-shadow:var(--shadow);
-    transition:.18s ease;
+    transition:.16s ease;
   }
 
   .action:hover{ transform:translateY(-1px) scale(1.03); }
-  .action.liked{ background:#fff; color:#000; }
+
+  .action.liked{
+    background:#fff;
+    color:#000;
+  }
+
+  .badge{
+    position:absolute;
+    top:24px;
+    left:24px;
+    z-index:3;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(12px);
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:#fff;
+  }
+
+  .badge .dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#fff;
+  }
 
   .sidehint{
     position:absolute;
@@ -397,7 +448,7 @@
     font-size:11px;
     text-transform:uppercase;
     letter-spacing:1.4px;
-    font-family:system-ui,sans-serif;
+    font-family:system-ui, sans-serif;
     pointer-events:none;
   }
 
@@ -407,8 +458,263 @@
     background:rgba(255,255,255,.2);
   }
 
-  /* mobile */
-  @media (max-width: 820px){
+  .ad-card .media{
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,.14), transparent 20%),
+      radial-gradient(circle at 80% 18%, rgba(255,255,255,.08), transparent 18%),
+      linear-gradient(135deg, #0b0b0b, #262626);
+  }
+
+  .ad-card .headline{
+    font-size:clamp(26px, 4.4vw, 52px);
+  }
+
+  .ad-box{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:14px;
+  }
+
+  .ad-label{
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.07);
+    color:#fff;
+    font-size:11px;
+  }
+
+  .ad-brand{
+    font-size:13px;
+    color:var(--muted);
+    font-family:system-ui, sans-serif;
+    font-weight:700;
+    letter-spacing:.4px;
+  }
+
+  .fab{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    z-index:60;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:14px 16px;
+    border:none;
+    border-radius:999px;
+    background:#fff;
+    color:#000;
+    box-shadow:var(--shadow);
+    cursor:pointer;
+    font-family:inherit;
+    font-size:12px;
+    transition:.16s ease;
+  }
+
+  .fab:hover{ transform:translateY(-2px) scale(1.01); }
+
+  .fab .plus{
+    width:28px;
+    height:28px;
+    border-radius:50%;
+    background:#000;
+    color:#fff;
+    display:grid;
+    place-items:center;
+    font-size:16px;
+  }
+
+  .modal{
+    position:fixed;
+    inset:0;
+    z-index:80;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:18px;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(10px);
+  }
+
+  .modal.open{ display:flex; }
+
+  .sheet{
+    width:min(720px, 100%);
+    border-radius:28px;
+    border:1px solid rgba(255,255,255,.10);
+    background:linear-gradient(180deg, rgba(12,12,12,.96), rgba(7,7,7,.98));
+    box-shadow:var(--shadow);
+    overflow:hidden;
+  }
+
+  .sheet-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:18px 18px 14px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+  }
+
+  .sheet-title{
+    font-size:20px;
+    letter-spacing:.4px;
+  }
+
+  .close{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.10);
+    background:#111;
+    color:#fff;
+    cursor:pointer;
+    font-size:18px;
+  }
+
+  .sheet-body{
+    display:grid;
+    grid-template-columns:1.15fr .85fr;
+    gap:0;
+  }
+
+  .form{
+    padding:18px;
+    display:grid;
+    gap:10px;
+  }
+
+  .input, .textarea, .file{
+    width:100%;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.10);
+    background:#000;
+    color:#fff;
+    outline:none;
+    font-family:system-ui, sans-serif;
+    padding:12px 14px;
+    font-size:14px;
+  }
+
+  .textarea{
+    min-height:140px;
+    resize:vertical;
+  }
+
+  .input::placeholder,
+  .textarea::placeholder{
+    color:#7f7f7f;
+  }
+
+  .helper{
+    color:var(--muted);
+    font-family:system-ui, sans-serif;
+    font-size:12px;
+    line-height:1.5;
+    margin-top:2px;
+  }
+
+  .preview{
+    padding:18px 18px 18px 0;
+  }
+
+  .preview-card{
+    height:100%;
+    min-height:380px;
+    border-radius:24px;
+    border:1px solid rgba(255,255,255,.10);
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,.16), transparent 16%),
+      linear-gradient(135deg, #1a1a1a, #333);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .preview-media{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:none;
+  }
+
+  .preview-overlay{
+    position:absolute;
+    inset:auto 0 0 0;
+    padding:16px;
+    background:linear-gradient(180deg, transparent, rgba(0,0,0,.86));
+  }
+
+  .preview-title{
+    font-size:28px;
+    line-height:.96;
+    margin:0 0 8px;
+  }
+
+  .preview-text{
+    margin:0;
+    font-family:system-ui, sans-serif;
+    font-size:13px;
+    line-height:1.55;
+    color:#e8e8e8;
+    font-weight:600;
+  }
+
+  .sheet-actions{
+    display:flex;
+    gap:10px;
+    justify-content:flex-end;
+    padding:0 18px 18px;
+  }
+
+  .sheet-actions button{
+    border:none;
+    border-radius:999px;
+    padding:12px 14px;
+    font-family:inherit;
+    font-size:12px;
+    cursor:pointer;
+  }
+
+  .ghost{
+    background:#111;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.10);
+  }
+
+  .save{
+    background:#fff;
+    color:#000;
+  }
+
+  .profile-pill{
+    font-family:system-ui, sans-serif;
+    font-size:12px;
+    color:#fff;
+    opacity:.88;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.05);
+    padding:8px 12px;
+    border-radius:999px;
+  }
+
+  .loading{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:grid;
+    place-items:center;
+    background:#000;
+    color:#fff;
+    font-family:system-ui, sans-serif;
+    letter-spacing:.4px;
+  }
+
+  .hidden{ display:none !important; }
+
+  @media (max-width: 860px){
     .topbar{
       padding:10px 10px 0;
     }
@@ -422,9 +728,14 @@
       display:none;
     }
 
+    .searchbar{
+      top:104px;
+      width:calc(100vw - 16px);
+    }
+
     .progress-wrap{
-      top:66px;
-      width:calc(100vw - 18px);
+      top:156px;
+      width:calc(100vw - 16px);
     }
 
     .content{
@@ -453,16 +764,35 @@
       display:none;
     }
 
-    .headline{
-      font-size: clamp(24px, 8vw, 42px);
+    .fab{
+      right:14px;
+      bottom:14px;
+      padding:13px 14px;
+    }
+
+    .sheet-body{
+      grid-template-columns:1fr;
+    }
+
+    .preview{
+      padding:0 18px 18px;
+    }
+
+    .preview-card{
+      min-height:260px;
+    }
+
+    .preview-title{
+      font-size:24px;
     }
   }
 </style>
 </head>
 
 <body>
-<div class="app">
+<div class="loading" id="loading">Loading Shared...</div>
 
+<div class="app hidden" id="app">
   <div class="topbar">
     <div class="topbar-inner">
       <div class="brand">
@@ -477,230 +807,371 @@
       </div>
 
       <div class="topright">
-        <button class="iconbtn" title="Search">⌕</button>
-        <button class="iconbtn" title="Profile">◌</button>
+        <div class="profile-pill" id="profilePill">Guest</div>
+        <button class="iconbtn" id="refreshBtn" title="Refresh">↻</button>
       </div>
     </div>
+  </div>
+
+  <div class="searchbar">
+    <input id="searchInput" type="text" placeholder="Cerca post o profili..." />
+    <button class="iconbtn" id="searchClear" title="Clear">×</button>
   </div>
 
   <div class="progress-wrap">
     <div class="segments" id="segments"></div>
   </div>
 
-  <div class="feed" id="feed">
+  <div class="feed" id="feed"></div>
+</div>
 
-    <section class="post" style="--c1:#1a1a1a; --c2:#4c4c4c;">
-      <div class="media"></div>
-      <div class="sidehint"><span class="line"></span> swipe <span class="line"></span></div>
-      <div class="content">
-        <div class="card">
-          <div class="author-row">
-            <div class="avatar">S</div>
-            <div class="author-meta">
-              <div class="author">Shared Studio</div>
-              <div class="handle">@shared</div>
-            </div>
-          </div>
+<button class="fab" id="openUpload">
+  <span class="plus">+</span>
+  Upload
+</button>
 
-          <h2 class="headline">A cleaner feed, built to keep people moving.</h2>
-          <p class="caption">
-            Una home pensata per essere veloce, memorabile e naturale da scrollare.
-            Ogni post prende tutto lo schermo, con progressione chiara e interazione immediata.
-          </p>
+<div class="modal" id="uploadModal" aria-hidden="true">
+  <div class="sheet">
+    <div class="sheet-head">
+      <div class="sheet-title">New content</div>
+      <button class="close" id="closeUpload">×</button>
+    </div>
 
-          <div class="meta">
-            <span class="chip">#design</span>
-            <span class="chip">#community</span>
-            <span class="chip">#minimal</span>
-          </div>
-
-          <div class="footerline">
-            <div class="stats">
-              <span>12.4K views</span>
-              <span>1.8K likes</span>
-              <span>214 shares</span>
-            </div>
-            <div class="cta">
-              <button class="secondary">Save</button>
-              <button class="primary">Open</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="action likeBtn" aria-label="Like">❤</button>
-          <button class="action" aria-label="Comment">✦</button>
-          <button class="action" aria-label="Share">↗</button>
+    <div class="sheet-body">
+      <div class="form">
+        <input class="input" id="uName" type="text" placeholder="Username" />
+        <input class="input" id="uHandle" type="text" placeholder="@handle" />
+        <input class="input" id="uTitle" type="text" placeholder="Titolo post" />
+        <textarea class="textarea" id="uCaption" placeholder="Caption"></textarea>
+        <input class="file" id="uFile" type="file" accept="image/*,video/*" />
+        <div class="helper">
+          Il file viene caricato su Supabase Storage e il post viene salvato in <code>posts</code>. Il profilo viene letto da <code>profiles</code>.
         </div>
       </div>
-    </section>
 
-    <section class="post" style="--c1:#101010; --c2:#2f2f2f;">
-      <div class="media"></div>
-      <div class="content">
-        <div class="card">
-          <div class="author-row">
-            <div class="avatar">A</div>
-            <div class="author-meta">
-              <div class="author">Anna V.</div>
-              <div class="handle">@anna</div>
-            </div>
+      <div class="preview">
+        <div class="preview-card" id="previewCard">
+          <img class="preview-media" id="previewImg" alt="" />
+          <video class="preview-media" id="previewVideo" muted loop playsinline></video>
+
+          <div class="preview-overlay">
+            <h3 class="preview-title" id="previewTitle">Preview</h3>
+            <p class="preview-text" id="previewText">Qui vedrai l’anteprima del contenuto che stai preparando.</p>
           </div>
-
-          <h2 class="headline">Scroll orizzontale senza rumore visivo.</h2>
-          <p class="caption">
-            Il focus resta sul contenuto. Il frame, le ombre e gli overlay servono solo a dare gerarchia,
-            non a distrarre.
-          </p>
-
-          <div class="meta">
-            <span class="chip">#content</span>
-            <span class="chip">#ui</span>
-            <span class="chip">#ux</span>
-          </div>
-
-          <div class="footerline">
-            <div class="stats">
-              <span>8.1K views</span>
-              <span>931 likes</span>
-              <span>88 shares</span>
-            </div>
-            <div class="cta">
-              <button class="secondary">Save</button>
-              <button class="primary">Open</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="action likeBtn" aria-label="Like">❤</button>
-          <button class="action" aria-label="Comment">✦</button>
-          <button class="action" aria-label="Share">↗</button>
         </div>
       </div>
-    </section>
+    </div>
 
-    <section class="post" style="--c1:#090909; --c2:#202020;">
-      <div class="media"></div>
-      <div class="content">
-        <div class="card">
-          <div class="author-row">
-            <div class="avatar">M</div>
-            <div class="author-meta">
-              <div class="author">Marco R.</div>
-              <div class="handle">@marco</div>
-            </div>
-          </div>
-
-          <h2 class="headline">Progress bar chiara, semplice, inevitabile.</h2>
-          <p class="caption">
-            Ogni segmento mostra esattamente dove sei. L’autoplay aiuta il ritmo,
-            ma lo scroll manuale resta sempre prioritario.
-          </p>
-
-          <div class="meta">
-            <span class="chip">#motion</span>
-            <span class="chip">#feed</span>
-            <span class="chip">#product</span>
-          </div>
-
-          <div class="footerline">
-            <div class="stats">
-              <span>5.4K views</span>
-              <span>642 likes</span>
-              <span>51 shares</span>
-            </div>
-            <div class="cta">
-              <button class="secondary">Save</button>
-              <button class="primary">Open</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="action likeBtn" aria-label="Like">❤</button>
-          <button class="action" aria-label="Comment">✦</button>
-          <button class="action" aria-label="Share">↗</button>
-        </div>
-      </div>
-    </section>
-
-    <section class="post" style="--c1:#131313; --c2:#555555;">
-      <div class="media"></div>
-      <div class="content">
-        <div class="card">
-          <div class="author-row">
-            <div class="avatar">L</div>
-            <div class="author-meta">
-              <div class="author">Leo D.</div>
-              <div class="handle">@leo</div>
-            </div>
-          </div>
-
-          <h2 class="headline">Un feed che sembra prodotto, non pagina.</h2>
-          <p class="caption">
-            Micro-interazioni, ordine tipografico e una navigazione che resta coerente con il branding
-            bianco e nero di Shared.
-          </p>
-
-          <div class="meta">
-            <span class="chip">#brand</span>
-            <span class="chip">#social</span>
-            <span class="chip">#shared</span>
-          </div>
-
-          <div class="footerline">
-            <div class="stats">
-              <span>18.9K views</span>
-              <span>2.7K likes</span>
-              <span>306 shares</span>
-            </div>
-            <div class="cta">
-              <button class="secondary">Save</button>
-              <button class="primary">Open</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="actions">
-          <button class="action likeBtn" aria-label="Like">❤</button>
-          <button class="action" aria-label="Comment">✦</button>
-          <button class="action" aria-label="Share">↗</button>
-        </div>
-      </div>
-    </section>
-
+    <div class="sheet-actions">
+      <button class="ghost" id="cancelUpload">Cancel</button>
+      <button class="save" id="submitUpload">Publish</button>
+    </div>
   </div>
 </div>
 
-<script>
-  const feed = document.getElementById("feed");
-  const posts = [...document.querySelectorAll(".post")];
-  const segmentsWrap = document.getElementById("segments");
-  const likeButtons = [...document.querySelectorAll(".likeBtn")];
+<script type="module">
+  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
-  const AUTOPLAY_MS = 5200;
-  let activeIndex = 0;
-  let progressStart = performance.now();
-  let rafId = null;
-  let isAutoScrolling = false;
+  const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
 
-  // Build progress segments
-  posts.forEach(() => {
-    const seg = document.createElement("div");
-    seg.className = "segment";
-    seg.innerHTML = "<span></span>";
-    segmentsWrap.appendChild(seg);
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true
+    }
   });
 
-  const segments = [...document.querySelectorAll(".segment > span")];
+  const loading = document.getElementById("loading");
+  const app = document.getElementById("app");
+  const feed = document.getElementById("feed");
+  const segmentsWrap = document.getElementById("segments");
+  const uploadModal = document.getElementById("uploadModal");
+  const profilePill = document.getElementById("profilePill");
+
+  const openUploadBtn = document.getElementById("openUpload");
+  const closeUploadBtn = document.getElementById("closeUpload");
+  const cancelUploadBtn = document.getElementById("cancelUpload");
+  const submitUploadBtn = document.getElementById("submitUpload");
+  const refreshBtn = document.getElementById("refreshBtn");
+
+  const searchInput = document.getElementById("searchInput");
+  const searchClear = document.getElementById("searchClear");
+
+  const uName = document.getElementById("uName");
+  const uHandle = document.getElementById("uHandle");
+  const uTitle = document.getElementById("uTitle");
+  const uCaption = document.getElementById("uCaption");
+  const uFile = document.getElementById("uFile");
+
+  const previewTitle = document.getElementById("previewTitle");
+  const previewText = document.getElementById("previewText");
+  const previewImg = document.getElementById("previewImg");
+  const previewVideo = document.getElementById("previewVideo");
+
+  const AUTOPLAY_MS = 5200;
+  const AD_MS = 4200;
+
+  let currentUser = null;
+  let currentProfile = null;
+  let allPosts = [];
+  let visiblePosts = [];
+  let timeline = [];
+  let activeIndex = 0;
+  let progressStart = performance.now();
+  let isAutoScrolling = false;
+  let realtimeChannel = null;
+  let searchTimer = null;
+  let rafId = null;
 
   function clamp(v, min, max){
     return Math.max(min, Math.min(max, v));
   }
 
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function openModal(){
+    uploadModal.classList.add("open");
+    uploadModal.setAttribute("aria-hidden", "false");
+    previewFromForm();
+  }
+
+  function closeModal(){
+    uploadModal.classList.remove("open");
+    uploadModal.setAttribute("aria-hidden", "true");
+  }
+
+  function resetFilePreview(){
+    previewImg.style.display = "none";
+    previewVideo.style.display = "none";
+    previewImg.src = "";
+    previewVideo.pause();
+    previewVideo.removeAttribute("src");
+    previewVideo.load();
+  }
+
+  function previewFromForm(){
+    previewTitle.textContent = uTitle.value.trim() || "Preview";
+    previewText.textContent = uCaption.value.trim() || "Qui vedrai l’anteprima del contenuto che stai preparando.";
+  }
+
+  function buildTimeline(posts){
+    const postsWithAds = [];
+    posts.forEach((post, index) => {
+      postsWithAds.push({ type:"post", data:post, id:`post-${post.id}` });
+      postsWithAds.push({
+        type:"ad",
+        data:{
+          id:`ad-${index}`,
+          brand:["North","Pulse","Mono","Aurora"][index % 4],
+          title:[
+            "A better way to reach people.",
+            "Minimal tools. Maximum attention.",
+            "Built for fast-moving communities.",
+            "Design that keeps the scroll alive."
+          ][index % 4],
+          caption:[
+            "Promoted placement inside Shared, in line with the visual style of the app.",
+            "Ad cards are intentionally calm and clean so they fit the feed naturally.",
+            "Use this slot for sponsorships, brand drops, or native campaigns.",
+            "The ad system can later be replaced by real inventory from your backend."
+          ][index % 4]
+        },
+        id:`ad-slot-${index}`
+      });
+    });
+    return postsWithAds;
+  }
+
+  function renderSegments(){
+    segmentsWrap.innerHTML = "";
+    timeline.forEach(() => {
+      const seg = document.createElement("div");
+      seg.className = "segment";
+      seg.innerHTML = "<span></span>";
+      segmentsWrap.appendChild(seg);
+    });
+  }
+
+  function renderFeed(){
+    timeline = buildTimeline(visiblePosts.length ? visiblePosts : allPosts);
+    renderSegments();
+
+    feed.innerHTML = timeline.map((item, idx) => {
+      if (item.type === "post") {
+        const post = item.data;
+        const profile = post.profile || {};
+        const authorName = profile.display_name || profile.username || "Unknown";
+        const authorHandle = profile.username ? `@${profile.username}` : "@user";
+        const avatar = (authorName || "S").trim().charAt(0).toUpperCase();
+        const likesCount = post.like_count ?? 0;
+        const userLiked = !!post.user_liked;
+        const mediaHtml = post.media_url
+          ? (
+              post.media_type === "video"
+                ? `<video class="file" src="${escapeHtml(post.media_url)}" muted loop playsinline></video>`
+                : `<img class="file" src="${escapeHtml(post.media_url)}" alt="">`
+            )
+          : "";
+
+        return `
+          <section class="item post-card" data-index="${idx}" data-type="post" data-post-id="${post.id}">
+            <div class="media gradient" style="--c1:${post.color1 || '#111111'};--c2:${post.color2 || '#444444'};">
+              ${mediaHtml}
+            </div>
+
+            <div class="badge"><span class="dot"></span> Post</div>
+            <div class="sidehint"><span class="line"></span> swipe <span class="line"></span></div>
+
+            <div class="content">
+              <div class="card">
+                <div class="author-row">
+                  <div class="avatar">${escapeHtml(avatar)}</div>
+                  <div class="author-meta">
+                    <div class="author">${escapeHtml(authorName)}</div>
+                    <div class="handle">${escapeHtml(authorHandle)}</div>
+                  </div>
+                </div>
+
+                <h2 class="headline">${escapeHtml(post.title || "")}</h2>
+                <p class="caption">${escapeHtml(post.caption || "")}</p>
+
+                <div class="meta">
+                  <span class="chip">#shared</span>
+                  <span class="chip">#post</span>
+                  <span class="chip">${userLiked ? "#liked" : "#fresh"}</span>
+                </div>
+
+                <div class="footerline">
+                  <div class="stats">
+                    <span>${likesCount} likes</span>
+                    <span>${post.view_count ?? 0} views</span>
+                    <span>${post.share_count ?? 0} shares</span>
+                  </div>
+                  <div class="cta">
+                    <button class="secondary saveBtn">Save</button>
+                    <button class="primary openBtn">Open</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="actions">
+                <button class="action likeBtn ${userLiked ? 'liked' : ''}" aria-label="Like">${userLiked ? "❤" : "❤"}</button>
+                <button class="action" aria-label="Comment">✦</button>
+                <button class="action" aria-label="Share">↗</button>
+              </div>
+            </div>
+          </section>
+        `;
+      }
+
+      const ad = item.data;
+      return `
+        <section class="item ad-card" data-index="${idx}" data-type="ad">
+          <div class="media"></div>
+
+          <div class="badge"><span class="dot"></span> Sponsored</div>
+          <div class="sidehint"><span class="line"></span> ad <span class="line"></span></div>
+
+          <div class="content">
+            <div class="card">
+              <div class="ad-box">
+                <div class="ad-label">Sponsored</div>
+                <div class="ad-brand">${escapeHtml(ad.brand)}</div>
+              </div>
+
+              <h2 class="headline">${escapeHtml(ad.title)}</h2>
+              <p class="caption">${escapeHtml(ad.caption)}</p>
+
+              <div class="meta">
+                <span class="chip">#native</span>
+                <span class="chip">#promotion</span>
+                <span class="chip">#brand</span>
+              </div>
+
+              <div class="footerline">
+                <div class="stats">
+                  <span>Reach more users</span>
+                  <span>Premium placement</span>
+                  <span>Native integration</span>
+                </div>
+                <div class="cta">
+                  <button class="secondary">Details</button>
+                  <button class="primary">Open ad</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="action" aria-label="Info">i</button>
+              <button class="action" aria-label="Save">▣</button>
+              <button class="action" aria-label="Share">↗</button>
+            </div>
+          </div>
+        </section>
+      `;
+    }).join("");
+
+    attachHandlers();
+    updateSegments();
+    bindMediaAutoplay();
+    scrollToIndex(0, false);
+  }
+
+  function attachHandlers(){
+    document.querySelectorAll(".likeBtn").forEach(btn => {
+      btn.addEventListener("click", async (e) => {
+        const card = e.currentTarget.closest("[data-post-id]");
+        if (!card) return;
+
+        const postId = card.dataset.postId;
+        const liked = e.currentTarget.classList.contains("liked");
+
+        e.currentTarget.disabled = true;
+        try {
+          await toggleLike(postId, liked);
+          await loadPosts(searchInput.value.trim(), false);
+        } finally {
+          e.currentTarget.disabled = false;
+        }
+      });
+    });
+
+    document.querySelectorAll(".openBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest("[data-post-id]");
+        if (!card) return;
+        const postId = card.dataset.postId;
+        const post = allPosts.find(p => p.id === postId);
+        if (post?.media_url) window.open(post.media_url, "_blank", "noopener,noreferrer");
+      });
+    });
+  }
+
+  function bindMediaAutoplay(){
+    document.querySelectorAll("video.file").forEach(v => {
+      v.play().catch(() => {});
+    });
+  }
+
+  function updateSegments(){
+    const spans = [...document.querySelectorAll(".segment > span")];
+    spans.forEach((s, i) => {
+      if (i < activeIndex) s.style.width = "100%";
+      else if (i > activeIndex) s.style.width = "0%";
+    });
+  }
+
   function scrollToIndex(index, smooth = true){
-    activeIndex = clamp(index, 0, posts.length - 1);
+    activeIndex = clamp(index, 0, timeline.length - 1);
     isAutoScrolling = true;
     feed.scrollTo({
       left: activeIndex * window.innerWidth,
@@ -708,32 +1179,27 @@
     });
     progressStart = performance.now();
     updateSegments();
-    setTimeout(() => { isAutoScrolling = false; }, 500);
-  }
-
-  function updateSegments(){
-    segments.forEach((seg, i) => {
-      if (i < activeIndex) seg.style.width = "100%";
-      else if (i > activeIndex) seg.style.width = "0%";
-    });
+    setTimeout(() => { isAutoScrolling = false; }, 450);
   }
 
   function tick(now){
+    const current = timeline[activeIndex];
+    const duration = current?.type === "ad" ? AD_MS : AUTOPLAY_MS;
     const elapsed = now - progressStart;
-    const pct = clamp((elapsed / AUTOPLAY_MS) * 100, 0, 100);
+    const pct = clamp((elapsed / duration) * 100, 0, 100);
 
-    segments[activeIndex].style.width = pct + "%";
+    const spans = [...document.querySelectorAll(".segment > span")];
+    if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
 
-    if (pct >= 100){
-      const next = (activeIndex + 1) % posts.length;
-      scrollToIndex(next, true);
+    if (pct >= 100 && timeline.length > 0){
+      scrollToIndex((activeIndex + 1) % timeline.length, true);
     }
 
     rafId = requestAnimationFrame(tick);
   }
 
   function syncActiveFromScroll(){
-    const idx = clamp(Math.round(feed.scrollLeft / window.innerWidth), 0, posts.length - 1);
+    const idx = clamp(Math.round(feed.scrollLeft / window.innerWidth), 0, timeline.length - 1);
     if (idx !== activeIndex && !isAutoScrolling){
       activeIndex = idx;
       progressStart = performance.now();
@@ -741,7 +1207,325 @@
     }
   }
 
-  // wheel -> horizontal
+  function getRandomPalette(i){
+    const palettes = [
+      ["#111111", "#4c4c4c"],
+      ["#090909", "#262626"],
+      ["#131313", "#555555"],
+      ["#1a1a1a", "#373737"]
+    ];
+    return palettes[i % palettes.length];
+  }
+
+  async function ensureSession(){
+    const { data, error } = await supabase.auth.getSession();
+    if (error) console.error(error);
+    if (!data?.session) {
+      window.location.replace("./login.html");
+      return null;
+    }
+    return data.session;
+  }
+
+  async function loadCurrentProfile(){
+    const { data: userData, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      console.error(userError);
+      return null;
+    }
+    currentUser = userData?.user || null;
+    if (!currentUser) return null;
+
+    const { data: profile, error } = await supabase
+      .from("profiles")
+      .select("id, username, display_name, avatar_url, bio")
+      .eq("id", currentUser.id)
+      .single();
+
+    if (error) {
+      console.error(error);
+      profilePill.textContent = currentUser.email || "Logged in";
+      return null;
+    }
+
+    currentProfile = profile;
+    profilePill.textContent = profile.display_name || profile.username || currentUser.email || "Logged in";
+    uName.value = profile.display_name || "";
+    uHandle.value = profile.username ? `@${profile.username}` : "";
+    return profile;
+  }
+
+  async function loadPosts(query = "", preserveScroll = true){
+    let postsQuery = supabase
+      .from("posts")
+      .select(`
+        id,
+        user_id,
+        title,
+        caption,
+        media_url,
+        media_type,
+        created_at,
+        view_count,
+        share_count,
+        profiles (
+          id,
+          username,
+          display_name,
+          avatar_url
+        )
+      `)
+      .order("created_at", { ascending: false });
+
+    if (query) {
+      const q = query.replaceAll("%", "").trim();
+      const { data: profileHits } = await supabase
+        .from("profiles")
+        .select("id")
+        .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
+        .limit(20);
+
+      const profileIds = (profileHits || []).map(p => p.id);
+
+      postsQuery = postsQuery.or(`title.ilike.%${q}%,caption.ilike.%${q}%${profileIds.length ? `,user_id.in.(${profileIds.join(",")})` : ""}`);
+    }
+
+    const { data: postsData, error } = await postsQuery;
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const posts = postsData || [];
+    const postIds = posts.map(p => p.id);
+
+    let likeCounts = new Map();
+    let userLikes = new Set();
+
+    if (postIds.length) {
+      const { data: likesRows, error: likesError } = await supabase
+        .from("post_likes")
+        .select("post_id, user_id")
+        .in("post_id", postIds);
+
+      if (likesError) console.error(likesError);
+
+      for (const row of (likesRows || [])) {
+        likeCounts.set(row.post_id, (likeCounts.get(row.post_id) || 0) + 1);
+        if (currentUser && row.user_id === currentUser.id) userLikes.add(row.post_id);
+      }
+    }
+
+    allPosts = posts.map((p, idx) => {
+      const [c1, c2] = getRandomPalette(idx);
+      return {
+        ...p,
+        color1: c1,
+        color2: c2,
+        profile: Array.isArray(p.profiles) ? p.profiles[0] : p.profiles,
+        like_count: likeCounts.get(p.id) || 0,
+        user_liked: userLikes.has(p.id)
+      };
+    });
+
+    visiblePosts = allPosts;
+    renderFeed();
+
+    if (!preserveScroll) scrollToIndex(0, false);
+  }
+
+  async function toggleLike(postId, liked){
+    if (!currentUser) return;
+
+    if (liked) {
+      const { error } = await supabase
+        .from("post_likes")
+        .delete()
+        .eq("post_id", postId)
+        .eq("user_id", currentUser.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase
+        .from("post_likes")
+        .insert({
+          post_id: postId,
+          user_id: currentUser.id
+        });
+      if (error) throw error;
+    }
+  }
+
+  async function uploadMediaIfNeeded(file){
+    if (!file) return { url: null, type: null };
+
+    const safeName = file.name.replaceAll(" ", "_");
+    const path = `${currentUser.id}/${Date.now()}-${safeName}`;
+
+    const { error: uploadError } = await supabase
+      .storage
+      .from("post-media")
+      .upload(path, file, {
+        cacheControl: "3600",
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data } = supabase
+      .storage
+      .from("post-media")
+      .getPublicUrl(path);
+
+    return {
+      url: data.publicUrl,
+      type: file.type.startsWith("video/") ? "video" : "image"
+    };
+  }
+
+  async function createPost(){
+    if (!currentUser) return;
+
+    const displayName = uName.value.trim();
+    const handle = uHandle.value.trim().replace(/^@/, "");
+    const title = uTitle.value.trim();
+    const caption = uCaption.value.trim();
+    const file = uFile.files?.[0] || null;
+
+    if (!displayName || !handle || !title || !caption) {
+      alert("Compila username, handle, titolo e caption.");
+      return;
+    }
+
+    submitUploadBtn.disabled = true;
+
+    try {
+      let profileId = currentUser.id;
+
+      const { error: profileUpsertError } = await supabase
+        .from("profiles")
+        .upsert({
+          id: profileId,
+          username: handle,
+          display_name: displayName,
+          avatar_url: currentProfile?.avatar_url || null
+        });
+
+      if (profileUpsertError) throw profileUpsertError;
+
+      const media = await uploadMediaIfNeeded(file);
+
+      const { error: postError } = await supabase
+        .from("posts")
+        .insert({
+          user_id: profileId,
+          title,
+          caption,
+          media_url: media.url,
+          media_type: media.type
+        });
+
+      if (postError) throw postError;
+
+      closeModal();
+      uName.value = "";
+      uHandle.value = "";
+      uTitle.value = "";
+      uCaption.value = "";
+      uFile.value = "";
+      resetFilePreview();
+      await loadCurrentProfile();
+      await loadPosts(searchInput.value.trim(), false);
+    } catch (err) {
+      console.error(err);
+      alert(err?.message || "Errore durante il publish.");
+    } finally {
+      submitUploadBtn.disabled = false;
+    }
+  }
+
+  async function refreshAll(){
+    await loadCurrentProfile();
+    await loadPosts(searchInput.value.trim(), false);
+  }
+
+  function setupRealtime(){
+    if (realtimeChannel) {
+      supabase.removeChannel(realtimeChannel);
+    }
+
+    realtimeChannel = supabase
+      .channel("shared-feed")
+      .on("postgres_changes", { event:"*", schema:"public", table:"posts" }, () => refreshAll())
+      .on("postgres_changes", { event:"*", schema:"public", table:"post_likes" }, () => refreshAll())
+      .on("postgres_changes", { event:"*", schema:"public", table:"profiles" }, () => refreshAll())
+      .subscribe();
+  }
+
+  async function init(){
+    const session = await ensureSession();
+    if (!session) return;
+
+    await loadCurrentProfile();
+    await loadPosts("", false);
+    setupRealtime();
+
+    loading.classList.add("hidden");
+    app.classList.remove("hidden");
+    rafId = requestAnimationFrame(tick);
+  }
+
+  openUploadBtn.addEventListener("click", openModal);
+  closeUploadBtn.addEventListener("click", closeModal);
+  cancelUploadBtn.addEventListener("click", closeModal);
+  uploadModal.addEventListener("click", (e) => {
+    if (e.target === uploadModal) closeModal();
+  });
+
+  submitUploadBtn.addEventListener("click", createPost);
+
+  refreshBtn.addEventListener("click", refreshAll);
+
+  uName.addEventListener("input", previewFromForm);
+  uHandle.addEventListener("input", previewFromForm);
+  uTitle.addEventListener("input", previewFromForm);
+  uCaption.addEventListener("input", previewFromForm);
+
+  uFile.addEventListener("change", () => {
+    const file = uFile.files?.[0];
+    resetFilePreview();
+
+    if (!file) {
+      previewFromForm();
+      return;
+    }
+
+    const url = URL.createObjectURL(file);
+
+    if (file.type.startsWith("video/")) {
+      previewVideo.src = url;
+      previewVideo.style.display = "block";
+      previewVideo.play().catch(() => {});
+    } else {
+      previewImg.src = url;
+      previewImg.style.display = "block";
+    }
+
+    previewTitle.textContent = uTitle.value.trim() || file.name;
+    previewText.textContent = uCaption.value.trim() || "Anteprima del file selezionato.";
+  });
+
+  searchInput.addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+      loadPosts(searchInput.value.trim(), false);
+    }, 250);
+  });
+
+  searchClear.addEventListener("click", () => {
+    searchInput.value = "";
+    loadPosts("", false);
+  });
+
   feed.addEventListener("wheel", (e) => {
     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
       e.preventDefault();
@@ -749,29 +1533,19 @@
     }
   }, { passive:false });
 
-  // drag touch/mouse is native via horizontal scroll
   feed.addEventListener("scroll", syncActiveFromScroll);
 
-  // keyboard support
   window.addEventListener("keydown", (e) => {
     if (e.key === "ArrowRight") scrollToIndex(activeIndex + 1, true);
     if (e.key === "ArrowLeft") scrollToIndex(activeIndex - 1, true);
   });
 
-  // tap like
-  likeButtons.forEach(btn => {
-    btn.addEventListener("click", () => {
-      btn.classList.toggle("liked");
-      btn.textContent = btn.classList.contains("liked") ? "❤" : "❤";
-    });
+  window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
+  window.addEventListener("beforeunload", () => {
+    if (realtimeChannel) supabase.removeChannel(realtimeChannel);
   });
 
-  // start
-  updateSegments();
-  rafId = requestAnimationFrame(tick);
-
-  // keep alignment on resize
-  window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
+  init();
 </script>
 </body>
 </html>
