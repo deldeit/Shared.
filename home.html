@@ -955,7 +955,6 @@
   let activeIndex = 0;
   let progressStart = performance.now();
   let isAutoScrolling = false;
-  let realtimeChannel = null;
   let searchTimer = null;
   let rafId = null;
 
@@ -970,6 +969,25 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
+  }
+
+  function sanitizeQuery(str){
+    return String(str ?? "")
+      .replaceAll("%", "")
+      .replaceAll(",", " ")
+      .replaceAll("(", " ")
+      .replaceAll(")", " ")
+      .trim();
+  }
+
+  function getPalette(i){
+    const palettes = [
+      ["#111111", "#4c4c4c"],
+      ["#090909", "#262626"],
+      ["#131313", "#555555"],
+      ["#1a1a1a", "#373737"]
+    ];
+    return palettes[i % palettes.length];
   }
 
   function openModal(){
@@ -998,31 +1016,29 @@
   }
 
   function buildTimeline(posts){
-    const postsWithAds = [];
+    const items = [];
     posts.forEach((post, index) => {
-      postsWithAds.push({ type:"post", data:post, id:`post-${post.id}` });
-      postsWithAds.push({
-        type:"ad",
-        data:{
-          id:`ad-${index}`,
-          brand:["North","Pulse","Mono","Aurora"][index % 4],
-          title:[
+      items.push({ type: "post", data: post });
+      items.push({
+        type: "ad",
+        data: {
+          brand: ["North", "Pulse", "Mono", "Aurora"][index % 4],
+          title: [
             "A better way to reach people.",
             "Minimal tools. Maximum attention.",
             "Built for fast-moving communities.",
             "Design that keeps the scroll alive."
           ][index % 4],
-          caption:[
+          caption: [
             "Promoted placement inside Shared, in line with the visual style of the app.",
             "Ad cards are intentionally calm and clean so they fit the feed naturally.",
             "Use this slot for sponsorships, brand drops, or native campaigns.",
             "The ad system can later be replaced by real inventory from your backend."
           ][index % 4]
-        },
-        id:`ad-slot-${index}`
+        }
       });
     });
-    return postsWithAds;
+    return items;
   }
 
   function renderSegments(){
@@ -1043,10 +1059,16 @@
     timeline = buildTimeline(visiblePosts.length ? visiblePosts : allPosts);
     renderSegments();
 
+    if (!timeline.length) {
+      feed.innerHTML = "";
+      updateEmptyState();
+      return;
+    }
+
     feed.innerHTML = timeline.map((item, idx) => {
       if (item.type === "post") {
         const post = item.data;
-        const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles || {};
+        const profile = post.profile || {};
         const authorName = profile.display_name || profile.username || "User";
         const authorHandle = profile.username ? `@${profile.username}` : "@user";
         const avatar = (authorName || "S").trim().charAt(0).toUpperCase();
@@ -1102,7 +1124,7 @@
               </div>
 
               <div class="actions">
-                <button class="action likeBtn ${userLiked ? 'liked' : ''}" aria-label="Like">${userLiked ? "❤" : "❤"}</button>
+                <button class="action likeBtn ${userLiked ? "liked" : ""}" aria-label="Like">${userLiked ? "❤" : "❤"}</button>
                 <button class="action" aria-label="Comment">✦</button>
                 <button class="action" aria-label="Share">↗</button>
               </div>
@@ -1224,6 +1246,11 @@
   }
 
   function tick(now){
+    if (!timeline.length) {
+      rafId = requestAnimationFrame(tick);
+      return;
+    }
+
     const current = timeline[activeIndex];
     const duration = current?.type === "ad" ? AD_MS : AUTOPLAY_MS;
     const elapsed = now - progressStart;
@@ -1232,7 +1259,7 @@
     const spans = [...document.querySelectorAll(".segment > span")];
     if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
 
-    if (pct >= 100 && timeline.length > 0){
+    if (pct >= 100){
       scrollToIndex((activeIndex + 1) % timeline.length, true);
     }
 
@@ -1303,10 +1330,8 @@
     return profile;
   }
 
-  async function loadPosts(query = "", preserveScroll = true){
-    const normalized = query.replaceAll("%", "").replaceAll(",", " ").trim();
-
-    let postsQuery = supabase
+  async function fetchPostsByText(query){
+    let q = supabase
       .from("posts")
       .select(`
         id,
@@ -1317,47 +1342,97 @@
         media_type,
         created_at,
         view_count,
-        share_count,
-        profiles:profiles (
-          id,
-          username,
-          display_name,
-          avatar_url
-        )
+        share_count
       `)
-      .order("created_at", { ascending: false });
+      .order("created_at", { ascending: false })
+      .limit(40);
 
-    if (normalized) {
+    if (query) {
+      q = q.or(`title.ilike.%${query}%,caption.ilike.%${query}%`);
+    }
+
+    const { data, error } = await q;
+    if (error) {
+      console.error(error);
+      return [];
+    }
+    return data || [];
+  }
+
+  async function fetchPostsByProfileIds(profileIds){
+    if (!profileIds.length) return [];
+
+    const { data, error } = await supabase
+      .from("posts")
+      .select(`
+        id,
+        user_id,
+        title,
+        caption,
+        media_url,
+        media_type,
+        created_at,
+        view_count,
+        share_count
+      `)
+      .in("user_id", profileIds)
+      .order("created_at", { ascending: false })
+      .limit(40);
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+    return data || [];
+  }
+
+  function dedupePosts(posts){
+    const map = new Map();
+    for (const post of posts) {
+      if (!map.has(post.id)) map.set(post.id, post);
+    }
+    return [...map.values()];
+  }
+
+  async function loadPosts(query = "", preserveScroll = true){
+    const q = sanitizeQuery(query);
+
+    let posts = [];
+
+    if (!q) {
+      posts = await fetchPostsByText("");
+    } else {
       const { data: profileHits, error: profileHitsError } = await supabase
         .from("profiles")
         .select("id")
-        .or(`username.ilike.%${normalized}%,display_name.ilike.%${normalized}%`)
+        .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
         .limit(50);
 
       if (profileHitsError) console.error(profileHitsError);
 
       const profileIds = (profileHits || []).map(p => p.id);
 
-      const parts = [
-        `title.ilike.%${normalized}%`,
-        `caption.ilike.%${normalized}%`
-      ];
+      const textPosts = await fetchPostsByText(q);
+      const profilePosts = await fetchPostsByProfileIds(profileIds);
 
-      if (profileIds.length) {
-        parts.push(`user_id.in.(${profileIds.join(",")})`);
-      }
-
-      postsQuery = postsQuery.or(parts.join(","));
+      posts = dedupePosts([...textPosts, ...profilePosts]);
     }
 
-    const { data: postsData, error } = await postsQuery;
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    const posts = postsData || [];
+    const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
     const postIds = posts.map(p => p.id);
+
+    let profileRows = [];
+    if (userIds.length) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, username, display_name, avatar_url")
+        .in("id", userIds);
+
+      if (error) console.error(error);
+      profileRows = data || [];
+    }
+
+    const profileMap = new Map(profileRows.map(p => [p.id, p]));
 
     const likeCounts = new Map();
     const userLikes = new Set();
@@ -1372,7 +1447,9 @@
 
       for (const row of (likesRows || [])) {
         likeCounts.set(row.post_id, (likeCounts.get(row.post_id) || 0) + 1);
-        if (currentUser && row.user_id === currentUser.id) userLikes.add(row.post_id);
+        if (currentUser && row.user_id === currentUser.id) {
+          userLikes.add(row.post_id);
+        }
       }
     }
 
@@ -1382,7 +1459,7 @@
         ...p,
         color1: c1,
         color2: c2,
-        profile: Array.isArray(p.profiles) ? p.profiles[0] : p.profiles,
+        profile: profileMap.get(p.user_id) || null,
         like_count: likeCounts.get(p.id) || 0,
         user_liked: userLikes.has(p.id)
       };
@@ -1468,7 +1545,7 @@
           username: handle,
           display_name: displayName,
           avatar_url: currentProfile?.avatar_url || null
-        });
+        }, { onConflict: "id" });
 
       if (profileUpsertError) throw profileUpsertError;
 
@@ -1509,26 +1586,12 @@
     await loadPosts(searchInput.value.trim(), false);
   }
 
-  function setupRealtime(){
-    if (realtimeChannel) {
-      supabase.removeChannel(realtimeChannel);
-    }
-
-    realtimeChannel = supabase
-      .channel("shared-feed")
-      .on("postgres_changes", { event:"*", schema:"public", table:"posts" }, () => refreshAll())
-      .on("postgres_changes", { event:"*", schema:"public", table:"post_likes" }, () => refreshAll())
-      .on("postgres_changes", { event:"*", schema:"public", table:"profiles" }, () => refreshAll())
-      .subscribe();
-  }
-
   async function init(){
     const session = await ensureSession();
     if (!session) return;
 
     await loadCurrentProfile();
     await loadPosts("", false);
-    setupRealtime();
 
     loading.classList.add("hidden");
     app.classList.remove("hidden");
@@ -1603,10 +1666,6 @@
   });
 
   window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
-
-  window.addEventListener("beforeunload", () => {
-    if (realtimeChannel) supabase.removeChannel(realtimeChannel);
-  });
 
   init();
 </script>
