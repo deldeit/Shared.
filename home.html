@@ -19,6 +19,7 @@
   }
 
   *{ box-sizing:border-box; }
+
   html, body{
     margin:0;
     width:100%;
@@ -32,6 +33,20 @@
     color:var(--text);
     font-family:'Archivo Black', system-ui, sans-serif;
   }
+
+  .loading{
+    position:fixed;
+    inset:0;
+    z-index:100;
+    display:grid;
+    place-items:center;
+    background:#000;
+    color:#fff;
+    font-family:system-ui, sans-serif;
+    letter-spacing:.4px;
+  }
+
+  .hidden{ display:none !important; }
 
   .app{
     width:100%;
@@ -75,15 +90,6 @@
     letter-spacing:.4px;
   }
 
-  .brand .pill{
-    font-size:10px;
-    line-height:1;
-    padding:6px 8px;
-    border-radius:999px;
-    background:#fff;
-    color:#000;
-  }
-
   .nav{
     display:flex;
     align-items:center;
@@ -114,6 +120,17 @@
     display:flex;
     align-items:center;
     gap:10px;
+  }
+
+  .profile-pill{
+    font-family:system-ui, sans-serif;
+    font-size:12px;
+    color:#fff;
+    opacity:.88;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.05);
+    padding:8px 12px;
+    border-radius:999px;
   }
 
   .iconbtn{
@@ -285,6 +302,7 @@
   }
 
   .author-meta{ min-width:0; }
+
   .author{
     font-size:16px;
     line-height:1.1;
@@ -689,30 +707,41 @@
     color:#000;
   }
 
-  .profile-pill{
-    font-family:system-ui, sans-serif;
-    font-size:12px;
-    color:#fff;
-    opacity:.88;
+  .empty-state{
+    width:min(720px, calc(100vw - 28px));
+    margin:0 auto;
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    text-align:center;
     border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.05);
-    padding:8px 12px;
-    border-radius:999px;
+    border-radius:28px;
+    background:rgba(12,12,12,.72);
+    backdrop-filter:blur(14px);
+    padding:22px;
+    box-shadow:var(--shadow);
+    display:none;
+    z-index:5;
   }
 
-  .loading{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    display:grid;
-    place-items:center;
-    background:#000;
-    color:#fff;
+  .empty-state.show{
+    display:block;
+  }
+
+  .empty-state h2{
+    margin:0 0 8px;
+    font-size:22px;
+  }
+
+  .empty-state p{
+    margin:0;
     font-family:system-ui, sans-serif;
-    letter-spacing:.4px;
+    color:var(--muted);
+    line-height:1.55;
+    font-size:13px;
+    font-weight:600;
   }
-
-  .hidden{ display:none !important; }
 
   @media (max-width: 860px){
     .topbar{
@@ -797,7 +826,6 @@
     <div class="topbar-inner">
       <div class="brand">
         <div class="logo">Shared.</div>
-        <div class="pill">LIVE</div>
       </div>
 
       <div class="nav">
@@ -820,6 +848,11 @@
 
   <div class="progress-wrap">
     <div class="segments" id="segments"></div>
+  </div>
+
+  <div class="empty-state" id="emptyState">
+    <h2>Nessun contenuto trovato</h2>
+    <p>Prova a cercare un altro profilo o crea il primo post con Upload.</p>
   </div>
 
   <div class="feed" id="feed"></div>
@@ -845,7 +878,7 @@
         <textarea class="textarea" id="uCaption" placeholder="Caption"></textarea>
         <input class="file" id="uFile" type="file" accept="image/*,video/*" />
         <div class="helper">
-          Il file viene caricato su Supabase Storage e il post viene salvato in <code>posts</code>. Il profilo viene letto da <code>profiles</code>.
+          Il file viene caricato su Supabase Storage e il post viene salvato in <code>posts</code>. I profili vengono letti da <code>profiles</code> e i like da <code>post_likes</code>.
         </div>
       </div>
 
@@ -886,6 +919,7 @@
   const loading = document.getElementById("loading");
   const app = document.getElementById("app");
   const feed = document.getElementById("feed");
+  const emptyState = document.getElementById("emptyState");
   const segmentsWrap = document.getElementById("segments");
   const uploadModal = document.getElementById("uploadModal");
   const profilePill = document.getElementById("profilePill");
@@ -1001,6 +1035,10 @@
     });
   }
 
+  function updateEmptyState(){
+    emptyState.classList.toggle("show", timeline.length === 0);
+  }
+
   function renderFeed(){
     timeline = buildTimeline(visiblePosts.length ? visiblePosts : allPosts);
     renderSegments();
@@ -1008,8 +1046,8 @@
     feed.innerHTML = timeline.map((item, idx) => {
       if (item.type === "post") {
         const post = item.data;
-        const profile = post.profile || {};
-        const authorName = profile.display_name || profile.username || "Unknown";
+        const profile = Array.isArray(post.profiles) ? post.profiles[0] : post.profiles || {};
+        const authorName = profile.display_name || profile.username || "User";
         const authorHandle = profile.username ? `@${profile.username}` : "@user";
         const avatar = (authorName || "S").trim().charAt(0).toUpperCase();
         const likesCount = post.like_count ?? 0;
@@ -1123,6 +1161,7 @@
     attachHandlers();
     updateSegments();
     bindMediaAutoplay();
+    updateEmptyState();
     scrollToIndex(0, false);
   }
 
@@ -1171,7 +1210,9 @@
   }
 
   function scrollToIndex(index, smooth = true){
-    activeIndex = clamp(index, 0, timeline.length - 1);
+    activeIndex = clamp(index, 0, Math.max(timeline.length - 1, 0));
+    if (!timeline.length) return;
+
     isAutoScrolling = true;
     feed.scrollTo({
       left: activeIndex * window.innerWidth,
@@ -1199,6 +1240,7 @@
   }
 
   function syncActiveFromScroll(){
+    if (!timeline.length) return;
     const idx = clamp(Math.round(feed.scrollLeft / window.innerWidth), 0, timeline.length - 1);
     if (idx !== activeIndex && !isAutoScrolling){
       activeIndex = idx;
@@ -1220,7 +1262,7 @@
   async function ensureSession(){
     const { data, error } = await supabase.auth.getSession();
     if (error) console.error(error);
-    if (!data?.session) {
+    if (!data?.session){
       window.location.replace("./login.html");
       return null;
     }
@@ -1233,6 +1275,7 @@
       console.error(userError);
       return null;
     }
+
     currentUser = userData?.user || null;
     if (!currentUser) return null;
 
@@ -1240,7 +1283,7 @@
       .from("profiles")
       .select("id, username, display_name, avatar_url, bio")
       .eq("id", currentUser.id)
-      .single();
+      .maybeSingle();
 
     if (error) {
       console.error(error);
@@ -1248,14 +1291,21 @@
       return null;
     }
 
-    currentProfile = profile;
-    profilePill.textContent = profile.display_name || profile.username || currentUser.email || "Logged in";
-    uName.value = profile.display_name || "";
-    uHandle.value = profile.username ? `@${profile.username}` : "";
+    currentProfile = profile || null;
+    profilePill.textContent =
+      profile?.display_name ||
+      profile?.username ||
+      currentUser.email ||
+      "Logged in";
+
+    uName.value = profile?.display_name || "";
+    uHandle.value = profile?.username ? `@${profile.username}` : "";
     return profile;
   }
 
   async function loadPosts(query = "", preserveScroll = true){
+    const normalized = query.replaceAll("%", "").replaceAll(",", " ").trim();
+
     let postsQuery = supabase
       .from("posts")
       .select(`
@@ -1268,7 +1318,7 @@
         created_at,
         view_count,
         share_count,
-        profiles (
+        profiles:profiles (
           id,
           username,
           display_name,
@@ -1277,17 +1327,27 @@
       `)
       .order("created_at", { ascending: false });
 
-    if (query) {
-      const q = query.replaceAll("%", "").trim();
-      const { data: profileHits } = await supabase
+    if (normalized) {
+      const { data: profileHits, error: profileHitsError } = await supabase
         .from("profiles")
         .select("id")
-        .or(`username.ilike.%${q}%,display_name.ilike.%${q}%`)
-        .limit(20);
+        .or(`username.ilike.%${normalized}%,display_name.ilike.%${normalized}%`)
+        .limit(50);
+
+      if (profileHitsError) console.error(profileHitsError);
 
       const profileIds = (profileHits || []).map(p => p.id);
 
-      postsQuery = postsQuery.or(`title.ilike.%${q}%,caption.ilike.%${q}%${profileIds.length ? `,user_id.in.(${profileIds.join(",")})` : ""}`);
+      const parts = [
+        `title.ilike.%${normalized}%`,
+        `caption.ilike.%${normalized}%`
+      ];
+
+      if (profileIds.length) {
+        parts.push(`user_id.in.(${profileIds.join(",")})`);
+      }
+
+      postsQuery = postsQuery.or(parts.join(","));
     }
 
     const { data: postsData, error } = await postsQuery;
@@ -1299,8 +1359,8 @@
     const posts = postsData || [];
     const postIds = posts.map(p => p.id);
 
-    let likeCounts = new Map();
-    let userLikes = new Set();
+    const likeCounts = new Map();
+    const userLikes = new Set();
 
     if (postIds.length) {
       const { data: likesRows, error: likesError } = await supabase
@@ -1343,6 +1403,7 @@
         .delete()
         .eq("post_id", postId)
         .eq("user_id", currentUser.id);
+
       if (error) throw error;
     } else {
       const { error } = await supabase
@@ -1351,6 +1412,7 @@
           post_id: postId,
           user_id: currentUser.id
         });
+
       if (error) throw error;
     }
   }
@@ -1399,12 +1461,10 @@
     submitUploadBtn.disabled = true;
 
     try {
-      let profileId = currentUser.id;
-
       const { error: profileUpsertError } = await supabase
         .from("profiles")
         .upsert({
-          id: profileId,
+          id: currentUser.id,
           username: handle,
           display_name: displayName,
           avatar_url: currentProfile?.avatar_url || null
@@ -1417,7 +1477,7 @@
       const { error: postError } = await supabase
         .from("posts")
         .insert({
-          user_id: profileId,
+          user_id: currentUser.id,
           title,
           caption,
           media_url: media.url,
@@ -1433,6 +1493,7 @@
       uCaption.value = "";
       uFile.value = "";
       resetFilePreview();
+
       await loadCurrentProfile();
       await loadPosts(searchInput.value.trim(), false);
     } catch (err) {
@@ -1471,18 +1532,19 @@
 
     loading.classList.add("hidden");
     app.classList.remove("hidden");
+
     rafId = requestAnimationFrame(tick);
   }
 
   openUploadBtn.addEventListener("click", openModal);
   closeUploadBtn.addEventListener("click", closeModal);
   cancelUploadBtn.addEventListener("click", closeModal);
+
   uploadModal.addEventListener("click", (e) => {
     if (e.target === uploadModal) closeModal();
   });
 
   submitUploadBtn.addEventListener("click", createPost);
-
   refreshBtn.addEventListener("click", refreshAll);
 
   uName.addEventListener("input", previewFromForm);
@@ -1518,7 +1580,7 @@
     clearTimeout(searchTimer);
     searchTimer = setTimeout(() => {
       loadPosts(searchInput.value.trim(), false);
-    }, 250);
+    }, 300);
   });
 
   searchClear.addEventListener("click", () => {
@@ -1541,6 +1603,7 @@
   });
 
   window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
+
   window.addEventListener("beforeunload", () => {
     if (realtimeChannel) supabase.removeChannel(realtimeChannel);
   });
