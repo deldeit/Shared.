@@ -1,2185 +1,777 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="it">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Shared</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
-
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8019369535802415"
-     crossorigin="anonymous"></script>
 
 <style>
-*{
-  box-sizing:border-box;
-  font-family:'Archivo Black', sans-serif;
-}
-
-:root{
-  --bg:#000;
-  --panel:#0f0f0f;
-  --panel-2:#111;
-  --border:#222;
-  --border-2:#333;
-  --text:#fff;
-  --muted:rgba(255,255,255,.65);
-}
-
-html, body{
-  margin:0;
-  background:var(--bg);
-  color:var(--text);
-  overflow-x:hidden;
-}
-
-body{
-  min-height:100vh;
-}
-
-.container{
-  max-width:720px;
-  margin:0 auto;
-  padding:20px;
-}
-
-.topbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:20px;
-}
-
-.header{
-  font-size:30px;
-  line-height:1;
-  text-align:center;
-  flex:1;
-}
-
-.icon-btn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  border:none;
-  border-radius:999px;
-  padding:10px 14px;
-  cursor:pointer;
-  font-size:12px;
-  background:#fff;
-  color:#000;
-  white-space:nowrap;
-}
-
-.icon-btn.secondary{
-  background:#1a1a1a;
-  color:#fff;
-  border:1px solid #333;
-}
-
-.icon-btn.liked{
-  color:#ff2d55;
-}
-
-.material-symbols-outlined{
-  font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
-  line-height:1;
-  font-size:20px;
-}
-
-.icon-btn.liked .material-symbols-outlined{
-  font-variation-settings:'FILL' 1,'wght' 400,'GRAD' 0,'opsz' 24;
-}
-
-.upload-box{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:24px;
-  padding:16px;
-  margin-bottom:18px;
-}
-
-.dropzone{
-  width:100%;
-  min-height:160px;
-  border-radius:18px;
-  border:2px dashed var(--border-2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  flex-direction:column;
-  gap:8px;
-  color:#777;
-  cursor:pointer;
-  transition:.2s;
-  user-select:none;
-  text-align:center;
-  padding:18px;
-}
-
-.dropzone.dragover{
-  border-color:#fff;
-  color:#fff;
-}
-
-.preview{
-  width:100%;
-  height:160px;
-  border-radius:18px;
-  overflow:hidden;
-  display:none;
-  margin-bottom:10px;
-  border:1px solid var(--border);
-}
-
-.preview img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-input,textarea{
-  width:100%;
-  margin-top:10px;
-  padding:12px 14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#000;
-  color:#fff;
-  outline:none;
-}
-
-textarea{
-  min-height:100px;
-  resize:vertical;
-}
-
-.tag-picker{
-  position:relative;
-  margin-top:12px;
-}
-
-.tag-picker-label{
-  margin-bottom:8px;
-  font-size:12px;
-  opacity:.8;
-}
-
-.tag-selected{
-  margin-top:10px;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  padding:8px 12px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  background:#000;
-  color:#fff;
-  font-size:11px;
-}
-
-.tag-suggestions{
-  display:none;
-  position:absolute;
-  left:0;
-  right:0;
-  top:calc(100% + 6px);
-  z-index:25;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-  max-height:280px;
-  overflow-y:auto;
-  box-shadow:0 18px 40px rgba(0,0,0,.35);
-}
-
-.tag-option{
-  width:100%;
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:12px 14px;
-  border:none;
-  border-bottom:1px solid var(--border);
-  background:#000;
-  color:#fff;
-  cursor:pointer;
-  text-align:left;
-  font-size:12px;
-}
-
-.tag-option:last-child{
-  border-bottom:none;
-}
-
-.tag-option:hover{
-  background:#151515;
-}
-
-.tag-option .material-symbols-outlined{
-  font-size:18px;
-}
-
-.song-wrapper{
-  position:relative;
-}
-
-#suggestions{
-  position:absolute;
-  top:100%;
-  left:0;
-  right:0;
-  margin-top:6px;
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:14px;
-  max-height:260px;
-  overflow:auto;
-  z-index:20;
-  display:none;
-}
-
-.song-item{
-  padding:12px;
-  border-bottom:1px solid var(--border);
-  cursor:pointer;
-  font-size:12px;
-}
-
-.song-item:last-child{
-  border-bottom:none;
-}
-
-.song-item:hover{
-  background:#151515;
-}
-
-.song-item small{
-  display:block;
-  margin-top:4px;
-  opacity:.7;
-  font-size:11px;
-  font-family:inherit;
-}
-
-.selected-song{
-  margin-top:10px;
-  border:1px solid var(--border);
-  border-radius:16px;
-  background:var(--panel-2);
-  padding:12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.selected-song .meta{
-  min-width:0;
-  flex:1;
-}
-
-.selected-song .title{
-  font-size:12px;
-  line-height:1.35;
-}
-
-.selected-song .artist{
-  display:block;
-  margin-top:4px;
-  font-size:11px;
-  opacity:.72;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.selected-song-actions{
-  display:flex;
-  gap:8px;
-  align-items:center;
-  flex:0 0 auto;
-}
-
-.primary-btn{
-  width:100%;
-  margin-top:12px;
-  padding:14px;
-  border-radius:16px;
-  border:none;
-  background:linear-gradient(135deg,#fff,#d7d7d7);
-  color:#000;
-  cursor:pointer;
-  font-size:14px;
-}
-
-.primary-btn:disabled,
-.icon-btn:disabled{
-  opacity:.6;
-  cursor:not-allowed;
-}
-
-#feed{
-  display:grid;
-  gap:16px;
-}
-
-.post{
-  background:var(--panel);
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:14px;
-}
-
-.post img{
-  width:100%;
-  aspect-ratio:1/1;
-  object-fit:cover;
-  border-radius:16px;
-  margin-bottom:10px;
-}
-
-.post-header{
-  display:flex;
-  justify-content:space-between;
-  gap:10px;
-  align-items:flex-start;
-  margin-bottom:10px;
-}
-
-.post-user{
-  display:flex;
-  flex-direction:column;
-  gap:4px;
-  min-width:0;
-}
-
-.post-user .name{
-  font-size:13px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  flex-wrap:wrap;
-}
-
-.post-user .name a{
-  color:#fff;
-  text-decoration:none;
-}
-
-.post-user .name a:hover{
-  text-decoration:underline;
-}
-
-.verified-badge{
-  width:16px;
-  height:16px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  flex:0 0 auto;
-}
-
-.verified-badge svg{
-  width:16px;
-  height:16px;
-  display:block;
-}
-
-.post-user .time{
-  font-size:11px;
-  opacity:.72;
-  display:flex;
-  align-items:center;
-  gap:6px;
-}
-
-.post-caption{
-  font-size:14px;
-  line-height:1.4;
-  white-space:pre-wrap;
-  margin-top:8px;
-}
-
-.post-tag{
-  margin-top:10px;
-  display:inline-flex;
-  align-items:center;
-  gap:8px;
-  border:1px solid var(--border);
-  border-radius:999px;
-  padding:8px 12px;
-  font-size:11px;
-  background:#000;
-  color:#fff;
-}
-
-.post-song{
-  margin-top:12px;
-  padding-top:12px;
-  border-top:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-}
-
-.song-meta{
-  min-width:0;
-}
-
-.song-title{
-  font-size:12px;
-  line-height:1.35;
-}
-
-.song-sub{
-  margin-top:4px;
-  font-size:11px;
-  opacity:.7;
-}
-
-.post-actions{
-  margin-top:12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  flex-wrap:wrap;
-}
-
-.like-wrap{
-  display:flex;
-  align-items:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-
-.like-count-btn{
-  border:none;
-  background:transparent;
-  color:#fff;
-  cursor:pointer;
-  font-size:12px;
-  opacity:.85;
-  padding:0;
-  font-family:inherit;
-  text-align:left;
-}
-
-.like-count-btn:hover{
-  text-decoration:underline;
-}
-
-.like-count{
-  min-width:16px;
-  text-align:center;
-}
-
-.ad-post{
-  padding:12px;
-}
-
-.ad-label{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:10px;
-  font-size:11px;
-  opacity:.7;
-}
-
-.ad-square{
-  width:100%;
-  aspect-ratio:1 / 1;
-  border:1px solid var(--border);
-  border-radius:16px;
-  overflow:hidden;
-  background:#050505;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-
-.ad-square ins{
-  width:100%;
-  height:100%;
-  display:block;
-}
-
-.empty-state{
-  opacity:.6;
-  font-size:13px;
-  text-align:center;
-  padding:24px 0;
-}
-
-#overlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  z-index:50;
-  display:none;
-}
-
-#overlay.show{
-  display:block;
-}
-
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-340px;
-  width:300px;
-  max-width:88vw;
-  height:100vh;
-  background:#0f0f0f;
-  border-right:1px solid #222;
-  z-index:60;
-  transition:left .25s ease;
-  padding:18px;
-  display:flex;
-  flex-direction:column;
-  gap:14px;
-}
-
-#sidebar.open{
-  left:0;
-}
-
-.sidebar-title{
-  font-size:18px;
-  margin-bottom:4px;
-}
-
-.sidebar-profile{
-  display:flex;
-  align-items:center;
-  gap:12px;
-  padding:12px;
-  border:1px solid #222;
-  border-radius:16px;
-  background:#000;
-  color:#fff;
-  text-decoration:none;
-  cursor:pointer;
-}
-
-.sidebar-profile:hover{
-  background:#111;
-}
-
-.profile-avatar{
-  width:40px;
-  height:40px;
-  border-radius:50%;
-  overflow:hidden;
-  flex:0 0 auto;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  background:#1a1a1a;
-  border:1px solid #2b2b2b;
-  color:#fff;
-  font-size:13px;
-}
-
-.profile-avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:block;
-}
-
-.profile-meta{
-  min-width:0;
-  flex:1;
-}
-
-.profile-meta .name{
-  font-size:12px;
-  line-height:1.35;
-}
-
-.profile-meta .sub{
-  margin-top:4px;
-  font-size:11px;
-  opacity:.7;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-}
-
-.search-box{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.search-box input{
-  margin-top:0;
-}
-
-#userResults{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  max-height:55vh;
-  overflow:auto;
-}
-
-.user-item{
-  border:1px solid #222;
-  background:#000;
-  border-radius:14px;
-  padding:12px;
-  cursor:pointer;
-  transition:.15s ease;
-  display:flex;
-  align-items:center;
-  gap:10px;
-}
-
-.user-item:hover{
-  background:#111;
-}
-
-.user-item .display-name{
-  font-size:12px;
-  line-height:1.35;
-}
-
-.sidebar-spacer{
-  flex:1;
-}
-
-.sidebar-bottom-actions{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.sidebar-bottom-actions .icon-btn{
-  width:100%;
-  justify-content:flex-start;
-}
-
-#likersOverlay{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  z-index:70;
-  display:none;
-}
-
-#likersOverlay.show{
-  display:block;
-}
-
-#likersModal{
-  position:fixed;
-  z-index:80;
-  left:50%;
-  top:50%;
-  transform:translate(-50%,-50%);
-  width:min(92vw,420px);
-  max-height:78vh;
-  background:#0f0f0f;
-  border:1px solid #222;
-  border-radius:22px;
-  padding:16px;
-  display:none;
-  flex-direction:column;
-  gap:12px;
-  box-shadow:0 20px 60px rgba(0,0,0,.45);
-}
-
-#likersModal.show{
-  display:flex;
-}
-
-.likers-header{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
-}
-
-.likers-title{
-  font-size:16px;
-}
-
-.likers-list{
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  overflow:auto;
-  padding-right:2px;
-}
-
-.liker-item{
-  display:flex;
-  align-items:center;
-  gap:10px;
-  padding:10px 12px;
-  border:1px solid #222;
-  border-radius:14px;
-  background:#000;
-  text-decoration:none;
-  color:#fff;
-}
-
-.liker-item:hover{
-  background:#111;
-}
-
-.liker-item .meta{
-  min-width:0;
-  flex:1;
-}
-
-.liker-item .name{
-  font-size:12px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  flex-wrap:wrap;
-}
-
-@media (max-width:520px){
-  .topbar{
-    align-items:center;
+  :root{
+    --bg:#000;
+    --panel:#0b0b0b;
+    --panel2:#111;
+    --line:#232323;
+    --muted:#9a9a9a;
+    --text:#fff;
+    --soft:#d9d9d9;
+    --shadow: 0 24px 80px rgba(0,0,0,.45);
+    --radius: 28px;
   }
 
-  .post-actions,
-  .post-song,
-  .selected-song{
-    flex-direction:column;
-    align-items:flex-start;
-  }
-
-  .selected-song-actions{
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0;
     width:100%;
+    height:100%;
+    overflow:hidden;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(255,255,255,.06), transparent 26%),
+      radial-gradient(circle at 80% 10%, rgba(255,255,255,.05), transparent 22%),
+      radial-gradient(circle at 50% 100%, rgba(255,255,255,.05), transparent 28%),
+      #000;
+    color:var(--text);
+    font-family:'Archivo Black', system-ui, sans-serif;
+  }
+
+  .app{
+    position:relative;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+  }
+
+  /* top */
+  .topbar{
+    position:fixed;
+    inset:0 0 auto 0;
+    z-index:50;
+    padding:14px 14px 0;
+    pointer-events:none;
+  }
+
+  .topbar-inner{
+    pointer-events:auto;
+    display:flex;
+    align-items:center;
     justify-content:space-between;
+    gap:12px;
+    padding:12px 14px;
+    margin:0 auto;
+    max-width:1200px;
+    border:1px solid rgba(255,255,255,.08);
+    background:rgba(8,8,8,.72);
+    backdrop-filter: blur(16px);
+    border-radius:999px;
+    box-shadow:var(--shadow);
   }
 
-  .icon-btn{
-    width:auto;
+  .brand{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+    letter-spacing:.5px;
   }
 
-  .header{
-    font-size:26px;
+  .brand .logo{
+    font-size:20px;
+    line-height:1;
   }
 
-  #sidebar{
-    width:86vw;
+  .brand .pill{
+    font-size:11px;
+    color:#000;
+    background:#fff;
+    padding:5px 8px;
+    border-radius:999px;
   }
 
-  #likersModal{
-    width:92vw;
+  .nav{
+    display:flex;
+    align-items:center;
+    gap:8px;
   }
-}
+
+  .navbtn{
+    border:1px solid rgba(255,255,255,.08);
+    background:#0e0e0e;
+    color:#fff;
+    padding:10px 14px;
+    border-radius:999px;
+    font-family:inherit;
+    font-size:12px;
+    cursor:pointer;
+    transition:.18s ease;
+  }
+
+  .navbtn.active{
+    background:#fff;
+    color:#000;
+    border-color:#fff;
+  }
+
+  .navbtn:hover{ transform:translateY(-1px); }
+
+  .topright{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .iconbtn{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.08);
+    background:#0e0e0e;
+    color:#fff;
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    transition:.18s ease;
+  }
+  .iconbtn:hover{ transform:translateY(-1px) scale(1.02); }
+
+  /* progress */
+  .progress-wrap{
+    position:fixed;
+    top:70px;
+    left:50%;
+    transform:translateX(-50%);
+    width:min(680px, calc(100vw - 24px));
+    z-index:45;
+    pointer-events:none;
+  }
+
+  .segments{
+    display:flex;
+    gap:6px;
+    width:100%;
+  }
+
+  .segment{
+    flex:1;
+    height:4px;
+    border-radius:999px;
+    background:rgba(255,255,255,.10);
+    overflow:hidden;
+  }
+
+  .segment > span{
+    display:block;
+    height:100%;
+    width:0%;
+    border-radius:inherit;
+    background:#fff;
+  }
+
+  /* feed */
+  .feed{
+    height:100%;
+    display:flex;
+    overflow-x:auto;
+    overflow-y:hidden;
+    scroll-snap-type:x mandatory;
+    scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .feed::-webkit-scrollbar{ display:none; }
+
+  .post{
+    flex:0 0 100vw;
+    height:100vh;
+    scroll-snap-align:start;
+    position:relative;
+    isolation:isolate;
+  }
+
+  .post::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      radial-gradient(circle at 50% 35%, rgba(255,255,255,.15), transparent 22%),
+      linear-gradient(180deg, rgba(0,0,0,.08), rgba(0,0,0,.78) 80%, rgba(0,0,0,.95));
+    z-index:1;
+    pointer-events:none;
+  }
+
+  .media{
+    position:absolute;
+    inset:0;
+    z-index:0;
+    background:
+      radial-gradient(circle at 25% 20%, rgba(255,255,255,.18), transparent 18%),
+      radial-gradient(circle at 75% 30%, rgba(255,255,255,.12), transparent 20%),
+      linear-gradient(135deg, var(--c1), var(--c2));
+    transform:scale(1.04);
+  }
+
+  .media::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:
+      linear-gradient(115deg, rgba(255,255,255,.0) 0%, rgba(255,255,255,.08) 18%, rgba(255,255,255,.0) 36%),
+      radial-gradient(circle at center, transparent 30%, rgba(0,0,0,.18) 100%);
+    mix-blend-mode:screen;
+    opacity:.65;
+  }
+
+  .content{
+    position:absolute;
+    inset:auto 0 0 0;
+    z-index:2;
+    padding:24px;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:18px;
+    align-items:end;
+  }
+
+  .card{
+    width:min(720px, calc(100vw - 88px));
+    max-width:100%;
+    border:1px solid rgba(255,255,255,.10);
+    background:linear-gradient(180deg, rgba(12,12,12,.35), rgba(12,12,12,.78));
+    backdrop-filter: blur(16px);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:18px;
+  }
+
+  .author-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    margin-bottom:14px;
+  }
+
+  .avatar{
+    width:46px;
+    height:46px;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    color:#000;
+    background:#fff;
+    font-size:16px;
+    flex:0 0 auto;
+  }
+
+  .author-meta{
+    min-width:0;
+  }
+
+  .author{
+    font-size:16px;
+    line-height:1.1;
+    margin-bottom:4px;
+  }
+
+  .handle{
+    font-size:11px;
+    color:var(--muted);
+    letter-spacing:.8px;
+  }
+
+  .headline{
+    font-size: clamp(28px, 5vw, 58px);
+    line-height:.95;
+    letter-spacing: .2px;
+    margin:0 0 10px;
+    text-wrap:balance;
+  }
+
+  .caption{
+    font-size:13px;
+    line-height:1.65;
+    color:#e8e8e8;
+    opacity:.92;
+    margin:0 0 16px;
+    max-width:62ch;
+    font-family: system-ui, sans-serif;
+    font-weight:600;
+  }
+
+  .meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:16px;
+  }
+
+  .chip{
+    font-size:11px;
+    padding:8px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.06);
+    color:#fff;
+  }
+
+  .footerline{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:14px;
+    border-top:1px solid rgba(255,255,255,.08);
+    padding-top:14px;
+  }
+
+  .stats{
+    display:flex;
+    gap:14px;
+    color:#ededed;
+    font-size:11px;
+    font-family:system-ui,sans-serif;
+    font-weight:700;
+  }
+
+  .cta{
+    display:flex;
+    gap:10px;
+  }
+
+  .cta button{
+    border:none;
+    border-radius:999px;
+    padding:12px 14px;
+    font-family:inherit;
+    font-size:12px;
+    cursor:pointer;
+    transition:.18s ease;
+  }
+
+  .primary{
+    background:#fff;
+    color:#000;
+  }
+
+  .secondary{
+    background:#111;
+    color:#fff;
+    border:1px solid rgba(255,255,255,.12);
+  }
+
+  .primary:hover,.secondary:hover{ transform:translateY(-1px); }
+
+  .actions{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    padding-bottom:2px;
+  }
+
+  .action{
+    width:52px;
+    height:52px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(10,10,10,.72);
+    backdrop-filter: blur(12px);
+    color:#fff;
+    display:grid;
+    place-items:center;
+    font-size:18px;
+    cursor:pointer;
+    box-shadow:var(--shadow);
+    transition:.18s ease;
+  }
+
+  .action:hover{ transform:translateY(-1px) scale(1.03); }
+  .action.liked{ background:#fff; color:#000; }
+
+  .sidehint{
+    position:absolute;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:3;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:rgba(255,255,255,.75);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.4px;
+    font-family:system-ui,sans-serif;
+    pointer-events:none;
+  }
+
+  .sidehint .line{
+    width:54px;
+    height:1px;
+    background:rgba(255,255,255,.2);
+  }
+
+  /* mobile */
+  @media (max-width: 820px){
+    .topbar{
+      padding:10px 10px 0;
+    }
+
+    .topbar-inner{
+      border-radius:24px;
+      padding:10px 12px;
+    }
+
+    .nav{
+      display:none;
+    }
+
+    .progress-wrap{
+      top:66px;
+      width:calc(100vw - 18px);
+    }
+
+    .content{
+      padding:14px;
+      grid-template-columns:1fr;
+    }
+
+    .card{
+      width:100%;
+      border-radius:24px;
+      padding:16px;
+    }
+
+    .actions{
+      flex-direction:row;
+      justify-content:flex-end;
+    }
+
+    .action{
+      width:48px;
+      height:48px;
+      border-radius:16px;
+    }
+
+    .sidehint{
+      display:none;
+    }
+
+    .headline{
+      font-size: clamp(24px, 8vw, 42px);
+    }
+  }
 </style>
 </head>
 
 <body>
-<div id="overlay"></div>
-<div id="likersOverlay"></div>
+<div class="app">
 
-<aside id="sidebar" aria-label="Sidebar menu">
-  <div class="sidebar-title">Menu</div>
-
-  <a href="#" class="sidebar-profile" id="sidebarProfileLink">
-    <div class="profile-avatar" id="sidebarAvatar">U</div>
-    <div class="profile-meta">
-      <div class="name" id="sidebarName">Loading profile...</div>
-      <div class="sub" id="sidebarSub">Signed in</div>
-    </div>
-  </a>
-
-  <div class="search-box">
-    <input id="userSearch" type="text" placeholder="Search profiles..." autocomplete="off">
-    <div id="userResults"></div>
-  </div>
-
-  <div class="sidebar-spacer"></div>
-
-  <div class="sidebar-bottom-actions">
-    <button id="aboutSidebarBtn" class="icon-btn secondary" type="button">
-      <span class="material-symbols-outlined">info</span>
-      About
-    </button>
-
-    <button id="settingsSidebarBtn" class="icon-btn secondary" type="button">
-      <span class="material-symbols-outlined">settings</span>
-      Settings
-    </button>
-
-    <button id="logoutSidebarBtn" class="icon-btn secondary" type="button">
-      <span class="material-symbols-outlined">logout</span>
-      Logout
-    </button>
-  </div>
-</aside>
-
-<div id="likersModal" role="dialog" aria-modal="true" aria-labelledby="likersTitle">
-  <div class="likers-header">
-    <div class="likers-title" id="likersTitle">Likes</div>
-    <button type="button" class="icon-btn secondary" id="closeLikersBtn">
-      <span class="material-symbols-outlined">close</span>
-    </button>
-  </div>
-  <div class="likers-list" id="likersList"></div>
-</div>
-
-<div class="container">
   <div class="topbar">
-    <button id="menuBtn" class="icon-btn secondary" type="button" aria-label="Open menu">
-      <span class="material-symbols-outlined">menu</span>
-    </button>
+    <div class="topbar-inner">
+      <div class="brand">
+        <div class="logo">Shared.</div>
+        <div class="pill">LIVE</div>
+      </div>
 
-    <div class="header">Shared.</div>
+      <div class="nav">
+        <button class="navbtn active">For You</button>
+        <button class="navbtn">Following</button>
+        <button class="navbtn">Explore</button>
+      </div>
 
-    <div style="width:44px;"></div>
+      <div class="topright">
+        <button class="iconbtn" title="Search">⌕</button>
+        <button class="iconbtn" title="Profile">◌</button>
+      </div>
+    </div>
   </div>
 
-  <div class="upload-box">
-    <div class="dropzone" id="dropzone">
-      <span class="material-symbols-outlined" style="font-size:30px;">upload</span>
-      Drag & drop or click
-    </div>
-
-    <div class="preview" id="previewBox"></div>
-
-    <input type="file" id="file" hidden accept="image/png,image/jpeg,image/jpg,image/gif">
-
-    <textarea id="caption" placeholder="Write a caption..."></textarea>
-
-    <div class="tag-picker">
-      <div class="tag-picker-label">Choose 1 tag</div>
-      <input id="tagSearch" type="text" placeholder="Search a tag..." autocomplete="off">
-      <div class="tag-suggestions" id="tagSuggestions"></div>
-      <div class="tag-selected" id="tagSelected">Selected: Gaming</div>
-    </div>
-
-    <div class="song-wrapper">
-      <input id="songInput" placeholder="Search song...">
-      <div id="suggestions"></div>
-    </div>
-
-    <div id="songList"></div>
-
-    <button id="uploadBtn" class="primary-btn">UPLOAD</button>
+  <div class="progress-wrap">
+    <div class="segments" id="segments"></div>
   </div>
 
-  <div id="feed"></div>
+  <div class="feed" id="feed">
+
+    <section class="post" style="--c1:#1a1a1a; --c2:#4c4c4c;">
+      <div class="media"></div>
+      <div class="sidehint"><span class="line"></span> swipe <span class="line"></span></div>
+      <div class="content">
+        <div class="card">
+          <div class="author-row">
+            <div class="avatar">S</div>
+            <div class="author-meta">
+              <div class="author">Shared Studio</div>
+              <div class="handle">@shared</div>
+            </div>
+          </div>
+
+          <h2 class="headline">A cleaner feed, built to keep people moving.</h2>
+          <p class="caption">
+            Una home pensata per essere veloce, memorabile e naturale da scrollare.
+            Ogni post prende tutto lo schermo, con progressione chiara e interazione immediata.
+          </p>
+
+          <div class="meta">
+            <span class="chip">#design</span>
+            <span class="chip">#community</span>
+            <span class="chip">#minimal</span>
+          </div>
+
+          <div class="footerline">
+            <div class="stats">
+              <span>12.4K views</span>
+              <span>1.8K likes</span>
+              <span>214 shares</span>
+            </div>
+            <div class="cta">
+              <button class="secondary">Save</button>
+              <button class="primary">Open</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action likeBtn" aria-label="Like">❤</button>
+          <button class="action" aria-label="Comment">✦</button>
+          <button class="action" aria-label="Share">↗</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="post" style="--c1:#101010; --c2:#2f2f2f;">
+      <div class="media"></div>
+      <div class="content">
+        <div class="card">
+          <div class="author-row">
+            <div class="avatar">A</div>
+            <div class="author-meta">
+              <div class="author">Anna V.</div>
+              <div class="handle">@anna</div>
+            </div>
+          </div>
+
+          <h2 class="headline">Scroll orizzontale senza rumore visivo.</h2>
+          <p class="caption">
+            Il focus resta sul contenuto. Il frame, le ombre e gli overlay servono solo a dare gerarchia,
+            non a distrarre.
+          </p>
+
+          <div class="meta">
+            <span class="chip">#content</span>
+            <span class="chip">#ui</span>
+            <span class="chip">#ux</span>
+          </div>
+
+          <div class="footerline">
+            <div class="stats">
+              <span>8.1K views</span>
+              <span>931 likes</span>
+              <span>88 shares</span>
+            </div>
+            <div class="cta">
+              <button class="secondary">Save</button>
+              <button class="primary">Open</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action likeBtn" aria-label="Like">❤</button>
+          <button class="action" aria-label="Comment">✦</button>
+          <button class="action" aria-label="Share">↗</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="post" style="--c1:#090909; --c2:#202020;">
+      <div class="media"></div>
+      <div class="content">
+        <div class="card">
+          <div class="author-row">
+            <div class="avatar">M</div>
+            <div class="author-meta">
+              <div class="author">Marco R.</div>
+              <div class="handle">@marco</div>
+            </div>
+          </div>
+
+          <h2 class="headline">Progress bar chiara, semplice, inevitabile.</h2>
+          <p class="caption">
+            Ogni segmento mostra esattamente dove sei. L’autoplay aiuta il ritmo,
+            ma lo scroll manuale resta sempre prioritario.
+          </p>
+
+          <div class="meta">
+            <span class="chip">#motion</span>
+            <span class="chip">#feed</span>
+            <span class="chip">#product</span>
+          </div>
+
+          <div class="footerline">
+            <div class="stats">
+              <span>5.4K views</span>
+              <span>642 likes</span>
+              <span>51 shares</span>
+            </div>
+            <div class="cta">
+              <button class="secondary">Save</button>
+              <button class="primary">Open</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action likeBtn" aria-label="Like">❤</button>
+          <button class="action" aria-label="Comment">✦</button>
+          <button class="action" aria-label="Share">↗</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="post" style="--c1:#131313; --c2:#555555;">
+      <div class="media"></div>
+      <div class="content">
+        <div class="card">
+          <div class="author-row">
+            <div class="avatar">L</div>
+            <div class="author-meta">
+              <div class="author">Leo D.</div>
+              <div class="handle">@leo</div>
+            </div>
+          </div>
+
+          <h2 class="headline">Un feed che sembra prodotto, non pagina.</h2>
+          <p class="caption">
+            Micro-interazioni, ordine tipografico e una navigazione che resta coerente con il branding
+            bianco e nero di Shared.
+          </p>
+
+          <div class="meta">
+            <span class="chip">#brand</span>
+            <span class="chip">#social</span>
+            <span class="chip">#shared</span>
+          </div>
+
+          <div class="footerline">
+            <div class="stats">
+              <span>18.9K views</span>
+              <span>2.7K likes</span>
+              <span>306 shares</span>
+            </div>
+            <div class="cta">
+              <button class="secondary">Save</button>
+              <button class="primary">Open</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="action likeBtn" aria-label="Like">❤</button>
+          <button class="action" aria-label="Comment">✦</button>
+          <button class="action" aria-label="Share">↗</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
 </div>
 
-<script type="module">
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+<script>
+  const feed = document.getElementById("feed");
+  const posts = [...document.querySelectorAll(".post")];
+  const segmentsWrap = document.getElementById("segments");
+  const likeButtons = [...document.querySelectorAll(".likeBtn")];
 
-const supabase = createClient(
-  "https://cnhaonawapuahzoctqav.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes"
-);
+  const AUTOPLAY_MS = 5200;
+  let activeIndex = 0;
+  let progressStart = performance.now();
+  let rafId = null;
+  let isAutoScrolling = false;
 
-window.supabase = supabase;
-
-/* CHANGE THIS */
-const BACKEND_URL = "https://shared-bk4b.onrender.com";
-const ADSENSE_CLIENT = "ca-pub-8019369535802415";
-const ADSENSE_SLOT = "8427156093";
-
-const dropzone = document.getElementById("dropzone");
-const fileInput = document.getElementById("file");
-const previewBox = document.getElementById("previewBox");
-const captionInput = document.getElementById("caption");
-const songInput = document.getElementById("songInput");
-const suggestions = document.getElementById("suggestions");
-const songList = document.getElementById("songList");
-const feed = document.getElementById("feed");
-const uploadBtn = document.getElementById("uploadBtn");
-const logoutSidebarBtn = document.getElementById("logoutSidebarBtn");
-const aboutSidebarBtn = document.getElementById("aboutSidebarBtn");
-const settingsSidebarBtn = document.getElementById("settingsSidebarBtn");
-const menuBtn = document.getElementById("menuBtn");
-const sidebar = document.getElementById("sidebar");
-const overlay = document.getElementById("overlay");
-const userSearch = document.getElementById("userSearch");
-const userResults = document.getElementById("userResults");
-const sidebarAvatar = document.getElementById("sidebarAvatar");
-const sidebarName = document.getElementById("sidebarName");
-const sidebarSub = document.getElementById("sidebarSub");
-const sidebarProfileLink = document.getElementById("sidebarProfileLink");
-
-const likersOverlay = document.getElementById("likersOverlay");
-const likersModal = document.getElementById("likersModal");
-const likersList = document.getElementById("likersList");
-const likersTitle = document.getElementById("likersTitle");
-const closeLikersBtn = document.getElementById("closeLikersBtn");
-
-const tagSearch = document.getElementById("tagSearch");
-const tagSuggestions = document.getElementById("tagSuggestions");
-const tagSelected = document.getElementById("tagSelected");
-
-const TOPIC_CONFIG = {
-  music: { icon: "music_note", label: "Music" },
-  gaming: { icon: "sports_esports", label: "Gaming" },
-  sports: { icon: "sports_soccer", label: "Sports" },
-  tech: { icon: "devices", label: "Tech" },
-  ai: { icon: "smart_toy", label: "AI" },
-  art: { icon: "brush", label: "Art" },
-  travel: { icon: "flight", label: "Travel" },
-  food: { icon: "restaurant", label: "Food" },
-  movies: { icon: "movie", label: "Movies" },
-  anime: { icon: "auto_awesome", label: "Anime" },
-  cars: { icon: "directions_car", label: "Cars" },
-  finance: { icon: "trending_up", label: "Finance" },
-  science: { icon: "science", label: "Science" },
-  fitness: { icon: "fitness_center", label: "Fitness" },
-  photo: { icon: "photo_camera", label: "Photography" },
-  nature: { icon: "forest", label: "Nature" },
-  books: { icon: "menu_book", label: "Books" },
-  memes: { icon: "mood", label: "Memes" },
-  coding: { icon: "code", label: "Coding" },
-  fashion: { icon: "styler", label: "Fashion" }
-};
-
-const TOPIC_ALIAS = Object.fromEntries(
-  Object.entries(TOPIC_CONFIG).flatMap(([id, cfg]) => [
-    [id.toLowerCase(), id],
-    [cfg.label.toLowerCase(), id]
-  ])
-);
-
-let user = null;
-let displayName = "user";
-let currentProfile = null;
-let croppedBlob = null;
-let selectedSong = null;
-let selectedTopic = "gaming";
-let userInterests = [];
-let debounceSong = null;
-let debounceUser = null;
-let debounceTag = null;
-let globalAudio = new Audio();
-let activePlayButton = null;
-let jsonpScript = null;
-let postState = new Map();
-let canSaveUsername = false;
-let currentLikersPostId = null;
-let verifiedBadgeId = 0;
-
-function escapeHTML(value){
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;");
-}
-
-function getFallbackName(sessionUser){
-  return (
-    sessionUser?.user_metadata?.display_name ||
-    sessionUser?.user_metadata?.username ||
-    sessionUser?.user_metadata?.name ||
-    sessionUser?.email?.split("@")?.[0] ||
-    "user"
-  );
-}
-
-function getInitials(name){
-  const clean = String(name || "U").trim();
-  if(!clean) return "U";
-  const parts = clean.split(/\s+/).filter(Boolean);
-  if(parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
-  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
-}
-
-function normalizeTopicValue(value){
-  const raw = String(value ?? "").trim().toLowerCase();
-  if(!raw) return "";
-  return TOPIC_ALIAS[raw] || raw;
-}
-
-function normalizeInterests(value){
-  const arr = [];
-
-  if(Array.isArray(value)){
-    arr.push(...value);
-  }else if(typeof value === "string"){
-    const raw = value.trim();
-    if(!raw) return [];
-
-    try{
-      const parsed = JSON.parse(raw);
-      if(Array.isArray(parsed)){
-        arr.push(...parsed);
-      }else{
-        arr.push(...raw.split(","));
-      }
-    }catch(_){
-      arr.push(...raw.split(","));
-    }
-  }else if(value && typeof value === "object"){
-    arr.push(...Object.values(value).flat());
-  }
-
-  return arr
-    .map(normalizeTopicValue)
-    .filter(Boolean);
-}
-
-function renderVerifiedBadge(){
-  const id = `checkcut-${verifiedBadgeId++}`;
-  return `
-    <span class="verified-badge" aria-label="Verified">
-      <svg viewBox="0 0 24 24" role="img" aria-hidden="true">
-        <defs>
-          <mask id="${id}">
-            <rect width="24" height="24" fill="white"></rect>
-            <path d="M6.5 12.5 L10.3 16.2 L17.6 8.8"
-                  fill="none"
-                  stroke="black"
-                  stroke-width="3.6"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"></path>
-          </mask>
-        </defs>
-        <circle cx="12" cy="12" r="11" fill="white" mask="url(#${id})"></circle>
-      </svg>
-    </span>
-  `;
-}
-
-function syncTagSelected(){
-  const cfg = TOPIC_CONFIG[selectedTopic];
-  tagSelected.innerHTML = `
-    <span class="material-symbols-outlined" style="font-size:16px;">${escapeHTML(cfg?.icon || "tag")}</span>
-    Selected: ${escapeHTML(cfg?.label || selectedTopic || "Tag")}
-  `;
-}
-
-function setSelectedTopic(topicId, updateInput = true){
-  const normalized = normalizeTopicValue(topicId);
-  if(!normalized || !TOPIC_CONFIG[normalized]) return;
-  selectedTopic = normalized;
-  syncTagSelected();
-  if(updateInput){
-    tagSearch.value = TOPIC_CONFIG[normalized].label;
-    tagSuggestions.style.display = "none";
-  }
-}
-
-function renderTagSuggestions(query){
-  const q = String(query || "").trim().toLowerCase();
-  const entries = Object.entries(TOPIC_CONFIG).filter(([id, cfg])=>{
-    if(!q) return true;
-    return id.includes(q) || cfg.label.toLowerCase().includes(q);
+  // Build progress segments
+  posts.forEach(() => {
+    const seg = document.createElement("div");
+    seg.className = "segment";
+    seg.innerHTML = "<span></span>";
+    segmentsWrap.appendChild(seg);
   });
 
-  if(entries.length === 0){
-    tagSuggestions.innerHTML = `<div class="empty-state">No tags found.</div>`;
-    tagSuggestions.style.display = "block";
-    return;
+  const segments = [...document.querySelectorAll(".segment > span")];
+
+  function clamp(v, min, max){
+    return Math.max(min, Math.min(max, v));
   }
 
-  tagSuggestions.innerHTML = "";
-  entries.forEach(([id, cfg])=>{
-    const btn = document.createElement("button");
-    btn.type = "button";
-    btn.className = "tag-option";
-    btn.innerHTML = `
-      <span class="material-symbols-outlined">${escapeHTML(cfg.icon)}</span>
-      <span>${escapeHTML(cfg.label)}</span>
-    `;
-    btn.onclick = ()=>{
-      setSelectedTopic(id, true);
-      tagSearch.blur();
-    };
-    tagSuggestions.appendChild(btn);
-  });
-
-  tagSuggestions.style.display = "block";
-}
-
-function formatDateTime(value){
-  const d = value ? new Date(value) : null;
-  if(!d || Number.isNaN(d.getTime())) return "";
-  return new Intl.DateTimeFormat("it-IT", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(d);
-}
-
-function setAudioButtonState(button, playing){
-  if(!button) return;
-  const icon = button.querySelector(".material-symbols-outlined");
-  const label = button.querySelector(".btn-label");
-  if(!icon || !label) return;
-
-  if(playing){
-    icon.textContent = "pause";
-    label.textContent = "Pause preview";
-    button.dataset.playing = "1";
-  }else{
-    icon.textContent = "play_arrow";
-    label.textContent = "Play preview";
-    button.dataset.playing = "0";
-  }
-}
-
-async function playPreview(url, button){
-  if(!url || !button) return;
-
-  if(activePlayButton && activePlayButton !== button){
-    setAudioButtonState(activePlayButton, false);
-  }
-
-  if(globalAudio.src !== url){
-    globalAudio.pause();
-    globalAudio.src = url;
-  }
-
-  if(globalAudio.paused){
-    try{
-      await globalAudio.play();
-      setAudioButtonState(button, true);
-      activePlayButton = button;
-    }catch(err){
-      console.error("audio play error", err);
-    }
-  }else{
-    globalAudio.pause();
-    setAudioButtonState(button, false);
-    if(activePlayButton === button) activePlayButton = null;
-  }
-}
-
-globalAudio.addEventListener("ended", ()=>{
-  if(activePlayButton){
-    setAudioButtonState(activePlayButton, false);
-    activePlayButton = null;
-  }
-});
-
-function openSidebar(){
-  sidebar.classList.add("open");
-  overlay.classList.add("show");
-}
-
-function closeSidebar(){
-  sidebar.classList.remove("open");
-  overlay.classList.remove("show");
-}
-
-function openLikersModal(){
-  likersOverlay.classList.add("show");
-  likersModal.classList.add("show");
-}
-
-function closeLikersModal(){
-  likersOverlay.classList.remove("show");
-  likersModal.classList.remove("show");
-  currentLikersPostId = null;
-  likersList.innerHTML = "";
-  likersTitle.textContent = "Likes";
-}
-
-async function loadCurrentProfile(){
-  try{
-    const { data, error } = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url, interests")
-      .eq("id", user.id)
-      .maybeSingle();
-
-    if(error){
-      console.warn("current profile load error:", error);
-      currentProfile = null;
-      userInterests = [];
-      return;
-    }
-
-    currentProfile = data || null;
-    userInterests = normalizeInterests(currentProfile?.interests);
-
-    if(userInterests.length > 0 && TOPIC_CONFIG[userInterests[0]]){
-      selectedTopic = userInterests[0];
-    }
-
-    syncTagSelected();
-  }catch(err){
-    console.warn("current profile load failed:", err);
-    currentProfile = null;
-    userInterests = [];
-  }
-}
-
-function renderSidebarProfile(){
-  const name = currentProfile?.display_name || displayName || getFallbackName(user);
-  const avatarUrl = currentProfile?.avatar_url || user?.user_metadata?.avatar_url || "";
-  const profileHref = `user.html?id=${encodeURIComponent(user.id)}&name=${encodeURIComponent(name)}`;
-
-  sidebarProfileLink.href = profileHref;
-  sidebarName.textContent = name;
-  sidebarSub.textContent = "Signed in";
-
-  if(avatarUrl){
-    sidebarAvatar.innerHTML = `<img src="${escapeHTML(avatarUrl)}" alt="profile avatar">`;
-  }else{
-    sidebarAvatar.textContent = getInitials(name);
-  }
-}
-
-menuBtn.onclick = ()=>{
-  renderSidebarProfile();
-  openSidebar();
-};
-
-overlay.onclick = closeSidebar;
-likersOverlay.onclick = closeLikersModal;
-closeLikersBtn.onclick = closeLikersModal;
-
-aboutSidebarBtn.onclick = ()=>{
-  location.href = "about.html";
-};
-
-settingsSidebarBtn.onclick = ()=>{
-  location.href = "settings.html";
-};
-
-setSelectedTopic("gaming", false);
-syncTagSelected();
-
-document.addEventListener("click", e=>{
-  if(!e.target.closest(".tag-picker")){
-    tagSuggestions.style.display = "none";
-  }
-  if(!e.target.closest(".song-wrapper")){
-    suggestions.style.display = "none";
-  }
-});
-
-tagSearch.addEventListener("focus", ()=>{
-  renderTagSuggestions(tagSearch.value);
-});
-
-tagSearch.addEventListener("input", e=>{
-  clearTimeout(debounceTag);
-  const q = e.target.value.trim();
-  debounceTag = setTimeout(()=>{
-    renderTagSuggestions(q);
-  }, 120);
-});
-
-(async ()=>{
-  const { data: { session } } = await supabase.auth.getSession();
-  if(!session) location.href = "index.html";
-
-  user = session.user;
-  displayName = getFallbackName(user);
-
-  await detectUsernameColumn();
-  await loadCurrentProfile();
-  renderSidebarProfile();
-  await loadFeed();
-  realtime();
-})();
-
-async function detectUsernameColumn(){
-  try{
-    const { error } = await supabase
-      .from("posts")
-      .select("username")
-      .limit(1);
-
-    canSaveUsername = !error;
-    if(error) console.warn("username column not available:", error.message);
-  }catch(_){
-    canSaveUsername = false;
-  }
-}
-
-logoutSidebarBtn.onclick = async ()=>{
-  await supabase.auth.signOut();
-  location.href = "index.html";
-};
-
-dropzone.onclick = ()=> fileInput.click();
-
-dropzone.ondragover = e=>{
-  e.preventDefault();
-  dropzone.classList.add("dragover");
-};
-
-dropzone.ondragleave = ()=>{
-  dropzone.classList.remove("dragover");
-};
-
-dropzone.ondrop = e=>{
-  e.preventDefault();
-  dropzone.classList.remove("dragover");
-  handleFile(e.dataTransfer.files[0]);
-};
-
-fileInput.onchange = e=>{
-  handleFile(e.target.files[0]);
-};
-
-async function handleFile(file){
-  if(!file) return;
-
-  const reader = new FileReader();
-  const img = new Image();
-
-  reader.onload = e=>{
-    img.src = e.target.result;
-  };
-
-  img.onload = ()=>{
-    const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 800;
-
-    const size = Math.min(img.width, img.height);
-    const ctx = canvas.getContext("2d");
-
-    ctx.drawImage(
-      img,
-      (img.width - size) / 2,
-      (img.height - size) / 2,
-      size,
-      size,
-      0,
-      0,
-      800,
-      800
-    );
-
-    canvas.toBlob(blob=>{
-      croppedBlob = blob;
-      previewBox.style.display = "block";
-      dropzone.style.display = "none";
-      previewBox.innerHTML = `<img src="${URL.createObjectURL(blob)}" alt="preview">`;
-    }, "image/jpeg", 0.75);
-  };
-
-  reader.readAsDataURL(file);
-}
-
-async function moderateImage(blob){
-  const formData = new FormData();
-  formData.append("file", blob, "image.jpg");
-
-  const res = await fetch(`${BACKEND_URL}/moderate`, {
-    method: "POST",
-    body: formData
-  });
-
-  let data = null;
-  try{
-    data = await res.json();
-  }catch(_){
-    data = { ok: false, flagged: false, warning: "invalid moderation response" };
-  }
-
-  return data;
-}
-
-function deezerSearch(query){
-  return new Promise((resolve, reject)=>{
-    if(jsonpScript){
-      jsonpScript.remove();
-      jsonpScript = null;
-    }
-
-    const callbackName = `dz_cb_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-    const timeout = setTimeout(()=>{
-      cleanup();
-      reject(new Error("Deezer request timeout"));
-    }, 10000);
-
-    function cleanup(){
-      clearTimeout(timeout);
-      try{ delete window[callbackName]; }catch(_){ }
-      if(jsonpScript && jsonpScript.parentNode){
-        jsonpScript.parentNode.removeChild(jsonpScript);
-      }
-      jsonpScript = null;
-    }
-
-    window[callbackName] = data=>{
-      cleanup();
-      resolve(data);
-    };
-
-    const script = document.createElement("script");
-    jsonpScript = script;
-    script.onerror = ()=>{
-      cleanup();
-      reject(new Error("Deezer request failed"));
-    };
-
-    script.src = `https://api.deezer.com/search?q=${encodeURIComponent(query)}&output=jsonp&callback=${callbackName}`;
-    document.body.appendChild(script);
-  });
-}
-
-function renderSelectedSong(){
-  if(!selectedSong){
-    songList.innerHTML = "";
-    return;
-  }
-
-  songList.innerHTML = `
-    <div class="selected-song">
-      <div class="meta">
-        <div class="title">Selected: ${escapeHTML(selectedSong.title)}</div>
-        <span class="artist">${escapeHTML(selectedSong.artist || "")}</span>
-      </div>
-
-      <div class="selected-song-actions">
-        <button type="button" class="icon-btn secondary" id="selectedPlayBtn">
-          <span class="material-symbols-outlined">play_arrow</span>
-          <span class="btn-label">Play preview</span>
-        </button>
-
-        <button type="button" class="icon-btn secondary" id="clearSongBtn" title="Remove song">
-          <span class="material-symbols-outlined">close</span>
-        </button>
-      </div>
-    </div>
-  `;
-
-  const selectedPlayBtn = document.getElementById("selectedPlayBtn");
-  const clearSongBtn = document.getElementById("clearSongBtn");
-
-  selectedPlayBtn.onclick = ()=>{
-    playPreview(selectedSong.preview, selectedPlayBtn);
-  };
-
-  clearSongBtn.onclick = ()=>{
-    selectedSong = null;
-    songList.innerHTML = "";
-  };
-}
-
-songInput.addEventListener("input", async e=>{
-  clearTimeout(debounceSong);
-  const q = e.target.value.trim();
-
-  if(q.length < 2){
-    suggestions.innerHTML = "";
-    suggestions.style.display = "none";
-    return;
-  }
-
-  debounceSong = setTimeout(async ()=>{
-    try{
-      const data = await deezerSearch(q);
-      const tracks = (data?.data || []).filter(track => track && track.preview);
-
-      suggestions.innerHTML = "";
-
-      if(tracks.length === 0){
-        suggestions.innerHTML = `<div class="song-item">No results</div>`;
-        suggestions.style.display = "block";
-        return;
-      }
-
-      tracks.slice(0, 6).forEach(track=>{
-        const row = document.createElement("div");
-        row.className = "song-item";
-        row.innerHTML = `
-          ${escapeHTML(track.title)}
-          <small>${escapeHTML(track.artist?.name || "Unknown artist")}</small>
-        `;
-
-        row.onclick = ()=>{
-          selectedSong = {
-            title: track.title,
-            artist: track.artist?.name || "",
-            preview: track.preview,
-            id: track.id
-          };
-          renderSelectedSong();
-          suggestions.innerHTML = "";
-          suggestions.style.display = "none";
-          songInput.value = "";
-        };
-
-        suggestions.appendChild(row);
-      });
-
-      suggestions.style.display = "block";
-    }catch(err){
-      console.error(err);
-      suggestions.innerHTML = `<div class="song-item">Search failed</div>`;
-      suggestions.style.display = "block";
-    }
-  }, 250);
-});
-
-function postTagLabel(tag){
-  const key = normalizeTopicValue(tag);
-  return TOPIC_CONFIG[key]?.label || String(tag || "No tag");
-}
-
-function postTagIcon(tag){
-  const key = normalizeTopicValue(tag);
-  return TOPIC_CONFIG[key]?.icon || "tag";
-}
-
-function getPostInterestScore(postTag){
-  const normalized = normalizeTopicValue(postTag);
-  if(!normalized) return 0;
-  return userInterests.includes(normalized) ? 1 : 0;
-}
-
-async function fetchProfilesByIds(ids){
-  const uniqueIds = [...new Set((ids || []).filter(Boolean))];
-  if(uniqueIds.length === 0) return new Map();
-
-  let data = null;
-  let error = null;
-
-  try{
-    const res = await supabase
-      .from("profiles")
-      .select("id, display_name, avatar_url, verified")
-      .in("id", uniqueIds);
-
-    data = res.data;
-    error = res.error;
-  }catch(err){
-    error = err;
-  }
-
-  if(error){
-    try{
-      const fallback = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url")
-        .in("id", uniqueIds);
-
-      data = fallback.data || [];
-      error = fallback.error || null;
-    }catch(err){
-      error = err;
-    }
-  }
-
-  if(error){
-    console.warn("profile fetch error:", error);
-    return new Map();
-  }
-
-  const map = new Map();
-  (data || []).forEach(row=>{
-    map.set(row.id, row);
-  });
-
-  return map;
-}
-
-userSearch.addEventListener("input", async e=>{
-  clearTimeout(debounceUser);
-  const q = e.target.value.trim();
-
-  if(q.length < 2){
-    userResults.innerHTML = "";
-    return;
-  }
-
-  debounceUser = setTimeout(async ()=>{
-    userResults.innerHTML = `<div class="empty-state">Searching...</div>`;
-
-    try{
-      let rows = [];
-
-      const { data: profiles, error: profilesError } = await supabase
-        .from("profiles")
-        .select("id, display_name, avatar_url")
-        .ilike("display_name", `%${q}%`)
-        .order("display_name", { ascending: true })
-        .limit(8);
-
-      if(profilesError){
-        console.warn("profiles search error:", profilesError);
-      }
-
-      rows = Array.isArray(profiles) ? profiles : [];
-
-      if(rows.length === 0){
-        const { data: postUsers, error: postsError } = await supabase
-          .from("posts")
-          .select("user_id, username")
-          .ilike("username", `%${q}%`)
-          .limit(20);
-
-        if(postsError){
-          console.warn("posts fallback search error:", postsError);
-        }else{
-          const seen = new Set();
-          rows = (postUsers || [])
-            .map(r => ({
-              id: r.user_id || "",
-              display_name: r.username || "",
-              avatar_url: ""
-            }))
-            .filter(r => {
-              const name = (r.display_name || "").trim();
-              if(!name) return false;
-              const key = `${String(r.id || "").trim()}|${name.toLowerCase()}`;
-              if(seen.has(key)) return false;
-              seen.add(key);
-              return true;
-            });
-        }
-      }
-
-      if(rows.length === 0){
-        userResults.innerHTML = `<div class="empty-state">No profiles found.</div>`;
-        return;
-      }
-
-      userResults.innerHTML = "";
-
-      rows.forEach(profile=>{
-        const item = document.createElement("div");
-        item.className = "user-item";
-
-        const name = profile.display_name || "Unnamed profile";
-        const avatarHtml = profile.avatar_url
-          ? `<div class="profile-avatar"><img src="${escapeHTML(profile.avatar_url)}" alt="avatar"></div>`
-          : `<div class="profile-avatar">${escapeHTML(getInitials(name))}</div>`;
-
-        item.innerHTML = `
-          ${avatarHtml}
-          <div style="min-width:0;flex:1;">
-            <div class="display-name">${escapeHTML(name)}</div>
-          </div>
-        `;
-
-        item.onclick = ()=>{
-          if(!profile.id) return;
-          location.href = `user.html?id=${encodeURIComponent(profile.id)}&name=${encodeURIComponent(name)}`;
-        };
-
-        userResults.appendChild(item);
-      });
-    }catch(err){
-      console.error("Profile search failed:", err);
-      userResults.innerHTML = `<div class="empty-state">Search unavailable.</div>`;
-    }
-  }, 250);
-});
-
-uploadBtn.onclick = async ()=>{
-  if(!croppedBlob){
-    alert("Image required");
-    return;
-  }
-
-  if(!captionInput.value.trim()){
-    alert("Caption required");
-    return;
-  }
-
-  if(!selectedSong){
-    alert("Select a song");
-    return;
-  }
-
-  if(!selectedTopic){
-    alert("Select a tag");
-    return;
-  }
-
-  uploadBtn.disabled = true;
-  uploadBtn.textContent = "CHECKING...";
-
-  try{
-    const mod = await moderateImage(croppedBlob);
-
-    if(mod && mod.flagged){
-      alert("Image blocked by moderation");
-      return;
-    }
-
-    const path = `${user.id}/${Date.now()}.jpg`;
-
-    const { error: uploadError } = await supabase.storage
-      .from("shared")
-      .upload(path, croppedBlob, {
-        contentType: "image/jpeg",
-        upsert: false
-      });
-
-    if(uploadError){
-      console.error(uploadError);
-      alert(uploadError.message || "Upload failed");
-      return;
-    }
-
-    const { data } = supabase.storage.from("shared").getPublicUrl(path);
-
-    const payload = {
-      user_id: user.id,
-      image_url: data.publicUrl,
-      caption: captionInput.value.trim(),
-      song_title: selectedSong.title,
-      song_preview: selectedSong.preview,
-      tags: selectedTopic,
-      created_at: new Date().toISOString()
-    };
-
-    if(canSaveUsername){
-      payload.username = currentProfile?.display_name || displayName;
-    }
-
-    const { error: insertError } = await supabase.from("posts").insert([payload]);
-
-    if(insertError){
-      console.error(insertError);
-      alert(insertError.message || "Post failed");
-      return;
-    }
-
-    croppedBlob = null;
-    selectedSong = null;
-
-    previewBox.innerHTML = "";
-    previewBox.style.display = "none";
-    dropzone.style.display = "flex";
-
-    captionInput.value = "";
-    songInput.value = "";
-    songList.innerHTML = "";
-    suggestions.innerHTML = "";
-    suggestions.style.display = "none";
-    fileInput.value = "";
-
-    await loadFeed();
-  }catch(err){
-    console.error("upload/moderation error:", err);
-    alert(err?.message || "Moderation failed");
-  }finally{
-    uploadBtn.disabled = false;
-    uploadBtn.textContent = "UPLOAD";
-  }
-};
-
-async function toggleLike(postId){
-  const { data: { session } } = await supabase.auth.getSession();
-  if(!session) return;
-
-  const uid = session.user.id;
-  const state = postState.get(postId);
-  if(!state) return;
-
-  const { data: existing, error: findError } = await supabase
-    .from("likes")
-    .select("id")
-    .eq("post_id", postId)
-    .eq("user_id", uid)
-    .maybeSingle();
-
-  if(findError){
-    console.error(findError);
-    return;
-  }
-
-  const row = state.element;
-  const likeBtn = row.querySelector(".likeBtn");
-  const likeCountBtn = row.querySelector(".likeCountBtn");
-  const likeCountEl = row.querySelector(".likeCount");
-  const iconEl = likeBtn.querySelector(".material-symbols-outlined");
-
-  if(existing){
-    const { error } = await supabase
-      .from("likes").delete().eq("id", existing.id);
-
-    if(error){
-      console.error(error);
-      alert(error.message || "Unlike failed");
-      return;
-    }
-
-    state.likedByMe = false;
-    state.count = Math.max(0, state.count - 1);
-  }else{
-    const { error } = await supabase
-      .from("likes")
-      .insert([{ post_id: postId, user_id: uid }]);
-
-    if(error){
-      console.error(error);
-      alert(error.message || "Like failed");
-      return;
-    }
-
-    state.likedByMe = true;
-    state.count += 1;
-  }
-
-  likeCountEl.textContent = String(state.count);
-  likeCountBtn.textContent = `${state.count} ${state.count === 1 ? "like" : "likes"}`;
-
-  if(state.likedByMe){
-    likeBtn.classList.add("liked");
-    iconEl.textContent = "favorite";
-  }else{
-    likeBtn.classList.remove("liked");
-    iconEl.textContent = "favorite_border";
-  }
-}
-
-async function showLikers(postId){
-  currentLikersPostId = postId;
-  likersList.innerHTML = `<div class="empty-state">Loading...</div>`;
-  likersTitle.textContent = "Likes";
-  openLikersModal();
-
-  const { data, error } = await supabase
-    .from("likes")
-    .select("user_id, created_at")
-    .eq("post_id", postId)
-    .order("created_at", { ascending: false });
-
-  if(error){
-    console.error(error);
-    likersList.innerHTML = `<div class="empty-state">Unable to load likes.</div>`;
-    return;
-  }
-
-  const rows = data || [];
-  if(rows.length === 0){
-    likersList.innerHTML = `<div class="empty-state">No likes yet.</div>`;
-    return;
-  }
-
-  const profilesMap = await fetchProfilesByIds(rows.map(r => r.user_id));
-
-  likersList.innerHTML = "";
-
-  rows.forEach(row=>{
-    const profile = profilesMap.get(row.user_id);
-    const name = profile?.display_name || "Unknown user";
-    const avatarUrl = profile?.avatar_url || "";
-    const verified = !!profile?.verified;
-    const href = `user.html?id=${encodeURIComponent(row.user_id || "")}&name=${encodeURIComponent(name)}`;
-
-    const item = document.createElement("a");
-    item.className = "liker-item";
-    item.href = href;
-
-    item.innerHTML = `
-      <div class="profile-avatar">
-        ${
-          avatarUrl
-            ? `<img src="${escapeHTML(avatarUrl)}" alt="avatar">`
-            : `${escapeHTML(getInitials(name))}`
-        }
-      </div>
-      <div class="meta">
-        <div class="name">
-          <span>${escapeHTML(name)}</span>
-          ${verified ? renderVerifiedBadge() : ""}
-        </div>
-      </div>
-    `;
-
-    likersList.appendChild(item);
-  });
-}
-
-async function deletePost(postId){
-  const { data: { session } } = await supabase.auth.getSession();
-  if(!session) return;
-
-  const confirmDelete = confirm("Delete this post?");
-  if(!confirmDelete) return;
-
-  const { error } = await supabase
-    .from("posts")
-    .delete()
-    .eq("id", postId)
-    .eq("user_id", user.id);
-
-  if(error){
-    console.error(error);
-    alert(error.message || "Delete failed");
-    return;
-  }
-
-  await loadFeed();
-}
-
-function createPostElement(post, likeCount, likedByMe, authorData){
-  const postDiv = document.createElement("div");
-  postDiv.className = "post";
-  postDiv.dataset.postId = post.id;
-
-  const authorName = authorData?.display_name || post.username || "user";
-  const authorVerified = !!authorData?.verified;
-  const formattedDate = formatDateTime(post.created_at);
-  const topicIcon = postTagIcon(post.tags);
-  const topicLabel = postTagLabel(post.tags);
-
-  postDiv.innerHTML = `
-    <div class="post-header">
-      <div class="post-user">
-        <div class="name">
-          <a href="user.html?id=${encodeURIComponent(post.user_id || "")}&name=${encodeURIComponent(authorName)}">
-            ${escapeHTML(authorName)}
-          </a>
-          ${authorVerified ? renderVerifiedBadge() : ""}
-        </div>
-        <div class="time">
-          <span class="material-symbols-outlined" style="font-size:16px;">schedule</span>
-          <span>${escapeHTML(formattedDate || "")}</span>
-        </div>
-      </div>
-
-      ${
-        post.user_id === user.id
-          ? `<button type="button" class="icon-btn secondary deleteBtn" title="Delete post">
-              <span class="material-symbols-outlined">delete</span>
-              Delete
-            </button>`
-          : `<span class="material-symbols-outlined" style="opacity:.6;">more_horiz</span>`
-      }
-    </div>
-
-    <img src="${escapeHTML(post.image_url)}" alt="post image">
-
-    <div class="post-caption">${escapeHTML(post.caption || "")}</div>
-
-    <div class="post-tag" title="${escapeHTML(topicLabel)}" aria-label="${escapeHTML(topicLabel)}">
-      <span class="material-symbols-outlined" style="font-size:18px;">${escapeHTML(topicIcon)}</span>
-      <span>${escapeHTML(topicLabel)}</span>
-    </div>
-
-    <div class="post-song">
-      <div class="song-meta">
-        <div class="song-title">
-          <span class="material-symbols-outlined" style="font-size:16px;vertical-align:-3px;margin-right:4px;">music_note</span>
-          ${escapeHTML(post.song_title || "Unknown song")}
-        </div>
-        <div class="song-sub">Hover to play preview</div>
-      </div>
-
-      <button type="button" class="icon-btn secondary playBtn">
-        <span class="material-symbols-outlined">play_arrow</span>
-        <span class="btn-label">Play preview</span>
-      </button>
-    </div>
-
-    <div class="post-actions">
-      <div class="like-wrap">
-        <button type="button" class="icon-btn likeBtn ${likedByMe ? "liked" : ""}">
-          <span class="material-symbols-outlined">${likedByMe ? "favorite" : "favorite_border"}</span>
-          <span>Like</span>
-        </button>
-
-        <button type="button" class="like-count-btn likeCountBtn">
-          <span class="likeCount">${likeCount}</span> ${likeCount === 1 ? "like" : "likes"}
-        </button>
-      </div>
-    </div>
-  `;
-
-  const playBtn = postDiv.querySelector(".playBtn");
-  const likeBtn = postDiv.querySelector(".likeBtn");
-  const likeCountBtn = postDiv.querySelector(".likeCountBtn");
-  const deleteBtn = postDiv.querySelector(".deleteBtn");
-
-  playBtn.onclick = ()=>{
-    playPreview(post.song_preview, playBtn);
-  };
-
-  postDiv.addEventListener("mouseenter", ()=>{
-    if(post.song_preview){
-      playPreview(post.song_preview, playBtn);
-    }
-  });
-
-  postDiv.addEventListener("mouseleave", ()=>{
-    if(globalAudio.src === post.song_preview){
-      globalAudio.pause();
-      setAudioButtonState(playBtn, false);
-      if(activePlayButton === playBtn) activePlayButton = null;
-    }
-  });
-
-  likeBtn.onclick = async ()=>{
-    await toggleLike(post.id);
-  };
-
-  likeCountBtn.onclick = async ()=>{
-    await showLikers(post.id);
-  };
-
-  if(deleteBtn){
-    deleteBtn.onclick = async ()=>{
-      await deletePost(post.id);
-    };
-  }
-
-  return postDiv;
-}
-
-function createAdPost(){
-  const adDiv = document.createElement("div");
-  adDiv.className = "post ad-post";
-  adDiv.innerHTML = `
-    <div class="ad-label">
-      <span>Advertisement</span>
-      <span class="material-symbols-outlined" style="font-size:16px;">campaign</span>
-    </div>
-
-    <div class="ad-square">
-      <ins class="adsbygoogle"
-           style="display:block"
-           data-ad-format="fluid"
-           data-ad-layout-key="-6t+ed+2i-1n-4w"
-           data-ad-client="ca-pub-8019369535802415"
-           data-ad-slot="8427156093"></ins>
-    </div>
-  `;
-
-  return adDiv;
-}
-
-function pushAdsenseIfPossible(){
-  try{
-    (window.adsbygoogle = window.adsbygoogle || []).push({});
-  }catch(err){
-    console.warn("AdSense push failed:", err);
-  }
-}
-
-function getRandomAdGap(){
-  return 3 + Math.floor(Math.random() * 3);
-}
-
-async function loadFeed(){
-  const { data: posts, error: postsError } = await supabase
-    .from("posts")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if(postsError){
-    console.error(postsError);
-    feed.innerHTML = `<div class="empty-state">Unable to load feed.</div>`;
-    return;
-  }
-
-  const rows = posts || [];
-  feed.innerHTML = "";
-  postState.clear();
-
-  if(rows.length === 0){
-    feed.innerHTML = `<div class="empty-state">No posts yet.</div>`;
-    return;
-  }
-
-  const authorMap = await fetchProfilesByIds(rows.map(p => p.user_id));
-
-  const postIds = rows.map(p => p.id);
-  let likes = [];
-
-  if(postIds.length){
-    const { data: likesData, error: likesError } = await supabase
-      .from("likes")
-      .select("post_id,user_id")
-      .in("post_id", postIds);
-
-    if(likesError){
-      console.error(likesError);
-    }else{
-      likes = likesData || [];
-    }
-  }
-
-  const likeCountMap = new Map();
-  const likedByMeMap = new Map();
-
-  likes.forEach(row=>{
-    likeCountMap.set(row.post_id, (likeCountMap.get(row.post_id) || 0) + 1);
-    if(row.user_id === user.id){
-      likedByMeMap.set(row.post_id, true);
-    }
-  });
-
-  rows.sort((a, b)=>{
-    const aInterest = getPostInterestScore(a.tags);
-    const bInterest = getPostInterestScore(b.tags);
-    if(bInterest !== aInterest) return bInterest - aInterest;
-
-    const diffLikes = (likeCountMap.get(b.id) || 0) - (likeCountMap.get(a.id) || 0);
-    if(diffLikes !== 0) return diffLikes;
-
-    return new Date(b.created_at || 0) - new Date(a.created_at || 0);
-  });
-
-  let postsSinceAd = 0;
-  let nextAdGap = getRandomAdGap();
-
-  for(let i = 0; i < rows.length; i++){
-    const post = rows[i];
-    const likeCount = likeCountMap.get(post.id) || 0;
-    const likedByMe = likedByMeMap.get(post.id) || false;
-    const authorData = authorMap.get(post.user_id) || null;
-
-    const postEl = createPostElement(post, likeCount, likedByMe, authorData);
-    feed.appendChild(postEl);
-
-    postState.set(post.id, {
-      count: likeCount,
-      likedByMe,
-      element: postEl
+  function scrollToIndex(index, smooth = true){
+    activeIndex = clamp(index, 0, posts.length - 1);
+    isAutoScrolling = true;
+    feed.scrollTo({
+      left: activeIndex * window.innerWidth,
+      behavior: smooth ? "smooth" : "auto"
     });
+    progressStart = performance.now();
+    updateSegments();
+    setTimeout(() => { isAutoScrolling = false; }, 500);
+  }
 
-    postsSinceAd += 1;
+  function updateSegments(){
+    segments.forEach((seg, i) => {
+      if (i < activeIndex) seg.style.width = "100%";
+      else if (i > activeIndex) seg.style.width = "0%";
+    });
+  }
 
-    const canInsertAd = rows.length >= 4 && i < rows.length - 1;
-    if(canInsertAd && postsSinceAd >= nextAdGap){
-      const adEl = createAdPost();
-      feed.appendChild(adEl);
-      requestAnimationFrame(pushAdsenseIfPossible);
-      postsSinceAd = 0;
-      nextAdGap = getRandomAdGap();
+  function tick(now){
+    const elapsed = now - progressStart;
+    const pct = clamp((elapsed / AUTOPLAY_MS) * 100, 0, 100);
+
+    segments[activeIndex].style.width = pct + "%";
+
+    if (pct >= 100){
+      const next = (activeIndex + 1) % posts.length;
+      scrollToIndex(next, true);
+    }
+
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function syncActiveFromScroll(){
+    const idx = clamp(Math.round(feed.scrollLeft / window.innerWidth), 0, posts.length - 1);
+    if (idx !== activeIndex && !isAutoScrolling){
+      activeIndex = idx;
+      progressStart = performance.now();
+      updateSegments();
     }
   }
-}
 
-function realtime(){
-  supabase
-    .channel("shared-posts-likes")
-    .on("postgres_changes", {
-      event: "*",
-      schema: "public",
-      table: "posts"
-    }, async ()=>{
-      await loadFeed();
-    })
-    .on("postgres_changes", {
-      event: "*",
-      schema: "public",
-      table: "likes"
-    }, async ()=>{
-      await loadFeed();
-    })
-    .subscribe();
-}
+  // wheel -> horizontal
+  feed.addEventListener("wheel", (e) => {
+    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+      e.preventDefault();
+      feed.scrollLeft += e.deltaY;
+    }
+  }, { passive:false });
+
+  // drag touch/mouse is native via horizontal scroll
+  feed.addEventListener("scroll", syncActiveFromScroll);
+
+  // keyboard support
+  window.addEventListener("keydown", (e) => {
+    if (e.key === "ArrowRight") scrollToIndex(activeIndex + 1, true);
+    if (e.key === "ArrowLeft") scrollToIndex(activeIndex - 1, true);
+  });
+
+  // tap like
+  likeButtons.forEach(btn => {
+    btn.addEventListener("click", () => {
+      btn.classList.toggle("liked");
+      btn.textContent = btn.classList.contains("liked") ? "❤" : "❤";
+    });
+  });
+
+  // start
+  updateSegments();
+  rafId = requestAnimationFrame(tick);
+
+  // keep alignment on resize
+  window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
 </script>
 </body>
 </html>
