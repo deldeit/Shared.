@@ -11,15 +11,14 @@
 <style>
   :root{
     --bg:#050505;
-    --panel:#0c0c0c;
-    --panel-2:rgba(12,12,12,.82);
+    --panel:#0d0d0d;
+    --panel-2:rgba(13,13,13,.88);
     --text:#fff;
     --muted:#a6a6a6;
     --line:rgba(255,255,255,.10);
     --line-2:rgba(255,255,255,.06);
     --shadow:0 24px 80px rgba(0,0,0,.42);
-    --radius:28px;
-    --radius-sm:18px;
+    --radius:22px;
   }
 
   *{ box-sizing:border-box; }
@@ -39,6 +38,7 @@
   }
 
   button,input{ font:inherit; }
+  a{ color:inherit; text-decoration:none; }
   .hidden{ display:none !important; }
 
   .loading{
@@ -49,7 +49,6 @@
     place-items:center;
     background:#000;
     color:#fff;
-    text-align:center;
     padding:24px;
   }
 
@@ -57,63 +56,62 @@
     width:min(420px, calc(100vw - 32px));
     border:1px solid var(--line);
     border-radius:24px;
-    background:rgba(12,12,12,.88);
+    background:rgba(12,12,12,.92);
     box-shadow:var(--shadow);
     padding:26px 20px;
-  }
-
-  .loading-title{
-    font-family:'Archivo Black', sans-serif;
-    font-size:32px;
-    margin:0 0 8px;
-    letter-spacing:.2px;
-  }
-
-  .loading-sub{
-    margin:0;
-    color:var(--muted);
-    line-height:1.55;
-    font-size:13px;
-    font-weight:600;
+    text-align:center;
   }
 
   .spinner{
     width:34px;
     height:34px;
+    margin:0 auto 18px;
     border-radius:50%;
     border:3px solid rgba(255,255,255,.12);
     border-top-color:#fff;
-    margin:0 auto 18px;
     animation:spin 1s linear infinite;
   }
 
   @keyframes spin { to { transform:rotate(360deg); } }
 
+  .loading-title{
+    margin:0 0 8px;
+    font-family:'Archivo Black', sans-serif;
+    font-size:32px;
+    line-height:1;
+  }
+
+  .loading-sub{
+    margin:0;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.55;
+    font-weight:600;
+  }
+
   .app{
-    position:relative;
     width:100%;
     height:100%;
+    position:relative;
     overflow:hidden;
   }
 
   .topbar{
     position:fixed;
-    top:0;
-    left:0;
-    right:0;
-    z-index:50;
+    inset:0 0 auto 0;
+    z-index:60;
     padding:12px 12px 0;
     pointer-events:none;
   }
 
   .topbar-inner{
     pointer-events:auto;
-    max-width:1280px;
+    max-width:1180px;
     margin:0 auto;
     display:flex;
     align-items:center;
-    gap:12px;
     justify-content:space-between;
+    gap:12px;
     padding:12px 14px;
     border:1px solid var(--line);
     border-radius:999px;
@@ -123,16 +121,17 @@
   }
 
   .brand{
-    min-width:0;
     display:flex;
     align-items:center;
+    min-width:0;
   }
 
   .brand-text{
     font-family:'Archivo Black', sans-serif;
-    font-size:18px;
-    line-height:1;
+    font-size:19px;
     letter-spacing:.2px;
+    line-height:1;
+    white-space:nowrap;
   }
 
   .search-area{
@@ -144,7 +143,10 @@
     margin:0 10px;
   }
 
-  .searchbar{ flex:1 1 auto; }
+  .searchbar{
+    flex:1 1 auto;
+  }
+
   .searchbar input{
     width:100%;
     border-radius:999px;
@@ -156,7 +158,7 @@
     font-size:14px;
   }
 
-  .searchbar input::placeholder{ color:#797979; }
+  .searchbar input::placeholder{ color:#7a7a7a; }
 
   .icon-btn{
     width:42px;
@@ -168,7 +170,6 @@
     cursor:pointer;
     transition:transform .16s ease, opacity .16s ease, background .16s ease;
     flex:0 0 auto;
-    box-shadow:none;
   }
 
   .icon-btn:hover{ transform:translateY(-1px) scale(1.02); }
@@ -189,7 +190,6 @@
     background:#111;
     display:block;
     flex:0 0 auto;
-    text-decoration:none;
   }
 
   .profile-link img{
@@ -211,87 +211,77 @@
   }
 
   .feed{
-    height:100%;
+    position:absolute;
+    inset:0;
+    padding:96px 14px 24px;
     overflow-y:auto;
     overflow-x:hidden;
-    scrollbar-width:none;
-    -webkit-overflow-scrolling:touch;
-    scroll-behavior:smooth;
-    padding:92px 14px 26px;
-    display:grid;
-    gap:18px;
-    align-content:start;
-    justify-items:center;
   }
 
-  .feed::-webkit-scrollbar{ display:none; }
+  .feed-inner{
+    width:min(100%, 680px);
+    margin:0 auto;
+    display:grid;
+    gap:14px;
+  }
 
-  .item{
-    width:min(100%, 640px);
+  .post-card{
     border:1px solid var(--line);
     border-radius:24px;
-    overflow:hidden;
-    background:rgba(10,10,10,.95);
+    background:rgba(12,12,12,.84);
+    backdrop-filter:blur(18px);
     box-shadow:var(--shadow);
-    position:relative;
+    overflow:hidden;
   }
 
   .post-header{
     display:flex;
     align-items:center;
-    justify-content:space-between;
     gap:12px;
     padding:14px 14px 12px;
-    border-bottom:1px solid rgba(255,255,255,.06);
   }
 
-  .profile-anchor{
-    text-decoration:none;
-    color:inherit;
-    display:flex;
-    align-items:center;
-    gap:12px;
-    min-width:0;
-    flex:1 1 auto;
-  }
-
-  .avatar{
+  .post-avatar{
     width:42px;
     height:42px;
     border-radius:50%;
+    overflow:hidden;
     flex:0 0 auto;
-    display:grid;
-    place-items:center;
     background:#fff;
     color:#000;
-    font-size:14px;
-    overflow:hidden;
+    display:grid;
+    place-items:center;
     font-family:'Archivo Black', sans-serif;
+    font-size:14px;
   }
 
-  .avatar img{
+  .post-avatar img{
     width:100%;
     height:100%;
     object-fit:cover;
     display:block;
   }
 
-  .author-meta{
+  .post-author-wrap{
     min-width:0;
     flex:1 1 auto;
   }
 
-  .author-line{
+  .post-author{
     display:flex;
     align-items:center;
     gap:8px;
     flex-wrap:wrap;
+    min-width:0;
   }
 
-  .author{
+  .post-author-name{
     font-family:'Archivo Black', sans-serif;
-    font-size:15px;
+    font-size:14px;
     line-height:1.1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .verified{
@@ -306,92 +296,94 @@
     flex:0 0 auto;
   }
 
-  .handle{
-    margin-top:4px;
+  .post-handle{
+    margin-top:3px;
     font-size:11px;
     color:var(--muted);
-    letter-spacing:.4px;
-  }
-
-  .profile-stats{
-    margin-top:4px;
-    font-size:11px;
-    color:#d7d7d7;
-    font-weight:700;
+    letter-spacing:.3px;
   }
 
   .post-time{
-    margin:0;
+    flex:0 0 auto;
     font-size:11px;
     color:var(--muted);
     white-space:nowrap;
   }
 
-  .media-wrap{
+  .post-media{
     width:100%;
+    aspect-ratio:1 / 1;
+    background:#0a0a0a;
     position:relative;
-    background:#111;
-    aspect-ratio:4/5;
     overflow:hidden;
   }
 
-  .media-wrap::after{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(180deg, rgba(0,0,0,.02), rgba(0,0,0,.16));
-    pointer-events:none;
-  }
-
-  .file{
-    position:absolute;
-    inset:0;
+  .post-media img,
+  .post-media video{
     width:100%;
     height:100%;
     object-fit:cover;
-  }
-
-  .media-fallback{
-    width:100%;
-    height:100%;
-    background:linear-gradient(135deg, var(--c1), var(--c2));
-  }
-
-  .audio-hidden{
-    display:none;
+    display:block;
+    background:#0a0a0a;
   }
 
   .post-body{
     padding:14px 14px 16px;
   }
 
-  .headline{
-    margin:0 0 8px;
-    font-family:'Archivo Black', sans-serif;
-    font-size:clamp(24px, 4vw, 42px);
-    line-height:.96;
-    letter-spacing:.2px;
-    text-wrap:balance;
+  .actions-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-bottom:12px;
+  }
+
+  .like-btn{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    border:none;
+    border-radius:999px;
+    padding:10px 12px;
+    cursor:pointer;
+    background:#fff;
+    color:#000;
+    font-weight:800;
+    transition:transform .16s ease, opacity .16s ease;
+  }
+
+  .like-btn:hover{ transform:translateY(-1px); }
+
+  .like-btn.liked{
+    background:#fff;
+    color:#000;
+  }
+
+  .like-count{
+    font-size:12px;
+    color:#fff;
+    font-weight:700;
   }
 
   .caption{
-    margin:0;
-    color:#e8e8e8;
     font-size:13px;
     line-height:1.6;
+    color:#f1f1f1;
     font-weight:600;
+    margin:0 0 12px;
     white-space:pre-wrap;
   }
 
-  .chips{
+  .song-meta{
     display:flex;
     flex-wrap:wrap;
     gap:8px;
-    margin-top:12px;
+    margin-bottom:12px;
   }
 
   .chip{
-    padding:7px 10px;
+    padding:8px 10px;
     border-radius:999px;
     border:1px solid var(--line);
     background:rgba(255,255,255,.06);
@@ -400,44 +392,8 @@
     font-weight:700;
   }
 
-  .post-footer{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    padding:12px 14px 14px;
-    border-top:1px solid rgba(255,255,255,.06);
-  }
-
-  .stats{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    color:#f0f0f0;
-    font-size:11px;
-    font-weight:700;
-  }
-
-  .like-btn{
-    width:44px;
-    height:44px;
-    border-radius:14px;
-    border:1px solid var(--line);
-    background:#111;
-    color:#fff;
-    display:grid;
-    place-items:center;
-    cursor:pointer;
-    transition:transform .16s ease, background .16s ease, color .16s ease;
-    flex:0 0 auto;
-    font-size:17px;
-  }
-
-  .like-btn:hover{ transform:translateY(-1px) scale(1.02); }
-
-  .like-btn.liked{
-    background:#fff;
-    color:#000;
+  .audio-hidden{
+    display:none;
   }
 
   .empty-state{
@@ -479,7 +435,7 @@
     left:50%;
     bottom:18px;
     transform:translateX(-50%);
-    z-index:70;
+    z-index:90;
     width:min(920px, calc(100vw - 20px));
     display:none;
   }
@@ -657,23 +613,31 @@
       gap:10px;
     }
 
+    .brand-text{ font-size:18px; }
     .search-area{ margin:0; gap:8px; }
     .searchbar input{ font-size:13px; padding:13px 14px; }
 
     .feed{
-      padding:92px 10px 24px;
-      gap:14px;
+      padding:88px 10px 20px;
     }
 
-    .item{ border-radius:22px; }
-
-    .author{ font-size:14px; }
+    .post-header{ padding:12px 12px 10px; }
+    .post-body{ padding:12px 12px 14px; }
+    .post-avatar{ width:38px; height:38px; }
     .post-time{ display:none; }
-    .headline{ font-size:clamp(22px, 7vw, 34px); }
 
-    .sheet-body{ grid-template-columns:1fr; }
-    .preview{ padding:0 18px 18px; }
-    .preview-card{ min-height:260px; }
+    .sheet-body{
+      grid-template-columns:1fr;
+    }
+
+    .preview{
+      padding:0 18px 18px;
+    }
+
+    .preview-card{
+      min-height:260px;
+    }
+
     .preview-title{ font-size:24px; }
     .profile-link,.uploadbtn{ width:40px; height:40px; }
   }
@@ -707,19 +671,20 @@
           <button class="icon-btn uploadbtn" id="openUpload" title="Upload" type="button">+</button>
         </div>
 
-        <a class="profile-link" id="profileLink" href="./profile.html" title="Profile">
+        <a class="profile-link" id="profileLink" href="./login.html" title="Profile">
           <div class="profile-fallback" id="profileFallback">S</div>
           <img id="profileImg" alt="Profile" class="hidden" />
         </a>
       </div>
     </div>
 
-    <div class="empty-state" id="emptyState">
-      <h2>No posts found</h2>
-      <p>Try another search or create the first post with Upload.</p>
+    <div class="feed" id="feed">
+      <div class="feed-inner" id="feedInner"></div>
+      <div class="empty-state" id="emptyState">
+        <h2>No posts found</h2>
+        <p>Try another search or create the first post with Upload.</p>
+      </div>
     </div>
-
-    <div class="feed" id="feed"></div>
   </div>
 
   <div class="modal" id="uploadModal" aria-hidden="true">
@@ -734,10 +699,11 @@
           <input class="input" id="uDisplayName" type="text" placeholder="Display name" />
           <input class="input" id="uCaption" type="text" placeholder="Caption" />
           <input class="input" id="uSongTitle" type="text" placeholder="Song title" />
-          <input class="input" id="uSongPreview" type="text" placeholder="Song/audio URL (hidden)" />
+          <input class="input" id="uSongPreview" type="text" placeholder="Song preview" />
           <input class="file" id="uFile" type="file" accept="image/*,video/*" />
+          <input class="file" id="uAudioFile" type="file" accept="audio/*" />
           <div class="helper">
-            Uploads to bucket <code>shared</code>, then stores the post in <code>posts</code>.
+            Uploads to bucket <code>shared</code>. The optional audio file is stored in <code>audio_url</code>.
           </div>
         </div>
 
@@ -766,13 +732,13 @@
   const CONFIG = {
     SUPABASE_URL: "https://cnhaonawapuahzoctqav.supabase.co",
     SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes",
+    BUCKET: "shared",
+    PROFILE_PAGE: "./profile.html",
+    LOGIN_PAGE: "./login.html",
     AUTOPLAY_MS: 5200,
     MAX_POSTS: 50,
     FETCH_TIMEOUT_MS: 8000,
-    BOOT_TIMEOUT_MS: 3500,
-    FALLBACK_REDIRECT: "./login.html",
-    PROFILE_PAGE: "./profile.html",
-    BUCKET: "shared"
+    BOOT_TIMEOUT_MS: 3500
   };
 
   const el = (id) => document.getElementById(id);
@@ -783,6 +749,7 @@
     toastInner: el("toastInner"),
     app: el("app"),
     feed: el("feed"),
+    feedInner: el("feedInner"),
     emptyState: el("emptyState"),
     uploadModal: el("uploadModal"),
     profileLink: el("profileLink"),
@@ -798,6 +765,7 @@
     uSongTitle: el("uSongTitle"),
     uSongPreview: el("uSongPreview"),
     uFile: el("uFile"),
+    uAudioFile: el("uAudioFile"),
     previewTitle: el("previewTitle"),
     previewText: el("previewText"),
     previewImg: el("previewImg"),
@@ -809,12 +777,11 @@
   let currentProfile = null;
   let posts = [];
   let currentSearch = "";
-  let booted = false;
   let searchTimer = null;
-  let activeIndex = 0;
-  let observer = null;
-  let fallbackAudioResumeBound = false;
-  let bootFallbackTimer = null;
+  let booted = false;
+  let audioObserver = null;
+  let activeAudio = null;
+  let audioUnlocked = false;
 
   const palettes = [
     ["#121212", "#4b4b4b"],
@@ -823,19 +790,6 @@
     ["#1c1c1c", "#383838"],
     ["#101010", "#6b6b6b"]
   ];
-
-  function clamp(v, min, max) {
-    return Math.max(min, Math.min(max, v));
-  }
-
-  function esc(str) {
-    return String(str ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
 
   function showApp() {
     ui.loading.classList.add("hidden");
@@ -847,6 +801,28 @@
     ui.toast.classList.add("show");
     clearTimeout(showToast._t);
     showToast._t = setTimeout(() => ui.toast.classList.remove("show"), ms);
+  }
+
+  function esc(str) {
+    return String(str ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function clamp(v, min, max) {
+    return Math.max(min, Math.min(max, v));
+  }
+
+  function sanitizeQuery(str) {
+    return String(str ?? "")
+      .replaceAll("%", "")
+      .replaceAll(",", " ")
+      .replaceAll("(", " ")
+      .replaceAll(")", " ")
+      .trim();
   }
 
   function normalizeUsername(name) {
@@ -879,8 +855,8 @@
     ]);
   }
 
-  function safeCall(fn, fallback = null) {
-    return Promise.resolve().then(fn).catch(() => fallback);
+  function getPalette(i) {
+    return palettes[i % palettes.length];
   }
 
   function updateEmptyState() {
@@ -931,21 +907,19 @@
       ui.profileFallback.classList.remove("hidden");
     }
 
-    ui.profileLink.href = currentUser ? `${CONFIG.PROFILE_PAGE}?uid=${encodeURIComponent(currentUser.id)}` : CONFIG.FALLBACK_REDIRECT;
+    ui.profileLink.href = currentUser
+      ? `${CONFIG.PROFILE_PAGE}?id=${encodeURIComponent(currentUser.id)}`
+      : CONFIG.LOGIN_PAGE;
+
     ui.uDisplayName.value = currentProfile?.display_name || currentUser?.user_metadata?.display_name || "";
   }
 
-  function getAudioUrl(post) {
-    const candidate = post?.audio_url || post?.music_url || post?.song_url || post?.song_preview || "";
-    if (typeof candidate !== "string") return null;
-    const url = candidate.trim();
-    if (!url) return null;
-    if (/^https?:\/\//i.test(url) || /^\/\//.test(url)) return url;
-    return null;
+  function mediaIsVideo(url = "") {
+    return /\.(mp4|webm|ogg|mov)(\?|$)/i.test(String(url));
   }
 
-  function buildFeedHTML(list) {
-    return list.map((post, idx) => {
+  function renderCards() {
+    ui.feedInner.innerHTML = posts.map((post) => {
       const profile = post.profile || {};
       const authorName = profile.display_name || post.username || "User";
       const handle = post.username ? `@${post.username}` : `@${normalizeUsername(authorName)}`;
@@ -954,64 +928,78 @@
       const liked = !!post.user_liked;
       const verified = !!profile.verified;
       const chips = [...asArray(profile.interests).slice(0, 3), ...parseTags(post.tags).slice(0, 3)].slice(0, 5);
-      const audioUrl = getAudioUrl(post);
 
       const avatarHtml = profile.avatar_url
         ? `<img src="${esc(profile.avatar_url)}" alt="">`
         : esc(initials);
 
       const mediaHtml = post.image_url
-        ? `<img class="file" src="${esc(post.image_url)}" alt="">`
-        : `<div class="media-fallback" style="--c1:${post.c1};--c2:${post.c2};"></div>`;
+        ? (mediaIsVideo(post.image_url)
+            ? `<video class="post-media-file" src="${esc(post.image_url)}" autoplay muted loop playsinline preload="metadata"></video>`
+            : `<img class="post-media-file" src="${esc(post.image_url)}" alt="">`)
+        : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--c1),var(--c2));"></div>`;
+
+      const audioHtml = post.audio_url ? `
+        <audio class="audio-hidden post-audio" preload="auto" muted loop playsinline src="${esc(post.audio_url)}"></audio>
+      ` : "";
 
       return `
-        <article class="item post-card" data-index="${idx}" data-post-id="${post.id}" data-audio-url="${esc(audioUrl || "")}">
-          <div class="post-header">
-            <a class="profile-anchor" href="${CONFIG.PROFILE_PAGE}?uid=${encodeURIComponent(post.user_id || "")}">
-              <div class="avatar">${avatarHtml}</div>
-              <div class="author-meta">
-                <div class="author-line">
-                  <div class="author">${esc(authorName)}</div>
-                  ${verified ? `<div class="verified" title="Verified">✓</div>` : ""}
-                </div>
-                <div class="handle">${esc(handle)}</div>
-                <div class="profile-stats">${Number(profile.followers_count || 0)} followers · ${Number(profile.following_count || 0)} following</div>
-              </div>
+        <article class="post-card" data-post-id="${esc(post.id)}">
+          <header class="post-header">
+            <a class="post-avatar" href="${CONFIG.PROFILE_PAGE}?id=${encodeURIComponent(post.user_id || "")}" title="Open profile">
+              ${avatarHtml}
             </a>
-            <div class="post-time">${post.created_at ? new Date(post.created_at).toLocaleDateString() : ""}</div>
-          </div>
 
-          <div class="media-wrap">
+            <div class="post-author-wrap">
+              <div class="post-author">
+                <a class="post-author-name" href="${CONFIG.PROFILE_PAGE}?id=${encodeURIComponent(post.user_id || "")}">${esc(authorName)}</a>
+                ${verified ? `<div class="verified" title="Verified">✓</div>` : ""}
+              </div>
+              <div class="post-handle">${esc(handle)}</div>
+            </div>
+
+            <div class="post-time">${post.created_at ? new Date(post.created_at).toLocaleDateString() : ""}</div>
+          </header>
+
+          <div class="post-media">
             ${mediaHtml}
           </div>
 
-          ${audioUrl ? `<audio class="audio-hidden post-audio" preload="auto" loop playsinline src="${esc(audioUrl)}"></audio>` : ""}
-
           <div class="post-body">
-            <h2 class="headline">${esc(post.caption || "")}</h2>
-            ${chips.length ? `<div class="chips">${chips.map(i => `<span class="chip">${esc(i)}</span>`).join("")}</div>` : ""}
-          </div>
-
-          <div class="post-footer">
-            <div class="stats">
-              <span>${likeCount} likes</span>
+            ${audioHtml}
+            <div class="actions-row">
+              <button class="like-btn ${liked ? "liked" : ""}" type="button" data-like-btn="1">
+                ${liked ? "❤" : "♡"}
+                <span class="like-count">${likeCount}</span>
+              </button>
             </div>
-            <button class="like-btn ${liked ? "liked" : ""}" type="button" aria-label="Like">${liked ? "❤" : "❤"}</button>
+
+            ${post.caption ? `<p class="caption">${esc(post.caption)}</p>` : ""}
+
+            ${post.song_title ? `<p class="caption" style="margin-top:-4px;opacity:.78;font-weight:700;">${esc(post.song_title)}</p>` : ""}
+
+            ${chips.length ? `<div class="song-meta">${chips.map(c => `<span class="chip">${esc(c)}</span>`).join("")}</div>` : ""}
           </div>
         </article>
       `;
     }).join("");
+
+    bindCardEvents();
+    setupAudioObserver();
+    unlockOnFirstGesture();
+    updateEmptyState();
   }
 
-  function attachHandlers() {
-    document.querySelectorAll(".like-btn").forEach(btn => {
+  function bindCardEvents() {
+    ui.feedInner.querySelectorAll("[data-like-btn='1']").forEach(btn => {
       btn.addEventListener("click", async (e) => {
+        const card = e.currentTarget.closest(".post-card");
+        if (!card) return;
+
         if (!currentUser) {
           showToast("Log in to like posts.");
           return;
         }
-        const card = e.currentTarget.closest("[data-post-id]");
-        if (!card) return;
 
         const postId = card.dataset.postId;
         const liked = e.currentTarget.classList.contains("liked");
@@ -1019,7 +1007,7 @@
 
         try {
           await toggleLike(postId, liked);
-          await loadPosts(currentSearch, true);
+          await loadPosts(currentSearch);
         } catch (err) {
           showToast(err?.message || "Like action failed.");
         } finally {
@@ -1029,89 +1017,98 @@
     });
   }
 
-  function pauseAllAudios() {
-    document.querySelectorAll(".post-audio").forEach(audio => {
-      try { audio.pause(); } catch {}
+  function pauseAllAudio() {
+    ui.feedInner.querySelectorAll("audio.post-audio").forEach(a => {
+      try {
+        a.pause();
+        a.currentTime = 0;
+      } catch {}
+      a.dataset.active = "false";
     });
   }
 
-  function activateAudioForCard(card) {
-    if (!card) return;
-
-    const audio = card.querySelector(".post-audio");
-    pauseAllAudios();
-
+  function playAudioForCard(card) {
+    const audio = card.querySelector("audio.post-audio");
     if (!audio) return;
 
-    audio.loop = true;
-    audio.preload = "auto";
-    audio.playsInline = true;
+    if (activeAudio && activeAudio !== audio) {
+      try {
+        activeAudio.pause();
+        activeAudio.currentTime = 0;
+      } catch {}
+      activeAudio.dataset.active = "false";
+    }
 
-    const attempt = audio.play();
-    if (attempt && typeof attempt.catch === "function") {
-      attempt.catch(() => {
-        if (!fallbackAudioResumeBound) {
-          fallbackAudioResumeBound = true;
-          const resume = () => {
-            const current = document.querySelector(`.post-card.is-active .post-audio`);
-            if (current) current.play().catch(() => {});
-            window.removeEventListener("pointerdown", resume);
-            window.removeEventListener("touchstart", resume);
-          };
-          window.addEventListener("pointerdown", resume, { once: true });
-          window.addEventListener("touchstart", resume, { once: true });
-        }
-      });
+    activeAudio = audio;
+    activeAudio.dataset.active = "true";
+    activeAudio.loop = true;
+    activeAudio.muted = !audioUnlocked;
+
+    const playPromise = activeAudio.play();
+    if (playPromise && typeof playPromise.catch === "function") {
+      playPromise.catch(() => {});
     }
   }
 
-  function setupObserver() {
-    if (observer) observer.disconnect();
-    observer = new IntersectionObserver((entries) => {
-      let best = null;
-      for (const entry of entries) {
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.62) {
-          best = entry;
-          break;
-        }
-      }
-      if (!best) return;
+  function setupAudioObserver() {
+    if (audioObserver) {
+      audioObserver.disconnect();
+      audioObserver = null;
+    }
 
-      document.querySelectorAll(".post-card").forEach(card => card.classList.remove("is-active"));
-      best.target.classList.add("is-active");
-      activeIndex = Number(best.target.dataset.index || 0);
-      activateAudioForCard(best.target);
+    pauseAllAudio();
+
+    audioObserver = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        const card = entry.target;
+        const visible = entry.isIntersecting && entry.intersectionRatio >= 0.62;
+
+        if (visible) {
+          playAudioForCard(card);
+        } else {
+          const audio = card.querySelector("audio.post-audio");
+          if (audio) {
+            try {
+              audio.pause();
+              audio.currentTime = 0;
+            } catch {}
+            audio.dataset.active = "false";
+          }
+        }
+      });
     }, {
       root: ui.feed,
-      threshold: [0.25, 0.5, 0.62, 0.75, 1]
+      threshold: [0.35, 0.62, 0.85]
     });
 
-    document.querySelectorAll(".post-card").forEach(card => observer.observe(card));
+    ui.feedInner.querySelectorAll(".post-card").forEach(card => audioObserver.observe(card));
   }
 
-  function renderFeed() {
-    ui.feed.innerHTML = buildFeedHTML(posts);
-    attachHandlers();
-    updateEmptyState();
-    setupObserver();
+  function unlockOnFirstGesture() {
+    if (audioUnlocked) return;
+    const unlock = () => {
+      audioUnlocked = true;
+      if (activeAudio) {
+        activeAudio.muted = false;
+        const p = activeAudio.play();
+        if (p && typeof p.catch === "function") p.catch(() => {});
+      }
+      window.removeEventListener("pointerdown", unlock);
+      window.removeEventListener("touchstart", unlock);
+      window.removeEventListener("keydown", unlock);
+    };
 
-    if (posts.length) {
-      requestAnimationFrame(() => {
-        const first = document.querySelector(".post-card");
-        if (first) {
-          first.classList.add("is-active");
-          activateAudioForCard(first);
-        }
-      });
-    }
+    window.addEventListener("pointerdown", unlock, { once: true });
+    window.addEventListener("touchstart", unlock, { once: true });
+    window.addEventListener("keydown", unlock, { once: true });
   }
 
   async function initSupabase() {
     if (!window.supabase || typeof window.supabase.createClient !== "function") {
       throw new Error("Supabase library failed to load.");
     }
-    if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY) {
-      throw new Error("Missing Supabase config.");
+    if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY || CONFIG.SUPABASE_ANON_KEY === "PASTE_YOUR_ANON_KEY_HERE") {
+      throw new Error("Set SUPABASE_ANON_KEY before using the app.");
     }
     supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
       auth: {
@@ -1124,70 +1121,35 @@
 
   async function getSessionSafe() {
     if (!supabase) return null;
-    try {
-      const res = await withTimeout(supabase.auth.getSession(), CONFIG.FETCH_TIMEOUT_MS);
-      return res?.data?.session || null;
-    } catch {
-      return null;
-    }
+    const res = await withTimeout(supabase.auth.getSession(), CONFIG.FETCH_TIMEOUT_MS);
+    return res?.data?.session || null;
   }
 
   async function loadCurrentProfile() {
     if (!supabase || !currentUser) return null;
 
-    try {
-      const { data, error } = await withTimeout(
-        supabase
-          .from("profiles")
-          .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
-          .eq("id", currentUser.id)
-          .maybeSingle()
-      );
+    const { data, error } = await withTimeout(
+      supabase
+        .from("profiles")
+        .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
+        .eq("id", currentUser.id)
+        .maybeSingle()
+    );
 
-      if (error) throw error;
-      currentProfile = data || null;
-      setHeaderFromSession();
-      return currentProfile;
-    } catch {
+    if (error) {
       currentProfile = null;
       setHeaderFromSession();
       return null;
     }
-  }
 
-  async function fetchPublicPosts() {
-    if (!supabase) return [];
-    const { data, error } = await withTimeout(
-      supabase
-        .from("posts")
-        .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags, audio_url, music_url, song_url")
-        .order("created_at", { ascending: false })
-        .limit(CONFIG.MAX_POSTS)
-    );
-    if (error) throw error;
-    return data || [];
-  }
-
-  async function fetchPostsByProfiles(profileIds) {
-    if (!supabase || !profileIds.length) return [];
-    try {
-      const { data, error } = await withTimeout(
-        supabase
-          .from("posts")
-          .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags, audio_url, music_url, song_url")
-          .in("user_id", profileIds)
-          .order("created_at", { ascending: false })
-          .limit(CONFIG.MAX_POSTS)
-      );
-      if (error) return [];
-      return data || [];
-    } catch {
-      return [];
-    }
+    currentProfile = data || null;
+    setHeaderFromSession();
+    return currentProfile;
   }
 
   async function loadProfilesForPosts(userIds) {
     if (!supabase || !userIds.length) return new Map();
+
     try {
       const { data, error } = await withTimeout(
         supabase
@@ -1195,6 +1157,7 @@
           .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
           .in("id", userIds)
       );
+
       if (error) return new Map();
       return new Map((data || []).map(p => [p.id, p]));
     } catch {
@@ -1204,6 +1167,7 @@
 
   async function loadLikesForPosts(postIds) {
     if (!supabase || !postIds.length) return { counts: new Map(), likedByUser: new Set() };
+
     try {
       const { data, error } = await withTimeout(
         supabase
@@ -1211,31 +1175,59 @@
           .select("post_id, user_id")
           .in("post_id", postIds)
       );
+
       if (error) return { counts: new Map(), likedByUser: new Set() };
 
       const counts = new Map();
       const likedByUser = new Set();
+
       for (const row of (data || [])) {
         counts.set(row.post_id, (counts.get(row.post_id) || 0) + 1);
         if (currentUser && row.user_id === currentUser.id) likedByUser.add(row.post_id);
       }
+
       return { counts, likedByUser };
     } catch {
       return { counts: new Map(), likedByUser: new Set() };
     }
   }
 
-  async function loadPosts(query = "", preserveScroll = true) {
-    currentSearch = String(query || "").trim();
+  async function fetchPostsByProfiles(profileIds) {
+    if (!supabase || !profileIds.length) return [];
+
+    const { data, error } = await withTimeout(
+      supabase
+        .from("posts")
+        .select("id, user_id, image_url, audio_url, caption, created_at, song_preview, song_title, likes, username, tags")
+        .in("user_id", profileIds)
+        .order("created_at", { ascending: false })
+        .limit(CONFIG.MAX_POSTS)
+    );
+
+    if (error) return [];
+    return data || [];
+  }
+
+  async function fetchPublicPosts() {
+    if (!supabase) return [];
+
+    const { data, error } = await withTimeout(
+      supabase
+        .from("posts")
+        .select("id, user_id, image_url, audio_url, caption, created_at, song_preview, song_title, likes, username, tags")
+        .order("created_at", { ascending: false })
+        .limit(CONFIG.MAX_POSTS)
+    );
+
+    if (error) throw error;
+    return data || [];
+  }
+
+  async function loadPosts(query = "") {
+    currentSearch = sanitizeQuery(query);
 
     try {
       let rawPosts = [];
-
-      if (!supabase) {
-        posts = [];
-        renderFeed();
-        return;
-      }
 
       if (!currentSearch) {
         rawPosts = await fetchPublicPosts();
@@ -1243,7 +1235,7 @@
         const textRes = await withTimeout(
           supabase
             .from("posts")
-            .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags, audio_url, music_url, song_url")
+            .select("id, user_id, image_url, audio_url, caption, created_at, song_preview, song_title, likes, username, tags")
             .or(`caption.ilike.%${currentSearch}%,song_title.ilike.%${currentSearch}%,username.ilike.%${currentSearch}%,tags.ilike.%${currentSearch}%`)
             .order("created_at", { ascending: false })
             .limit(CONFIG.MAX_POSTS)
@@ -1266,6 +1258,7 @@
         } catch {}
 
         const profilePosts = await fetchPostsByProfiles(profileIds);
+
         const merged = [...textPosts, ...profilePosts];
         const dedup = new Map();
         for (const post of merged) dedup.set(post.id, post);
@@ -1277,7 +1270,7 @@
       const { counts, likedByUser } = await loadLikesForPosts(rawPosts.map(p => p.id));
 
       posts = rawPosts.map((p, idx) => {
-        const [c1, c2] = palettes[idx % palettes.length];
+        const [c1, c2] = getPalette(idx);
         return {
           ...p,
           c1,
@@ -1288,13 +1281,13 @@
         };
       });
 
-      renderFeed();
-      if (!preserveScroll) ui.feed.scrollTop = 0;
+      renderCards();
+      updateEmptyState();
     } catch (err) {
-      console.warn("Load posts failed:", err);
       posts = [];
-      renderFeed();
-      showToast(err?.message || "Posts could not be loaded, but the app is still usable.");
+      renderCards();
+      updateEmptyState();
+      showToast(err?.message || "Posts could not be loaded, but the app is still running.");
     }
   }
 
@@ -1307,20 +1300,22 @@
         .delete()
         .eq("post_id", postId)
         .eq("user_id", currentUser.id);
+
       if (error) throw error;
     } else {
       const { error } = await supabase
         .from("likes")
         .insert({ post_id: postId, user_id: currentUser.id });
+
       if (error) throw error;
     }
   }
 
-  async function uploadMedia(file) {
+  async function uploadToBucket(file, folder = "") {
     if (!currentUser || !supabase) throw new Error("You need to log in to upload.");
 
     const safeName = file.name.replaceAll(" ", "_");
-    const path = `${currentUser.id}/${Date.now()}-${safeName}`;
+    const path = `${currentUser.id}/${folder}${Date.now()}-${safeName}`;
 
     const { error } = await supabase.storage.from(CONFIG.BUCKET).upload(path, file, {
       cacheControl: "3600",
@@ -1343,23 +1338,29 @@
     const caption = ui.uCaption.value.trim();
     const songTitle = ui.uSongTitle.value.trim();
     const songPreview = ui.uSongPreview.value.trim();
-    const file = ui.uFile.files?.[0] || null;
+    const imageFile = ui.uFile.files?.[0] || null;
+    const audioFile = ui.uAudioFile.files?.[0] || null;
 
-    if (!displayName || !caption || !file) {
-      showToast("Display name, caption, and a file are required.");
+    if (!displayName || !caption || !imageFile) {
+      showToast("Display name, caption, and a media file are required.");
       return;
     }
 
     ui.submitUpload.disabled = true;
 
     try {
-      const mediaUrl = await uploadMedia(file);
+      const imageUrl = await uploadToBucket(imageFile, "media/");
+      let audioUrl = null;
+      if (audioFile) {
+        audioUrl = await uploadToBucket(audioFile, "audio/");
+      }
 
       const { error } = await supabase
         .from("posts")
         .insert({
           user_id: currentUser.id,
-          image_url: mediaUrl,
+          image_url: imageUrl,
+          audio_url: audioUrl,
           caption,
           song_title: songTitle || null,
           song_preview: songPreview || null,
@@ -1374,10 +1375,11 @@
       ui.uSongTitle.value = "";
       ui.uSongPreview.value = "";
       ui.uFile.value = "";
+      ui.uAudioFile.value = "";
       resetPreviewMedia();
 
       await loadCurrentProfile();
-      await loadPosts(currentSearch, false);
+      await loadPosts(currentSearch);
       showToast("Post published.");
     } catch (err) {
       showToast(err?.message || "Publish failed.");
@@ -1388,6 +1390,7 @@
 
   async function trackPresence() {
     if (!currentUser || !supabase) return;
+
     try {
       const { error } = await supabase
         .from("presence")
@@ -1395,38 +1398,11 @@
           user_id: currentUser.id,
           last_seen: new Date().toISOString()
         }, { onConflict: "user_id" });
+
       if (error) console.warn("Presence update failed:", error);
     } catch (err) {
       console.warn("Presence update failed:", err);
     }
-  }
-
-  function initObserver() {
-    if (observer) observer.disconnect();
-    observer = new IntersectionObserver((entries) => {
-      const visible = entries
-        .filter(e => e.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (!visible) return;
-
-      document.querySelectorAll(".post-card").forEach(card => card.classList.remove("is-active"));
-      visible.target.classList.add("is-active");
-      activeIndex = Number(visible.target.dataset.index || 0);
-      const audio = visible.target.querySelector(".post-audio");
-      pauseAllAudios();
-      if (audio) {
-        const p = audio.play();
-        if (p && typeof p.catch === "function") p.catch(() => {});
-      }
-    }, { root: ui.feed, threshold: [0.3, 0.5, 0.62, 0.75, 0.9] });
-
-    document.querySelectorAll(".post-card").forEach(card => observer.observe(card));
-  }
-
-  function pauseAllAudios() {
-    document.querySelectorAll(".post-audio").forEach(audio => {
-      try { audio.pause(); } catch {}
-    });
   }
 
   function initEvents() {
@@ -1455,6 +1431,7 @@
       }
 
       const url = URL.createObjectURL(file);
+
       if (file.type.startsWith("video/")) {
         ui.previewVideo.src = url;
         ui.previewVideo.style.display = "block";
@@ -1471,19 +1448,8 @@
     ui.searchInput.addEventListener("input", () => {
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
-        loadPosts(ui.searchInput.value.trim(), false);
+        loadPosts(ui.searchInput.value.trim());
       }, 250);
-    });
-
-    ui.feed.addEventListener("wheel", (e) => {
-      if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
-        e.preventDefault();
-        ui.feed.scrollTop += e.deltaY;
-      }
-    }, { passive:false });
-
-    window.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeModal();
     });
   }
 
@@ -1491,19 +1457,25 @@
     if (booted) return;
     booted = true;
 
-    bootFallbackTimer = setTimeout(() => {
+    showApp();
+
+    const safety = setTimeout(() => {
       showApp();
-      showToast("Starting in fallback mode...");
+      if (!posts.length) {
+        ui.emptyState.querySelector("h2").textContent = "Fallback mode";
+        ui.emptyState.querySelector("p").textContent = "The interface is open. Data loading is taking longer than usual.";
+        ui.emptyState.classList.add("show");
+      }
     }, CONFIG.BOOT_TIMEOUT_MS);
 
     try {
       await initSupabase().catch(err => {
-        showToast(err?.message || "Supabase not available. App will still open.");
         supabase = null;
+        showToast(err?.message || "Supabase unavailable. Showing the UI anyway.");
       });
 
       if (supabase) {
-        const session = await getSessionSafe();
+        const session = await getSessionSafe().catch(() => null);
         if (session?.user) {
           currentUser = session.user;
           await loadCurrentProfile().catch(() => {});
@@ -1518,20 +1490,21 @@
         setHeaderFromSession();
       }
 
-      await loadPosts("", false);
-      await safeCall(() => trackPresence(), null);
+      await loadPosts("");
+      await trackPresence().catch(() => {});
       setInterval(() => trackPresence().catch(() => {}), 60000);
 
-      showApp();
-      initObserver();
+      if (!posts.length) {
+        updateEmptyState();
+      }
     } catch (err) {
       console.error("Boot failed:", err);
-      showApp();
-      ui.emptyState.querySelector("h2").textContent = "Fallback mode";
-      ui.emptyState.querySelector("p").textContent = err?.message || "The app started without data loading.";
-      ui.emptyState.classList.add("show");
+      showToast(err?.message || "The app started without full data.");
+      posts = [];
+      renderCards();
+      updateEmptyState();
     } finally {
-      clearTimeout(bootFallbackTimer);
+      clearTimeout(safety);
       showApp();
     }
   }
