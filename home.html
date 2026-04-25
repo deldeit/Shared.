@@ -866,6 +866,9 @@
     }
   }
 </style>
+
+<!-- Supabase UMD build: evita problemi di import module -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 
 <body>
@@ -917,7 +920,7 @@
         <input class="input" id="uCaption" type="text" placeholder="Caption" />
         <input class="input" id="uSongTitle" type="text" placeholder="Song title" />
         <input class="input" id="uSongPreview" type="text" placeholder="Song preview" />
-        <input class="file" id="uFile" type="file" accept="image/*" />
+        <input class="file" id="uFile" type="file" accept="image/*,video/*" />
         <div class="helper">
           Images are uploaded to the public bucket <code>shared</code> and the post is saved in <code>posts</code>.
         </div>
@@ -943,8 +946,8 @@
   </div>
 </div>
 
-<script type="module">
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+<script>
+  const { createClient } = window.supabase;
 
   const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
@@ -996,6 +999,29 @@
   let searchTimer = null;
   let currentSearch = "";
   let booted = false;
+
+  function hideLoader() {
+    loading.classList.add("hidden");
+    app.classList.remove("hidden");
+  }
+
+  function showBootError(err) {
+    emptyState.querySelector("h2").textContent = "Loading failed";
+    emptyState.querySelector("p").textContent = err?.message || "Check your Supabase configuration and table permissions.";
+    emptyState.classList.add("show");
+  }
+
+  window.addEventListener("error", (event) => {
+    console.error("Global error:", event.error || event.message);
+    hideLoader();
+    showBootError(event.error || new Error(event.message || "Unexpected error"));
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    console.error("Unhandled rejection:", event.reason);
+    hideLoader();
+    showBootError(event.reason instanceof Error ? event.reason : new Error(String(event.reason || "Unhandled promise rejection")));
+  });
 
   function clamp(v, min, max){
     return Math.max(min, Math.min(max, v));
@@ -1168,19 +1194,19 @@
               <div class="footerline">
                 <div class="stats">
                   <span class="like-count">${likeCount} likes</span>
-                  <span>${new Date(post.created_at).toLocaleDateString()}</span>
+                  <span>${post.created_at ? new Date(post.created_at).toLocaleDateString() : ""}</span>
                 </div>
                 <div class="cta">
-                  <button class="secondary saveBtn">Save</button>
-                  <button class="primary openBtn">Open</button>
+                  <button class="secondary saveBtn" type="button">Save</button>
+                  <button class="primary openBtn" type="button">Open</button>
                 </div>
               </div>
             </div>
 
             <div class="actions">
-              <button class="action likeBtn ${liked ? "liked" : ""}" aria-label="Like">${liked ? "❤" : "❤"}</button>
-              <button class="action" aria-label="Comment">✦</button>
-              <button class="action" aria-label="Share">↗</button>
+              <button class="action likeBtn ${liked ? "liked" : ""}" aria-label="Like" type="button">${liked ? "❤" : "❤"}</button>
+              <button class="action" aria-label="Comment" type="button">✦</button>
+              <button class="action" aria-label="Share" type="button">↗</button>
             </div>
           </div>
         </section>
@@ -1206,6 +1232,9 @@
         try {
           await toggleLike(postId, liked);
           await loadPosts(currentSearch, false);
+        } catch (err) {
+          console.error("Like toggle failed:", err);
+          alert(err?.message || "Like action failed.");
         } finally {
           e.currentTarget.disabled = false;
         }
@@ -1275,14 +1304,9 @@
   }
 
   async function ensureSession(){
-    try{
-      const { data, error } = await supabase.auth.getSession();
-      if (error) throw error;
-      return data?.session || null;
-    }catch(err){
-      console.error("Session check failed:", err);
-      return null;
-    }
+    const { data, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return data?.session || null;
   }
 
   async function loadCurrentProfile(){
@@ -1380,12 +1404,16 @@
     const postIds = posts.map(p => p.id);
     const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
 
-    const { data: profilesData, error: profilesError } = await supabase
-      .from("profiles")
-      .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
-      .in("id", userIds);
+    let profilesData = [];
+    if (userIds.length) {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
+        .in("id", userIds);
 
-    if (profilesError) throw profilesError;
+      if (error) throw error;
+      profilesData = data || [];
+    }
 
     const profileMap = new Map((profilesData || []).map(p => [p.id, p]));
 
@@ -1560,9 +1588,16 @@
     if (booted) return;
     booted = true;
 
+    const safetyTimeout = setTimeout(() => {
+      console.warn("Boot timeout reached.");
+      hideLoader();
+      showBootError(new Error("Boot timeout: the page took too long to initialize."));
+    }, 12000);
+
     try{
       const session = await ensureSession();
       if (!session){
+        hideLoader();
         window.location.replace("./login.html");
         return;
       }
@@ -1573,15 +1608,13 @@
       await trackPresence();
 
       setInterval(trackPresence, 60000);
+      requestAnimationFrame(tick);
     }catch(err){
       console.error("Boot failed:", err);
-      emptyState.querySelector("h2").textContent = "Loading failed";
-      emptyState.querySelector("p").textContent = err?.message || "Check your Supabase configuration and table permissions.";
-      emptyState.classList.add("show");
+      showBootError(err);
     }finally{
-      loading.classList.add("hidden");
-      app.classList.remove("hidden");
-      requestAnimationFrame(tick);
+      clearTimeout(safetyTimeout);
+      hideLoader();
     }
   }
 
