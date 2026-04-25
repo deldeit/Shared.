@@ -6,145 +6,212 @@
 <title>Shared</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
   :root{
-    --bg:#000;
+    --bg:#050505;
     --panel:#0c0c0c;
+    --panel-2:rgba(12,12,12,.82);
     --text:#fff;
-    --muted:#a0a0a0;
-    --shadow:0 24px 80px rgba(0,0,0,.48);
+    --muted:#a6a6a6;
+    --line:rgba(255,255,255,.10);
+    --line-2:rgba(255,255,255,.06);
+    --shadow:0 24px 80px rgba(0,0,0,.42);
     --radius:28px;
+    --radius-sm:18px;
   }
 
   *{ box-sizing:border-box; }
 
-  html, body{
+  html,body{
     margin:0;
     width:100%;
     height:100%;
     overflow:hidden;
     background:
-      radial-gradient(circle at 18% 20%, rgba(255,255,255,.06), transparent 24%),
-      radial-gradient(circle at 82% 12%, rgba(255,255,255,.05), transparent 20%),
-      radial-gradient(circle at 50% 100%, rgba(255,255,255,.04), transparent 26%),
-      #000;
+      radial-gradient(circle at 15% 18%, rgba(255,255,255,.08), transparent 22%),
+      radial-gradient(circle at 82% 15%, rgba(255,255,255,.06), transparent 18%),
+      radial-gradient(circle at 50% 100%, rgba(255,255,255,.05), transparent 28%),
+      var(--bg);
     color:var(--text);
-    font-family:'Archivo Black', system-ui, sans-serif;
+    font-family:Inter, system-ui, sans-serif;
   }
+
+  button,input{ font:inherit; }
+  .hidden{ display:none !important; }
 
   .loading{
     position:fixed;
     inset:0;
-    z-index:100;
+    z-index:1000;
     display:grid;
     place-items:center;
     background:#000;
     color:#fff;
-    font-family:system-ui, sans-serif;
-    letter-spacing:.4px;
     text-align:center;
     padding:24px;
   }
 
-  .hidden{ display:none !important; }
+  .loading-card{
+    width:min(420px, calc(100vw - 32px));
+    border:1px solid var(--line);
+    border-radius:24px;
+    background:rgba(12,12,12,.88);
+    box-shadow:var(--shadow);
+    padding:26px 20px;
+  }
+
+  .loading-title{
+    font-family:'Archivo Black', sans-serif;
+    font-size:32px;
+    margin:0 0 8px;
+    letter-spacing:.2px;
+  }
+
+  .loading-sub{
+    margin:0;
+    color:var(--muted);
+    line-height:1.55;
+    font-size:13px;
+    font-weight:600;
+  }
+
+  .spinner{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:3px solid rgba(255,255,255,.12);
+    border-top-color:#fff;
+    margin:0 auto 18px;
+    animation:spin 1s linear infinite;
+  }
+
+  @keyframes spin { to { transform:rotate(360deg); } }
 
   .app{
+    position:relative;
     width:100%;
     height:100%;
-    position:relative;
     overflow:hidden;
   }
 
   .topbar{
     position:fixed;
-    inset:0 0 auto 0;
-    z-index:60;
+    top:0;
+    left:0;
+    right:0;
+    z-index:50;
     padding:12px 12px 0;
     pointer-events:none;
   }
 
   .topbar-inner{
     pointer-events:auto;
-    max-width:1220px;
+    max-width:1280px;
     margin:0 auto;
     display:flex;
     align-items:center;
-    justify-content:space-between;
     gap:12px;
+    justify-content:space-between;
     padding:12px 14px;
-    border:1px solid rgba(255,255,255,.08);
+    border:1px solid var(--line);
     border-radius:999px;
     background:rgba(8,8,8,.72);
-    backdrop-filter:blur(16px);
+    backdrop-filter:blur(18px);
     box-shadow:var(--shadow);
   }
 
   .brand{
     display:flex;
-    align-items:baseline;
-    gap:10px;
-    flex:0 0 auto;
-  }
-
-  .brand .logo{
-    font-size:20px;
-    letter-spacing:.4px;
-    line-height:1;
-  }
-
-  .search-area{
-    flex:1 1 auto;
-    display:flex;
     align-items:center;
     gap:10px;
-    max-width:760px;
-    margin:0 10px;
+    min-width:0;
   }
 
-  .searchbar{
-    flex:1 1 auto;
-  }
-
-  .searchbar input{
-    width:100%;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(9,9,9,.82);
-    color:#fff;
-    outline:none;
-    padding:14px 16px;
-    font-family:system-ui, sans-serif;
-    font-size:14px;
-    backdrop-filter:blur(16px);
-  }
-
-  .searchbar input::placeholder{ color:#7b7b7b; }
-
-  .uploadbtn{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,.08);
+  .brand-badge{
+    width:40px;
+    height:40px;
+    border-radius:14px;
     background:#fff;
     color:#000;
     display:grid;
     place-items:center;
-    cursor:pointer;
-    transition:.16s ease;
+    font-family:'Archivo Black', sans-serif;
+    font-size:14px;
     flex:0 0 auto;
-    font-size:18px;
-    font-family:inherit;
   }
 
-  .uploadbtn:hover{ transform:translateY(-1px) scale(1.02); }
+  .brand-text{
+    min-width:0;
+  }
+
+  .brand-text h1{
+    margin:0;
+    font-family:'Archivo Black', sans-serif;
+    font-size:18px;
+    line-height:1;
+    letter-spacing:.2px;
+  }
+
+  .brand-text p{
+    margin:4px 0 0;
+    font-size:11px;
+    color:var(--muted);
+    font-weight:600;
+  }
+
+  .search-area{
+    flex:1 1 auto;
+    max-width:720px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:0 10px;
+  }
+
+  .searchbar{ flex:1 1 auto; }
+  .searchbar input{
+    width:100%;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:rgba(10,10,10,.85);
+    color:#fff;
+    outline:none;
+    padding:13px 16px;
+    font-size:14px;
+  }
+
+  .searchbar input::placeholder{ color:#797979; }
+
+  .icon-btn{
+    width:42px;
+    height:42px;
+    border:none;
+    border-radius:50%;
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    transition:transform .16s ease, opacity .16s ease, background .16s ease;
+    flex:0 0 auto;
+    box-shadow:none;
+  }
+
+  .icon-btn:hover{ transform:translateY(-1px) scale(1.02); }
+
+  .uploadbtn{
+    background:#fff;
+    color:#000;
+    font-size:18px;
+    font-weight:800;
+  }
 
   .profile-link{
     width:42px;
     height:42px;
     border-radius:50%;
     overflow:hidden;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:#111;
     display:block;
     flex:0 0 auto;
@@ -165,7 +232,7 @@
     place-items:center;
     background:#fff;
     color:#000;
-    font-family:inherit;
+    font-family:'Archivo Black', sans-serif;
     font-size:14px;
   }
 
@@ -175,7 +242,7 @@
     left:50%;
     transform:translateX(-50%);
     width:min(760px, calc(100vw - 20px));
-    z-index:55;
+    z-index:45;
     pointer-events:none;
   }
 
@@ -193,12 +260,12 @@
     background:rgba(255,255,255,.10);
   }
 
-  .segment > span{
+  .segment span{
     display:block;
     width:0%;
     height:100%;
-    border-radius:inherit;
     background:#fff;
+    border-radius:inherit;
   }
 
   .feed{
@@ -207,9 +274,9 @@
     overflow-x:auto;
     overflow-y:hidden;
     scroll-snap-type:x mandatory;
-    scroll-behavior:smooth;
     -webkit-overflow-scrolling:touch;
     scrollbar-width:none;
+    scroll-behavior:smooth;
   }
 
   .feed::-webkit-scrollbar{ display:none; }
@@ -225,14 +292,14 @@
   .media{
     position:absolute;
     inset:0;
-    z-index:0;
     transform:scale(1.03);
+    z-index:0;
   }
 
   .media.gradient{
     background:
-      radial-gradient(circle at 20% 18%, rgba(255,255,255,.18), transparent 18%),
-      radial-gradient(circle at 75% 26%, rgba(255,255,255,.10), transparent 20%),
+      radial-gradient(circle at 18% 20%, rgba(255,255,255,.18), transparent 18%),
+      radial-gradient(circle at 78% 24%, rgba(255,255,255,.10), transparent 20%),
       linear-gradient(135deg, var(--c1), var(--c2));
   }
 
@@ -241,17 +308,66 @@
     position:absolute;
     inset:0;
     background:
-      linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.72) 76%, rgba(0,0,0,.95)),
+      linear-gradient(180deg, rgba(0,0,0,.05), rgba(0,0,0,.70) 74%, rgba(0,0,0,.95)),
       linear-gradient(115deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.08) 18%, rgba(255,255,255,0) 36%);
     pointer-events:none;
   }
 
-  .media .file{
+  .file{
     position:absolute;
     inset:0;
     width:100%;
     height:100%;
     object-fit:cover;
+  }
+
+  .badge{
+    position:absolute;
+    top:24px;
+    left:24px;
+    z-index:3;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:10px 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(0,0,0,.55);
+    backdrop-filter:blur(12px);
+    font-size:11px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    color:#fff;
+  }
+
+  .dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+    background:#fff;
+  }
+
+  .sidehint{
+    position:absolute;
+    right:18px;
+    top:50%;
+    transform:translateY(-50%);
+    z-index:3;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    color:rgba(255,255,255,.75);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:1.4px;
+    pointer-events:none;
+    font-weight:700;
+  }
+
+  .sidehint .line{
+    width:54px;
+    height:1px;
+    background:rgba(255,255,255,.22);
   }
 
   .content{
@@ -269,15 +385,15 @@
     width:min(760px, calc(100vw - 92px));
     max-width:100%;
     border-radius:var(--radius);
-    border:1px solid rgba(255,255,255,.10);
-    background:linear-gradient(180deg, rgba(12,12,12,.35), rgba(12,12,12,.82));
+    border:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(12,12,12,.34), rgba(12,12,12,.82));
     backdrop-filter:blur(16px);
     box-shadow:var(--shadow);
     padding:18px;
     overflow:hidden;
   }
 
-  .profile-accent{
+  .accent{
     height:6px;
     width:100%;
     border-radius:999px;
@@ -303,6 +419,7 @@
     color:#000;
     font-size:15px;
     overflow:hidden;
+    font-family:'Archivo Black', sans-serif;
   }
 
   .avatar img{
@@ -312,10 +429,7 @@
     display:block;
   }
 
-  .author-meta{
-    min-width:0;
-    flex:1 1 auto;
-  }
+  .author-meta{ min-width:0; flex:1 1 auto; }
 
   .author-line{
     display:flex;
@@ -325,9 +439,9 @@
   }
 
   .author{
+    font-family:'Archivo Black', sans-serif;
     font-size:16px;
     line-height:1.1;
-    margin-bottom:4px;
   }
 
   .verified{
@@ -343,22 +457,24 @@
   }
 
   .handle{
+    margin-top:4px;
     font-size:11px;
     color:var(--muted);
     letter-spacing:.8px;
+    text-transform:none;
   }
 
   .profile-stats{
-    font-family:system-ui, sans-serif;
-    font-size:11px;
-    color:#d8d8d8;
     margin-top:4px;
+    font-size:11px;
+    color:#d7d7d7;
     font-weight:700;
-    opacity:.9;
+    font-family:Inter, system-ui, sans-serif;
   }
 
   .headline{
     margin:0 0 10px;
+    font-family:'Archivo Black', sans-serif;
     font-size:clamp(28px, 5vw, 58px);
     line-height:.95;
     letter-spacing:.2px;
@@ -368,9 +484,7 @@
   .caption{
     margin:0 0 14px;
     max-width:62ch;
-    color:#e9e9e9;
-    opacity:.95;
-    font-family:system-ui, sans-serif;
+    color:#eaeaea;
     font-size:13px;
     line-height:1.65;
     font-weight:600;
@@ -386,10 +500,11 @@
   .chip{
     padding:8px 10px;
     border-radius:999px;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:rgba(255,255,255,.06);
     color:#fff;
     font-size:11px;
+    font-weight:700;
   }
 
   .song-row{
@@ -399,14 +514,9 @@
     gap:10px;
     padding:12px 14px;
     border-radius:18px;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:rgba(255,255,255,.05);
     margin-bottom:14px;
-    font-family:system-ui, sans-serif;
-  }
-
-  .song-left{
-    min-width:0;
   }
 
   .song-title{
@@ -437,7 +547,6 @@
     flex-wrap:wrap;
     gap:14px;
     color:#f0f0f0;
-    font-family:system-ui, sans-serif;
     font-size:11px;
     font-weight:700;
   }
@@ -451,24 +560,19 @@
     border:none;
     border-radius:999px;
     padding:12px 14px;
-    font-family:inherit;
-    font-size:12px;
     cursor:pointer;
-    transition:.16s ease;
+    transition:transform .16s ease, opacity .16s ease;
+    font-weight:700;
   }
 
-  .primary{
-    background:#fff;
-    color:#000;
-  }
+  .cta button:hover{ transform:translateY(-1px); }
 
+  .primary{ background:#fff; color:#000; }
   .secondary{
     background:#111;
     color:#fff;
     border:1px solid rgba(255,255,255,.12);
   }
-
-  .cta button:hover{ transform:translateY(-1px); }
 
   .actions{
     display:flex;
@@ -481,7 +585,7 @@
     width:52px;
     height:52px;
     border-radius:18px;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:rgba(10,10,10,.72);
     backdrop-filter:blur(12px);
     color:#fff;
@@ -490,7 +594,7 @@
     font-size:18px;
     cursor:pointer;
     box-shadow:var(--shadow);
-    transition:.16s ease;
+    transition:transform .16s ease, opacity .16s ease;
   }
 
   .action:hover{ transform:translateY(-1px) scale(1.03); }
@@ -500,53 +604,63 @@
     color:#000;
   }
 
-  .badge{
+  .empty-state{
+    width:min(720px, calc(100vw - 28px));
+    margin:0 auto;
     position:absolute;
-    top:24px;
-    left:24px;
-    z-index:3;
-    display:inline-flex;
-    align-items:center;
-    gap:8px;
-    padding:10px 12px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(0,0,0,.55);
-    backdrop-filter:blur(12px);
-    font-size:11px;
-    letter-spacing:1px;
-    text-transform:uppercase;
-    color:#fff;
-  }
-
-  .badge .dot{
-    width:8px;
-    height:8px;
-    border-radius:50%;
-    background:#fff;
-  }
-
-  .sidehint{
-    position:absolute;
-    right:18px;
     top:50%;
-    transform:translateY(-50%);
-    z-index:3;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    color:rgba(255,255,255,.75);
-    font-size:11px;
-    text-transform:uppercase;
-    letter-spacing:1.4px;
-    font-family:system-ui, sans-serif;
-    pointer-events:none;
+    left:50%;
+    transform:translate(-50%, -50%);
+    text-align:center;
+    border:1px solid var(--line);
+    border-radius:28px;
+    background:rgba(12,12,12,.72);
+    backdrop-filter:blur(14px);
+    padding:22px;
+    box-shadow:var(--shadow);
+    display:none;
+    z-index:5;
   }
 
-  .sidehint .line{
-    width:54px;
-    height:1px;
-    background:rgba(255,255,255,.2);
+  .empty-state.show{ display:block; }
+
+  .empty-state h2{
+    margin:0 0 8px;
+    font-family:'Archivo Black', sans-serif;
+    font-size:22px;
+  }
+
+  .empty-state p{
+    margin:0;
+    color:var(--muted);
+    line-height:1.55;
+    font-size:13px;
+    font-weight:600;
+  }
+
+  .toast{
+    position:fixed;
+    left:50%;
+    bottom:18px;
+    transform:translateX(-50%);
+    z-index:70;
+    width:min(920px, calc(100vw - 20px));
+    display:none;
+  }
+
+  .toast.show{ display:block; }
+
+  .toast-inner{
+    border-radius:16px;
+    border:1px solid var(--line);
+    background:rgba(12,12,12,.94);
+    backdrop-filter:blur(14px);
+    color:#fff;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    font-size:12px;
+    line-height:1.45;
+    font-weight:600;
   }
 
   .modal{
@@ -557,7 +671,7 @@
     align-items:center;
     justify-content:center;
     padding:18px;
-    background:rgba(0,0,0,.72);
+    background:rgba(0,0,0,.74);
     backdrop-filter:blur(10px);
   }
 
@@ -566,7 +680,7 @@
   .sheet{
     width:min(760px, 100%);
     border-radius:28px;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:linear-gradient(180deg, rgba(12,12,12,.96), rgba(7,7,7,.98));
     box-shadow:var(--shadow);
     overflow:hidden;
@@ -581,15 +695,15 @@
   }
 
   .sheet-title{
+    font-family:'Archivo Black', sans-serif;
     font-size:20px;
-    letter-spacing:.4px;
   }
 
   .close{
     width:42px;
     height:42px;
     border-radius:50%;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:#111;
     color:#fff;
     cursor:pointer;
@@ -599,7 +713,6 @@
   .sheet-body{
     display:grid;
     grid-template-columns:1.05fr .95fr;
-    gap:0;
   }
 
   .form{
@@ -608,31 +721,21 @@
     gap:10px;
   }
 
-  .input, .textarea, .file{
+  .input,.file{
     width:100%;
     border-radius:16px;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:#000;
     color:#fff;
     outline:none;
-    font-family:system-ui, sans-serif;
     padding:12px 14px;
     font-size:14px;
   }
 
-  .textarea{
-    min-height:140px;
-    resize:vertical;
-  }
-
-  .input::placeholder,
-  .textarea::placeholder{
-    color:#7f7f7f;
-  }
+  .input::placeholder{ color:#7f7f7f; }
 
   .helper{
     color:var(--muted);
-    font-family:system-ui, sans-serif;
     font-size:12px;
     line-height:1.5;
     margin-top:2px;
@@ -643,10 +746,9 @@
   }
 
   .preview-card{
-    height:100%;
     min-height:380px;
     border-radius:24px;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
     background:
       radial-gradient(circle at 20% 20%, rgba(255,255,255,.16), transparent 16%),
       linear-gradient(135deg, #1a1a1a, #333);
@@ -671,6 +773,7 @@
   }
 
   .preview-title{
+    font-family:'Archivo Black', sans-serif;
     font-size:28px;
     line-height:.96;
     margin:0 0 8px;
@@ -678,7 +781,6 @@
 
   .preview-text{
     margin:0;
-    font-family:system-ui, sans-serif;
     font-size:13px;
     line-height:1.55;
     color:#e8e8e8;
@@ -696,15 +798,14 @@
     border:none;
     border-radius:999px;
     padding:12px 14px;
-    font-family:inherit;
-    font-size:12px;
     cursor:pointer;
+    font-weight:700;
   }
 
   .ghost{
     background:#111;
     color:#fff;
-    border:1px solid rgba(255,255,255,.10);
+    border:1px solid var(--line);
   }
 
   .save{
@@ -712,88 +813,24 @@
     color:#000;
   }
 
-  .empty-state{
-    width:min(720px, calc(100vw - 28px));
-    margin:0 auto;
-    position:absolute;
-    top:50%;
-    left:50%;
-    transform:translate(-50%, -50%);
-    text-align:center;
-    border:1px solid rgba(255,255,255,.10);
-    border-radius:28px;
-    background:rgba(12,12,12,.72);
-    backdrop-filter:blur(14px);
-    padding:22px;
-    box-shadow:var(--shadow);
-    display:none;
-    z-index:5;
-  }
-
-  .empty-state.show{
-    display:block;
-  }
-
-  .empty-state h2{
-    margin:0 0 8px;
-    font-size:22px;
-  }
-
-  .empty-state p{
-    margin:0;
-    font-family:system-ui, sans-serif;
-    color:var(--muted);
-    line-height:1.55;
-    font-size:13px;
-    font-weight:600;
-  }
-
-  .error-banner{
-    position:fixed;
-    left:50%;
-    bottom:18px;
-    transform:translateX(-50%);
-    z-index:90;
-    max-width:min(920px, calc(100vw - 24px));
-    width:fit-content;
-    padding:12px 14px;
-    border-radius:16px;
-    background:rgba(20,20,20,.94);
-    border:1px solid rgba(255,255,255,.10);
-    color:#fff;
-    font-family:system-ui, sans-serif;
-    font-size:12px;
-    line-height:1.5;
-    box-shadow:var(--shadow);
-    display:none;
-  }
-
-  .error-banner.show{ display:block; }
-
   @media (max-width: 860px){
-    .topbar{
-      padding:10px 10px 0;
-    }
-
+    .topbar{ padding:10px 10px 0; }
     .topbar-inner{
       border-radius:24px;
       padding:10px 12px;
       gap:10px;
     }
 
-    .search-area{
-      margin:0;
-      gap:8px;
-    }
+    .brand-badge{ width:36px; height:36px; border-radius:12px; }
+    .brand-text h1{ font-size:16px; }
+    .brand-text p{ display:none; }
+
+    .search-area{ margin:0; gap:8px; }
+    .searchbar input{ font-size:13px; padding:13px 14px; }
 
     .progress-wrap{
       top:156px;
       width:calc(100vw - 16px);
-    }
-
-    .searchbar input{
-      font-size:13px;
-      padding:13px 14px;
     }
 
     .content{
@@ -818,9 +855,7 @@
       border-radius:16px;
     }
 
-    .sidehint{
-      display:none;
-    }
+    .sidehint{ display:none; }
 
     .sheet-body{
       grid-template-columns:1fr;
@@ -834,19 +869,8 @@
       min-height:260px;
     }
 
-    .preview-title{
-      font-size:24px;
-    }
-
-    .brand .logo{
-      font-size:18px;
-    }
-
-    .profile-link,
-    .uploadbtn{
-      width:40px;
-      height:40px;
-    }
+    .preview-title{ font-size:24px; }
+    .profile-link,.uploadbtn{ width:40px; height:40px; }
   }
 </style>
 
@@ -854,136 +878,140 @@
 </head>
 
 <body>
-<div class="loading" id="loading">Loading Shared...</div>
-
-<div class="error-banner" id="errorBanner"></div>
-
-<div class="app hidden" id="app">
-  <div class="topbar">
-    <div class="topbar-inner">
-      <div class="brand">
-        <div class="logo">Shared.</div>
-      </div>
-
-      <div class="search-area">
-        <div class="searchbar">
-          <input id="searchInput" type="text" placeholder="Search posts or profiles..." />
-        </div>
-        <button class="uploadbtn" id="openUpload" title="Upload">+</button>
-      </div>
-
-      <a class="profile-link" id="profileLink" href="./profile.html" title="Profile">
-        <div class="profile-fallback" id="profileFallback">S</div>
-        <img id="profileImg" alt="Profile" class="hidden" />
-      </a>
+  <div class="loading" id="loading">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <h2 class="loading-title">Shared.</h2>
+      <p class="loading-sub">Starting the app, then loading data in the background.</p>
     </div>
   </div>
 
-  <div class="progress-wrap">
-    <div class="segments" id="segments"></div>
-  </div>
+  <div class="toast" id="toast"><div class="toast-inner" id="toastInner"></div></div>
 
-  <div class="empty-state" id="emptyState">
-    <h2>No posts found</h2>
-    <p>Try another search or create the first post with Upload.</p>
-  </div>
+  <div class="app hidden" id="app">
+    <div class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <div class="brand-badge">S</div>
+          <div class="brand-text">
+            <h1>Shared.</h1>
+            <p>No algorithm. Community feed.</p>
+          </div>
+        </div>
 
-  <div class="feed" id="feed"></div>
-</div>
+        <div class="search-area">
+          <div class="searchbar">
+            <input id="searchInput" type="text" placeholder="Search posts, users, tags..." />
+          </div>
+          <button class="icon-btn uploadbtn" id="openUpload" title="Upload" type="button">+</button>
+        </div>
 
-<div class="modal" id="uploadModal" aria-hidden="true">
-  <div class="sheet">
-    <div class="sheet-head">
-      <div class="sheet-title">New post</div>
-      <button class="close" id="closeUpload" type="button">×</button>
+        <a class="profile-link" id="profileLink" href="./profile.html" title="Profile">
+          <div class="profile-fallback" id="profileFallback">S</div>
+          <img id="profileImg" alt="Profile" class="hidden" />
+        </a>
+      </div>
     </div>
 
-    <div class="sheet-body">
-      <div class="form">
-        <input class="input" id="uDisplayName" type="text" placeholder="Display name" />
-        <input class="input" id="uCaption" type="text" placeholder="Caption" />
-        <input class="input" id="uSongTitle" type="text" placeholder="Song title" />
-        <input class="input" id="uSongPreview" type="text" placeholder="Song preview" />
-        <input class="file" id="uFile" type="file" accept="image/*,video/*" />
-        <div class="helper">
-          Images are uploaded to the public bucket <code>shared</code> and the post is saved in <code>posts</code>.
-        </div>
+    <div class="progress-wrap">
+      <div class="segments" id="segments"></div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <h2>No posts found</h2>
+      <p>Try another search or create the first post with Upload.</p>
+    </div>
+
+    <div class="feed" id="feed"></div>
+  </div>
+
+  <div class="modal" id="uploadModal" aria-hidden="true">
+    <div class="sheet">
+      <div class="sheet-head">
+        <div class="sheet-title">New post</div>
+        <button class="close" id="closeUpload" type="button">×</button>
       </div>
 
-      <div class="preview">
-        <div class="preview-card" id="previewCard">
-          <img class="preview-media" id="previewImg" alt="" />
-          <video class="preview-media" id="previewVideo" muted loop playsinline></video>
+      <div class="sheet-body">
+        <div class="form">
+          <input class="input" id="uDisplayName" type="text" placeholder="Display name" />
+          <input class="input" id="uCaption" type="text" placeholder="Caption" />
+          <input class="input" id="uSongTitle" type="text" placeholder="Song title" />
+          <input class="input" id="uSongPreview" type="text" placeholder="Song preview" />
+          <input class="file" id="uFile" type="file" accept="image/*,video/*" />
+          <div class="helper">
+            Uploads to bucket <code>shared</code>, then stores the post in <code>posts</code>.
+          </div>
+        </div>
 
-          <div class="preview-overlay">
-            <h3 class="preview-title" id="previewTitle">Preview</h3>
-            <p class="preview-text" id="previewText">Your selected content will appear here.</p>
+        <div class="preview">
+          <div class="preview-card" id="previewCard">
+            <img class="preview-media" id="previewImg" alt="" />
+            <video class="preview-media" id="previewVideo" muted loop playsinline></video>
+
+            <div class="preview-overlay">
+              <h3 class="preview-title" id="previewTitle">Preview</h3>
+              <p class="preview-text" id="previewText">Your selected content will appear here.</p>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="sheet-actions">
-      <button class="ghost" id="cancelUpload" type="button">Cancel</button>
-      <button class="save" id="submitUpload" type="button">Publish</button>
+      <div class="sheet-actions">
+        <button class="ghost" id="cancelUpload" type="button">Cancel</button>
+        <button class="save" id="submitUpload" type="button">Publish</button>
+      </div>
     </div>
   </div>
-</div>
 
 <script>
-  const errorBanner = document.getElementById("errorBanner");
-  function showBanner(message){
-    errorBanner.textContent = message;
-    errorBanner.classList.add("show");
-    clearTimeout(showBanner._t);
-    showBanner._t = setTimeout(() => errorBanner.classList.remove("show"), 5000);
-  }
+(() => {
+  const CONFIG = {
+    SUPABASE_URL: "https://cnhaonawapuahzoctqav.supabase.co",
+    SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes",
+    AUTOPLAY_MS: 5200,
+    MAX_POSTS: 50,
+    FETCH_TIMEOUT_MS: 8000,
+    BOOT_TIMEOUT_MS: 3500,
+    FALLBACK_REDIRECT: "./login.html",
+    PROFILE_PAGE: "./profile.html",
+    BUCKET: "shared"
+  };
 
-  window.addEventListener("error", (event) => {
-    console.error(event.error || event.message);
-    showBanner(event?.error?.message || event.message || "Unexpected error.");
-  });
+  const el = (id) => document.getElementById(id);
 
-  window.addEventListener("unhandledrejection", (event) => {
-    console.error(event.reason);
-    const msg = event.reason instanceof Error ? event.reason.message : String(event.reason || "Unhandled promise rejection");
-    showBanner(msg);
-  });
-
-  const loading = document.getElementById("loading");
-  const app = document.getElementById("app");
-  const feed = document.getElementById("feed");
-  const emptyState = document.getElementById("emptyState");
-  const segmentsWrap = document.getElementById("segments");
-  const uploadModal = document.getElementById("uploadModal");
-  const profileImg = document.getElementById("profileImg");
-  const profileFallback = document.getElementById("profileFallback");
-  const profileLink = document.getElementById("profileLink");
-
-  const openUploadBtn = document.getElementById("openUpload");
-  const closeUploadBtn = document.getElementById("closeUpload");
-  const cancelUploadBtn = document.getElementById("cancelUpload");
-  const submitUploadBtn = document.getElementById("submitUpload");
-
-  const searchInput = document.getElementById("searchInput");
-
-  const uDisplayName = document.getElementById("uDisplayName");
-  const uCaption = document.getElementById("uCaption");
-  const uSongTitle = document.getElementById("uSongTitle");
-  const uSongPreview = document.getElementById("uSongPreview");
-  const uFile = document.getElementById("uFile");
-
-  const previewTitle = document.getElementById("previewTitle");
-  const previewText = document.getElementById("previewText");
-  const previewImg = document.getElementById("previewImg");
-  const previewVideo = document.getElementById("previewVideo");
-
-  const AUTOPLAY_MS = 5200;
+  const ui = {
+    loading: el("loading"),
+    toast: el("toast"),
+    toastInner: el("toastInner"),
+    app: el("app"),
+    feed: el("feed"),
+    emptyState: el("emptyState"),
+    segments: el("segments"),
+    uploadModal: el("uploadModal"),
+    profileLink: el("profileLink"),
+    profileImg: el("profileImg"),
+    profileFallback: el("profileFallback"),
+    openUpload: el("openUpload"),
+    closeUpload: el("closeUpload"),
+    cancelUpload: el("cancelUpload"),
+    submitUpload: el("submitUpload"),
+    searchInput: el("searchInput"),
+    uDisplayName: el("uDisplayName"),
+    uCaption: el("uCaption"),
+    uSongTitle: el("uSongTitle"),
+    uSongPreview: el("uSongPreview"),
+    uFile: el("uFile"),
+    previewTitle: el("previewTitle"),
+    previewText: el("previewText"),
+    previewImg: el("previewImg"),
+    previewVideo: el("previewVideo")
+  };
 
   let supabase = null;
   let currentUser = null;
   let currentProfile = null;
-  let allPosts = [];
+  let posts = [];
   let timeline = [];
   let activeIndex = 0;
   let progressStart = performance.now();
@@ -991,12 +1019,34 @@
   let searchTimer = null;
   let currentSearch = "";
   let booted = false;
+  let tickStarted = false;
+  let bootFallbackTimer = null;
 
-  function clamp(v, min, max){
+  const palettes = [
+    ["#121212", "#4b4b4b"],
+    ["#0b0b0b", "#2b2b2b"],
+    ["#171717", "#575757"],
+    ["#1c1c1c", "#383838"],
+    ["#101010", "#6b6b6b"]
+  ];
+
+  function showApp() {
+    ui.loading.classList.add("hidden");
+    ui.app.classList.remove("hidden");
+  }
+
+  function showToast(message, ms = 4500) {
+    ui.toastInner.textContent = message;
+    ui.toast.classList.add("show");
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => ui.toast.classList.remove("show"), ms);
+  }
+
+  function clamp(v, min, max) {
     return Math.max(min, Math.min(max, v));
   }
 
-  function escapeHtml(str){
+  function esc(str) {
     return String(str ?? "")
       .replaceAll("&", "&amp;")
       .replaceAll("<", "&lt;")
@@ -1005,7 +1055,7 @@
       .replaceAll("'", "&#039;");
   }
 
-  function sanitizeQuery(str){
+  function sanitizeQuery(str) {
     return String(str ?? "")
       .replaceAll("%", "")
       .replaceAll(",", " ")
@@ -1014,7 +1064,7 @@
       .trim();
   }
 
-  function normalizeUsername(name){
+  function normalizeUsername(name) {
     return String(name || "shared_user")
       .trim()
       .toLowerCase()
@@ -1023,237 +1073,207 @@
       .slice(0, 24) || "shared_user";
   }
 
-  function getPalette(i){
-    const palettes = [
-      ["#111111", "#4c4c4c"],
-      ["#090909", "#262626"],
-      ["#131313", "#555555"],
-      ["#1a1a1a", "#373737"]
-    ];
+  function getPalette(i) {
     return palettes[i % palettes.length];
   }
 
-  function asArray(value){
+  function asArray(value) {
     if (Array.isArray(value)) return value;
     if (!value) return [];
     if (typeof value === "string") return [value];
     return [];
   }
 
-  function parseTags(value){
+  function parseTags(value) {
     if (!value) return [];
     if (Array.isArray(value)) return value.map(String).filter(Boolean);
     if (typeof value === "string") return value.split(",").map(s => s.trim()).filter(Boolean);
     return [];
   }
 
-  function showApp(){
-    loading.classList.add("hidden");
-    app.classList.remove("hidden");
+  function withTimeout(promise, timeoutMs = CONFIG.FETCH_TIMEOUT_MS) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Request timed out.")), timeoutMs))
+    ]);
   }
 
-  function showErrorState(title, message){
-    emptyState.querySelector("h2").textContent = title;
-    emptyState.querySelector("p").textContent = message;
-    emptyState.classList.add("show");
+  function safeCall(fn, fallback = null) {
+    return Promise.resolve()
+      .then(fn)
+      .catch((err) => {
+        console.warn(err);
+        return fallback;
+      });
   }
 
-  function openModal(){
-    uploadModal.classList.add("open");
-    uploadModal.setAttribute("aria-hidden", "false");
+  function updateEmptyState() {
+    ui.emptyState.classList.toggle("show", timeline.length === 0);
+  }
+
+  function openModal() {
+    if (!currentUser) {
+      showToast("Log in first to publish a post.");
+      return;
+    }
+    ui.uploadModal.classList.add("open");
+    ui.uploadModal.setAttribute("aria-hidden", "false");
     previewFromForm();
   }
 
-  function closeModal(){
-    uploadModal.classList.remove("open");
-    uploadModal.setAttribute("aria-hidden", "true");
+  function closeModal() {
+    ui.uploadModal.classList.remove("open");
+    ui.uploadModal.setAttribute("aria-hidden", "true");
   }
 
-  function resetFilePreview(){
-    previewImg.style.display = "none";
-    previewVideo.style.display = "none";
-    previewImg.src = "";
-    previewVideo.pause();
-    previewVideo.removeAttribute("src");
-    previewVideo.load();
+  function previewFromForm() {
+    ui.previewTitle.textContent = ui.uDisplayName.value.trim() || "Preview";
+    ui.previewText.textContent = ui.uCaption.value.trim() || "Your selected content will appear here.";
   }
 
-  function previewFromForm(){
-    previewTitle.textContent = uDisplayName.value.trim() || "Preview";
-    previewText.textContent = uCaption.value.trim() || "Your selected content will appear here.";
+  function resetPreviewMedia() {
+    ui.previewImg.style.display = "none";
+    ui.previewVideo.style.display = "none";
+    ui.previewImg.src = "";
+    ui.previewVideo.pause();
+    ui.previewVideo.removeAttribute("src");
+    ui.previewVideo.load();
   }
 
-  function renderSegments(){
-    segmentsWrap.innerHTML = "";
+  function renderSegments() {
+    ui.segments.innerHTML = "";
     timeline.forEach(() => {
       const seg = document.createElement("div");
       seg.className = "segment";
       seg.innerHTML = "<span></span>";
-      segmentsWrap.appendChild(seg);
+      ui.segments.appendChild(seg);
     });
   }
 
-  function updateEmptyState(){
-    emptyState.classList.toggle("show", timeline.length === 0);
-  }
-
-  function buildTimeline(posts){
-    return posts.map(post => ({ type: "post", data: post }));
-  }
-
-  function setAuthUI(){
+  function setHeaderFromSession() {
     const avatarUrl = currentProfile?.avatar_url || currentUser?.user_metadata?.avatar_url || currentUser?.user_metadata?.picture || null;
 
     if (avatarUrl) {
-      profileImg.src = avatarUrl;
-      profileImg.classList.remove("hidden");
-      profileFallback.classList.add("hidden");
+      ui.profileImg.src = avatarUrl;
+      ui.profileImg.classList.remove("hidden");
+      ui.profileFallback.classList.add("hidden");
     } else {
-      const fallbackChar = (currentProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.email || "S")
-        .trim()
-        .charAt(0)
-        .toUpperCase();
-      profileFallback.textContent = fallbackChar;
-      profileImg.classList.add("hidden");
-      profileFallback.classList.remove("hidden");
+      const ch = (currentProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.email || "S")
+        .trim().charAt(0).toUpperCase();
+      ui.profileFallback.textContent = ch;
+      ui.profileImg.classList.add("hidden");
+      ui.profileFallback.classList.remove("hidden");
     }
 
-    profileLink.href = currentUser ? "./profile.html" : "./login.html";
-    uDisplayName.value = currentProfile?.display_name || currentUser?.user_metadata?.display_name || "";
+    ui.profileLink.href = currentUser ? CONFIG.PROFILE_PAGE : CONFIG.FALLBACK_REDIRECT;
+    ui.uDisplayName.value = currentProfile?.display_name || currentUser?.user_metadata?.display_name || "";
   }
 
-  function renderFeed(){
-    timeline = buildTimeline(allPosts);
-    renderSegments();
-
-    if (!timeline.length) {
-      feed.innerHTML = "";
-      updateEmptyState();
-      return;
-    }
-
-    feed.innerHTML = timeline.map((item, idx) => {
-      const post = item.data;
+  function buildFeedHTML(list) {
+    return list.map((post, idx) => {
       const profile = post.profile || {};
       const authorName = profile.display_name || post.username || "User";
       const handle = post.username ? `@${post.username}` : `@${normalizeUsername(authorName)}`;
       const initials = (authorName || "S").trim().charAt(0).toUpperCase();
-      const likeCount = Number(post.likes || 0);
+      const likeCount = Number(post.like_count ?? post.likes ?? 0);
       const liked = !!post.user_liked;
-      const accent = profile.banner_color || "#ffffff";
-      const interests = asArray(profile.interests).slice(0, 3);
-      const tags = parseTags(post.tags).slice(0, 4);
       const verified = !!profile.verified;
+      const interests = asArray(profile.interests).slice(0, 3);
+      const tags = parseTags(post.tags).slice(0, 3);
+      const chips = [...interests, ...tags].slice(0, 5);
 
       const avatarHtml = profile.avatar_url
-        ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">`
-        : escapeHtml(initials);
+        ? `<img src="${esc(profile.avatar_url)}" alt="">`
+        : esc(initials);
 
       const mediaHtml = post.image_url
-        ? `<img class="file" src="${escapeHtml(post.image_url)}" alt="">`
+        ? `<img class="file" src="${esc(post.image_url)}" alt="">`
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--c1),var(--c2));"></div>`;
 
-      const chipHtml = [...interests, ...tags]
-        .slice(0, 5)
-        .map(i => `<span class="chip">${escapeHtml(i)}</span>`)
-        .join("");
-
-      const songBlock = post.song_title || post.song_preview ? `
+      const songBlock = (post.song_title || post.song_preview) ? `
         <div class="song-row">
-          <div class="song-left">
-            <div class="song-title">${escapeHtml(post.song_title || "Song")}</div>
-            <div class="song-preview">${escapeHtml(post.song_preview || "Preview unavailable")}</div>
+          <div>
+            <div class="song-title">${esc(post.song_title || "Song")}</div>
+            <div class="song-preview">${esc(post.song_preview || "Preview unavailable")}</div>
           </div>
         </div>
       ` : "";
 
       return `
         <section class="item post-card" data-index="${idx}" data-post-id="${post.id}">
-          <div class="media gradient" style="--c1:${post.c1};--c2:${post.c2};">
-            ${mediaHtml}
-          </div>
+          <div class="media gradient" style="--c1:${post.c1};--c2:${post.c2};">${mediaHtml}</div>
 
           <div class="badge"><span class="dot"></span> Post</div>
           <div class="sidehint"><span class="line"></span> swipe <span class="line"></span></div>
 
           <div class="content">
-            <div class="card" style="--accent:${escapeHtml(accent)};">
-              <div class="profile-accent"></div>
+            <div class="card" style="--accent:${esc(profile.banner_color || "#ffffff")}">
+              <div class="accent"></div>
 
               <div class="author-row">
-                <div class="avatar">
-                  ${avatarHtml}
-                </div>
+                <div class="avatar">${avatarHtml}</div>
 
                 <div class="author-meta">
                   <div class="author-line">
-                    <div class="author">${escapeHtml(authorName)}</div>
+                    <div class="author">${esc(authorName)}</div>
                     ${verified ? `<div class="verified" title="Verified">✓</div>` : ""}
                   </div>
-                  <div class="handle">${escapeHtml(handle)}</div>
+                  <div class="handle">${esc(handle)}</div>
                   <div class="profile-stats">
                     ${Number(profile.followers_count || 0)} followers · ${Number(profile.following_count || 0)} following
                   </div>
                 </div>
               </div>
 
-              <h2 class="headline">${escapeHtml(post.caption || "")}</h2>
-
+              <h2 class="headline">${esc(post.caption || "")}</h2>
               ${songBlock}
 
               <div class="meta">
-                ${chipHtml}
+                ${chips.map(i => `<span class="chip">${esc(i)}</span>`).join("")}
               </div>
 
               <div class="footerline">
                 <div class="stats">
-                  <span class="like-count">${likeCount} likes</span>
+                  <span>${likeCount} likes</span>
                   <span>${post.created_at ? new Date(post.created_at).toLocaleDateString() : ""}</span>
                 </div>
                 <div class="cta">
-                  <button class="secondary saveBtn" type="button">Save</button>
+                  <button class="secondary saveBtn" type="button">Copy</button>
                   <button class="primary openBtn" type="button">Open</button>
                 </div>
               </div>
             </div>
 
             <div class="actions">
-              <button class="action likeBtn ${liked ? "liked" : ""}" aria-label="Like" type="button">${liked ? "❤" : "❤"}</button>
-              <button class="action" aria-label="Comment" type="button">✦</button>
-              <button class="action" aria-label="Share" type="button">↗</button>
+              <button class="action likeBtn ${liked ? "liked" : ""}" type="button" aria-label="Like">${liked ? "❤" : "❤"}</button>
+              <button class="action" type="button" aria-label="Comment">✦</button>
+              <button class="action" type="button" aria-label="Share">↗</button>
             </div>
           </div>
         </section>
       `;
     }).join("");
-
-    attachHandlers();
-    updateSegments();
-    updateEmptyState();
-    scrollToIndex(0, false);
   }
 
-  function attachHandlers(){
+  function attachHandlers() {
     document.querySelectorAll(".likeBtn").forEach(btn => {
       btn.addEventListener("click", async (e) => {
+        if (!currentUser) {
+          showToast("Log in to like posts.");
+          return;
+        }
         const card = e.currentTarget.closest("[data-post-id]");
         if (!card) return;
 
-        if (!currentUser) {
-          alert("You need to log in to like posts.");
-          return;
-        }
-
         const postId = card.dataset.postId;
         const liked = e.currentTarget.classList.contains("liked");
-
         e.currentTarget.disabled = true;
+
         try {
           await toggleLike(postId, liked);
           await loadPosts(currentSearch, false);
         } catch (err) {
-          console.error("Like toggle failed:", err);
-          showBanner(err?.message || "Like action failed.");
+          showToast(err?.message || "Like action failed.");
         } finally {
           e.currentTarget.disabled = false;
         }
@@ -1264,40 +1284,60 @@
       btn.addEventListener("click", () => {
         const card = btn.closest("[data-post-id]");
         if (!card) return;
-        const postId = card.dataset.postId;
-        const post = allPosts.find(p => p.id === postId);
+        const post = posts.find(p => p.id === card.dataset.postId);
         if (post?.image_url) window.open(post.image_url, "_blank", "noopener,noreferrer");
       });
     });
 
     document.querySelectorAll(".saveBtn").forEach(btn => {
-      btn.addEventListener("click", () => {
+      btn.addEventListener("click", async () => {
         const card = btn.closest("[data-post-id]");
         if (!card) return;
-        const postId = card.dataset.postId;
-        const post = allPosts.find(p => p.id === postId);
+        const post = posts.find(p => p.id === card.dataset.postId);
         if (!post?.image_url) return;
-        navigator.clipboard?.writeText(post.image_url).catch(() => {});
-        btn.textContent = "Saved";
-        setTimeout(() => { btn.textContent = "Save"; }, 1000);
+
+        try {
+          await navigator.clipboard.writeText(post.image_url);
+          btn.textContent = "Copied";
+          setTimeout(() => btn.textContent = "Copy", 900);
+        } catch {
+          showToast("Could not copy the link.");
+        }
       });
     });
   }
 
-  function updateSegments(){
-    const spans = [...document.querySelectorAll(".segment > span")];
+  function renderFeed() {
+    timeline = posts.map(post => ({ type: "post", data: post }));
+    renderSegments();
+
+    if (!timeline.length) {
+      ui.feed.innerHTML = "";
+      updateEmptyState();
+      return;
+    }
+
+    ui.feed.innerHTML = buildFeedHTML(posts);
+    attachHandlers();
+    updateEmptyState();
+    updateSegments();
+    scrollToIndex(0, false);
+  }
+
+  function updateSegments() {
+    const spans = [...document.querySelectorAll(".segment span")];
     spans.forEach((s, i) => {
       if (i < activeIndex) s.style.width = "100%";
       else if (i > activeIndex) s.style.width = "0%";
     });
   }
 
-  function scrollToIndex(index, smooth = true){
+  function scrollToIndex(index, smooth = true) {
     activeIndex = clamp(index, 0, Math.max(timeline.length - 1, 0));
     if (!timeline.length) return;
 
     isAutoScrolling = true;
-    feed.scrollTo({
+    ui.feed.scrollTo({
       left: activeIndex * window.innerWidth,
       behavior: smooth ? "smooth" : "auto"
     });
@@ -1306,219 +1346,224 @@
     setTimeout(() => { isAutoScrolling = false; }, 450);
   }
 
-  function tick(now){
-    if (!timeline.length) {
-      requestAnimationFrame(tick);
-      return;
-    }
-
-    const elapsed = now - progressStart;
-    const pct = clamp((elapsed / AUTOPLAY_MS) * 100, 0, 100);
-
-    const spans = [...document.querySelectorAll(".segment > span")];
-    if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
-
-    if (pct >= 100){
-      scrollToIndex((activeIndex + 1) % timeline.length, true);
-    }
-
-    requestAnimationFrame(tick);
-  }
-
-  function syncActiveFromScroll(){
+  function syncActiveFromScroll() {
     if (!timeline.length) return;
-    const idx = clamp(Math.round(feed.scrollLeft / window.innerWidth), 0, timeline.length - 1);
-    if (idx !== activeIndex && !isAutoScrolling){
+    const idx = clamp(Math.round(ui.feed.scrollLeft / window.innerWidth), 0, timeline.length - 1);
+    if (idx !== activeIndex && !isAutoScrolling) {
       activeIndex = idx;
       progressStart = performance.now();
       updateSegments();
     }
   }
 
-  async function ensureSession(){
-    if (!supabase) return null;
-    try{
-      const { data, error } = await supabase.auth.getSession();
-      if (error) return null;
-      return data?.session || null;
-    }catch{
-      return null;
+  function tick(now) {
+    if (!timeline.length) {
+      requestAnimationFrame(tick);
+      return;
     }
+    const elapsed = now - progressStart;
+    const pct = clamp((elapsed / CONFIG.AUTOPLAY_MS) * 100, 0, 100);
+
+    const spans = [...document.querySelectorAll(".segment span")];
+    if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
+
+    if (pct >= 100) {
+      scrollToIndex((activeIndex + 1) % timeline.length, true);
+    }
+
+    requestAnimationFrame(tick);
   }
 
-  async function loadCurrentProfile(){
-    if (!supabase || !currentUser) {
-      currentProfile = null;
-      setAuthUI();
-      return null;
+  async function initSupabase() {
+    if (!window.supabase || typeof window.supabase.createClient !== "function") {
+      throw new Error("Supabase library failed to load.");
     }
+    if (!CONFIG.SUPABASE_URL || !CONFIG.SUPABASE_ANON_KEY || CONFIG.SUPABASE_ANON_KEY === "PASTE_YOUR_ANON_KEY_HERE") {
+      throw new Error("Set SUPABASE_ANON_KEY before using the app.");
+    }
+    supabase = window.supabase.createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
+  }
 
-    try{
-      const { data: userData, error: userError } = await supabase.auth.getUser();
-      if (userError) throw userError;
-      currentUser = userData?.user || currentUser;
+  async function getSessionSafe() {
+    if (!supabase) return null;
+    const res = await withTimeout(supabase.auth.getSession(), CONFIG.FETCH_TIMEOUT_MS);
+    return res?.data?.session || null;
+  }
 
-      const { data: profile, error } = await supabase
+  async function loadCurrentProfile() {
+    if (!supabase || !currentUser) return null;
+
+    const { data, error } = await withTimeout(
+      supabase
         .from("profiles")
         .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
         .eq("id", currentUser.id)
-        .maybeSingle();
+        .maybeSingle()
+    );
 
-      if (error) {
-        currentProfile = null;
-        setAuthUI();
-        return null;
-      }
-
-      currentProfile = profile || null;
-      setAuthUI();
-      return profile;
-    }catch{
+    if (error) {
+      console.warn("Profile load failed:", error);
       currentProfile = null;
-      setAuthUI();
+      setHeaderFromSession();
       return null;
     }
+
+    currentProfile = data || null;
+    setHeaderFromSession();
+    return currentProfile;
   }
 
-  async function fetchAllPosts(){
+  async function fetchPublicPosts() {
     if (!supabase) return [];
-    try{
-      const { data, error } = await supabase
+
+    const { data, error } = await withTimeout(
+      supabase
         .from("posts")
         .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags")
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(CONFIG.MAX_POSTS)
+    );
 
-      if (error) return [];
-      return data || [];
-    }catch{
-      return [];
-    }
+    if (error) throw error;
+    return data || [];
   }
 
-  async function fetchPostsByProfiles(profileIds){
+  async function fetchPostsByProfiles(profileIds) {
     if (!supabase || !profileIds.length) return [];
-    try{
-      const { data, error } = await supabase
+
+    const { data, error } = await withTimeout(
+      supabase
         .from("posts")
         .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags")
         .in("user_id", profileIds)
         .order("created_at", { ascending: false })
-        .limit(50);
+        .limit(CONFIG.MAX_POSTS)
+    );
 
-      if (error) return [];
-      return data || [];
-    }catch{
-      return [];
+    if (error) return [];
+    return data || [];
+  }
+
+  async function loadProfilesForPosts(userIds) {
+    if (!supabase || !userIds.length) return new Map();
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase
+          .from("profiles")
+          .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
+          .in("id", userIds)
+      );
+
+      if (error) return new Map();
+      return new Map((data || []).map(p => [p.id, p]));
+    } catch {
+      return new Map();
     }
   }
 
-  async function loadPosts(query = "", preserveScroll = true){
+  async function loadLikesForPosts(postIds) {
+    if (!supabase || !postIds.length) return { counts: new Map(), likedByUser: new Set() };
+
+    try {
+      const { data, error } = await withTimeout(
+        supabase
+          .from("likes")
+          .select("post_id, user_id")
+          .in("post_id", postIds)
+      );
+
+      if (error) return { counts: new Map(), likedByUser: new Set() };
+
+      const counts = new Map();
+      const likedByUser = new Set();
+
+      for (const row of (data || [])) {
+        counts.set(row.post_id, (counts.get(row.post_id) || 0) + 1);
+        if (currentUser && row.user_id === currentUser.id) likedByUser.add(row.post_id);
+      }
+
+      return { counts, likedByUser };
+    } catch {
+      return { counts: new Map(), likedByUser: new Set() };
+    }
+  }
+
+  async function loadPosts(query = "", preserveScroll = true) {
     currentSearch = sanitizeQuery(query);
 
-    let posts = [];
+    try {
+      let rawPosts = [];
 
-    if (!supabase) {
-      allPosts = [];
-      renderFeed();
-      return;
-    }
-
-    try{
       if (!currentSearch) {
-        posts = await fetchAllPosts();
+        rawPosts = await fetchPublicPosts();
       } else {
-        const textPostsRes = await supabase
-          .from("posts")
-          .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags")
-          .or(`caption.ilike.%${currentSearch}%,song_title.ilike.%${currentSearch}%,username.ilike.%${currentSearch}%,tags.ilike.%${currentSearch}%`)
-          .order("created_at", { ascending: false })
-          .limit(50);
+        const textRes = await withTimeout(
+          supabase
+            .from("posts")
+            .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags")
+            .or(`caption.ilike.%${currentSearch}%,song_title.ilike.%${currentSearch}%,username.ilike.%${currentSearch}%,tags.ilike.%${currentSearch}%`)
+            .order("created_at", { ascending: false })
+            .limit(CONFIG.MAX_POSTS)
+        );
 
-        const textPosts = textPostsRes.error ? [] : (textPostsRes.data || []);
+        const textPosts = textRes?.error ? [] : (textRes?.data || []);
 
         let profileIds = [];
         try {
-          const profileHitsRes = await supabase
-            .from("profiles")
-            .select("id")
-            .or(`display_name.ilike.%${currentSearch}%,bio.ilike.%${currentSearch}%`)
-            .limit(50);
-
-          if (!profileHitsRes.error) {
-            profileIds = (profileHitsRes.data || []).map(p => p.id);
+          const profileHitsRes = await withTimeout(
+            supabase
+              .from("profiles")
+              .select("id")
+              .or(`display_name.ilike.%${currentSearch}%,bio.ilike.%${currentSearch}%`)
+              .limit(CONFIG.MAX_POSTS)
+          );
+          if (!profileHitsRes?.error) {
+            profileIds = (profileHitsRes?.data || []).map(p => p.id);
           }
         } catch {}
 
         const profilePosts = await fetchPostsByProfiles(profileIds);
-
         const merged = [...textPosts, ...profilePosts];
-        const deduped = new Map();
-        for (const post of merged) deduped.set(post.id, post);
-        posts = [...deduped.values()];
+        const dedup = new Map();
+        for (const post of merged) dedup.set(post.id, post);
+        rawPosts = [...dedup.values()];
       }
 
-      const postIds = posts.map(p => p.id);
-      const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
+      const userIds = [...new Set(rawPosts.map(p => p.user_id).filter(Boolean))];
+      const profileMap = await loadProfilesForPosts(userIds);
+      const { counts, likedByUser } = await loadLikesForPosts(rawPosts.map(p => p.id));
 
-      let profilesData = [];
-      if (userIds.length) {
-        try{
-          const { data, error } = await supabase
-            .from("profiles")
-            .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
-            .in("id", userIds);
-
-          if (!error) profilesData = data || [];
-        }catch{}
-      }
-
-      const profileMap = new Map((profilesData || []).map(p => [p.id, p]));
-
-      let likesData = [];
-      if (postIds.length) {
-        try{
-          const res = await supabase
-            .from("likes")
-            .select("post_id, user_id")
-            .in("post_id", postIds);
-
-          if (!res.error) likesData = res.data || [];
-        }catch{}
-      }
-
-      const likeCounts = new Map();
-      const likedByUser = new Set();
-
-      for (const row of (likesData || [])) {
-        likeCounts.set(row.post_id, (likeCounts.get(row.post_id) || 0) + 1);
-        if (currentUser && row.user_id === currentUser.id) likedByUser.add(row.post_id);
-      }
-
-      allPosts = posts.map((p, idx) => {
+      posts = rawPosts.map((p, idx) => {
         const [c1, c2] = getPalette(idx);
         return {
           ...p,
           c1,
           c2,
           profile: profileMap.get(p.user_id) || null,
-          likes: likeCounts.get(p.id) ?? Number(p.likes || 0),
+          like_count: counts.get(p.id) ?? Number(p.likes || 0),
           user_liked: likedByUser.has(p.id)
         };
       });
 
       renderFeed();
       if (!preserveScroll) scrollToIndex(0, false);
-    }catch(err){
+    } catch (err) {
       console.warn("Load posts failed:", err);
-      allPosts = [];
+      posts = [];
       renderFeed();
-      showBanner(err?.message || "Posts could not be loaded, but the app is still running.");
+      showToast(err?.message || "Posts could not be loaded, but the app is still usable.");
     }
   }
 
-  async function toggleLike(postId, liked){
-    if (!currentUser || !supabase) throw new Error("You need to be logged in.");
+  async function toggleLike(postId, liked) {
+    if (!currentUser || !supabase) throw new Error("You need to log in.");
 
     if (liked) {
       const { error } = await supabase
@@ -1537,184 +1582,110 @@
     }
   }
 
-  async function uploadMediaIfNeeded(file){
-    if (!file) return { url: null, type: null };
-    if (!currentUser || !supabase) throw new Error("You need to be logged in to upload media.");
+  async function uploadMedia(file) {
+    if (!currentUser || !supabase) throw new Error("You need to log in to upload.");
 
     const safeName = file.name.replaceAll(" ", "_");
     const path = `${currentUser.id}/${Date.now()}-${safeName}`;
 
-    const { error: uploadError } = await supabase
-      .storage
-      .from("shared")
-      .upload(path, file, {
-        cacheControl: "3600",
-        upsert: false
-      });
+    const { error } = await supabase.storage.from(CONFIG.BUCKET).upload(path, file, {
+      cacheControl: "3600",
+      upsert: false
+    });
 
-    if (uploadError) throw uploadError;
+    if (error) throw error;
 
-    const { data } = supabase.storage.from("shared").getPublicUrl(path);
-    return {
-      url: data.publicUrl,
-      type: file.type.startsWith("video/") ? "video" : "image"
-    };
+    const { data } = supabase.storage.from(CONFIG.BUCKET).getPublicUrl(path);
+    return data?.publicUrl || null;
   }
 
-  async function createPost(){
+  async function createPost() {
     if (!currentUser || !supabase) {
-      alert("You need to log in to publish a post.");
+      showToast("You need to log in to publish.");
       return;
     }
 
-    const displayName = uDisplayName.value.trim() || currentProfile?.display_name || currentUser.email || "User";
-    const caption = uCaption.value.trim();
-    const songTitle = uSongTitle.value.trim();
-    const songPreview = uSongPreview.value.trim();
-    const file = uFile.files?.[0] || null;
+    const displayName = ui.uDisplayName.value.trim() || currentProfile?.display_name || currentUser.email || "User";
+    const caption = ui.uCaption.value.trim();
+    const songTitle = ui.uSongTitle.value.trim();
+    const songPreview = ui.uSongPreview.value.trim();
+    const file = ui.uFile.files?.[0] || null;
 
     if (!displayName || !caption || !file) {
-      alert("Display name, caption, and an image or video are required.");
+      showToast("Display name, caption, and a file are required.");
       return;
     }
 
-    submitUploadBtn.disabled = true;
+    ui.submitUpload.disabled = true;
 
-    try{
-      const media = await uploadMediaIfNeeded(file);
+    try {
+      const mediaUrl = await uploadMedia(file);
 
-      const { error: postError } = await supabase
+      const { error } = await supabase
         .from("posts")
         .insert({
           user_id: currentUser.id,
-          image_url: media.url,
+          image_url: mediaUrl,
           caption,
-          song_preview: songPreview || null,
           song_title: songTitle || null,
+          song_preview: songPreview || null,
           likes: 0,
           username: normalizeUsername(displayName)
         });
 
-      if (postError) throw postError;
+      if (error) throw error;
 
       closeModal();
-      uCaption.value = "";
-      uSongTitle.value = "";
-      uSongPreview.value = "";
-      uFile.value = "";
-      resetFilePreview();
+      ui.uCaption.value = "";
+      ui.uSongTitle.value = "";
+      ui.uSongPreview.value = "";
+      ui.uFile.value = "";
+      resetPreviewMedia();
 
       await loadCurrentProfile();
       await loadPosts(currentSearch, false);
-    }catch(err){
-      console.error("Create post failed:", err);
-      showBanner(err?.message || "Publish failed.");
-    }finally{
-      submitUploadBtn.disabled = false;
+      showToast("Post published.");
+    } catch (err) {
+      showToast(err?.message || "Publish failed.");
+    } finally {
+      ui.submitUpload.disabled = false;
     }
   }
 
-  async function trackPresence(){
+  async function trackPresence() {
     if (!currentUser || !supabase) return;
-    try{
+    try {
       const { error } = await supabase
         .from("presence")
         .upsert({
           user_id: currentUser.id,
           last_seen: new Date().toISOString()
         }, { onConflict: "user_id" });
-
       if (error) console.warn("Presence update failed:", error);
-    }catch(e){
-      console.warn("Presence update failed:", e);
+    } catch (err) {
+      console.warn("Presence update failed:", err);
     }
   }
 
-  async function boot(){
-    if (booted) return;
-    booted = true;
+  function initEvents() {
+    ui.openUpload.addEventListener("click", openModal);
+    ui.closeUpload.addEventListener("click", closeModal);
+    ui.cancelUpload.addEventListener("click", closeModal);
 
-    const hardTimeout = setTimeout(() => {
-      showApp();
-      showErrorState("Loading timeout", "The app started in fallback mode.");
-    }, 4000);
-
-    try{
-      if (window.supabase && typeof window.supabase.createClient === "function") {
-        const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-        supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-          auth: {
-            persistSession: true,
-            autoRefreshToken: true,
-            detectSessionInUrl: true
-          }
-        });
-      } else {
-        supabase = null;
-        showBanner("Supabase library not available. Starting in offline mode.");
-      }
-
-      const session = await ensureSession();
-      if (session?.user) {
-        currentUser = session.user;
-        await loadCurrentProfile();
-      } else {
-        currentUser = null;
-        currentProfile = null;
-        setAuthUI();
-      }
-
-      await loadPosts("", false);
-      await trackPresence();
-      setInterval(() => { trackPresence().catch(() => {}); }, 60000);
-
-      showApp();
-      requestAnimationFrame(tick);
-    }catch(err){
-      console.error("Boot failed:", err);
-      showApp();
-      showErrorState("Loading failed", err?.message || "The app opened in fallback mode.");
-      allPosts = [];
-      renderFeed();
-      requestAnimationFrame(tick);
-    }finally{
-      clearTimeout(hardTimeout);
-      showApp();
-    }
-  }
-
-  function initSearch(){
-    searchInput.addEventListener("input", () => {
-      clearTimeout(searchTimer);
-      searchTimer = setTimeout(() => {
-        loadPosts(searchInput.value.trim(), false).catch(err => {
-          console.error("Search failed:", err);
-          showBanner(err?.message || "Search failed.");
-        });
-      }, 250);
-    });
-  }
-
-  function initUploadModal(){
-    openUploadBtn.addEventListener("click", openModal);
-    closeUploadBtn.addEventListener("click", closeModal);
-    cancelUploadBtn.addEventListener("click", closeModal);
-
-    uploadModal.addEventListener("click", (e) => {
-      if (e.target === uploadModal) closeModal();
+    ui.uploadModal.addEventListener("click", (e) => {
+      if (e.target === ui.uploadModal) closeModal();
     });
 
-    submitUploadBtn.addEventListener("click", createPost);
+    ui.submitUpload.addEventListener("click", createPost);
 
-    uDisplayName.addEventListener("input", previewFromForm);
-    uCaption.addEventListener("input", previewFromForm);
-    uSongTitle.addEventListener("input", previewFromForm);
-    uSongPreview.addEventListener("input", previewFromForm);
+    ui.uDisplayName.addEventListener("input", previewFromForm);
+    ui.uCaption.addEventListener("input", previewFromForm);
+    ui.uSongTitle.addEventListener("input", previewFromForm);
+    ui.uSongPreview.addEventListener("input", previewFromForm);
 
-    uFile.addEventListener("change", () => {
-      const file = uFile.files?.[0];
-      resetFilePreview();
+    ui.uFile.addEventListener("change", () => {
+      const file = ui.uFile.files?.[0];
+      resetPreviewMedia();
 
       if (!file) {
         previewFromForm();
@@ -1722,30 +1693,34 @@
       }
 
       const url = URL.createObjectURL(file);
-
       if (file.type.startsWith("video/")) {
-        previewVideo.src = url;
-        previewVideo.style.display = "block";
-        previewVideo.play().catch(() => {});
+        ui.previewVideo.src = url;
+        ui.previewVideo.style.display = "block";
+        ui.previewVideo.play().catch(() => {});
       } else {
-        previewImg.src = url;
-        previewImg.style.display = "block";
+        ui.previewImg.src = url;
+        ui.previewImg.style.display = "block";
       }
 
-      previewTitle.textContent = uDisplayName.value.trim() || file.name;
-      previewText.textContent = uCaption.value.trim() || "Your selected content will appear here.";
+      ui.previewTitle.textContent = ui.uDisplayName.value.trim() || file.name;
+      ui.previewText.textContent = ui.uCaption.value.trim() || "Your selected content will appear here.";
     });
-  }
 
-  function initFeedControls(){
-    feed.addEventListener("wheel", (e) => {
+    ui.searchInput.addEventListener("input", () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        loadPosts(ui.searchInput.value.trim(), false);
+      }, 250);
+    });
+
+    ui.feed.addEventListener("scroll", syncActiveFromScroll);
+
+    ui.feed.addEventListener("wheel", (e) => {
       if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
         e.preventDefault();
-        feed.scrollLeft += e.deltaY;
+        ui.feed.scrollLeft += e.deltaY;
       }
     }, { passive:false });
-
-    feed.addEventListener("scroll", syncActiveFromScroll);
 
     window.addEventListener("keydown", (e) => {
       if (e.key === "ArrowRight") scrollToIndex(activeIndex + 1, true);
@@ -1755,10 +1730,92 @@
     window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
   }
 
-  initSearch();
-  initUploadModal();
-  initFeedControls();
+  async function boot() {
+    if (booted) return;
+    booted = true;
+
+    bootFallbackTimer = setTimeout(() => {
+      showApp();
+      showToast("Starting in fallback mode...");
+    }, CONFIG.BOOT_TIMEOUT_MS);
+
+    try {
+      await initSupabase().catch(err => {
+        showToast(err?.message || "Supabase not available. App will still open.");
+        supabase = null;
+      });
+
+      if (supabase) {
+        const session = await getSessionSafe();
+        if (session?.user) {
+          currentUser = session.user;
+          await loadCurrentProfile().catch(() => {});
+        } else {
+          currentUser = null;
+          currentProfile = null;
+          setHeaderFromSession();
+        }
+      } else {
+        currentUser = null;
+        currentProfile = null;
+        setHeaderFromSession();
+      }
+
+      await loadPosts("", false);
+      await safeCall(() => trackPresence(), null);
+      setInterval(() => trackPresence().catch(() => {}), 60000);
+
+      showApp();
+      if (!tickStarted) {
+        tickStarted = true;
+        requestAnimationFrame(tick);
+      }
+    } catch (err) {
+      console.error("Boot failed:", err);
+      showApp();
+      ui.emptyState.querySelector("h2").textContent = "Fallback mode";
+      ui.emptyState.querySelector("p").textContent = err?.message || "The app started without data loading.";
+      ui.emptyState.classList.add("show");
+      if (!tickStarted) {
+        tickStarted = true;
+        requestAnimationFrame(tick);
+      }
+    } finally {
+      clearTimeout(bootFallbackTimer);
+      showApp();
+    }
+  }
+
+  window.addEventListener("error", (event) => {
+    console.error(event.error || event.message);
+    showToast(event?.error?.message || event.message || "Unexpected error.");
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    console.error(event.reason);
+    showToast(event.reason instanceof Error ? event.reason.message : String(event.reason || "Unhandled promise rejection"));
+  });
+
+  initEvents();
   boot();
+  requestAnimationFrame(function loop(now) {
+    if (!timeline.length) {
+      requestAnimationFrame(loop);
+      return;
+    }
+
+    const elapsed = now - progressStart;
+    const pct = clamp((elapsed / CONFIG.AUTOPLAY_MS) * 100, 0, 100);
+    const spans = [...document.querySelectorAll(".segment span")];
+    if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
+
+    if (pct >= 100 && timeline.length) {
+      scrollToIndex((activeIndex + 1) % timeline.length, true);
+    }
+
+    requestAnimationFrame(loop);
+  });
+})();
 </script>
 </body>
 </html>
