@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -289,6 +289,15 @@
     backdrop-filter:blur(16px);
     box-shadow:var(--shadow);
     padding:18px;
+    overflow:hidden;
+  }
+
+  .profile-accent{
+    height:6px;
+    width:100%;
+    border-radius:999px;
+    background:var(--accent, #fff);
+    margin:-18px -18px 16px;
   }
 
   .author-row{
@@ -318,7 +327,17 @@
     display:block;
   }
 
-  .author-meta{ min-width:0; }
+  .author-meta{
+    min-width:0;
+    flex:1 1 auto;
+  }
+
+  .author-line{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    flex-wrap:wrap;
+  }
 
   .author{
     font-size:16px;
@@ -326,10 +345,31 @@
     margin-bottom:4px;
   }
 
+  .verified{
+    width:16px;
+    height:16px;
+    border-radius:50%;
+    background:#fff;
+    color:#000;
+    display:grid;
+    place-items:center;
+    font-size:10px;
+    flex:0 0 auto;
+  }
+
   .handle{
     font-size:11px;
     color:var(--muted);
     letter-spacing:.8px;
+  }
+
+  .profile-stats{
+    font-family:system-ui, sans-serif;
+    font-size:11px;
+    color:#d8d8d8;
+    margin-top:4px;
+    font-weight:700;
+    opacity:.9;
   }
 
   .headline{
@@ -341,7 +381,7 @@
   }
 
   .caption{
-    margin:0 0 16px;
+    margin:0 0 14px;
     max-width:62ch;
     color:#e9e9e9;
     opacity:.95;
@@ -355,7 +395,7 @@
     display:flex;
     flex-wrap:wrap;
     gap:8px;
-    margin-bottom:16px;
+    margin-bottom:14px;
   }
 
   .chip{
@@ -365,6 +405,49 @@
     background:rgba(255,255,255,.06);
     color:#fff;
     font-size:11px;
+  }
+
+  .song-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:12px 14px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.05);
+    margin-bottom:14px;
+    font-family:system-ui, sans-serif;
+  }
+
+  .song-left{
+    min-width:0;
+  }
+
+  .song-title{
+    font-size:12px;
+    font-weight:800;
+    color:#fff;
+    line-height:1.3;
+  }
+
+  .song-preview{
+    font-size:11px;
+    color:var(--muted);
+    line-height:1.3;
+    margin-top:3px;
+  }
+
+  .song-btn{
+    border:none;
+    border-radius:999px;
+    background:#fff;
+    color:#000;
+    padding:10px 12px;
+    font-family:inherit;
+    font-size:11px;
+    cursor:pointer;
+    flex:0 0 auto;
   }
 
   .footerline{
@@ -493,41 +576,6 @@
     background:rgba(255,255,255,.2);
   }
 
-  .ad-card .media{
-    background:
-      radial-gradient(circle at 20% 20%, rgba(255,255,255,.14), transparent 20%),
-      radial-gradient(circle at 80% 18%, rgba(255,255,255,.08), transparent 18%),
-      linear-gradient(135deg, #0b0b0b, #262626);
-  }
-
-  .ad-card .headline{
-    font-size:clamp(26px, 4.4vw, 52px);
-  }
-
-  .ad-box{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    margin-bottom:14px;
-  }
-
-  .ad-label{
-    padding:8px 10px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.07);
-    color:#fff;
-    font-size:11px;
-  }
-
-  .ad-brand{
-    font-size:13px;
-    color:var(--muted);
-    font-family:system-ui, sans-serif;
-    font-weight:700;
-    letter-spacing:.4px;
-  }
-
   .fab{
     position:fixed;
     right:18px;
@@ -576,7 +624,7 @@
   .modal.open{ display:flex; }
 
   .sheet{
-    width:min(720px, 100%);
+    width:min(760px, 100%);
     border-radius:28px;
     border:1px solid rgba(255,255,255,.10);
     background:linear-gradient(180deg, rgba(12,12,12,.96), rgba(7,7,7,.98));
@@ -610,7 +658,7 @@
 
   .sheet-body{
     display:grid;
-    grid-template-columns:1.15fr .85fr;
+    grid-template-columns:1.05fr .95fr;
     gap:0;
   }
 
@@ -860,14 +908,14 @@
 
       <div class="search-area">
         <div class="searchbar">
-          <input id="searchInput" type="text" placeholder="Cerca post o profili..." />
+          <input id="searchInput" type="text" placeholder="Search posts or profiles..." />
         </div>
         <button class="uploadbtn" id="openUpload" title="Upload">+</button>
       </div>
 
-      <a class="profile-link" id="profileLink" href="./profile.html" title="Profilo">
+      <a class="profile-link" id="profileLink" href="./profile.html" title="Profile">
         <div class="profile-fallback" id="profileFallback">S</div>
-        <img id="profileImg" alt="Profilo" class="hidden" />
+        <img id="profileImg" alt="Profile" class="hidden" />
       </a>
     </div>
   </div>
@@ -877,8 +925,8 @@
   </div>
 
   <div class="empty-state" id="emptyState">
-    <h2>Nessun contenuto trovato</h2>
-    <p>Prova a cercare un altro contenuto o crea il primo post con Upload.</p>
+    <h2>No posts found</h2>
+    <p>Try another search or create the first post with Upload.</p>
   </div>
 
   <div class="feed" id="feed"></div>
@@ -887,19 +935,19 @@
 <div class="modal" id="uploadModal" aria-hidden="true">
   <div class="sheet">
     <div class="sheet-head">
-      <div class="sheet-title">New content</div>
+      <div class="sheet-title">New post</div>
       <button class="close" id="closeUpload">×</button>
     </div>
 
     <div class="sheet-body">
       <div class="form">
-        <input class="input" id="uName" type="text" placeholder="Username" />
-        <input class="input" id="uHandle" type="text" placeholder="@handle" />
-        <input class="input" id="uTitle" type="text" placeholder="Titolo post" />
-        <textarea class="textarea" id="uCaption" placeholder="Caption"></textarea>
-        <input class="file" id="uFile" type="file" accept="image/*,video/*" />
+        <input class="input" id="uDisplayName" type="text" placeholder="Display name" />
+        <input class="input" id="uCaption" type="text" placeholder="Caption" />
+        <input class="input" id="uSongTitle" type="text" placeholder="Song title" />
+        <input class="input" id="uSongPreview" type="text" placeholder="Song preview URL" />
+        <input class="file" id="uFile" type="file" accept="image/*" />
         <div class="helper">
-          Il file viene caricato nel bucket <code>shared</code> e il post viene salvato in <code>posts</code>.
+          Images are uploaded to the public bucket <code>shared</code> and the post is saved in <code>posts</code>.
         </div>
       </div>
 
@@ -910,7 +958,7 @@
 
           <div class="preview-overlay">
             <h3 class="preview-title" id="previewTitle">Preview</h3>
-            <p class="preview-text" id="previewText">Qui vedrai l’anteprima del contenuto che stai preparando.</p>
+            <p class="preview-text" id="previewText">Your selected content will appear here.</p>
           </div>
         </div>
       </div>
@@ -927,7 +975,7 @@
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
   const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+  const SUPABASE_ANON_KEY = "INCOLLA_QUI_IL_TUO_ANON_O_PUBLISHABLE_KEY";
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
@@ -953,10 +1001,10 @@
 
   const searchInput = document.getElementById("searchInput");
 
-  const uName = document.getElementById("uName");
-  const uHandle = document.getElementById("uHandle");
-  const uTitle = document.getElementById("uTitle");
+  const uDisplayName = document.getElementById("uDisplayName");
   const uCaption = document.getElementById("uCaption");
+  const uSongTitle = document.getElementById("uSongTitle");
+  const uSongPreview = document.getElementById("uSongPreview");
   const uFile = document.getElementById("uFile");
 
   const previewTitle = document.getElementById("previewTitle");
@@ -965,18 +1013,17 @@
   const previewVideo = document.getElementById("previewVideo");
 
   const AUTOPLAY_MS = 5200;
-  const AD_MS = 4200;
 
   let currentUser = null;
   let currentProfile = null;
   let allPosts = [];
-  let visiblePosts = [];
   let timeline = [];
   let activeIndex = 0;
   let progressStart = performance.now();
   let isAutoScrolling = false;
   let searchTimer = null;
   let rafId = null;
+  let currentSearch = "";
 
   function clamp(v, min, max){
     return Math.max(min, Math.min(max, v));
@@ -1010,6 +1057,15 @@
     return palettes[i % palettes.length];
   }
 
+  function normalizeUsername(name){
+    return String(name || "shared_user")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 24) || "shared_user";
+  }
+
   function openModal(){
     uploadModal.classList.add("open");
     uploadModal.setAttribute("aria-hidden", "false");
@@ -1031,34 +1087,19 @@
   }
 
   function previewFromForm(){
-    previewTitle.textContent = uTitle.value.trim() || "Preview";
-    previewText.textContent = uCaption.value.trim() || "Qui vedrai l’anteprima del contenuto che stai preparando.";
+    previewTitle.textContent = uDisplayName.value.trim() || "Preview";
+    previewText.textContent = uCaption.value.trim() || "Your selected content will appear here.";
+  }
+
+  function asArray(value){
+    if (Array.isArray(value)) return value;
+    if (!value) return [];
+    if (typeof value === "string") return [value];
+    return [];
   }
 
   function buildTimeline(posts){
-    const items = [];
-    posts.forEach((post, index) => {
-      items.push({ type:"post", data:post });
-      items.push({
-        type:"ad",
-        data:{
-          brand:["North","Pulse","Mono","Aurora"][index % 4],
-          title:[
-            "A better way to reach people.",
-            "Minimal tools. Maximum attention.",
-            "Built for fast-moving communities.",
-            "Design that keeps the scroll alive."
-          ][index % 4],
-          caption:[
-            "Promoted placement inside Shared, in line with the visual style of the app.",
-            "Ad cards are intentionally calm and clean so they fit the feed naturally.",
-            "Use this slot for sponsorships, brand drops, or native campaigns.",
-            "The ad system can later be replaced by real inventory from your backend."
-          ][index % 4]
-        }
-      });
-    });
-    return items;
+    return posts.map(post => ({ type: "post", data: post }));
   }
 
   function renderSegments(){
@@ -1076,7 +1117,7 @@
   }
 
   function renderFeed(){
-    timeline = buildTimeline(visiblePosts.length ? visiblePosts : allPosts);
+    timeline = buildTimeline(allPosts);
     renderSegments();
 
     if (!timeline.length) {
@@ -1086,117 +1127,88 @@
     }
 
     feed.innerHTML = timeline.map((item, idx) => {
-      if (item.type === "post") {
-        const post = item.data;
-        const profile = post.profile || {};
-        const authorName = profile.display_name || profile.username || "User";
-        const authorHandle = profile.username ? `@${profile.username}` : "@user";
-        const avatar = (authorName || "S").trim().charAt(0).toUpperCase();
-        const likesCount = post.like_count ?? 0;
-        const userLiked = !!post.user_liked;
-        const mediaHtml = post.media_url
-          ? (
-              post.media_type === "video"
-                ? `<video class="file" src="${escapeHtml(post.media_url)}" muted loop playsinline></video>`
-                : `<img class="file" src="${escapeHtml(post.media_url)}" alt="">`
-            )
-          : "";
+      const post = item.data;
+      const profile = post.profile || {};
+      const authorName = profile.display_name || post.username || "User";
+      const handle = post.username ? `@${post.username}` : `@${normalizeUsername(authorName)}`;
+      const initials = (authorName || "S").trim().charAt(0).toUpperCase();
+      const likeCount = Number(post.likes || 0);
+      const liked = !!post.user_liked;
+      const accent = profile.banner_color || "#ffffff";
+      const interests = asArray(profile.interests).slice(0, 3);
+      const verified = !!profile.verified;
 
-        return `
-          <section class="item post-card" data-index="${idx}" data-type="post" data-post-id="${post.id}">
-            <div class="media gradient" style="--c1:${post.color1 || '#111111'};--c2:${post.color2 || '#444444'};">
-              ${mediaHtml}
-            </div>
+      const avatarHtml = profile.avatar_url
+        ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">`
+        : escapeHtml(initials);
 
-            <div class="badge"><span class="dot"></span> Post</div>
-            <div class="sidehint"><span class="line"></span> swipe <span class="line"></span></div>
+      const mediaHtml = post.image_url
+        ? `<img class="file" src="${escapeHtml(post.image_url)}" alt="">`
+        : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--c1),var(--c2));"></div>`;
 
-            <div class="content">
-              <div class="card">
-                <div class="author-row">
-                  <div class="avatar">
-                    ${profile.avatar_url
-                      ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">`
-                      : escapeHtml(avatar)}
-                  </div>
-                  <div class="author-meta">
-                    <div class="author">${escapeHtml(authorName)}</div>
-                    <div class="handle">${escapeHtml(authorHandle)}</div>
-                  </div>
-                </div>
+      const songBlock = post.song_title || post.song_preview ? `
+        <div class="song-row">
+          <div class="song-left">
+            <div class="song-title">${escapeHtml(post.song_title || "Song")}</div>
+            <div class="song-preview">${escapeHtml(post.song_preview || "Preview unavailable")}</div>
+          </div>
+          ${post.song_preview ? `<button class="song-btn" data-song="${escapeHtml(post.song_preview)}">Play preview</button>` : ""}
+        </div>
+      ` : "";
 
-                <h2 class="headline">${escapeHtml(post.title || "")}</h2>
-                <p class="caption">${escapeHtml(post.caption || "")}</p>
-
-                <div class="meta">
-                  <span class="chip">#shared</span>
-                  <span class="chip">#post</span>
-                  <span class="chip">${userLiked ? "#liked" : "#fresh"}</span>
-                </div>
-
-                <div class="footerline">
-                  <div class="stats">
-                    <span>${likesCount} likes</span>
-                    <span>${post.view_count ?? 0} views</span>
-                    <span>${post.share_count ?? 0} shares</span>
-                  </div>
-                  <div class="cta">
-                    <button class="secondary saveBtn">Save</button>
-                    <button class="primary openBtn">Open</button>
-                  </div>
-                </div>
-              </div>
-
-              <div class="actions">
-                <button class="action likeBtn ${userLiked ? "liked" : ""}" aria-label="Like">${userLiked ? "❤" : "❤"}</button>
-                <button class="action" aria-label="Comment">✦</button>
-                <button class="action" aria-label="Share">↗</button>
-              </div>
-            </div>
-          </section>
-        `;
-      }
-
-      const ad = item.data;
       return `
-        <section class="item ad-card" data-index="${idx}" data-type="ad">
-          <div class="media"></div>
+        <section class="item post-card" data-index="${idx}" data-post-id="${post.id}">
+          <div class="media gradient" style="--c1:${post.c1};--c2:${post.c2};">
+            ${mediaHtml}
+          </div>
 
-          <div class="badge"><span class="dot"></span> Sponsored</div>
-          <div class="sidehint"><span class="line"></span> ad <span class="line"></span></div>
+          <div class="badge"><span class="dot"></span> Post</div>
+          <div class="sidehint"><span class="line"></span> swipe <span class="line"></span></div>
 
           <div class="content">
-            <div class="card">
-              <div class="ad-box">
-                <div class="ad-label">Sponsored</div>
-                <div class="ad-brand">${escapeHtml(ad.brand)}</div>
+            <div class="card" style="--accent:${escapeHtml(accent)};">
+              <div class="profile-accent"></div>
+
+              <div class="author-row">
+                <div class="avatar">
+                  ${avatarHtml}
+                </div>
+
+                <div class="author-meta">
+                  <div class="author-line">
+                    <div class="author">${escapeHtml(authorName)}</div>
+                    ${verified ? `<div class="verified" title="Verified">✓</div>` : ""}
+                  </div>
+                  <div class="handle">${escapeHtml(handle)}</div>
+                  <div class="profile-stats">
+                    ${profile.followers_count ?? 0} followers · ${profile.following_count ?? 0} following
+                  </div>
+                </div>
               </div>
 
-              <h2 class="headline">${escapeHtml(ad.title)}</h2>
-              <p class="caption">${escapeHtml(ad.caption)}</p>
+              <h2 class="headline">${escapeHtml(post.caption || "")}</h2>
+
+              ${songBlock}
 
               <div class="meta">
-                <span class="chip">#native</span>
-                <span class="chip">#promotion</span>
-                <span class="chip">#brand</span>
+                ${interests.map(i => `<span class="chip">${escapeHtml(i)}</span>`).join("")}
               </div>
 
               <div class="footerline">
                 <div class="stats">
-                  <span>Reach more users</span>
-                  <span>Premium placement</span>
-                  <span>Native integration</span>
+                  <span class="like-count">${likeCount} likes</span>
+                  <span>${new Date(post.created_at).toLocaleDateString()}</span>
                 </div>
                 <div class="cta">
-                  <button class="secondary">Details</button>
-                  <button class="primary">Open ad</button>
+                  <button class="secondary saveBtn">Save</button>
+                  <button class="primary openBtn">Open</button>
                 </div>
               </div>
             </div>
 
             <div class="actions">
-              <button class="action" aria-label="Info">i</button>
-              <button class="action" aria-label="Save">▣</button>
+              <button class="action likeBtn ${liked ? "liked" : ""}" aria-label="Like">${liked ? "❤" : "❤"}</button>
+              <button class="action" aria-label="Comment">✦</button>
               <button class="action" aria-label="Share">↗</button>
             </div>
           </div>
@@ -1223,7 +1235,7 @@
         e.currentTarget.disabled = true;
         try {
           await toggleLike(postId, liked);
-          await loadPosts(searchInput.value.trim(), false);
+          await loadPosts(currentSearch, false);
         } finally {
           e.currentTarget.disabled = false;
         }
@@ -1236,7 +1248,14 @@
         if (!card) return;
         const postId = card.dataset.postId;
         const post = allPosts.find(p => p.id === postId);
-        if (post?.media_url) window.open(post.media_url, "_blank", "noopener,noreferrer");
+        if (post?.image_url) window.open(post.image_url, "_blank", "noopener,noreferrer");
+      });
+    });
+
+    document.querySelectorAll(".song-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const url = btn.dataset.song;
+        if (url) window.open(url, "_blank", "noopener,noreferrer");
       });
     });
   }
@@ -1275,10 +1294,8 @@
       return;
     }
 
-    const current = timeline[activeIndex];
-    const duration = current?.type === "ad" ? AD_MS : AUTOPLAY_MS;
     const elapsed = now - progressStart;
-    const pct = clamp((elapsed / duration) * 100, 0, 100);
+    const pct = clamp((elapsed / AUTOPLAY_MS) * 100, 0, 100);
 
     const spans = [...document.querySelectorAll(".segment > span")];
     if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
@@ -1332,13 +1349,13 @@
 
     const { data: profile, error } = await supabase
       .from("profiles")
-      .select("id, username, display_name, avatar_url, bio")
+      .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
       .eq("id", currentUser.id)
       .maybeSingle();
 
     if (error) {
       console.error(error);
-      profileFallback.textContent = (currentUser.email || "S").trim().charAt(0).toUpperCase();
+      profileFallback.textContent = (currentUser.user_metadata?.display_name || currentUser.email || "S").trim().charAt(0).toUpperCase();
       profileImg.classList.add("hidden");
       profileFallback.classList.remove("hidden");
       return null;
@@ -1353,69 +1370,79 @@
       profileImg.classList.remove("hidden");
       profileFallback.classList.add("hidden");
     } else {
-      profileFallback.textContent = (profile?.display_name || profile?.username || currentUser.email || "S").trim().charAt(0).toUpperCase();
+      profileFallback.textContent = (profile?.display_name || currentUser.user_metadata?.display_name || currentUser.email || "S").trim().charAt(0).toUpperCase();
       profileImg.classList.add("hidden");
       profileFallback.classList.remove("hidden");
     }
 
-    uName.value = profile?.display_name || "";
-    uHandle.value = profile?.username ? `@${profile.username}` : "";
+    uDisplayName.value = profile?.display_name || currentUser.user_metadata?.display_name || "";
     return profile;
   }
 
-  async function fetchPosts(query){
-    let q = supabase
+  async function loadPosts(query = "", preserveScroll = true){
+    currentSearch = sanitizeQuery(query);
+
+    let postsQuery = supabase
       .from("posts")
       .select(`
         id,
         user_id,
-        title,
+        image_url,
         caption,
-        media_url,
-        media_type,
         created_at,
-        view_count,
-        share_count
+        song_preview,
+        song_title,
+        likes,
+        username
       `)
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (query) {
-      q = q.or(`title.ilike.%${query}%,caption.ilike.%${query}%`);
+    if (currentSearch) {
+      const { data: profileHits, error: profileHitsError } = await supabase
+        .from("profiles")
+        .select("id")
+        .or(`display_name.ilike.%${currentSearch}%,bio.ilike.%${currentSearch}%`)
+        .limit(50);
+
+      if (profileHitsError) console.error(profileHitsError);
+
+      const profileIds = (profileHits || []).map(p => p.id);
+
+      const parts = [
+        `caption.ilike.%${currentSearch}%`,
+        `song_title.ilike.%${currentSearch}%`,
+        `username.ilike.%${currentSearch}%`
+      ];
+
+      if (profileIds.length) {
+        parts.push(`user_id.in.(${profileIds.join(",")})`);
+      }
+
+      postsQuery = postsQuery.or(parts.join(","));
     }
 
-    const { data, error } = await q;
+    const { data: postsData, error } = await postsQuery;
     if (error) {
       console.error(error);
-      return [];
+      return;
     }
-    return data || [];
-  }
 
-  async function loadPosts(query = "", preserveScroll = true){
-    const q = sanitizeQuery(query);
-    const posts = await fetchPosts(q);
-
-    const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
+    const posts = postsData || [];
     const postIds = posts.map(p => p.id);
+    const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
 
-    let profileRows = [];
-    if (userIds.length) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, username, display_name, avatar_url")
-        .in("id", userIds);
+    const { data: profilesData, error: profilesError } = await supabase
+      .from("profiles")
+      .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
+      .in("id", userIds);
 
-      if (error) console.error(error);
-      profileRows = data || [];
-    }
+    if (profilesError) console.error(profilesError);
 
-    const profileMap = new Map(profileRows.map(p => [p.id, p]));
+    const profileMap = new Map((profilesData || []).map(p => [p.id, p]));
 
-    const likeCounts = new Map();
-    const userLikes = new Set();
-
-    if (postIds.length) {
+    let userLikes = new Set();
+    if (currentUser && postIds.length) {
       const { data: likesRows, error: likesError } = await supabase
         .from("likes")
         .select("post_id, user_id")
@@ -1423,11 +1450,22 @@
 
       if (likesError) console.error(likesError);
 
+      userLikes = new Set((likesRows || [])
+        .filter(row => row.user_id === currentUser.id)
+        .map(row => row.post_id));
+    }
+
+    const likeCounts = new Map();
+    if (postIds.length) {
+      const { data: likesRows, error: likesError } = await supabase
+        .from("likes")
+        .select("post_id")
+        .in("post_id", postIds);
+
+      if (likesError) console.error(likesError);
+
       for (const row of (likesRows || [])) {
         likeCounts.set(row.post_id, (likeCounts.get(row.post_id) || 0) + 1);
-        if (currentUser && row.user_id === currentUser.id) {
-          userLikes.add(row.post_id);
-        }
       }
     }
 
@@ -1435,15 +1473,14 @@
       const [c1, c2] = getRandomPalette(idx);
       return {
         ...p,
-        color1: c1,
-        color2: c2,
+        c1,
+        c2,
         profile: profileMap.get(p.user_id) || null,
-        like_count: likeCounts.get(p.id) || 0,
+        likes: likeCounts.get(p.id) ?? Number(p.likes || 0),
         user_liked: userLikes.has(p.id)
       };
     });
 
-    visiblePosts = allPosts;
     renderFeed();
 
     if (!preserveScroll) scrollToIndex(0, false);
@@ -1502,27 +1539,34 @@
   async function createPost(){
     if (!currentUser) return;
 
-    const displayName = uName.value.trim();
-    const handle = uHandle.value.trim().replace(/^@/, "");
-    const title = uTitle.value.trim();
+    const displayName = uDisplayName.value.trim();
     const caption = uCaption.value.trim();
+    const songTitle = uSongTitle.value.trim();
+    const songPreview = uSongPreview.value.trim();
     const file = uFile.files?.[0] || null;
 
-    if (!displayName || !handle || !title || !caption) {
-      alert("Compila username, handle, titolo e caption.");
+    if (!displayName || !caption || !file) {
+      alert("Display name, caption, and an image are required.");
       return;
     }
 
     submitUploadBtn.disabled = true;
 
     try {
+      const normalizedUsername = normalizeUsername(displayName);
+
       const { error: profileUpsertError } = await supabase
         .from("profiles")
         .upsert({
           id: currentUser.id,
-          username: handle,
           display_name: displayName,
-          avatar_url: currentProfile?.avatar_url || null
+          avatar_url: currentProfile?.avatar_url || null,
+          banner_color: currentProfile?.banner_color || null,
+          verified: currentProfile?.verified || false,
+          followers_count: currentProfile?.followers_count || 0,
+          following_count: currentProfile?.following_count || 0,
+          interests: currentProfile?.interests || [],
+          bio: currentProfile?.bio || null
         }, { onConflict: "id" });
 
       if (profileUpsertError) throw profileUpsertError;
@@ -1533,30 +1577,59 @@
         .from("posts")
         .insert({
           user_id: currentUser.id,
-          title,
+          image_url: media.url,
           caption,
-          media_url: media.url,
-          media_type: media.type
+          song_preview: songPreview || null,
+          song_title: songTitle || null,
+          likes: 0,
+          username: normalizedUsername
         });
 
       if (postError) throw postError;
 
       closeModal();
-      uName.value = "";
-      uHandle.value = "";
-      uTitle.value = "";
+      uDisplayName.value = displayName;
       uCaption.value = "";
+      uSongTitle.value = "";
+      uSongPreview.value = "";
       uFile.value = "";
       resetFilePreview();
 
       await loadCurrentProfile();
-      await loadPosts(searchInput.value.trim(), false);
+      await loadPosts(currentSearch, false);
     } catch (err) {
       console.error(err);
-      alert(err?.message || "Errore durante il publish.");
+      alert(err?.message || "Publish failed.");
     } finally {
       submitUploadBtn.disabled = false;
     }
+  }
+
+  async function trackPresence(){
+    if (!currentUser) return;
+
+    try {
+      await supabase.from("presence").upsert({
+        user_id: currentUser.id,
+        last_seen: new Date().toISOString()
+      }, { onConflict: "user_id" });
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  async function ensureReady(){
+    const session = await ensureSession();
+    if (!session) return;
+
+    await loadCurrentProfile();
+    await loadPosts("", false);
+    await trackPresence();
+
+    loading.classList.add("hidden");
+    app.classList.remove("hidden");
+
+    rafId = requestAnimationFrame(tick);
   }
 
   function initSearch(){
@@ -1579,10 +1652,10 @@
 
     submitUploadBtn.addEventListener("click", createPost);
 
-    uName.addEventListener("input", previewFromForm);
-    uHandle.addEventListener("input", previewFromForm);
-    uTitle.addEventListener("input", previewFromForm);
+    uDisplayName.addEventListener("input", previewFromForm);
     uCaption.addEventListener("input", previewFromForm);
+    uSongTitle.addEventListener("input", previewFromForm);
+    uSongPreview.addEventListener("input", previewFromForm);
 
     uFile.addEventListener("change", () => {
       const file = uFile.files?.[0];
@@ -1604,8 +1677,8 @@
         previewImg.style.display = "block";
       }
 
-      previewTitle.textContent = uTitle.value.trim() || file.name;
-      previewText.textContent = uCaption.value.trim() || "Anteprima del file selezionato.";
+      previewTitle.textContent = uDisplayName.value.trim() || file.name;
+      previewText.textContent = uCaption.value.trim() || "Your selected content will appear here.";
     });
   }
 
@@ -1625,20 +1698,13 @@
     });
 
     window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
+
+    window.addEventListener("beforeunload", async () => {
+      await trackPresence();
+    });
   }
 
-  async function ensureReady(){
-    const session = await ensureSession();
-    if (!session) return;
-
-    await loadCurrentProfile();
-    await loadPosts("", false);
-
-    loading.classList.add("hidden");
-    app.classList.remove("hidden");
-
-    rafId = requestAnimationFrame(tick);
-  }
+  openUploadBtn.addEventListener("click", openModal);
 
   initSearch();
   initUploadModal();
