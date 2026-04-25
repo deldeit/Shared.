@@ -867,7 +867,6 @@
   }
 </style>
 
-<!-- Supabase UMD build: evita problemi di import module -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 </head>
 
@@ -911,7 +910,7 @@
   <div class="sheet">
     <div class="sheet-head">
       <div class="sheet-title">New post</div>
-      <button class="close" id="closeUpload">×</button>
+      <button class="close" id="closeUpload" type="button">×</button>
     </div>
 
     <div class="sheet-body">
@@ -940,13 +939,18 @@
     </div>
 
     <div class="sheet-actions">
-      <button class="ghost" id="cancelUpload">Cancel</button>
-      <button class="save" id="submitUpload">Publish</button>
+      <button class="ghost" id="cancelUpload" type="button">Cancel</button>
+      <button class="save" id="submitUpload" type="button">Publish</button>
     </div>
   </div>
 </div>
 
 <script>
+  if (!window.supabase || typeof window.supabase.createClient !== "function") {
+    document.getElementById("loading").textContent = "Supabase library failed to load.";
+    throw new Error("Supabase library failed to load.");
+  }
+
   const { createClient } = window.supabase;
 
   const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
@@ -968,6 +972,7 @@
   const uploadModal = document.getElementById("uploadModal");
   const profileImg = document.getElementById("profileImg");
   const profileFallback = document.getElementById("profileFallback");
+  const profileLink = document.getElementById("profileLink");
 
   const openUploadBtn = document.getElementById("openUpload");
   const closeUploadBtn = document.getElementById("closeUpload");
@@ -999,29 +1004,6 @@
   let searchTimer = null;
   let currentSearch = "";
   let booted = false;
-
-  function hideLoader() {
-    loading.classList.add("hidden");
-    app.classList.remove("hidden");
-  }
-
-  function showBootError(err) {
-    emptyState.querySelector("h2").textContent = "Loading failed";
-    emptyState.querySelector("p").textContent = err?.message || "Check your Supabase configuration and table permissions.";
-    emptyState.classList.add("show");
-  }
-
-  window.addEventListener("error", (event) => {
-    console.error("Global error:", event.error || event.message);
-    hideLoader();
-    showBootError(event.error || new Error(event.message || "Unexpected error"));
-  });
-
-  window.addEventListener("unhandledrejection", (event) => {
-    console.error("Unhandled rejection:", event.reason);
-    hideLoader();
-    showBootError(event.reason instanceof Error ? event.reason : new Error(String(event.reason || "Unhandled promise rejection")));
-  });
 
   function clamp(v, min, max){
     return Math.max(min, Math.min(max, v));
@@ -1071,6 +1053,39 @@
     return [];
   }
 
+  function parseTags(value){
+    if (!value) return [];
+    if (Array.isArray(value)) return value.map(String).filter(Boolean);
+    if (typeof value === "string") {
+      return value.split(",").map(s => s.trim()).filter(Boolean);
+    }
+    return [];
+  }
+
+  function showApp(){
+    loading.classList.add("hidden");
+    app.classList.remove("hidden");
+  }
+
+  function showErrorState(title, message){
+    emptyState.querySelector("h2").textContent = title;
+    emptyState.querySelector("p").textContent = message;
+    emptyState.classList.add("show");
+  }
+
+  window.addEventListener("error", (event) => {
+    console.error("Global error:", event.error || event.message);
+    showApp();
+    showErrorState("Loading failed", event?.error?.message || event.message || "Unexpected error.");
+  });
+
+  window.addEventListener("unhandledrejection", (event) => {
+    console.error("Unhandled rejection:", event.reason);
+    showApp();
+    const msg = event.reason instanceof Error ? event.reason.message : String(event.reason || "Unhandled promise rejection");
+    showErrorState("Loading failed", msg);
+  });
+
   function openModal(){
     uploadModal.classList.add("open");
     uploadModal.setAttribute("aria-hidden", "false");
@@ -1114,6 +1129,27 @@
     return posts.map(post => ({ type: "post", data: post }));
   }
 
+  function setAuthUI(){
+    const avatarUrl = currentProfile?.avatar_url || currentUser?.user_metadata?.avatar_url || currentUser?.user_metadata?.picture || null;
+
+    if (avatarUrl) {
+      profileImg.src = avatarUrl;
+      profileImg.classList.remove("hidden");
+      profileFallback.classList.add("hidden");
+    } else {
+      const fallbackChar = (currentProfile?.display_name || currentUser?.user_metadata?.display_name || currentUser?.email || "S")
+        .trim()
+        .charAt(0)
+        .toUpperCase();
+      profileFallback.textContent = fallbackChar;
+      profileImg.classList.add("hidden");
+      profileFallback.classList.remove("hidden");
+    }
+
+    profileLink.href = currentUser ? "./profile.html" : "./login.html";
+    uDisplayName.value = currentProfile?.display_name || currentUser?.user_metadata?.display_name || "";
+  }
+
   function renderFeed(){
     timeline = buildTimeline(allPosts);
     renderSegments();
@@ -1134,6 +1170,7 @@
       const liked = !!post.user_liked;
       const accent = profile.banner_color || "#ffffff";
       const interests = asArray(profile.interests).slice(0, 3);
+      const tags = parseTags(post.tags).slice(0, 4);
       const verified = !!profile.verified;
 
       const avatarHtml = profile.avatar_url
@@ -1143,6 +1180,11 @@
       const mediaHtml = post.image_url
         ? `<img class="file" src="${escapeHtml(post.image_url)}" alt="">`
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--c1),var(--c2));"></div>`;
+
+      const chipHtml = [...interests, ...tags]
+        .slice(0, 5)
+        .map(i => `<span class="chip">${escapeHtml(i)}</span>`)
+        .join("");
 
       const songBlock = post.song_title || post.song_preview ? `
         <div class="song-row">
@@ -1178,7 +1220,7 @@
                   </div>
                   <div class="handle">${escapeHtml(handle)}</div>
                   <div class="profile-stats">
-                    ${profile.followers_count ?? 0} followers · ${profile.following_count ?? 0} following
+                    ${Number(profile.followers_count || 0)} followers · ${Number(profile.following_count || 0)} following
                   </div>
                 </div>
               </div>
@@ -1188,7 +1230,7 @@
               ${songBlock}
 
               <div class="meta">
-                ${interests.map(i => `<span class="chip">${escapeHtml(i)}</span>`).join("")}
+                ${chipHtml}
               </div>
 
               <div class="footerline">
@@ -1225,6 +1267,11 @@
         const card = e.currentTarget.closest("[data-post-id]");
         if (!card) return;
 
+        if (!currentUser) {
+          alert("You need to log in to like posts.");
+          return;
+        }
+
         const postId = card.dataset.postId;
         const liked = e.currentTarget.classList.contains("liked");
 
@@ -1248,6 +1295,19 @@
         const postId = card.dataset.postId;
         const post = allPosts.find(p => p.id === postId);
         if (post?.image_url) window.open(post.image_url, "_blank", "noopener,noreferrer");
+      });
+    });
+
+    document.querySelectorAll(".saveBtn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        const card = btn.closest("[data-post-id]");
+        if (!card) return;
+        const postId = card.dataset.postId;
+        const post = allPosts.find(p => p.id === postId);
+        if (!post?.image_url) return;
+        navigator.clipboard?.writeText(post.image_url).catch(() => {});
+        btn.textContent = "Saved";
+        setTimeout(() => { btn.textContent = "Save"; }, 1000);
       });
     });
   }
@@ -1314,7 +1374,11 @@
     if (userError) throw userError;
 
     currentUser = userData?.user || null;
-    if (!currentUser) return null;
+    if (!currentUser) {
+      currentProfile = null;
+      setAuthUI();
+      return null;
+    }
 
     const { data: profile, error } = await supabase
       .from("profiles")
@@ -1322,30 +1386,22 @@
       .eq("id", currentUser.id)
       .maybeSingle();
 
-    if (error) throw error;
-
-    currentProfile = profile || null;
-
-    const avatarUrl = profile?.avatar_url || currentUser.user_metadata?.avatar_url || currentUser.user_metadata?.picture || null;
-
-    if (avatarUrl) {
-      profileImg.src = avatarUrl;
-      profileImg.classList.remove("hidden");
-      profileFallback.classList.add("hidden");
-    } else {
-      profileFallback.textContent = (profile?.display_name || currentUser.user_metadata?.display_name || currentUser.email || "S").trim().charAt(0).toUpperCase();
-      profileImg.classList.add("hidden");
-      profileFallback.classList.remove("hidden");
+    if (error) {
+      console.warn("Profile load failed:", error);
+      currentProfile = null;
+      setAuthUI();
+      return null;
     }
 
-    uDisplayName.value = profile?.display_name || currentUser.user_metadata?.display_name || "";
+    currentProfile = profile || null;
+    setAuthUI();
     return profile;
   }
 
   async function fetchAllPosts(){
     const { data, error } = await supabase
       .from("posts")
-      .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username")
+      .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags")
       .order("created_at", { ascending: false })
       .limit(50);
 
@@ -1358,7 +1414,7 @@
 
     const { data, error } = await supabase
       .from("posts")
-      .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username")
+      .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags")
       .in("user_id", profileIds)
       .order("created_at", { ascending: false })
       .limit(50);
@@ -1377,22 +1433,28 @@
     } else {
       const textPostsRes = await supabase
         .from("posts")
-        .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username")
-        .or(`caption.ilike.%${currentSearch}%,song_title.ilike.%${currentSearch}%,username.ilike.%${currentSearch}%`)
+        .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username, tags")
+        .or(`caption.ilike.%${currentSearch}%,song_title.ilike.%${currentSearch}%,username.ilike.%${currentSearch}%,tags.ilike.%${currentSearch}%`)
         .order("created_at", { ascending: false })
         .limit(50);
 
       if (textPostsRes.error) throw textPostsRes.error;
 
-      const profileHitsRes = await supabase
-        .from("profiles")
-        .select("id")
-        .or(`display_name.ilike.%${currentSearch}%,bio.ilike.%${currentSearch}%`)
-        .limit(50);
+      let profileIds = [];
+      try {
+        const profileHitsRes = await supabase
+          .from("profiles")
+          .select("id")
+          .or(`display_name.ilike.%${currentSearch}%,bio.ilike.%${currentSearch}%`)
+          .limit(50);
 
-      if (profileHitsRes.error) throw profileHitsRes.error;
+        if (!profileHitsRes.error) {
+          profileIds = (profileHitsRes.data || []).map(p => p.id);
+        }
+      } catch (err) {
+        console.warn("Profile search failed:", err);
+      }
 
-      const profileIds = (profileHitsRes.data || []).map(p => p.id);
       const profilePosts = await fetchPostsByProfiles(profileIds);
 
       const merged = [...(textPostsRes.data || []), ...profilePosts];
@@ -1406,25 +1468,35 @@
 
     let profilesData = [];
     if (userIds.length) {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
-        .in("id", userIds);
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
+          .in("id", userIds);
 
-      if (error) throw error;
-      profilesData = data || [];
+        if (!error) profilesData = data || [];
+        else console.warn("Profiles query failed:", error);
+      } catch (err) {
+        console.warn("Profiles query failed:", err);
+      }
     }
 
     const profileMap = new Map((profilesData || []).map(p => [p.id, p]));
 
-    const { data: likesData, error: likesError } = postIds.length
-      ? await supabase
+    let likesData = [];
+    if (postIds.length) {
+      try {
+        const res = await supabase
           .from("likes")
           .select("post_id, user_id")
-          .in("post_id", postIds)
-      : { data: [], error: null };
+          .in("post_id", postIds);
 
-    if (likesError) throw likesError;
+        if (!res.error) likesData = res.data || [];
+        else console.warn("Likes query failed:", res.error);
+      } catch (err) {
+        console.warn("Likes query failed:", err);
+      }
+    }
 
     const likeCounts = new Map();
     const likedByUser = new Set();
@@ -1452,7 +1524,9 @@
   }
 
   async function toggleLike(postId, liked){
-    if (!currentUser) return;
+    if (!currentUser) {
+      throw new Error("You need to be logged in.");
+    }
 
     if (liked) {
       const { error } = await supabase
@@ -1476,6 +1550,10 @@
 
   async function uploadMediaIfNeeded(file){
     if (!file) return { url: null, type: null };
+
+    if (!currentUser) {
+      throw new Error("You need to be logged in to upload media.");
+    }
 
     const safeName = file.name.replaceAll(" ", "_");
     const path = `${currentUser.id}/${Date.now()}-${safeName}`;
@@ -1502,38 +1580,25 @@
   }
 
   async function createPost(){
-    if (!currentUser) return;
+    if (!currentUser) {
+      alert("You need to log in to publish a post.");
+      return;
+    }
 
-    const displayName = uDisplayName.value.trim();
+    const displayName = uDisplayName.value.trim() || currentProfile?.display_name || currentUser.email || "User";
     const caption = uCaption.value.trim();
     const songTitle = uSongTitle.value.trim();
     const songPreview = uSongPreview.value.trim();
     const file = uFile.files?.[0] || null;
 
     if (!displayName || !caption || !file) {
-      alert("Display name, caption, and an image are required.");
+      alert("Display name, caption, and an image or video are required.");
       return;
     }
 
     submitUploadBtn.disabled = true;
 
     try{
-      const { error: profileUpsertError } = await supabase
-        .from("profiles")
-        .upsert({
-          id: currentUser.id,
-          display_name: displayName,
-          avatar_url: currentProfile?.avatar_url || null,
-          banner_color: currentProfile?.banner_color || null,
-          verified: currentProfile?.verified || false,
-          followers_count: currentProfile?.followers_count || 0,
-          following_count: currentProfile?.following_count || 0,
-          interests: currentProfile?.interests || [],
-          bio: currentProfile?.bio || null
-        }, { onConflict: "id" });
-
-      if (profileUpsertError) throw profileUpsertError;
-
       const media = await uploadMediaIfNeeded(file);
 
       const { error: postError } = await supabase
@@ -1557,7 +1622,7 @@
       uFile.value = "";
       resetFilePreview();
 
-      await loadCurrentProfile();
+      await loadCurrentProfile().catch(() => {});
       await loadPosts(currentSearch, false);
     }catch(err){
       console.error("Create post failed:", err);
@@ -1590,31 +1655,35 @@
 
     const safetyTimeout = setTimeout(() => {
       console.warn("Boot timeout reached.");
-      hideLoader();
-      showBootError(new Error("Boot timeout: the page took too long to initialize."));
+      showApp();
+      showErrorState("Loading timeout", "The app took too long to initialize.");
     }, 12000);
 
     try{
-      const session = await ensureSession();
-      if (!session){
-        hideLoader();
-        window.location.replace("./login.html");
-        return;
+      const session = await ensureSession().catch(() => null);
+
+      if (session?.user) {
+        currentUser = session.user;
+        await loadCurrentProfile().catch(() => {});
+      } else {
+        currentUser = null;
+        currentProfile = null;
+        setAuthUI();
       }
 
-      currentUser = session.user;
-      await loadCurrentProfile();
       await loadPosts("", false);
-      await trackPresence();
+      await trackPresence().catch(() => {});
+      setInterval(() => { trackPresence().catch(() => {}); }, 60000);
 
-      setInterval(trackPresence, 60000);
+      showApp();
       requestAnimationFrame(tick);
     }catch(err){
       console.error("Boot failed:", err);
-      showBootError(err);
+      showApp();
+      showErrorState("Loading failed", err?.message || "Check your Supabase configuration and table permissions.");
     }finally{
       clearTimeout(safetyTimeout);
-      hideLoader();
+      showApp();
     }
   }
 
@@ -1624,8 +1693,7 @@
       searchTimer = setTimeout(() => {
         loadPosts(searchInput.value.trim(), false).catch(err => {
           console.error("Search failed:", err);
-          emptyState.querySelector("h2").textContent = "Search failed";
-          emptyState.querySelector("p").textContent = err?.message || "Check search permissions and column names.";
+          showErrorState("Search failed", err?.message || "Check search permissions and column names.");
           emptyState.classList.add("show");
         });
       }, 250);
@@ -1689,25 +1757,6 @@
     });
 
     window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
-  }
-
-  function tick(now){
-    if (!timeline.length) {
-      requestAnimationFrame(tick);
-      return;
-    }
-
-    const elapsed = now - progressStart;
-    const pct = clamp((elapsed / AUTOPLAY_MS) * 100, 0, 100);
-
-    const spans = [...document.querySelectorAll(".segment > span")];
-    if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
-
-    if (pct >= 100){
-      scrollToIndex((activeIndex + 1) % timeline.length, true);
-    }
-
-    requestAnimationFrame(tick);
   }
 
   initSearch();
