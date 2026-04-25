@@ -43,6 +43,8 @@
     color:#fff;
     font-family:system-ui, sans-serif;
     letter-spacing:.4px;
+    text-align:center;
+    padding:24px;
   }
 
   .hidden{ display:none !important; }
@@ -88,6 +90,7 @@
   .brand .logo{
     font-size:20px;
     letter-spacing:.4px;
+    line-height:1;
   }
 
   .search-area{
@@ -992,6 +995,7 @@
   let isAutoScrolling = false;
   let searchTimer = null;
   let currentSearch = "";
+  let booted = false;
 
   function clamp(v, min, max){
     return Math.max(min, Math.min(max, v));
@@ -1114,6 +1118,15 @@
         ? `<img class="file" src="${escapeHtml(post.image_url)}" alt="">`
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--c1),var(--c2));"></div>`;
 
+      const songBlock = post.song_title || post.song_preview ? `
+        <div class="song-row">
+          <div class="song-left">
+            <div class="song-title">${escapeHtml(post.song_title || "Song")}</div>
+            <div class="song-preview">${escapeHtml(post.song_preview || "Preview unavailable")}</div>
+          </div>
+        </div>
+      ` : "";
+
       return `
         <section class="item post-card" data-index="${idx}" data-post-id="${post.id}">
           <div class="media gradient" style="--c1:${post.c1};--c2:${post.c2};">
@@ -1146,14 +1159,7 @@
 
               <h2 class="headline">${escapeHtml(post.caption || "")}</h2>
 
-              ${post.song_title || post.song_preview ? `
-                <div class="song-row">
-                  <div class="song-left">
-                    <div class="song-title">${escapeHtml(post.song_title || "Song")}</div>
-                    <div class="song-preview">${escapeHtml(post.song_preview || "Preview unavailable")}</div>
-                  </div>
-                </div>
-              ` : ""}
+              ${songBlock}
 
               <div class="meta">
                 ${interests.map(i => `<span class="chip">${escapeHtml(i)}</span>`).join("")}
@@ -1269,21 +1275,19 @@
   }
 
   async function ensureSession(){
-    const { data, error } = await supabase.auth.getSession();
-    if (error) console.error(error);
-    if (!data?.session){
-      window.location.replace("./login.html");
+    try{
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      return data?.session || null;
+    }catch(err){
+      console.error("Session check failed:", err);
       return null;
     }
-    return data.session;
   }
 
   async function loadCurrentProfile(){
     const { data: userData, error: userError } = await supabase.auth.getUser();
-    if (userError) {
-      console.error(userError);
-      return null;
-    }
+    if (userError) throw userError;
 
     currentUser = userData?.user || null;
     if (!currentUser) return null;
@@ -1294,13 +1298,7 @@
       .eq("id", currentUser.id)
       .maybeSingle();
 
-    if (error) {
-      console.error(error);
-      profileFallback.textContent = (currentUser.user_metadata?.display_name || currentUser.email || "S").trim().charAt(0).toUpperCase();
-      profileImg.classList.add("hidden");
-      profileFallback.classList.remove("hidden");
-      return null;
-    }
+    if (error) throw error;
 
     currentProfile = profile || null;
 
@@ -1327,10 +1325,7 @@
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (error) {
-      console.error(error);
-      return [];
-    }
+    if (error) throw error;
     return data || [];
   }
 
@@ -1344,11 +1339,7 @@
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (error) {
-      console.error(error);
-      return [];
-    }
-
+    if (error) throw error;
     return data || [];
   }
 
@@ -1360,27 +1351,27 @@
     if (!currentSearch) {
       posts = await fetchAllPosts();
     } else {
-      const textPosts = await supabase
+      const textPostsRes = await supabase
         .from("posts")
         .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username")
         .or(`caption.ilike.%${currentSearch}%,song_title.ilike.%${currentSearch}%,username.ilike.%${currentSearch}%`)
         .order("created_at", { ascending: false })
         .limit(50);
 
-      if (textPosts.error) console.error(textPosts.error);
+      if (textPostsRes.error) throw textPostsRes.error;
 
-      const profileHits = await supabase
+      const profileHitsRes = await supabase
         .from("profiles")
         .select("id")
         .or(`display_name.ilike.%${currentSearch}%,bio.ilike.%${currentSearch}%`)
         .limit(50);
 
-      if (profileHits.error) console.error(profileHits.error);
+      if (profileHitsRes.error) throw profileHitsRes.error;
 
-      const profileIds = (profileHits.data || []).map(p => p.id);
+      const profileIds = (profileHitsRes.data || []).map(p => p.id);
       const profilePosts = await fetchPostsByProfiles(profileIds);
 
-      const merged = [...(textPosts.data || []), ...profilePosts];
+      const merged = [...(textPostsRes.data || []), ...profilePosts];
       const deduped = new Map();
       for (const post of merged) deduped.set(post.id, post);
       posts = [...deduped.values()];
@@ -1394,7 +1385,7 @@
       .select("id, created_at, display_name, avatar_url, banner_color, verified, followers_count, following_count, interests, bio")
       .in("id", userIds);
 
-    if (profilesError) console.error(profilesError);
+    if (profilesError) throw profilesError;
 
     const profileMap = new Map((profilesData || []).map(p => [p.id, p]));
 
@@ -1405,7 +1396,7 @@
           .in("post_id", postIds)
       : { data: [], error: null };
 
-    if (likesError) console.error(likesError);
+    if (likesError) throw likesError;
 
     const likeCounts = new Map();
     const likedByUser = new Set();
@@ -1498,9 +1489,7 @@
 
     submitUploadBtn.disabled = true;
 
-    try {
-      const normalizedUsername = normalizeUsername(displayName);
-
+    try{
       const { error: profileUpsertError } = await supabase
         .from("profiles")
         .upsert({
@@ -1528,7 +1517,7 @@
           song_preview: songPreview || null,
           song_title: songTitle || null,
           likes: 0,
-          username: normalizedUsername
+          username: normalizeUsername(displayName)
         });
 
       if (postError) throw postError;
@@ -1542,10 +1531,10 @@
 
       await loadCurrentProfile();
       await loadPosts(currentSearch, false);
-    } catch (err) {
-      console.error(err);
+    }catch(err){
+      console.error("Create post failed:", err);
       alert(err?.message || "Publish failed.");
-    } finally {
+    }finally{
       submitUploadBtn.disabled = false;
     }
   }
@@ -1553,36 +1542,59 @@
   async function trackPresence(){
     if (!currentUser) return;
 
-    try {
-      await supabase.from("presence").upsert({
-        user_id: currentUser.id,
-        last_seen: new Date().toISOString()
-      }, { onConflict: "user_id" });
-    } catch (e) {
-      console.error(e);
+    try{
+      const { error } = await supabase
+        .from("presence")
+        .upsert({
+          user_id: currentUser.id,
+          last_seen: new Date().toISOString()
+        }, { onConflict: "user_id" });
+
+      if (error) console.warn("Presence update failed:", error);
+    }catch(e){
+      console.warn("Presence update failed:", e);
     }
   }
 
-  async function ensureReady(){
-    const session = await ensureSession();
-    if (!session) return;
+  async function boot(){
+    if (booted) return;
+    booted = true;
 
-    await loadCurrentProfile();
-    await loadPosts("", false);
-    await trackPresence();
+    try{
+      const session = await ensureSession();
+      if (!session){
+        window.location.replace("./login.html");
+        return;
+      }
 
-    loading.classList.add("hidden");
-    app.classList.remove("hidden");
+      currentUser = session.user;
+      await loadCurrentProfile();
+      await loadPosts("", false);
+      await trackPresence();
 
-    requestAnimationFrame(tick);
-    setInterval(trackPresence, 60000);
+      setInterval(trackPresence, 60000);
+    }catch(err){
+      console.error("Boot failed:", err);
+      emptyState.querySelector("h2").textContent = "Loading failed";
+      emptyState.querySelector("p").textContent = err?.message || "Check your Supabase configuration and table permissions.";
+      emptyState.classList.add("show");
+    }finally{
+      loading.classList.add("hidden");
+      app.classList.remove("hidden");
+      requestAnimationFrame(tick);
+    }
   }
 
   function initSearch(){
     searchInput.addEventListener("input", () => {
       clearTimeout(searchTimer);
       searchTimer = setTimeout(() => {
-        loadPosts(searchInput.value.trim(), false);
+        loadPosts(searchInput.value.trim(), false).catch(err => {
+          console.error("Search failed:", err);
+          emptyState.querySelector("h2").textContent = "Search failed";
+          emptyState.querySelector("p").textContent = err?.message || "Check search permissions and column names.";
+          emptyState.classList.add("show");
+        });
       }, 250);
     });
   }
@@ -1665,12 +1677,10 @@
     requestAnimationFrame(tick);
   }
 
-  openUploadBtn.addEventListener("click", openModal);
-
-  ensureReady();
   initSearch();
   initUploadModal();
   initFeedControls();
+  boot();
 </script>
 </body>
 </html>
