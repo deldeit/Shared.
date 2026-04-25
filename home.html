@@ -11,7 +11,6 @@
   :root{
     --bg:#000;
     --panel:#0c0c0c;
-    --line:#232323;
     --text:#fff;
     --muted:#a0a0a0;
     --shadow:0 24px 80px rgba(0,0,0,.48);
@@ -150,6 +149,7 @@
     transition:.16s ease;
     flex:0 0 auto;
     font-size:18px;
+    font-family:inherit;
   }
 
   .uploadbtn:hover{ transform:translateY(-1px) scale(1.02); }
@@ -308,6 +308,14 @@
     background:#fff;
     color:#000;
     font-size:15px;
+    overflow:hidden;
+  }
+
+  .avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
   }
 
   .author-meta{ min-width:0; }
@@ -852,7 +860,7 @@
 
       <div class="search-area">
         <div class="searchbar">
-          <input id="searchInput" type="text" placeholder="Cerca post..." />
+          <input id="searchInput" type="text" placeholder="Cerca post o profili..." />
         </div>
         <button class="uploadbtn" id="openUpload" title="Upload">+</button>
       </div>
@@ -870,7 +878,7 @@
 
   <div class="empty-state" id="emptyState">
     <h2>Nessun contenuto trovato</h2>
-    <p>Prova a cercare un altro post o crea il primo contenuto con Upload.</p>
+    <p>Prova a cercare un altro contenuto o crea il primo post con Upload.</p>
   </div>
 
   <div class="feed" id="feed"></div>
@@ -891,7 +899,7 @@
         <textarea class="textarea" id="uCaption" placeholder="Caption"></textarea>
         <input class="file" id="uFile" type="file" accept="image/*,video/*" />
         <div class="helper">
-          Il file viene caricato su Supabase Storage e il post viene salvato in <code>posts</code>.
+          Il file viene caricato nel bucket <code>shared</code> e il post viene salvato in <code>posts</code>.
         </div>
       </div>
 
@@ -937,7 +945,6 @@
   const uploadModal = document.getElementById("uploadModal");
   const profileImg = document.getElementById("profileImg");
   const profileFallback = document.getElementById("profileFallback");
-  const profileLink = document.getElementById("profileLink");
 
   const openUploadBtn = document.getElementById("openUpload");
   const closeUploadBtn = document.getElementById("closeUpload");
@@ -1107,7 +1114,11 @@
             <div class="content">
               <div class="card">
                 <div class="author-row">
-                  <div class="avatar">${escapeHtml(avatar)}</div>
+                  <div class="avatar">
+                    ${profile.avatar_url
+                      ? `<img src="${escapeHtml(profile.avatar_url)}" alt="">`
+                      : escapeHtml(avatar)}
+                  </div>
                   <div class="author-meta">
                     <div class="author">${escapeHtml(authorName)}</div>
                     <div class="handle">${escapeHtml(authorHandle)}</div>
@@ -1406,7 +1417,7 @@
 
     if (postIds.length) {
       const { data: likesRows, error: likesError } = await supabase
-        .from("post_likes")
+        .from("likes")
         .select("post_id, user_id")
         .in("post_id", postIds);
 
@@ -1421,7 +1432,7 @@
     }
 
     allPosts = posts.map((p, idx) => {
-      const [c1, c2] = getPalette(idx);
+      const [c1, c2] = getRandomPalette(idx);
       return {
         ...p,
         color1: c1,
@@ -1443,7 +1454,7 @@
 
     if (liked) {
       const { error } = await supabase
-        .from("post_likes")
+        .from("likes")
         .delete()
         .eq("post_id", postId)
         .eq("user_id", currentUser.id);
@@ -1451,7 +1462,7 @@
       if (error) throw error;
     } else {
       const { error } = await supabase
-        .from("post_likes")
+        .from("likes")
         .insert({
           post_id: postId,
           user_id: currentUser.id
@@ -1469,7 +1480,7 @@
 
     const { error: uploadError } = await supabase
       .storage
-      .from("post-media")
+      .from("shared")
       .upload(path, file, {
         cacheControl: "3600",
         upsert: false
@@ -1479,7 +1490,7 @@
 
     const { data } = supabase
       .storage
-      .from("post-media")
+      .from("shared")
       .getPublicUrl(path);
 
     return {
