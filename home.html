@@ -101,8 +101,6 @@
 
   .searchbar{
     flex:1 1 auto;
-    display:flex;
-    gap:10px;
   }
 
   .searchbar input{
@@ -119,22 +117,6 @@
   }
 
   .searchbar input::placeholder{ color:#7b7b7b; }
-
-  .iconbtn{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,.08);
-    background:#0d0d0d;
-    color:#fff;
-    display:grid;
-    place-items:center;
-    cursor:pointer;
-    transition:.16s ease;
-    flex:0 0 auto;
-  }
-
-  .iconbtn:hover{ transform:translateY(-1px) scale(1.02); }
 
   .uploadbtn{
     width:42px;
@@ -436,18 +418,6 @@
     color:var(--muted);
     line-height:1.3;
     margin-top:3px;
-  }
-
-  .song-btn{
-    border:none;
-    border-radius:999px;
-    background:#fff;
-    color:#000;
-    padding:10px 12px;
-    font-family:inherit;
-    font-size:11px;
-    cursor:pointer;
-    flex:0 0 auto;
   }
 
   .footerline{
@@ -887,8 +857,7 @@
     }
 
     .profile-link,
-    .uploadbtn,
-    .iconbtn{
+    .uploadbtn{
       width:40px;
       height:40px;
     }
@@ -944,7 +913,7 @@
         <input class="input" id="uDisplayName" type="text" placeholder="Display name" />
         <input class="input" id="uCaption" type="text" placeholder="Caption" />
         <input class="input" id="uSongTitle" type="text" placeholder="Song title" />
-        <input class="input" id="uSongPreview" type="text" placeholder="Song preview URL" />
+        <input class="input" id="uSongPreview" type="text" placeholder="Song preview" />
         <input class="file" id="uFile" type="file" accept="image/*" />
         <div class="helper">
           Images are uploaded to the public bucket <code>shared</code> and the post is saved in <code>posts</code>.
@@ -975,7 +944,7 @@
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
   const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-  const SUPABASE_ANON_KEY = "INCOLLA_QUI_IL_TUO_ANON_O_PUBLISHABLE_KEY";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
 
   const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     auth: {
@@ -1022,7 +991,6 @@
   let progressStart = performance.now();
   let isAutoScrolling = false;
   let searchTimer = null;
-  let rafId = null;
   let currentSearch = "";
 
   function clamp(v, min, max){
@@ -1047,6 +1015,15 @@
       .trim();
   }
 
+  function normalizeUsername(name){
+    return String(name || "shared_user")
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "_")
+      .replace(/^_+|_+$/g, "")
+      .slice(0, 24) || "shared_user";
+  }
+
   function getPalette(i){
     const palettes = [
       ["#111111", "#4c4c4c"],
@@ -1057,13 +1034,11 @@
     return palettes[i % palettes.length];
   }
 
-  function normalizeUsername(name){
-    return String(name || "shared_user")
-      .trim()
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "")
-      .slice(0, 24) || "shared_user";
+  function asArray(value){
+    if (Array.isArray(value)) return value;
+    if (!value) return [];
+    if (typeof value === "string") return [value];
+    return [];
   }
 
   function openModal(){
@@ -1091,17 +1066,6 @@
     previewText.textContent = uCaption.value.trim() || "Your selected content will appear here.";
   }
 
-  function asArray(value){
-    if (Array.isArray(value)) return value;
-    if (!value) return [];
-    if (typeof value === "string") return [value];
-    return [];
-  }
-
-  function buildTimeline(posts){
-    return posts.map(post => ({ type: "post", data: post }));
-  }
-
   function renderSegments(){
     segmentsWrap.innerHTML = "";
     timeline.forEach(() => {
@@ -1114,6 +1078,10 @@
 
   function updateEmptyState(){
     emptyState.classList.toggle("show", timeline.length === 0);
+  }
+
+  function buildTimeline(posts){
+    return posts.map(post => ({ type: "post", data: post }));
   }
 
   function renderFeed(){
@@ -1145,16 +1113,6 @@
       const mediaHtml = post.image_url
         ? `<img class="file" src="${escapeHtml(post.image_url)}" alt="">`
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--c1),var(--c2));"></div>`;
-
-      const songBlock = post.song_title || post.song_preview ? `
-        <div class="song-row">
-          <div class="song-left">
-            <div class="song-title">${escapeHtml(post.song_title || "Song")}</div>
-            <div class="song-preview">${escapeHtml(post.song_preview || "Preview unavailable")}</div>
-          </div>
-          ${post.song_preview ? `<button class="song-btn" data-song="${escapeHtml(post.song_preview)}">Play preview</button>` : ""}
-        </div>
-      ` : "";
 
       return `
         <section class="item post-card" data-index="${idx}" data-post-id="${post.id}">
@@ -1188,7 +1146,14 @@
 
               <h2 class="headline">${escapeHtml(post.caption || "")}</h2>
 
-              ${songBlock}
+              ${post.song_title || post.song_preview ? `
+                <div class="song-row">
+                  <div class="song-left">
+                    <div class="song-title">${escapeHtml(post.song_title || "Song")}</div>
+                    <div class="song-preview">${escapeHtml(post.song_preview || "Preview unavailable")}</div>
+                  </div>
+                </div>
+              ` : ""}
 
               <div class="meta">
                 ${interests.map(i => `<span class="chip">${escapeHtml(i)}</span>`).join("")}
@@ -1218,7 +1183,6 @@
 
     attachHandlers();
     updateSegments();
-    bindMediaAutoplay();
     updateEmptyState();
     scrollToIndex(0, false);
   }
@@ -1251,19 +1215,6 @@
         if (post?.image_url) window.open(post.image_url, "_blank", "noopener,noreferrer");
       });
     });
-
-    document.querySelectorAll(".song-btn").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const url = btn.dataset.song;
-        if (url) window.open(url, "_blank", "noopener,noreferrer");
-      });
-    });
-  }
-
-  function bindMediaAutoplay(){
-    document.querySelectorAll("video.file").forEach(v => {
-      v.play().catch(() => {});
-    });
   }
 
   function updateSegments(){
@@ -1290,7 +1241,7 @@
 
   function tick(now){
     if (!timeline.length) {
-      rafId = requestAnimationFrame(tick);
+      requestAnimationFrame(tick);
       return;
     }
 
@@ -1304,7 +1255,7 @@
       scrollToIndex((activeIndex + 1) % timeline.length, true);
     }
 
-    rafId = requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
   }
 
   function syncActiveFromScroll(){
@@ -1315,16 +1266,6 @@
       progressStart = performance.now();
       updateSegments();
     }
-  }
-
-  function getRandomPalette(i){
-    const palettes = [
-      ["#111111", "#4c4c4c"],
-      ["#090909", "#262626"],
-      ["#131313", "#555555"],
-      ["#1a1a1a", "#373737"]
-    ];
-    return palettes[i % palettes.length];
   }
 
   async function ensureSession(){
@@ -1379,56 +1320,72 @@
     return profile;
   }
 
-  async function loadPosts(query = "", preserveScroll = true){
-    currentSearch = sanitizeQuery(query);
-
-    let postsQuery = supabase
+  async function fetchAllPosts(){
+    const { data, error } = await supabase
       .from("posts")
-      .select(`
-        id,
-        user_id,
-        image_url,
-        caption,
-        created_at,
-        song_preview,
-        song_title,
-        likes,
-        username
-      `)
+      .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username")
       .order("created_at", { ascending: false })
       .limit(50);
 
-    if (currentSearch) {
-      const { data: profileHits, error: profileHitsError } = await supabase
+    if (error) {
+      console.error(error);
+      return [];
+    }
+    return data || [];
+  }
+
+  async function fetchPostsByProfiles(profileIds){
+    if (!profileIds.length) return [];
+
+    const { data, error } = await supabase
+      .from("posts")
+      .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username")
+      .in("user_id", profileIds)
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    if (error) {
+      console.error(error);
+      return [];
+    }
+
+    return data || [];
+  }
+
+  async function loadPosts(query = "", preserveScroll = true){
+    currentSearch = sanitizeQuery(query);
+
+    let posts = [];
+
+    if (!currentSearch) {
+      posts = await fetchAllPosts();
+    } else {
+      const textPosts = await supabase
+        .from("posts")
+        .select("id, user_id, image_url, caption, created_at, song_preview, song_title, likes, username")
+        .or(`caption.ilike.%${currentSearch}%,song_title.ilike.%${currentSearch}%,username.ilike.%${currentSearch}%`)
+        .order("created_at", { ascending: false })
+        .limit(50);
+
+      if (textPosts.error) console.error(textPosts.error);
+
+      const profileHits = await supabase
         .from("profiles")
         .select("id")
         .or(`display_name.ilike.%${currentSearch}%,bio.ilike.%${currentSearch}%`)
         .limit(50);
 
-      if (profileHitsError) console.error(profileHitsError);
+      if (profileHits.error) console.error(profileHits.error);
 
-      const profileIds = (profileHits || []).map(p => p.id);
+      const profileIds = (profileHits.data || []).map(p => p.id);
+      const profilePosts = await fetchPostsByProfiles(profileIds);
 
-      const parts = [
-        `caption.ilike.%${currentSearch}%`,
-        `song_title.ilike.%${currentSearch}%`,
-        `username.ilike.%${currentSearch}%`
-      ];
-
-      if (profileIds.length) {
-        parts.push(`user_id.in.(${profileIds.join(",")})`);
-      }
-
-      postsQuery = postsQuery.or(parts.join(","));
+      const merged = [...(textPosts.data || []), ...profilePosts];
+      const deduped = new Map();
+      for (const post of merged) deduped.set(post.id, post);
+      posts = [...deduped.values()];
     }
 
-    const { data: postsData, error } = await postsQuery;
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    const posts = postsData || [];
     const postIds = posts.map(p => p.id);
     const userIds = [...new Set(posts.map(p => p.user_id).filter(Boolean))];
 
@@ -1441,43 +1398,32 @@
 
     const profileMap = new Map((profilesData || []).map(p => [p.id, p]));
 
-    let userLikes = new Set();
-    if (currentUser && postIds.length) {
-      const { data: likesRows, error: likesError } = await supabase
-        .from("likes")
-        .select("post_id, user_id")
-        .in("post_id", postIds);
+    const { data: likesData, error: likesError } = postIds.length
+      ? await supabase
+          .from("likes")
+          .select("post_id, user_id")
+          .in("post_id", postIds)
+      : { data: [], error: null };
 
-      if (likesError) console.error(likesError);
-
-      userLikes = new Set((likesRows || [])
-        .filter(row => row.user_id === currentUser.id)
-        .map(row => row.post_id));
-    }
+    if (likesError) console.error(likesError);
 
     const likeCounts = new Map();
-    if (postIds.length) {
-      const { data: likesRows, error: likesError } = await supabase
-        .from("likes")
-        .select("post_id")
-        .in("post_id", postIds);
+    const likedByUser = new Set();
 
-      if (likesError) console.error(likesError);
-
-      for (const row of (likesRows || [])) {
-        likeCounts.set(row.post_id, (likeCounts.get(row.post_id) || 0) + 1);
-      }
+    for (const row of (likesData || [])) {
+      likeCounts.set(row.post_id, (likeCounts.get(row.post_id) || 0) + 1);
+      if (currentUser && row.user_id === currentUser.id) likedByUser.add(row.post_id);
     }
 
     allPosts = posts.map((p, idx) => {
-      const [c1, c2] = getRandomPalette(idx);
+      const [c1, c2] = getPalette(idx);
       return {
         ...p,
         c1,
         c2,
         profile: profileMap.get(p.user_id) || null,
         likes: likeCounts.get(p.id) ?? Number(p.likes || 0),
-        user_liked: userLikes.has(p.id)
+        user_liked: likedByUser.has(p.id)
       };
     });
 
@@ -1588,7 +1534,6 @@
       if (postError) throw postError;
 
       closeModal();
-      uDisplayName.value = displayName;
       uCaption.value = "";
       uSongTitle.value = "";
       uSongPreview.value = "";
@@ -1629,7 +1574,8 @@
     loading.classList.add("hidden");
     app.classList.remove("hidden");
 
-    rafId = requestAnimationFrame(tick);
+    requestAnimationFrame(tick);
+    setInterval(trackPresence, 60000);
   }
 
   function initSearch(){
@@ -1698,18 +1644,33 @@
     });
 
     window.addEventListener("resize", () => scrollToIndex(activeIndex, false));
+  }
 
-    window.addEventListener("beforeunload", async () => {
-      await trackPresence();
-    });
+  function tick(now){
+    if (!timeline.length) {
+      requestAnimationFrame(tick);
+      return;
+    }
+
+    const elapsed = now - progressStart;
+    const pct = clamp((elapsed / AUTOPLAY_MS) * 100, 0, 100);
+
+    const spans = [...document.querySelectorAll(".segment > span")];
+    if (spans[activeIndex]) spans[activeIndex].style.width = pct + "%";
+
+    if (pct >= 100){
+      scrollToIndex((activeIndex + 1) % timeline.length, true);
+    }
+
+    requestAnimationFrame(tick);
   }
 
   openUploadBtn.addEventListener("click", openModal);
 
+  ensureReady();
   initSearch();
   initUploadModal();
   initFeedControls();
-  ensureReady();
 </script>
 </body>
 </html>
