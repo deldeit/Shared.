@@ -16,13 +16,11 @@
     --text:#fff;
     --muted:#a6a6a6;
     --line:rgba(255,255,255,.10);
-    --line-2:rgba(255,255,255,.06);
     --shadow:0 24px 80px rgba(0,0,0,.42);
     --radius:22px;
   }
 
   *{ box-sizing:border-box; }
-
   html,body{
     margin:0;
     width:100%;
@@ -143,9 +141,7 @@
     margin:0 10px;
   }
 
-  .searchbar{
-    flex:1 1 auto;
-  }
+  .searchbar{ flex:1 1 auto; }
 
   .searchbar input{
     width:100%;
@@ -213,9 +209,12 @@
   .feed{
     position:absolute;
     inset:0;
-    padding:96px 14px 24px;
+    padding:92px 14px 24px;
     overflow-y:auto;
     overflow-x:hidden;
+    scroll-snap-type:y mandatory;
+    scroll-behavior:smooth;
+    -webkit-overflow-scrolling:touch;
   }
 
   .feed-inner{
@@ -226,12 +225,16 @@
   }
 
   .post-card{
+    min-height:calc(100vh - 116px);
+    scroll-snap-align:start;
     border:1px solid var(--line);
     border-radius:24px;
     background:rgba(12,12,12,.84);
     backdrop-filter:blur(18px);
     box-shadow:var(--shadow);
     overflow:hidden;
+    display:flex;
+    flex-direction:column;
   }
 
   .post-header{
@@ -329,6 +332,9 @@
 
   .post-body{
     padding:14px 14px 16px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
   }
 
   .actions-row{
@@ -336,10 +342,16 @@
     align-items:center;
     justify-content:space-between;
     gap:12px;
-    margin-bottom:12px;
   }
 
-  .like-btn{
+  .like-controls{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+
+  .like-btn,
+  .likes-btn{
     display:inline-flex;
     align-items:center;
     gap:8px;
@@ -347,23 +359,36 @@
     border-radius:999px;
     padding:10px 12px;
     cursor:pointer;
-    background:#fff;
-    color:#000;
-    font-weight:800;
     transition:transform .16s ease, opacity .16s ease;
+    font-weight:800;
   }
 
-  .like-btn:hover{ transform:translateY(-1px); }
+  .like-btn{
+    background:#fff;
+    color:#000;
+  }
+
+  .likes-btn{
+    background:rgba(255,255,255,.06);
+    color:#fff;
+    border:1px solid var(--line);
+  }
+
+  .like-btn:hover,
+  .likes-btn:hover{
+    transform:translateY(-1px);
+  }
 
   .like-btn.liked{
     background:#fff;
     color:#000;
   }
 
-  .like-count{
+  .like-count,
+  .likes-btn span{
     font-size:12px;
-    color:#fff;
-    font-weight:700;
+    color:inherit;
+    font-weight:800;
   }
 
   .caption{
@@ -371,7 +396,7 @@
     line-height:1.6;
     color:#f1f1f1;
     font-weight:600;
-    margin:0 0 12px;
+    margin:0;
     white-space:pre-wrap;
   }
 
@@ -379,7 +404,6 @@
     display:flex;
     flex-wrap:wrap;
     gap:8px;
-    margin-bottom:12px;
   }
 
   .chip{
@@ -392,9 +416,7 @@
     font-weight:700;
   }
 
-  .audio-hidden{
-    display:none;
-  }
+  .audio-hidden{ display:none; }
 
   .empty-state{
     width:min(720px, calc(100vw - 28px));
@@ -605,6 +627,70 @@
     color:#000;
   }
 
+  .likes-list{
+    max-height:min(56vh, 520px);
+    overflow:auto;
+    display:grid;
+    gap:10px;
+    padding-right:4px;
+  }
+
+  .liker-row{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    border:1px solid var(--line);
+    border-radius:18px;
+    background:rgba(255,255,255,.04);
+  }
+
+  .liker-avatar{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    overflow:hidden;
+    background:#fff;
+    color:#000;
+    display:grid;
+    place-items:center;
+    flex:0 0 auto;
+    font-family:'Archivo Black', sans-serif;
+    font-size:14px;
+  }
+
+  .liker-avatar img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+
+  .liker-meta{
+    min-width:0;
+    flex:1 1 auto;
+  }
+
+  .liker-name{
+    margin:0;
+    font-family:'Archivo Black', sans-serif;
+    font-size:14px;
+    line-height:1.1;
+  }
+
+  .liker-handle{
+    margin-top:3px;
+    font-size:11px;
+    color:var(--muted);
+  }
+
+  .likes-empty{
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.5;
+    padding:10px 2px 0;
+  }
+
   @media (max-width: 860px){
     .topbar{ padding:10px 10px 0; }
     .topbar-inner{
@@ -626,18 +712,9 @@
     .post-avatar{ width:38px; height:38px; }
     .post-time{ display:none; }
 
-    .sheet-body{
-      grid-template-columns:1fr;
-    }
-
-    .preview{
-      padding:0 18px 18px;
-    }
-
-    .preview-card{
-      min-height:260px;
-    }
-
+    .sheet-body{ grid-template-columns:1fr; }
+    .preview{ padding:0 18px 18px; }
+    .preview-card{ min-height:260px; }
     .preview-title{ font-size:24px; }
     .profile-link,.uploadbtn{ width:40px; height:40px; }
   }
@@ -727,6 +804,19 @@
     </div>
   </div>
 
+  <div class="modal" id="likesModal" aria-hidden="true">
+    <div class="sheet" style="width:min(560px,100%);">
+      <div class="sheet-head">
+        <div class="sheet-title" id="likesModalTitle">Likes</div>
+        <button class="close" id="closeLikes" type="button">×</button>
+      </div>
+
+      <div style="padding:18px;">
+        <div class="likes-list" id="likesList"></div>
+      </div>
+    </div>
+  </div>
+
 <script>
 (() => {
   const CONFIG = {
@@ -752,6 +842,10 @@
     feedInner: el("feedInner"),
     emptyState: el("emptyState"),
     uploadModal: el("uploadModal"),
+    likesModal: el("likesModal"),
+    likesModalTitle: el("likesModalTitle"),
+    likesList: el("likesList"),
+    closeLikes: el("closeLikes"),
     profileLink: el("profileLink"),
     profileImg: el("profileImg"),
     profileFallback: el("profileFallback"),
@@ -782,6 +876,7 @@
   let audioObserver = null;
   let activeAudio = null;
   let audioUnlocked = false;
+  let likesModalPostId = null;
 
   const palettes = [
     ["#121212", "#4b4b4b"],
@@ -878,6 +973,18 @@
     ui.uploadModal.setAttribute("aria-hidden", "true");
   }
 
+  function openLikesModal() {
+    ui.likesModal.classList.add("open");
+    ui.likesModal.setAttribute("aria-hidden", "false");
+  }
+
+  function closeLikesModal() {
+    ui.likesModal.classList.remove("open");
+    ui.likesModal.setAttribute("aria-hidden", "true");
+    likesModalPostId = null;
+    ui.likesList.innerHTML = "";
+  }
+
   function previewFromForm() {
     ui.previewTitle.textContent = ui.uDisplayName.value.trim() || "Preview";
     ui.previewText.textContent = ui.uCaption.value.trim() || "Your selected content will appear here.";
@@ -939,8 +1046,9 @@
             : `<img class="post-media-file" src="${esc(post.image_url)}" alt="">`)
         : `<div style="width:100%;height:100%;background:linear-gradient(135deg,var(--c1),var(--c2));"></div>`;
 
-      const audioHtml = post.audio_url ? `
-        <audio class="audio-hidden post-audio" preload="auto" muted loop playsinline src="${esc(post.audio_url)}"></audio>
+      const audioSrc = post.audio_url || (post.song_preview && String(post.song_preview).startsWith("http") ? post.song_preview : null);
+      const audioHtml = audioSrc ? `
+        <audio class="audio-hidden post-audio" preload="auto" muted loop playsinline src="${esc(audioSrc)}"></audio>
       ` : "";
 
       return `
@@ -967,15 +1075,21 @@
 
           <div class="post-body">
             ${audioHtml}
+
             <div class="actions-row">
-              <button class="like-btn ${liked ? "liked" : ""}" type="button" data-like-btn="1">
-                ${liked ? "❤" : "♡"}
-                <span class="like-count">${likeCount}</span>
-              </button>
+              <div class="like-controls">
+                <button class="like-btn ${liked ? "liked" : ""}" type="button" data-like-btn="1">
+                  ${liked ? "❤" : "♡"}
+                  <span class="like-count">${likeCount}</span>
+                </button>
+
+                <button class="likes-btn" type="button" data-likes-list-btn="1">
+                  <span>${likeCount} likes</span>
+                </button>
+              </div>
             </div>
 
             ${post.caption ? `<p class="caption">${esc(post.caption)}</p>` : ""}
-
             ${post.song_title ? `<p class="caption" style="margin-top:-4px;opacity:.78;font-weight:700;">${esc(post.song_title)}</p>` : ""}
 
             ${chips.length ? `<div class="song-meta">${chips.map(c => `<span class="chip">${esc(c)}</span>`).join("")}</div>` : ""}
@@ -1013,6 +1127,16 @@
         } finally {
           e.currentTarget.disabled = false;
         }
+      });
+    });
+
+    ui.feedInner.querySelectorAll("[data-likes-list-btn='1']").forEach(btn => {
+      btn.addEventListener("click", async () => {
+        const card = btn.closest(".post-card");
+        if (!card) return;
+        const postId = card.dataset.postId;
+        const post = posts.find(p => p.id === postId);
+        await loadLikers(postId, post);
       });
     });
   }
@@ -1388,20 +1512,58 @@
     }
   }
 
-  async function trackPresence() {
-    if (!currentUser || !supabase) return;
+  async function loadLikers(postId, post) {
+    if (!supabase) {
+      showToast("Database unavailable.");
+      return;
+    }
+
+    likesModalPostId = postId;
+    ui.likesModalTitle.textContent = `Likes${post?.caption ? ` · ${post.caption.slice(0, 24)}` : ""}`;
+    ui.likesList.innerHTML = `<div class="likes-empty">Loading likes...</div>`;
+    openLikesModal();
 
     try {
-      const { error } = await supabase
-        .from("presence")
-        .upsert({
-          user_id: currentUser.id,
-          last_seen: new Date().toISOString()
-        }, { onConflict: "user_id" });
+      const { data: likesData, error } = await withTimeout(
+        supabase
+          .from("likes")
+          .select("user_id, created_at")
+          .eq("post_id", postId)
+          .order("created_at", { ascending: false })
+      );
 
-      if (error) console.warn("Presence update failed:", error);
+      if (error) throw error;
+
+      const rows = likesData || [];
+      if (!rows.length) {
+        ui.likesList.innerHTML = `<div class="likes-empty">No likes yet.</div>`;
+        return;
+      }
+
+      const userIds = [...new Set(rows.map(r => r.user_id).filter(Boolean))];
+      const profilesMap = await loadProfilesForPosts(userIds);
+
+      ui.likesList.innerHTML = rows.map(row => {
+        const p = profilesMap.get(row.user_id) || {};
+        const name = p.display_name || "User";
+        const handle = p.id ? `@${String(p.id).slice(0, 8)}` : "@user";
+        const avatar = p.avatar_url
+          ? `<img src="${esc(p.avatar_url)}" alt="">`
+          : esc((name || "U").trim().charAt(0).toUpperCase());
+
+        return `
+          <div class="liker-row">
+            <div class="liker-avatar">${avatar}</div>
+            <div class="liker-meta">
+              <p class="liker-name">${esc(name)}</p>
+              <div class="liker-handle">${esc(handle)}</div>
+            </div>
+            ${p.verified ? `<div class="verified" title="Verified">✓</div>` : ""}
+          </div>
+        `;
+      }).join("");
     } catch (err) {
-      console.warn("Presence update failed:", err);
+      ui.likesList.innerHTML = `<div class="likes-empty">${esc(err?.message || "Could not load likes.")}</div>`;
     }
   }
 
@@ -1409,6 +1571,11 @@
     ui.openUpload.addEventListener("click", openModal);
     ui.closeUpload.addEventListener("click", closeModal);
     ui.cancelUpload.addEventListener("click", closeModal);
+
+    ui.closeLikes.addEventListener("click", closeLikesModal);
+    ui.likesModal.addEventListener("click", (e) => {
+      if (e.target === ui.likesModal) closeLikesModal();
+    });
 
     ui.uploadModal.addEventListener("click", (e) => {
       if (e.target === ui.uploadModal) closeModal();
@@ -1506,6 +1673,23 @@
     } finally {
       clearTimeout(safety);
       showApp();
+    }
+  }
+
+  async function trackPresence() {
+    if (!currentUser || !supabase) return;
+
+    try {
+      const { error } = await supabase
+        .from("presence")
+        .upsert({
+          user_id: currentUser.id,
+          last_seen: new Date().toISOString()
+        }, { onConflict: "user_id" });
+
+      if (error) console.warn("Presence update failed:", error);
+    } catch (err) {
+      console.warn("Presence update failed:", err);
     }
   }
 
