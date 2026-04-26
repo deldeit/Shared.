@@ -64,11 +64,11 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 }
 
 /* glass surfaces */
-.topbar,.bottom-nav,.stories-wrap,.post-card,.mode-chip,.sheet,.toast-inner{
+.topbar,.bottom-nav,.stories-wrap,.post-card,.sheet,.toast-inner{
   backdrop-filter:blur(30px) saturate(180%);
   -webkit-backdrop-filter:blur(30px) saturate(180%);
 }
-.topbar::before,.bottom-nav::before,.stories-wrap::before,.post-card::before,.sheet::before,.mode-chip::before,.toast-inner::before{
+.topbar::before,.bottom-nav::before,.stories-wrap::before,.post-card::before,.sheet::before,.toast-inner::before{
   content:'';position:absolute;inset:0;
   background:
     linear-gradient(120deg, rgba(255,255,255,.16), transparent 18%),
@@ -101,7 +101,6 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 
 .main{flex:1 1 auto;margin-top:var(--topbar);overflow:hidden;display:flex;flex-direction:column;}
 .page{width:100%;height:100%;max-width:1180px;margin:0 auto;padding:12px 12px 0;display:flex;flex-direction:column;gap:10px;min-height:0;}
-
 .feed-col{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:10px;}
 
 .stories-wrap{
@@ -121,20 +120,6 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 .story-add-ring{border-style:dashed;}
 .story-add-ring .mi{font-size:24px;color:var(--text);opacity:.8;}
 
-.mode-row{display:flex;gap:8px;align-items:center;justify-content:space-between;padding:0 2px;}
-.mode-chip{position:relative;overflow:hidden;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.08);border-radius:999px;padding:8px 12px;font-size:10px;color:var(--text);letter-spacing:.8px;text-transform:uppercase;display:flex;align-items:center;gap:8px;box-shadow:var(--shadow);}
-.mode-chip .dot{width:6px;height:6px;border-radius:999px;background:#fff;display:inline-block;opacity:.9;}
-.mode-chip.subtle{opacity:.78;}
-.mode-back{display:none;align-items:center;gap:8px;}
-.mode-back.show{display:flex;}
-
-.empty{display:none;align-items:center;justify-content:center;text-align:center;padding:56px 24px;min-height:260px;}
-.empty.show{display:flex;}
-.empty .mi{font-size:52px;color:var(--muted);margin-bottom:12px;}
-.empty h3{font-size:18px;margin-bottom:6px;}
-.empty p{font-size:12px;color:var(--muted);}
-
-/* VERTICAL SNAP FEED */
 .feed-shell{flex:1 1 auto;min-height:0;position:relative;}
 .feed-track{
   height:100%;
@@ -147,7 +132,7 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 .feed-track::-webkit-scrollbar{display:none;}
 .post-card{
   position:relative;
-  height:calc(100vh - var(--topbar) - 12px - 12px - 10px - 10px - 74px); /* viewport minus chrome */
+  height:calc(100vh - var(--topbar) - 12px - 12px - 10px - 10px - 74px);
   min-height:560px;
   width:100%;
   scroll-snap-align:start;
@@ -175,7 +160,6 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 .ph-sub{font-size:10px;color:#cfcfcf;margin-top:2px;display:flex;align-items:center;gap:4px;opacity:.85;}
 .ph-more{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.06);transition:background .14s,transform .14s;}
 .ph-more:hover{background:rgba(255,255,255,.1);} .ph-more:active{transform:scale(.92);} .ph-more .mi{font-size:18px;color:#fff;}
-
 .post-media{position:absolute;inset:0;background:rgba(255,255,255,.03);overflow:hidden;}
 .post-media img,.post-media video{width:100%;height:100%;object-fit:cover;}
 .media-bg{width:100%;height:100%;background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.2), transparent 18%), radial-gradient(circle at 70% 80%, rgba(255,255,255,.12), transparent 22%), linear-gradient(135deg, var(--c1), var(--c2));filter:grayscale(1);}
@@ -183,7 +167,6 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 .like-flash .mi{font-size:88px;color:#fff;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;text-shadow:0 8px 30px rgba(0,0,0,.55);}
 .like-flash.pop{animation:lflash .55s ease both;}
 @keyframes lflash{0%{opacity:0;transform:scale(.4);}30%{opacity:1;transform:scale(1.25);}60%{opacity:.9;transform:scale(1);}100%{opacity:0;}}
-
 .post-overlay{
   position:absolute;left:0;right:0;bottom:0;z-index:3;
   padding:18px 14px 14px;
@@ -212,30 +195,7 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 .cmt-post{font-size:12px;color:#fff;opacity:0;transition:opacity .14s;}
 .cmt-post.vis{opacity:1;}
 
-/* HORIZONTAL PROFILE MODE */
-.profile-shell{display:none;flex:1 1 auto;min-height:0;position:relative;}
-.profile-shell.show{display:block;}
-.profile-track{
-  height:100%;
-  overflow-x:auto;overflow-y:hidden;
-  display:flex;gap:14px;
-  scroll-snap-type:x mandatory;
-  scroll-behavior:smooth;
-  scrollbar-width:none;
-  padding:4px 4px 14px;
-}
-.profile-track::-webkit-scrollbar{display:none;}
-.profile-track .post-card{
-  flex:0 0 min(92vw, 700px);
-  scroll-snap-align:center;
-  height:calc(100vh - var(--topbar) - 12px - 12px - 10px - 10px - 74px);
-}
-
-.bottom-nav{
-  display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--bottombar);
-  background:rgba(255,255,255,.055);border-top:1px solid rgba(255,255,255,.09);box-shadow:0 -10px 40px rgba(0,0,0,.45);
-  align-items:center;justify-content:space-around;padding:0 4px;overflow:hidden;
-}
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:100;height:var(--bottombar);background:rgba(255,255,255,.055);border-top:1px solid rgba(255,255,255,.09);box-shadow:0 -10px 40px rgba(0,0,0,.45);align-items:center;justify-content:space-around;padding:0 4px;overflow:hidden;}
 .bottom-nav::before{background:linear-gradient(25deg, rgba(255,255,255,.12), transparent 20%), radial-gradient(circle at 50% 100%, rgba(255,255,255,.06), transparent 30%);}
 .bn{flex:1;height:100%;display:flex;align-items:center;justify-content:center;border-radius:16px;opacity:.55;transition:opacity .14s, transform .13s, background .13s;position:relative;z-index:1;}
 .bn.active{opacity:1;background:rgba(255,255,255,.05);} .bn:active{transform:scale(.86);} .bn .mi{font-size:25px;}
@@ -276,23 +236,19 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 
 @media(max-width:900px){
   .page{padding:12px 8px 0;}
-  .post-card,.profile-track .post-card{height:calc(100vh - var(--topbar) - 12px - 12px - 10px - 10px - 82px);min-height:0;}
+  .post-card{height:calc(100vh - var(--topbar) - 12px - 12px - 10px - 10px - 82px);min-height:0;}
 }
 @media(max-width:640px){
   .bottom-nav{display:flex;}
   .topbar{padding:0 10px;}
   .topbar-right .tb-btn:nth-child(2),.topbar-right .tb-btn:nth-child(3){display:none;}
   .stories-wrap{border-radius:22px;}
-  .post-card,.profile-track .post-card{border-radius:22px;}
+  .post-card{border-radius:22px;}
 }
 </style>
 </head>
 <body>
-<div id="loading">
-  <div class="load-wordmark">Shared.</div>
-  <div class="load-track"><div class="load-fill"></div></div>
-</div>
-
+<div id="loading"><div class="load-wordmark">Shared.</div><div class="load-track"><div class="load-fill"></div></div></div>
 <div class="toast" id="toast"><div class="toast-inner" id="toastTxt"></div></div>
 
 <div id="app" class="hidden">
@@ -314,19 +270,9 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
     <div class="page">
       <div class="feed-col">
         <div class="stories-wrap"><div class="stories-row" id="storiesRow"></div></div>
-
-        <div class="mode-row">
-          <div class="mode-chip" id="modeChip"><span class="dot"></span><span id="modeLabel">Vertical snap feed</span></div>
-          <div class="mode-chip subtle mode-back" id="backChip"><span class="mi" style="font-size:16px">arrow_back</span><span>Back to feed</span></div>
-        </div>
-
-        <div class="feed-shell" id="feedShell">
-          <div class="empty" id="emptyState"><div><span class="mi">photo_camera</span><h3>Nothing here yet</h3><p>Be first to share something.</p></div></div>
+        <div class="feed-shell">
           <div class="feed-track" id="feedTrack"></div>
-        </div>
-
-        <div class="profile-shell" id="profileShell">
-          <div class="profile-track" id="profileTrack"></div>
+          <div class="empty" id="emptyState"><div><span class="mi">photo_camera</span><h3>Nothing here yet</h3><p>Be first to share something.</p></div></div>
         </div>
       </div>
     </div>
@@ -377,9 +323,8 @@ body,button,input,textarea{font-family:var(--font);letter-spacing:-.01em;}
 const CFG={
   URL:'https://cnhaonawapuahzoctqav.supabase.co',
   KEY:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes',
-  BUCKET:'shared',MAX:80,TIMEOUT:9000,BOOT_FB:4000,PROFILE:'./profile.html'
+  BUCKET:'shared',MAX:80,TIMEOUT:9000,BOOT_FB:4000
 };
-
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 const slug=s=>String(s||'user').trim().toLowerCase().replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'').slice(0,24)||'user';
@@ -389,28 +334,17 @@ const tout=(p,ms=CFG.TIMEOUT)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=
 const ago=d=>{if(!d)return'';const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)return s+'S AGO';if(s<3600)return Math.floor(s/60)+'M AGO';if(s<86400)return Math.floor(s/3600)+'H AGO';if(s<604800)return Math.floor(s/86400)+'D AGO';return new Date(d).toLocaleDateString('en',{month:'short',day:'numeric'}).toUpperCase();};
 const PAL=[['#101010','#2a2a2a'],['#0b0b0b','#1d1d1d'],['#151515','#313131'],['#090909','#252525'],['#121212','#2b2b2b'],['#0f0f0f','#202020']];
 
-let sb=null,user=null,profile=null,posts=[],searchT=null,booted=false,activeAuthorId='';
-const ui={
-  loading:$('loading'),toast:$('toast'),toastTxt:$('toastTxt'),app:$('app'),
-  storiesRow:$('storiesRow'),feedTrack:$('feedTrack'),profileTrack:$('profileTrack'),
-  feedShell:$('feedShell'),profileShell:$('profileShell'),empty:$('emptyState'),
-  modeChip:$('modeChip'),modeLabel:$('modeLabel'),backChip:$('backChip'),
-  likesModal:$('likesModal'),likesTitle:$('likesTitle'),likesList:$('likesList'),
-  uploadModal:$('uploadModal'),closeUpload:$('closeUpload'),submitUpload:$('submitUpload'),
-  searchInput:$('searchInput'),uName:$('uName'),uCaption:$('uCaption'),uSongTitle:$('uSongTitle'),uAudioUrl:$('uAudioUrl'),uFile:$('uFile'),fileIcon:$('fileIcon'),fileLbl:$('fileLbl'),
-  tbAvatar:$('tbAvatar'),bnAvatar:$('bnAvatar'),btnUpload:$('btnUpload'),bnCreate:$('bnCreate'),mainScroll:$('mainScroll')
-};
+let sb=null,user=null,profile=null,posts=[],searchT=null,booted=false;
+const ui={loading:$('loading'),toast:$('toast'),toastTxt:$('toastTxt'),app:$('app'),storiesRow:$('storiesRow'),feedTrack:$('feedTrack'),empty:$('emptyState'),likesModal:$('likesModal'),likesTitle:$('likesTitle'),likesList:$('likesList'),uploadModal:$('uploadModal'),closeUpload:$('closeUpload'),submitUpload:$('submitUpload'),searchInput:$('searchInput'),uName:$('uName'),uCaption:$('uCaption'),uSongTitle:$('uSongTitle'),uAudioUrl:$('uAudioUrl'),uFile:$('uFile'),fileIcon:$('fileIcon'),fileLbl:$('fileLbl'),tbAvatar:$('tbAvatar'),bnAvatar:$('bnAvatar'),btnUpload:$('btnUpload'),bnCreate:$('bnCreate')};
 
 function toast(msg,ms=3500){ui.toastTxt.textContent=msg;ui.toast.classList.add('show');clearTimeout(toast._t);toast._t=setTimeout(()=>ui.toast.classList.remove('show'),ms);}
 function showApp(){ui.loading.classList.add('hidden');ui.app.classList.remove('hidden');}
-function isProfileMode(){return !!activeAuthorId;}
-function currentAuthor(){return posts.find(p=>p.user_id===activeAuthorId)||null;}
+function avatarHtml(name, url){return url?`<img src="${esc(url)}" alt="">`:(name||'S').trim()[0]?.toUpperCase()||'S';}
 
 function updateHeader(){
   const av=profile?.avatar_url||user?.user_metadata?.avatar_url||null;
   const name=profile?.display_name||user?.user_metadata?.display_name||user?.email||'shared_user';
-  const init=(name||'S').trim()[0].toUpperCase();
-  const avHtml=av?`<img src="${esc(av)}" alt="">`:`${init}`;
+  const avHtml=avatarHtml(name,av);
   [ui.tbAvatar,ui.bnAvatar].forEach(el=>{if(el)el.innerHTML=avHtml;});
   ui.uName.value=profile?.display_name||'';
 }
@@ -419,75 +353,42 @@ function renderStories(list){
   const seen=new Set();const users=[];
   for(const p of list){if(!p.user_id||seen.has(p.user_id))continue;seen.add(p.user_id);users.push(p);}
   const meName=profile?.display_name||user?.user_metadata?.display_name||user?.email||'You';
-  const meInit=(meName||'Y')[0].toUpperCase();
   const meAv=profile?.avatar_url||user?.user_metadata?.avatar_url||null;
-  const meAvHtml=meAv?`<img src="${esc(meAv)}" alt="">`:meInit;
   ui.storiesRow.innerHTML=[
-    `<div class="story-item ${!activeAuthorId?'active':''}" data-filter-all>
-      <div class="story-add-ring"><span class="mi">apps</span></div><div class="story-name">All</div>
-    </div>`,
-    `<div class="story-item ${activeAuthorId===user?.id?'active':''}" data-user-filter="${esc(user?.id||'')}">
-      <div class="story-ring"><div class="story-inner">${meAvHtml}</div></div><div class="story-name">Me</div>
-    </div>`,
+    `<div class="story-item" data-story-filter="all"><div class="story-add-ring"><span class="mi">apps</span></div><div class="story-name">All</div></div>`,
+    `<div class="story-item" data-story-filter="me"><div class="story-ring"><div class="story-inner">${avatarHtml(meName,meAv)}</div></div><div class="story-name">Me</div></div>`,
     ...users.slice(0,14).map(p=>{
       const pr=p.profile||{};const name=pr.display_name||p.username||'User';
-      const init=(name||'U')[0].toUpperCase();
-      const avHtml=pr.avatar_url?`<img src="${esc(pr.avatar_url)}" alt="">`:init;
-      const active=activeAuthorId===p.user_id?'active':'';
-      return `<div class="story-item ${active}" data-user-filter="${esc(p.user_id)}"><div class="story-ring"><div class="story-inner">${avHtml}</div></div><div class="story-name">${esc(name)}</div></div>`;
+      return `<div class="story-item" data-story-filter="${esc(p.user_id||'')}"><div class="story-ring"><div class="story-inner">${avatarHtml(name,pr.avatar_url)}</div></div><div class="story-name">${esc(name)}</div></div>`;
     })
   ].join('');
-}
-
-function setModeUI(){
-  if(isProfileMode()){
-    const p=currentAuthor();
-    const name=p?.profile?.display_name||p?.username||'Profile';
-    ui.modeLabel.textContent=`Profile view · ${name}`;
-    ui.backChip.classList.add('show');
-  }else{
-    ui.modeLabel.textContent='Vertical snap feed';
-    ui.backChip.classList.remove('show');
-  }
 }
 
 function filteredPosts(){
   const q=ui.searchInput.value.trim().toLowerCase();
   return posts.filter(p=>{
-    if(activeAuthorId && p.user_id!==activeAuthorId)return false;
-    if(!q)return true;
-    const name=(p.profile?.display_name||p.username||'').toLowerCase();
-    const cap=(p.caption||'').toLowerCase();
-    const song=(p.song_title||'').toLowerCase();
-    const tags=String(p.tags||'').toLowerCase();
-    return [name,cap,song,tags].some(v=>v.includes(q));
+    if(q){
+      const name=(p.profile?.display_name||p.username||'').toLowerCase();
+      const cap=(p.caption||'').toLowerCase();
+      const song=(p.song_title||'').toLowerCase();
+      const tags=String(p.tags||'').toLowerCase();
+      if(![name,cap,song,tags].some(v=>v.includes(q)))return false;
+    }
+    return true;
   });
 }
 
 function renderFeed(){
   const list=filteredPosts();
-  setModeUI();
   ui.empty.classList.toggle('show',list.length===0);
-  if(isProfileMode()){
-    ui.feedShell.classList.add('hidden');
-    ui.profileShell.classList.add('show');
-    ui.profileTrack.innerHTML=list.length?buildFeed(list,'horizontal'):'';
-    bindFeedUI(ui.profileTrack);
-    updateCmtAvatars(ui.profileTrack);
-  }else{
-    ui.profileShell.classList.remove('show');
-    ui.feedShell.classList.remove('hidden');
-    ui.feedTrack.innerHTML=list.length?buildFeed(list,'vertical'):'';
-    bindFeedUI(ui.feedTrack);
-    updateCmtAvatars(ui.feedTrack);
-  }
+  ui.feedTrack.innerHTML=list.length?buildFeed(list):'';
+  bindFeedUI(ui.feedTrack);
+  updateCmtAvatars(ui.feedTrack);
 }
 
-function buildFeed(list,mode){
+function buildFeed(list){
   return list.map((p,i)=>{
     const pr=p.profile||{};const name=pr.display_name||p.username||'User';
-    const init=(name||'U')[0].toUpperCase();
-    const avHtml=pr.avatar_url?`<img src="${esc(pr.avatar_url)}" alt="">`:init;
     const likes=Number(p.like_count??p.likes??0);const liked=!!p.user_liked;
     const tags=[...asArr(pr.interests).slice(0,2),...parseTags(p.tags).slice(0,3)].slice(0,4);
     const [c1,c2]=PAL[i%PAL.length];
@@ -497,25 +398,19 @@ function buildFeed(list,mode){
     const audioUrl=/^https?:\/\//i.test(p.audio_url||'')?p.audio_url:/^https?:\/\//i.test(p.song_preview||'')?p.song_preview:'';
     const audioHtml=audioUrl?`<audio class="hidden post-audio" preload="auto" loop src="${esc(audioUrl)}"></audio>`:'';
     const tagsHtml=tags.length?`<div class="post-tags">${tags.map(t=>`<span class="post-tag">#${esc(t)}</span>`).join('')}</div>`:'';
-    const userFilterAttr=`data-user-filter="${esc(p.user_id||'')}"`;
     return `
-      <article class="post-card" data-post-id="${esc(p.id)}" data-user-id="${esc(p.user_id||'')}" data-mode="${mode}" style="animation-delay:${i*30}ms">
+      <article class="post-card" data-post-id="${esc(p.id)}" data-user-id="${esc(p.user_id||'')}">
         <div class="post-top">
           <div class="post-head">
-            <button class="ph-avatar" ${userFilterAttr} title="View profile">${avHtml}</button>
-            <div class="ph-info" ${userFilterAttr}>
+            <button class="ph-avatar" data-user-filter="${esc(p.user_id||'')}">${avatarHtml(name,pr.avatar_url)}</button>
+            <div class="ph-info" data-user-filter="${esc(p.user_id||'')}">
               <div class="ph-name">${esc(name)}</div>
               ${p.song_title?`<div class="ph-sub"><span class="mi" style="font-size:11px">music_note</span>${esc(p.song_title)}</div>`:''}
             </div>
           </div>
           <button class="ph-more"><span class="mi">more_horiz</span></button>
         </div>
-
-        <div class="post-media" data-mwrap>
-          ${media}
-          <div class="like-flash"><span class="mi">favorite</span></div>
-        </div>
-
+        <div class="post-media">${media}<div class="like-flash"><span class="mi">favorite</span></div></div>
         ${audioHtml}
         <div class="post-overlay">
           <div class="post-actions">
@@ -550,6 +445,38 @@ function updateCmtAvatars(root){
 function bindFeedUI(root){
   root.querySelectorAll('.cmt-input').forEach(inp=>{const btn=inp.nextElementSibling;inp.addEventListener('input',()=>btn.classList.toggle('vis',inp.value.trim().length>0));});
   root.querySelectorAll('.save-btn').forEach(btn=>btn.addEventListener('click',()=>btn.classList.toggle('saved')));
+
+  let lastTap=0;
+  root.addEventListener('touchend',e=>{
+    const card=e.target.closest('[data-post-id]');if(!card)return;
+    const now=Date.now();
+    if(now-lastTap<280){
+      const flash=card.querySelector('.like-flash');
+      const lb=card.querySelector('[data-like-btn]');
+      if(flash){flash.classList.remove('pop');void flash.offsetWidth;flash.classList.add('pop');}
+      if(lb&&!lb.classList.contains('liked'))lb.click();
+    }
+    lastTap=now;
+  },{passive:true});
+}
+
+function activateStory(filter){
+  if(filter==='all'){renderFeed();return;}
+  if(filter==='me' && user){
+    const myId=user.id;
+    posts=posts.slice();
+    const filtered=posts.filter(p=>p.user_id===myId);
+    ui.feedTrack.innerHTML=filtered.length?buildFeed(filtered):'';
+    ui.empty.classList.toggle('show',filtered.length===0);
+    bindFeedUI(ui.feedTrack);updateCmtAvatars(ui.feedTrack);
+    return;
+  }
+  if(filter){
+    const filtered=posts.filter(p=>p.user_id===filter);
+    ui.feedTrack.innerHTML=filtered.length?buildFeed(filtered):'';
+    ui.empty.classList.toggle('show',filtered.length===0);
+    bindFeedUI(ui.feedTrack);updateCmtAvatars(ui.feedTrack);
+  }
 }
 
 async function openLikesModal(postId,post){
@@ -566,7 +493,7 @@ async function openLikesModal(postId,post){
     const pm=await loadProfiles(ids);
     ui.likesList.innerHTML=rows.map(row=>{
       const p=pm.get(row.user_id)||{};const name=p.display_name||p.username||'User';
-      const av=p.avatar_url?`<img src="${esc(p.avatar_url)}" alt="">`:(name[0]||'U').toUpperCase();
+      const av=avatarHtml(name,p.avatar_url);
       return `<div class="liker"><div class="liker-av">${av}</div><div><div class="liker-name">${esc(name)}</div><div class="liker-handle">@${slug(name)}</div></div><button class="liker-follow">Follow</button></div>`;
     }).join('');
   }catch(err){ui.likesList.innerHTML=`<div class="likes-empty">${esc(err?.message||'Could not load.')}</div>`;}
@@ -600,7 +527,7 @@ async function loadPosts(q='',preserve=true){
     posts=raw.map(p=>({...p,profile:pm.get(p.user_id)||null,like_count:counts.get(p.id)??Number(p.likes||0),user_liked:liked.has(p.id)}));
     renderStories(posts);
     renderFeed();
-    if(!preserve)ui.mainScroll.scrollTop=0;
+    if(!preserve)ui.feedTrack.scrollTop=0;
   }catch(err){console.warn(err);posts=[];renderStories([]);renderFeed();toast(err?.message||'Could not load posts.');}
 }
 
@@ -637,14 +564,6 @@ async function createPost(){
   finally{ui.submitUpload.disabled=false;ui.submitUpload.textContent='Share';}
 }
 
-function activateAuthor(uid){
-  activeAuthorId=uid||'';
-  renderStories(posts);
-  renderFeed();
-  if(isProfileMode()) ui.profileTrack.scrollLeft=0;
-  else ui.feedTrack.scrollTop=0;
-}
-
 function initEvents(){
   [ui.btnUpload,ui.bnCreate].forEach(b=>b?.addEventListener('click',openUpload));
   ui.closeUpload.addEventListener('click',closeUploadFn);
@@ -653,38 +572,51 @@ function initEvents(){
   ui.likesModal.addEventListener('click',e=>{if(e.target===ui.likesModal)ui.likesModal.classList.remove('open');});
   ui.searchInput.addEventListener('input',()=>{clearTimeout(searchT);searchT=setTimeout(()=>loadPosts(ui.searchInput.value.trim(),false),180);});
   ui.uFile.addEventListener('change',()=>{const f=ui.uFile.files?.[0];if(!f)return;ui.fileIcon.textContent=f.type.startsWith('video/')?'videocam':'check_circle';ui.fileLbl.innerHTML=`<strong>${esc(f.name)}</strong>`;});
-  window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeUploadFn();ui.likesModal.classList.remove('open');if(isProfileMode())activateAuthor('');}});
-
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'){closeUploadFn();ui.likesModal.classList.remove('open');}});
   ui.storiesRow.addEventListener('click',e=>{
-    const all=e.target.closest('[data-filter-all]');
-    if(all){activateAuthor('');return;}
-    const btn=e.target.closest('[data-user-filter]');
-    if(btn){activateAuthor(btn.dataset.userFilter||'');}
+    const item=e.target.closest('[data-story-filter]');
+    if(!item)return;
+    const filter=item.dataset.storyFilter;
+    if(filter==='all'){renderFeed();return;}
+    if(filter==='me' && user){
+      const filtered=posts.filter(p=>p.user_id===user.id);
+      ui.feedTrack.innerHTML=filtered.length?buildFeed(filtered):'';
+      ui.empty.classList.toggle('show',filtered.length===0);
+      bindFeedUI(ui.feedTrack);updateCmtAvatars(ui.feedTrack);return;
+    }
+    if(filter){
+      const filtered=posts.filter(p=>p.user_id===filter);
+      ui.feedTrack.innerHTML=filtered.length?buildFeed(filtered):'';
+      ui.empty.classList.toggle('show',filtered.length===0);
+      bindFeedUI(ui.feedTrack);updateCmtAvatars(ui.feedTrack);
+    }
   });
-  ui.backChip.addEventListener('click',()=>activateAuthor(''));
-
-  ui.feedTrack.addEventListener('click',async e=>handleFeedClick(e,ui.feedTrack));
-  ui.profileTrack.addEventListener('click',async e=>handleFeedClick(e,ui.profileTrack));
-
+  ui.feedTrack.addEventListener('click',async e=>{
+    const uf=e.target.closest('[data-user-filter]');
+    if(uf){
+      const uid=uf.dataset.userFilter;
+      if(!uid)return;
+      const filtered=posts.filter(p=>p.user_id===uid);
+      ui.feedTrack.innerHTML=filtered.length?buildFeed(filtered):'';
+      ui.empty.classList.toggle('show',filtered.length===0);
+      bindFeedUI(ui.feedTrack);updateCmtAvatars(ui.feedTrack);
+      return;
+    }
+    const lb=e.target.closest('[data-like-btn]');
+    const likesBtn=e.target.closest('[data-likes-btn]');
+    const card=e.target.closest('[data-post-id]');
+    if(!card)return;
+    const postId=card.dataset.postId;
+    const post=posts.find(p=>p.id===postId)||null;
+    if(likesBtn){await openLikesModal(postId,post);return;}
+    if(lb){
+      if(!user){toast('Log in to like posts.');return;}
+      const liked=lb.classList.contains('liked');
+      lb.disabled=true;
+      try{await toggleLike(postId,liked);await loadPosts(ui.searchInput.value.trim(),true);}catch(err){toast(err?.message||'Failed.');}finally{lb.disabled=false;}
+    }
+  });
   setInterval(()=>{if(!sb||!user)return;sb.from('presence').upsert({user_id:user.id,last_seen:new Date().toISOString()},{onConflict:'user_id'}).catch(()=>{});},60000);
-}
-
-async function handleFeedClick(e,root){
-  const uf=e.target.closest('[data-user-filter]');
-  if(uf){activateAuthor(uf.dataset.userFilter||'');return;}
-  const lb=e.target.closest('[data-like-btn]');
-  const likesBtn=e.target.closest('[data-likes-btn]');
-  const card=e.target.closest('[data-post-id]');
-  if(!card)return;
-  const postId=card.dataset.postId;
-  const post=posts.find(p=>p.id===postId)||null;
-  if(likesBtn){await openLikesModal(postId,post);return;}
-  if(lb){
-    if(!user){toast('Log in to like posts.');return;}
-    const liked=lb.classList.contains('liked');
-    lb.disabled=true;
-    try{await toggleLike(postId,liked);await loadPosts(ui.searchInput.value.trim(),true);}catch(err){toast(err?.message||'Failed.');}finally{lb.disabled=false;}
-  }
 }
 
 async function boot(){
