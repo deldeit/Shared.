@@ -8,19 +8,21 @@
   <style>
     :root {
       --bg: #000000;
-      --panel: rgba(255, 255, 255, 0.06);
-      --panel-strong: rgba(255, 255, 255, 0.10);
+      --panel: rgba(255, 255, 255, 0.05);
+      --panel-2: rgba(255, 255, 255, 0.08);
+      --panel-3: rgba(255, 255, 255, 0.12);
       --border: rgba(255, 255, 255, 0.14);
       --text: #ffffff;
-      --muted: rgba(255, 255, 255, 0.72);
-      --muted-2: rgba(255, 255, 255, 0.50);
+      --muted: rgba(255, 255, 255, 0.68);
+      --muted-2: rgba(255, 255, 255, 0.48);
       --shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
       --radius-xl: 28px;
       --radius-lg: 22px;
       --radius-md: 16px;
       --radius-sm: 12px;
-      --max-width: 740px;
-      --header-h: 72px;
+      --max-width: 1180px;
+      --feed-width: 560px;
+      --header-h: 76px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
@@ -29,11 +31,13 @@
     html, body { height: 100%; }
     body {
       margin: 0;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #000;
+      background: var(--bg);
       color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       overflow: hidden;
     }
+
+    button, input, a { font: inherit; }
 
     .app {
       width: 100%;
@@ -56,33 +60,31 @@
     .topbar {
       position: sticky;
       top: 0;
-      z-index: 30;
-      padding-top: calc(var(--safe-top) + 10px);
-      padding-inline: 14px;
-      height: calc(var(--header-h) + var(--safe-top));
+      z-index: 40;
       display: grid;
-      grid-template-columns: 1fr auto 1fr;
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
       align-items: center;
-      gap: 10px;
-      background: rgba(0, 0, 0, 0.98);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
+      gap: 12px;
+      padding: calc(12px + var(--safe-top)) 14px 12px;
+      height: calc(var(--header-h) + var(--safe-top));
+      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
+      background: rgba(0, 0, 0, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
     }
-
-    .topbar-spacer { width: 1px; height: 1px; }
 
     .brand {
       justify-self: center;
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      text-decoration: none;
       color: var(--text);
+      text-decoration: none;
       font-weight: 900;
-      letter-spacing: -0.05em;
-      font-size: 1.45rem;
+      letter-spacing: -0.055em;
+      font-size: clamp(1.25rem, 2vw, 1.55rem);
       line-height: 1;
+      user-select: none;
     }
 
     .brand-dot {
@@ -91,9 +93,10 @@
       border-radius: 999px;
       background: #fff;
       box-shadow: 0 0 0 3px rgba(255,255,255,0.10);
+      flex: 0 0 auto;
     }
 
-    .actions-top {
+    .top-actions {
       justify-self: end;
       display: flex;
       align-items: center;
@@ -102,8 +105,8 @@
 
     .chip-btn {
       appearance: none;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      background: var(--panel);
       color: #fff;
       border-radius: 999px;
       padding: 10px 12px;
@@ -111,12 +114,16 @@
       font-weight: 700;
       letter-spacing: -0.01em;
       cursor: pointer;
-      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
       text-decoration: none;
       white-space: nowrap;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease;
     }
 
-    .chip-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.10); }
+    .chip-btn:hover {
+      background: var(--panel-2);
+      transform: translateY(-1px);
+    }
+
     .chip-btn:active { transform: scale(0.97); }
 
     .content {
@@ -124,26 +131,22 @@
       min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
-      overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
       scroll-behavior: smooth;
-      padding-bottom: calc(12px + var(--safe-bottom));
-    }
-
-    .content.snap-posts {
-      scroll-snap-type: y proximity;
+      padding-bottom: calc(18px + var(--safe-bottom));
     }
 
     .section {
-      padding: 12px 0 0;
+      padding-top: 12px;
     }
 
     .section-head {
-      padding: 0 14px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       gap: 10px;
+      padding: 0 14px 10px;
     }
 
     .section-title {
@@ -153,10 +156,89 @@
       text-transform: uppercase;
     }
 
-    .stories-wrap {
+    /* SEARCH */
+    .search-wrap {
       position: relative;
+      padding: 0 14px 12px;
     }
 
+    .search {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #fff;
+      outline: none;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .search::placeholder { color: rgba(255,255,255,0.42); }
+    .search:focus { background: var(--panel-2); border-color: rgba(255,255,255,0.22); }
+
+    .suggestions {
+      position: absolute;
+      z-index: 20;
+      left: 14px;
+      right: 14px;
+      top: calc(100% - 4px);
+      background: #0b0b0b;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      display: none;
+      box-shadow: var(--shadow);
+      max-height: 320px;
+      overflow-y: auto;
+    }
+
+    .suggestion {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: background 140ms ease;
+    }
+
+    .suggestion:last-child { border-bottom: 0; }
+    .suggestion:hover { background: rgba(255,255,255,0.05); }
+
+    .suggestion-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #111;
+      flex: 0 0 auto;
+      border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .suggestion-meta {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .suggestion-title {
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .suggestion-subtitle {
+      margin-top: 2px;
+      font-size: 0.76rem;
+      color: var(--muted-2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* STORIES */
     .stories {
       display: grid;
       grid-auto-flow: column;
@@ -164,7 +246,7 @@
       gap: 14px;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 2px 14px 10px;
+      padding: 4px 14px 12px;
       scrollbar-width: none;
     }
     .stories::-webkit-scrollbar { display: none; }
@@ -189,12 +271,12 @@
       border-radius: 999px;
       padding: 2px;
       background: #fff;
-      transition: transform 180ms ease, opacity 180ms ease;
       box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
+      transition: transform 160ms ease, opacity 160ms ease;
     }
 
-    .story:active .story-ring,
-    .story:hover .story-ring {
+    .story:hover .story-ring,
+    .story:active .story-ring {
       transform: scale(0.98);
       opacity: 0.92;
     }
@@ -202,11 +284,11 @@
     .story-avatar {
       width: 100%;
       height: 100%;
-      border-radius: 999px;
       object-fit: cover;
       display: block;
-      border: 2px solid #000;
+      border-radius: 999px;
       background: #111;
+      border: 2px solid #000;
     }
 
     .story-name {
@@ -218,47 +300,47 @@
       color: var(--muted);
     }
 
+    /* FEED */
     .feed {
-      display: grid;
-      gap: 12px;
-      padding: 2px 0 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 4px 0 0;
     }
 
     .post {
-      scroll-snap-align: start;
-      border-top: 1px solid rgba(255,255,255,0.08);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
+      width: min(var(--feed-width), calc(100vw - 24px));
+      margin: 0 auto;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
       background: #000;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.25);
     }
 
     .post-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 14px;
+      padding: 12px;
     }
 
     .avatar {
-      width: 42px;
-      height: 42px;
-      border-radius: 999px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
       object-fit: cover;
-      flex: 0 0 auto;
-      border: 1px solid rgba(255,255,255,0.12);
       background: #111;
+      border: 1px solid rgba(255,255,255,0.12);
+      flex: 0 0 auto;
     }
 
-    .user-meta { min-width: 0; flex: 1; }
-
     .username {
-      margin: 0;
       font-weight: 800;
-      font-size: 0.96rem;
-      line-height: 1.2;
+      font-size: 0.95rem;
       letter-spacing: -0.02em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      cursor: pointer;
+      line-height: 1.1;
     }
 
     .post-time {
@@ -267,7 +349,7 @@
       font-size: 0.76rem;
     }
 
-    .post-media {
+    .media {
       position: relative;
       width: 100%;
       aspect-ratio: 1 / 1;
@@ -275,7 +357,7 @@
       overflow: hidden;
     }
 
-    .post-media img {
+    .media img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -283,7 +365,7 @@
     }
 
     .post-body {
-      padding: 12px 14px 16px;
+      padding: 12px 12px 14px;
       display: grid;
       gap: 12px;
     }
@@ -303,8 +385,8 @@
 
     .icon-btn {
       appearance: none;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.04);
+      border: 1px solid var(--border);
+      background: var(--panel);
       color: #fff;
       width: 42px;
       height: 42px;
@@ -314,13 +396,12 @@
       justify-content: center;
       cursor: pointer;
       transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      flex: 0 0 auto;
     }
 
+    .icon-btn:hover { background: var(--panel-2); }
     .icon-btn:active { transform: scale(0.96); }
-    .icon-btn.liked {
-      background: rgba(255,255,255,0.16);
-      border-color: rgba(255,255,255,0.34);
-    }
+    .icon-btn.liked { background: var(--panel-3); border-color: rgba(255,255,255,0.26); }
 
     .icon {
       width: 20px;
@@ -337,9 +418,14 @@
       line-height: 1.45;
     }
 
-    .count { color: var(--muted); font-size: 0.84rem; }
+    .count {
+      color: var(--muted);
+      font-size: 0.84rem;
+      cursor: pointer;
+      user-select: none;
+    }
 
-    .caption strong { color: var(--text); }
+    .caption strong { color: #fff; }
 
     .song-card {
       display: grid;
@@ -347,7 +433,7 @@
       padding: 12px;
       border-radius: 18px;
       background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.08);
     }
 
     .song-label {
@@ -366,17 +452,18 @@
     audio {
       width: 100%;
       display: block;
-      filter: grayscale(1) contrast(1.15);
+      filter: grayscale(1) contrast(1.08);
     }
 
+    /* LOADING */
     .loading {
       position: fixed;
       inset: 0;
-      z-index: 80;
+      z-index: 90;
       display: grid;
       place-items: center;
       background: #000;
-      transition: opacity 240ms ease, visibility 240ms ease;
+      transition: opacity 220ms ease, visibility 220ms ease;
     }
 
     .loading.hidden {
@@ -407,13 +494,14 @@
     }
 
     .loading-text {
-      color: var(--text);
+      color: #fff;
       font-size: 0.98rem;
       letter-spacing: -0.01em;
     }
 
     @keyframes spin { to { transform: rotate(360deg); } }
 
+    /* STORY VIEWER */
     .story-viewer {
       position: fixed;
       inset: 0;
@@ -438,9 +526,7 @@
       width: 100%;
       max-width: var(--max-width);
       height: 100%;
-      overflow: hidden;
       display: flex;
-      align-items: stretch;
       justify-content: center;
       background: #000;
     }
@@ -462,7 +548,7 @@
     .story-gradient {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.62), transparent 20%, transparent 78%, rgba(0,0,0,0.72));
+      background: linear-gradient(180deg, rgba(0,0,0,0.62), transparent 18%, transparent 78%, rgba(0,0,0,0.72));
       pointer-events: none;
     }
 
@@ -504,7 +590,7 @@
       align-items: center;
       justify-content: space-between;
       gap: 12px;
-      color: var(--text);
+      color: #fff;
     }
 
     .story-meta-left {
@@ -517,9 +603,10 @@
     .story-meta-avatar {
       width: 36px;
       height: 36px;
-      border-radius: 999px;
+      border-radius: 50%;
       object-fit: cover;
       border: 1px solid rgba(255,255,255,0.16);
+      background: #111;
     }
 
     .story-meta-name {
@@ -568,8 +655,99 @@
       -webkit-backdrop-filter: blur(14px);
     }
 
+    /* MODALS */
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 110;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0,0,0,0.88);
+      padding: 16px;
+    }
+
+    .modal.open { display: flex; }
+
+    .modal-box {
+      width: min(92vw, 520px);
+      max-height: min(80vh, 760px);
+      overflow: auto;
+      background: #0b0b0b;
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .modal-close {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      width: 100%;
+      padding: 10px 8px;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 140ms ease;
+    }
+
+    .list-item:hover { background: rgba(255,255,255,0.05); }
+
+    .list-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: #111;
+      border: 1px solid rgba(255,255,255,0.10);
+      flex: 0 0 auto;
+    }
+
+    .list-main {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .list-name {
+      font-weight: 700;
+      font-size: 0.94rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .list-sub {
+      margin-top: 2px;
+      color: var(--muted-2);
+      font-size: 0.76rem;
+    }
+
     .empty {
-      margin: 18px 14px 0;
+      margin: 16px 14px 0;
       padding: 22px;
       border-radius: 22px;
       background: rgba(255,255,255,0.04);
@@ -578,14 +756,27 @@
       text-align: center;
     }
 
-    @media (max-width: 420px) {
-      .topbar {
-        grid-template-columns: auto 1fr auto;
+    @media (max-width: 620px) {
+      .post {
+        width: calc(100vw - 20px);
       }
-      .brand { font-size: 1.25rem; }
-      .chip-btn { padding: 9px 10px; font-size: 0.78rem; }
-      .stories { grid-auto-columns: 70px; gap: 12px; }
-      .story-ring { width: 64px; height: 64px; }
+
+      .topbar {
+        grid-template-columns: 1fr auto;
+      }
+
+      .brand {
+        justify-self: start;
+      }
+
+      .top-actions {
+        gap: 6px;
+      }
+
+      .chip-btn {
+        padding: 9px 10px;
+        font-size: 0.76rem;
+      }
     }
   </style>
 </head>
@@ -593,18 +784,29 @@
   <div class="app">
     <div class="shell">
       <header class="topbar">
-        <div class="topbar-spacer"></div>
+        <div></div>
         <a class="brand" href="#" aria-label="Shared home">
           <span class="brand-dot"></span>
           <span>Shared.</span>
         </a>
-        <div class="actions-top">
+        <div class="top-actions">
           <button id="uploadStoryBtn" class="chip-btn" type="button">Upload story</button>
           <button id="uploadPostBtn" class="chip-btn" type="button">Upload post</button>
         </div>
       </header>
 
-      <main id="content" class="content snap-posts" aria-live="polite">
+      <main id="content" class="content" aria-live="polite">
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">Search</div>
+            <div class="section-title">Users & posts</div>
+          </div>
+          <div class="search-wrap">
+            <input id="search" class="search" autocomplete="off" placeholder="Search posts or users..." />
+            <div id="suggestions" class="suggestions"></div>
+          </div>
+        </section>
+
         <section class="section stories-wrap">
           <div class="section-head">
             <div class="section-title">Stories</div>
@@ -659,6 +861,16 @@
     </div>
   </div>
 
+  <div id="likesModal" class="modal" aria-hidden="true">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="likesTitle">
+      <div class="modal-head">
+        <div id="likesTitle" class="modal-title">Likes</div>
+        <button class="modal-close" type="button" data-close-likes aria-label="Close likes">✕</button>
+      </div>
+      <div id="likesList"></div>
+    </div>
+  </div>
+
   <script type="module">
     import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -666,26 +878,28 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
     const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const avatarBucket = "avatars";
-    const sharedBucket = "shared";
-    const storiesBucket = "stories";
+    const BUCKET_AVATARS = "avatars";
+    const BUCKET_SHARED = "shared";
+    const BUCKET_STORIES = "stories";
 
     const state = {
       profiles: [],
       posts: [],
-      likesByPost: new Map(),
-      likedByMe: new Set(),
+      likes: [],
       currentUserId: null,
       storyQueue: [],
       storyIndex: 0,
       storyTimer: null,
-      storyStartTs: 0,
       storyRaf: null,
-      storyDurationMs: 30000
+      storyStartTs: 0,
+      storyDurationMs: 30000,
+      activePostLikes: null,
+      searchQuery: ""
     };
 
     const els = {
       loading: document.getElementById("loading"),
+      content: document.getElementById("content"),
       stories: document.getElementById("stories"),
       feed: document.getElementById("feed"),
       storiesCount: document.getElementById("storiesCount"),
@@ -698,9 +912,12 @@
       closeStory: document.getElementById("closeStory"),
       prevStory: document.getElementById("prevStory"),
       nextStory: document.getElementById("nextStory"),
-      content: document.getElementById("content"),
       uploadStoryBtn: document.getElementById("uploadStoryBtn"),
-      uploadPostBtn: document.getElementById("uploadPostBtn")
+      uploadPostBtn: document.getElementById("uploadPostBtn"),
+      search: document.getElementById("search"),
+      suggestions: document.getElementById("suggestions"),
+      likesModal: document.getElementById("likesModal"),
+      likesList: document.getElementById("likesList")
     };
 
     els.uploadStoryBtn.addEventListener("click", () => {
@@ -711,40 +928,8 @@
       window.location.href = "upload.html";
     });
 
-    function safeArray(value) {
-      return Array.isArray(value) ? value : [];
-    }
-
-    function getProfileById(id) {
-      return state.profiles.find((p) => p.id === id) || null;
-    }
-
-    function resolveAvatar(path) {
-      if (!path) return "";
-      if (path.startsWith("http://") || path.startsWith("https://")) return path;
-      const { data } = supabase.storage.from(avatarBucket).getPublicUrl(path);
-      return data?.publicUrl || "";
-    }
-
-    function resolveShared(path) {
-      if (!path) return "";
-      if (path.startsWith("http://") || path.startsWith("https://")) return path;
-      const { data } = supabase.storage.from(sharedBucket).getPublicUrl(path);
-      return data?.publicUrl || "";
-    }
-
-    function resolveStory(path) {
-      if (!path) return "";
-      if (path.startsWith("http://") || path.startsWith("https://")) return path;
-      const { data } = supabase.storage.from(storiesBucket).getPublicUrl(path);
-      return data?.publicUrl || "";
-    }
-
-    function formatCount(n) {
-      const num = Number(n || 0);
-      if (num >= 1000000) return `${(num / 1000000).toFixed(num % 1000000 ? 1 : 0)}M`;
-      if (num >= 1000) return `${(num / 1000).toFixed(num % 1000 ? 1 : 0)}K`;
-      return String(num);
+    function safeArray(v) {
+      return Array.isArray(v) ? v : [];
     }
 
     function escapeHtml(str) {
@@ -754,6 +939,13 @@
         .replaceAll(">", "&gt;")
         .replaceAll('"', "&quot;")
         .replaceAll("'", "&#039;");
+    }
+
+    function formatCount(n) {
+      const num = Number(n || 0);
+      if (num >= 1000000) return `${(num / 1000000).toFixed(num % 1000000 ? 1 : 0)}M`;
+      if (num >= 1000) return `${(num / 1000).toFixed(num % 1000 ? 1 : 0)}K`;
+      return String(num);
     }
 
     function timeAgo(value) {
@@ -770,40 +962,109 @@
       return date.toLocaleDateString([], { month: "short", day: "numeric" });
     }
 
-    async function getCurrentUserId() {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) return null;
-      return data?.user?.id || null;
+    function placeholderAvatar(seed = "Shared") {
+      const label = encodeURIComponent(String(seed).slice(0, 1).toUpperCase());
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+          <rect width="120" height="120" rx="60" fill="#111"/>
+          <circle cx="60" cy="50" r="18" fill="#fff"/>
+          <path d="M24 102c7-20 24-30 36-30s29 10 36 30" fill="#fff"/>
+          <text x="60" y="71" text-anchor="middle" font-size="22" font-family="Arial" fill="#000" font-weight="700">${label}</text>
+        </svg>
+      `)}`;
+    }
+
+    function placeholderImage() {
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+          <rect width="800" height="800" fill="#111"/>
+          <rect x="120" y="120" width="560" height="560" rx="42" fill="#1b1b1b"/>
+          <path d="M220 540l110-120 80 78 70-86 100 128" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="320" cy="300" r="44" fill="#fff"/>
+        </svg>
+      `)}`;
+    }
+
+    function normalizeAvatar(path) {
+      if (!path) return "";
+      if (/^https?:\/\//i.test(path)) return path;
+      const { data } = supabase.storage.from(BUCKET_AVATARS).getPublicUrl(path);
+      return data?.publicUrl || "";
+    }
+
+    function normalizeShared(path) {
+      if (!path) return "";
+      if (/^https?:\/\//i.test(path)) return path;
+      const { data } = supabase.storage.from(BUCKET_SHARED).getPublicUrl(path);
+      return data?.publicUrl || "";
+    }
+
+    function normalizeStory(path) {
+      if (!path) return "";
+      if (/^https?:\/\//i.test(path)) return path;
+      const { data } = supabase.storage.from(BUCKET_STORIES).getPublicUrl(path);
+      return data?.publicUrl || "";
+    }
+
+    function getProfileById(id) {
+      return state.profiles.find((p) => p.id === id) || null;
+    }
+
+    function getUsernameForPost(post) {
+      const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
+      return post.username || profile?.username || profile?.full_name || "user";
+    }
+
+    function getAvatarForPost(post) {
+      const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
+      const avatar = post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "";
+      return normalizeAvatar(avatar);
+    }
+
+    function getStoryQueue() {
+      return state.profiles
+        .map((profile) => {
+          const avatarPath = profile.avatar_url || profile.avatar || profile.profile_image || "";
+          const storyPath = profile.story_url || profile.story_image || profile.story || profile.latest_story || "";
+          return {
+            id: profile.id,
+            username: profile.username || profile.full_name || "user",
+            avatar: normalizeAvatar(avatarPath),
+            story: normalizeStory(storyPath),
+            profile
+          };
+        })
+        .filter((item) => item.story || item.avatar || item.username);
+    }
+
+    function postLikeCount(postId) {
+      return state.likes.filter((like) => (like.post_id ?? like.postId ?? like.postid) === postId).length;
+    }
+
+    function postLikedByMe(postId) {
+      return state.currentUserId
+        ? state.likes.some((like) => (like.post_id ?? like.postId ?? like.postid) === postId && like.user_id === state.currentUserId)
+        : false;
     }
 
     async function loadData() {
       try {
-        const [profilesRes, postsRes, likesRes, userId] = await Promise.all([
+        const [{ data: profilesData }, { data: postsData }, { data: likesData }, currentUserId] = await Promise.all([
           supabase.from("profiles").select("*").order("username", { ascending: true }),
           supabase.from("posts").select("*").order("created_at", { ascending: false }),
           supabase.from("likes").select("*"),
           getCurrentUserId()
         ]);
 
-        state.currentUserId = userId;
-        state.profiles = safeArray(profilesRes.data);
-        state.posts = safeArray(postsRes.data);
+        state.profiles = safeArray(profilesData);
+        state.posts = safeArray(postsData);
+        state.likes = safeArray(likesData);
+        state.currentUserId = currentUserId;
 
-        const likes = safeArray(likesRes.data);
-        state.likesByPost = new Map();
-        state.likedByMe = new Set();
-
-        for (const like of likes) {
-          const postId = like.post_id ?? like.postId ?? like.postid;
-          if (!postId) continue;
-          state.likesByPost.set(postId, (state.likesByPost.get(postId) || 0) + 1);
-          if (state.currentUserId && like.user_id === state.currentUserId) {
-            state.likedByMe.add(postId);
-          }
-        }
-
+        state.storyQueue = getStoryQueue();
         renderStories();
         renderFeed();
+        updateSuggestions();
       } catch (err) {
         console.error(err);
         els.feed.innerHTML = `<div class="empty">Impossibile caricare i contenuti.</div>`;
@@ -812,36 +1073,13 @@
       }
     }
 
-    function buildStoriesFromProfiles() {
-      return state.profiles
-        .map((profile) => {
-          const storyPath = profile.story_url || profile.story_image || profile.story || profile.latest_story || "";
-          const avatarPath = profile.avatar_url || profile.avatar || profile.profile_image || "";
-          return {
-            id: profile.id,
-            username: profile.username || profile.full_name || "user",
-            avatar: resolveAvatar(avatarPath),
-            story: resolveStory(storyPath),
-            profile
-          };
-        })
-        .filter((item) => item.story || item.avatar || item.username);
-    }
-
-    function placeholderAvatar(seed) {
-      const label = encodeURIComponent(String(seed || "Shared"));
-      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-          <rect width="120" height="120" rx="60" fill="#111"/>
-          <circle cx="60" cy="48" r="18" fill="#fff"/>
-          <path d="M24 100c7-20 24-30 36-30s29 10 36 30" fill="#fff"/>
-          <text x="60" y="114" font-family="Arial" font-size="0" fill="#fff">${label}</text>
-        </svg>
-      `)}`;
+    async function getCurrentUserId() {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) return null;
+      return data?.user?.id || null;
     }
 
     function renderStories() {
-      state.storyQueue = buildStoriesFromProfiles();
       els.storiesCount.textContent = formatCount(state.storyQueue.length);
 
       if (!state.storyQueue.length) {
@@ -850,7 +1088,7 @@
       }
 
       els.stories.innerHTML = state.storyQueue.map((story, index) => `
-        <button class="story" data-story-index="${index}" aria-label="Open story from ${escapeHtml(story.username)}">
+        <button class="story" data-story-index="${index}" type="button" aria-label="Open story from ${escapeHtml(story.username)}">
           <span class="story-ring">
             <img class="story-avatar" loading="lazy" src="${story.avatar || placeholderAvatar(story.username)}" alt="${escapeHtml(story.username)} avatar" />
           </span>
@@ -863,49 +1101,48 @@
       });
     }
 
-    function renderFeed() {
-      els.postsCount.textContent = formatCount(state.posts.length);
+    function renderFeed(filteredPosts = state.posts) {
+      els.postsCount.textContent = formatCount(filteredPosts.length);
 
-      if (!state.posts.length) {
-        els.feed.innerHTML = `<div class="empty">Nessun post disponibile.</div>`;
+      if (!filteredPosts.length) {
+        els.feed.innerHTML = `<div class="empty">Nessun post trovato.</div>`;
         return;
       }
 
-      els.feed.innerHTML = state.posts.map((post) => {
-        const profile = getProfileById(post.user_id) || getProfileById(post.profile_id) || null;
-        const username = post.username || profile?.username || profile?.full_name || "user";
-        const avatarPath = post.avatar_url || profile?.avatar_url || profile?.avatar || "";
-        const imagePath = resolveShared(post.image_url || post.media_url || post.image || "");
-        const likes = Number(post.likes_count ?? state.likesByPost.get(post.id) ?? 0);
-        const isLiked = state.likedByMe.has(post.id) || !!post.liked;
+      els.feed.innerHTML = filteredPosts.map((post) => {
+        const username = getUsernameForPost(post);
+        const avatar = getAvatarForPost(post);
+        const image = normalizeShared(post.image_url || post.media_url || post.image || "");
+        const caption = post.caption || post.text || "";
         const songTitle = post.song_title || post.song || "";
         const songPreview = post.song_preview || post.audio_url || "";
-        const caption = post.caption || post.text || "";
         const createdAt = post.created_at || post.inserted_at || post.updated_at || "";
+        const likesCount = postLikeCount(post.id);
+        const liked = postLikedByMe(post.id) || !!post.liked;
 
         return `
           <article class="post" data-post-id="${escapeHtml(post.id)}">
             <div class="post-header">
-              <img class="avatar" loading="lazy" src="${resolveAvatar(avatarPath) || placeholderAvatar(username)}" alt="${escapeHtml(username)} avatar" />
+              <img class="avatar" loading="lazy" src="${avatar || placeholderAvatar(username)}" alt="${escapeHtml(username)} avatar" />
               <div class="user-meta">
-                <p class="username">${escapeHtml(username)}</p>
+                <div class="username" data-profile-id="${escapeHtml(post.user_id || post.profile_id || post.id)}">${escapeHtml(username)}</div>
                 <div class="post-time">${escapeHtml(timeAgo(createdAt))}</div>
               </div>
             </div>
 
-            <div class="post-media">
-              <img class="lazy-media" loading="lazy" data-src="${escapeHtml(imagePath)}" alt="Post by ${escapeHtml(username)}" src="${tinyBlurDataUri()}" />
+            <div class="media">
+              <img class="lazy-media" loading="lazy" data-src="${escapeHtml(image)}" alt="Post by ${escapeHtml(username)}" src="${placeholderImage()}" />
             </div>
 
             <div class="post-body">
               <div class="actions">
                 <div class="action-left">
-                  <button class="icon-btn like-btn ${isLiked ? "liked" : ""}" data-like-btn="${escapeHtml(post.id)}" aria-label="Like post">
+                  <button class="icon-btn like-btn ${liked ? "liked" : ""}" data-like-btn="${escapeHtml(post.id)}" type="button" aria-label="Like post">
                     <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
                       <path d="M12.1 21.35l-1.1-1.02C5.14 15.24 2 12.39 2 8.88 2 6.04 4.24 3.8 7.08 3.8c1.6 0 3.16.74 4.12 1.92.96-1.18 2.52-1.92 4.12-1.92C18.16 3.8 20.4 6.04 20.4 8.88c0 3.51-3.14 6.36-9 11.45l-1.3 1.02Z"/>
                     </svg>
                   </button>
-                  <div class="count" data-like-count="${escapeHtml(post.id)}">${formatCount(likes)} likes</div>
+                  <div class="count" data-like-count="${escapeHtml(post.id)}">${formatCount(likesCount)} likes</div>
                 </div>
               </div>
 
@@ -924,15 +1161,7 @@
       }).join("");
 
       wireLazyImages();
-      wireLikeButtons();
-    }
-
-    function tinyBlurDataUri() {
-      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 10">
-          <rect width="8" height="10" fill="#111"/>
-        </svg>
-      `);
+      wirePostInteractions();
     }
 
     function wireLazyImages() {
@@ -951,38 +1180,167 @@
       images.forEach((img) => io.observe(img));
     }
 
-    function wireLikeButtons() {
+    function wirePostInteractions() {
+      document.querySelectorAll("[data-profile-id]").forEach((nameEl) => {
+        nameEl.addEventListener("click", () => {
+          const profileId = nameEl.dataset.profileId;
+          goToProfile(profileId);
+        });
+      });
+
       document.querySelectorAll("[data-like-btn]").forEach((btn) => {
         btn.addEventListener("click", async () => {
           const postId = btn.dataset.likeBtn;
           if (!postId) return;
 
+          const liked = btn.classList.contains("liked");
           const countEl = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
-          const currentlyLiked = btn.classList.contains("liked");
+          const currentCount = postLikeCount(postId);
+          const nextCount = liked ? Math.max(0, currentCount - 1) : currentCount + 1;
 
           btn.classList.toggle("liked");
-          let currentCount = Number((countEl?.textContent || "0").replace(/[^0-9]/g, "")) || 0;
-          currentCount += currentlyLiked ? -1 : 1;
-          if (countEl) countEl.textContent = `${formatCount(Math.max(0, currentCount))} likes`;
+          if (countEl) countEl.textContent = `${formatCount(nextCount)} likes`;
 
           if (!state.currentUserId) return;
 
           try {
-            if (currentlyLiked) {
-              await supabase.from("likes").delete().eq("post_id", postId).eq("user_id", state.currentUserId);
-              state.likedByMe.delete(postId);
+            if (liked) {
+              const existing = state.likes.find((like) => (like.post_id ?? like.postId ?? like.postid) === postId && like.user_id === state.currentUserId);
+              if (existing?.id) {
+                await supabase.from("likes").delete().eq("id", existing.id);
+              } else {
+                await supabase.from("likes").delete().eq("post_id", postId).eq("user_id", state.currentUserId);
+              }
             } else {
               await supabase.from("likes").insert({ post_id: postId, user_id: state.currentUserId });
-              state.likedByMe.add(postId);
             }
+            await reloadLikes();
           } catch (error) {
             console.error(error);
             btn.classList.toggle("liked");
-            if (countEl) countEl.textContent = `${formatCount(Math.max(0, currentlyLiked ? currentCount + 1 : currentCount - 1))} likes`;
+            if (countEl) countEl.textContent = `${formatCount(currentCount)} likes`;
+          }
+        });
+      });
+
+      document.querySelectorAll("[data-like-count]").forEach((countEl) => {
+        countEl.addEventListener("click", () => openLikesModal(countEl.dataset.likeCount));
+      });
+    }
+
+    async function reloadLikes() {
+      const { data } = await supabase.from("likes").select("*");
+      state.likes = safeArray(data);
+      state.storyQueue = getStoryQueue();
+      renderFeed(resolveCurrentFeed());
+      renderStories();
+    }
+
+    function resolveCurrentFeed() {
+      const q = state.searchQuery.trim().toLowerCase();
+      if (!q) return state.posts;
+      return state.posts.filter((post) => {
+        const username = getUsernameForPost(post).toLowerCase();
+        const caption = String(post.caption || post.text || "").toLowerCase();
+        const songTitle = String(post.song_title || post.song || "").toLowerCase();
+        return username.includes(q) || caption.includes(q) || songTitle.includes(q);
+      });
+    }
+
+    function updateSuggestions() {
+      const q = state.searchQuery.trim().toLowerCase();
+      if (!q) {
+        els.suggestions.style.display = "none";
+        els.suggestions.innerHTML = "";
+        return;
+      }
+
+      const userMatches = state.profiles
+        .filter((profile) => {
+          const username = String(profile.username || profile.full_name || "").toLowerCase();
+          const bio = String(profile.bio || "").toLowerCase();
+          return username.includes(q) || bio.includes(q);
+        })
+        .slice(0, 6)
+        .map((profile) => ({
+          type: "user",
+          id: profile.id,
+          title: profile.username || profile.full_name || "user",
+          subtitle: profile.bio || "Open profile",
+          avatar: normalizeAvatar(profile.avatar_url || profile.avatar || profile.profile_image || "") || placeholderAvatar(profile.username || profile.full_name || "u")
+        }));
+
+      const postMatches = state.posts
+        .filter((post) => {
+          const username = getUsernameForPost(post).toLowerCase();
+          const caption = String(post.caption || post.text || "").toLowerCase();
+          const songTitle = String(post.song_title || post.song || "").toLowerCase();
+          return username.includes(q) || caption.includes(q) || songTitle.includes(q);
+        })
+        .slice(0, 6)
+        .map((post) => ({
+          type: "post",
+          id: post.id,
+          title: getUsernameForPost(post),
+          subtitle: (post.caption || post.text || post.song_title || post.song || "Post").toString().slice(0, 80),
+          avatar: getAvatarForPost(post) || placeholderAvatar(getUsernameForPost(post))
+        }));
+
+      const items = [...userMatches, ...postMatches].slice(0, 8);
+
+      if (!items.length) {
+        els.suggestions.style.display = "none";
+        els.suggestions.innerHTML = "";
+        return;
+      }
+
+      els.suggestions.innerHTML = items.map((item) => `
+        <div class="suggestion" data-suggestion-type="${item.type}" data-suggestion-id="${escapeHtml(item.id)}">
+          <img class="suggestion-avatar" src="${item.avatar}" alt="" />
+          <div class="suggestion-meta">
+            <div class="suggestion-title">${escapeHtml(item.title)}</div>
+            <div class="suggestion-subtitle">${escapeHtml(item.subtitle)}</div>
+          </div>
+        </div>
+      `).join("");
+
+      els.suggestions.style.display = "block";
+
+      els.suggestions.querySelectorAll("[data-suggestion-type]").forEach((node) => {
+        node.addEventListener("click", () => {
+          const type = node.dataset.suggestionType;
+          const id = node.dataset.suggestionId;
+          if (type === "user") {
+            goToProfile(id);
+          } else {
+            const postEl = document.querySelector(`[data-post-id="${CSS.escape(id)}"]`);
+            if (postEl) {
+              postEl.scrollIntoView({ behavior: "smooth", block: "center" });
+              els.search.blur();
+              els.suggestions.style.display = "none";
+            }
           }
         });
       });
     }
+
+    function goToProfile(profileId) {
+      if (!profileId) return;
+      window.location.href = `profile.html?id=${encodeURIComponent(profileId)}`;
+    }
+
+    els.search.addEventListener("input", () => {
+      state.searchQuery = els.search.value;
+      updateSuggestions();
+      renderFeed(resolveCurrentFeed());
+    });
+
+    els.search.addEventListener("focus", updateSuggestions);
+    document.addEventListener("click", (e) => {
+      if (!e.target.closest(".search-wrap")) {
+        els.suggestions.style.display = "none";
+      }
+    });
 
     function openStory(index) {
       if (!state.storyQueue.length) return;
@@ -1061,17 +1419,67 @@
       startStoryTimer();
     }
 
+    async function openLikesModal(postId) {
+      const targetPost = state.posts.find((post) => String(post.id) === String(postId));
+      if (!targetPost) return;
+
+      const likesForPost = state.likes.filter((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId));
+      const items = likesForPost.map((like) => {
+        const profile = getProfileById(like.user_id) || state.profiles.find((p) => p.id === like.user_id);
+        return {
+          id: profile?.id || like.user_id,
+          name: profile?.username || profile?.full_name || "user",
+          avatar: normalizeAvatar(profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || placeholderAvatar(profile?.username || profile?.full_name || "u"),
+          subtitle: profile?.bio || "Open profile"
+        };
+      });
+
+      els.likesList.innerHTML = items.length
+        ? items.map((item) => `
+            <div class="list-item" data-open-profile="${escapeHtml(item.id)}">
+              <img class="list-avatar" src="${item.avatar}" alt="" />
+              <div class="list-main">
+                <div class="list-name">${escapeHtml(item.name)}</div>
+                <div class="list-sub">${escapeHtml(item.subtitle)}</div>
+              </div>
+            </div>
+          `).join("")
+        : `<div class="empty" style="margin:0;">No likes yet.</div>`;
+
+      els.likesModal.classList.add("open");
+      els.likesModal.setAttribute("aria-hidden", "false");
+
+      els.likesList.querySelectorAll("[data-open-profile]").forEach((item) => {
+        item.addEventListener("click", () => goToProfile(item.dataset.openProfile));
+      });
+    }
+
+    function closeLikesModal() {
+      els.likesModal.classList.remove("open");
+      els.likesModal.setAttribute("aria-hidden", "true");
+    }
+
+    document.querySelector("[data-close-likes]").addEventListener("click", closeLikesModal);
+    els.likesModal.addEventListener("click", (e) => {
+      if (e.target === els.likesModal) closeLikesModal();
+    });
+
     els.closeStory.addEventListener("click", closeStory);
     els.storyViewer.addEventListener("click", (event) => {
       if (event.target === els.storyViewer) closeStory();
     });
     els.prevStory.addEventListener("click", (event) => { event.stopPropagation(); prevStory(); });
     els.nextStory.addEventListener("click", (event) => { event.stopPropagation(); nextStory(); });
+
     window.addEventListener("keydown", (event) => {
-      if (!els.storyViewer.classList.contains("open")) return;
-      if (event.key === "Escape") closeStory();
-      if (event.key === "ArrowLeft") prevStory();
-      if (event.key === "ArrowRight") nextStory();
+      if (els.storyViewer.classList.contains("open")) {
+        if (event.key === "Escape") closeStory();
+        if (event.key === "ArrowLeft") prevStory();
+        if (event.key === "ArrowRight") nextStory();
+      }
+      if (els.likesModal.classList.contains("open") && event.key === "Escape") {
+        closeLikesModal();
+      }
     });
 
     document.addEventListener("visibilitychange", () => {
