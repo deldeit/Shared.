@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width([developer.apple.com](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/index.html?utm_source=chatgpt.com)), viewport-fit=cover">
 <title>Shared.</title>
 <meta name="theme-color" content="#000000">
 
@@ -21,8 +21,8 @@
     --panel-3:rgba(255,255,255,.12);
     --danger:#ff3b30;
     --like:#ff2d55;
-    --sidebar-w:300px;
-    --feed-width:460px;
+    --sidebar-w:330px;
+    --feed-width:420px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -51,7 +51,7 @@
     top:0;
     bottom:0;
     width:var(--sidebar-w);
-    padding:18px 14px;
+    padding:18px 16px;
     display:flex;
     flex-direction:column;
     gap:14px;
@@ -76,13 +76,6 @@
     gap:10px;
   }
 
-  .brand-side{
-    font-size:28px;
-    letter-spacing:-.05em;
-    line-height:1;
-    padding:4px 4px 10px;
-  }
-
   .search-wrap{
     position:relative;
   }
@@ -90,7 +83,7 @@
   .search-label{
     font-size:12px;
     color:var(--muted-2);
-    letter-spacing:.08em;
+    letter-spacing:.14em;
     text-transform:uppercase;
     margin:0 4px 8px;
   }
@@ -275,8 +268,8 @@
   .feed{
     display:flex;
     flex-direction:column;
-    gap:14px;
-    padding:16px 0 28px;
+    gap:12px;
+    padding:14px 0 22px;
   }
 
   .post{
@@ -297,8 +290,8 @@
   }
 
   .avatar{
-    width:34px;
-    height:34px;
+    width:42px;
+    height:42px;
     border-radius:50%;
     border:1px solid rgba(255,255,255,.12);
     flex:0 0 auto;
@@ -319,7 +312,7 @@
   .media{
     position:relative;
     width:100%;
-    aspect-ratio:1/1;
+    aspect-ratio:4/3;
     background:#111;
     overflow:hidden;
   }
@@ -396,6 +389,23 @@
     color:var(--muted);
     cursor:pointer;
     user-select:none;
+  }
+
+  .tag-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:6px;
+    padding:10px 11px 0;
+  }
+
+  .tag-pill{
+    padding:6px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.05);
+    color:#fff;
+    font-size:11px;
+    letter-spacing:.02em;
   }
 
   .caption{
@@ -760,12 +770,14 @@
     .sidebar-bottom{
       flex-direction:row;
       gap:8px;
+      overflow-x:auto;
     }
     .nav-btn{
       padding:12px 14px;
       font-size:13px;
       border-radius:12px;
       white-space:nowrap;
+      min-width:0;
     }
     .main{
       margin-left:0;
@@ -778,9 +790,6 @@
     .post{
       width:calc(100vw - 18px);
     }
-    .brand-side{
-      font-size:24px;
-    }
   }
 </style>
 </head>
@@ -788,10 +797,8 @@
   <div class="app">
     <aside class="sidebar">
       <div class="sidebar-top">
-        <div class="brand-side">Shared.</div>
-
         <div class="search-wrap">
-          <div class="search-label">Search</div>
+          <div class="search-label">Search profiles</div>
           <input id="search" class="search" placeholder="Search" autocomplete="off">
           <div id="suggestions" class="suggestions"></div>
         </div>
@@ -907,7 +914,8 @@ const state = {
   storyRaf: null,
   storyStartTs: 0,
   storyDurationMs: 30000,
-  searchQuery: ""
+  searchQuery: "",
+  coverCache: new Map()
 };
 
 const els = {
@@ -931,9 +939,7 @@ const els = {
   closeLikesBtn: document.getElementById("closeLikesBtn")
 };
 
-function safeArray(v) {
-  return Array.isArray(v) ? v : [];
-}
+function safeArray(v) { return Array.isArray(v) ? v : []; }
 
 function escapeHtml(str) {
   return String(str ?? "")
@@ -977,11 +983,20 @@ function defaultProfileIcon() {
 
 function placeholderImage() {
   return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
-      <rect width="800" height="800" fill="#111"/>
-      <rect x="120" y="120" width="560" height="560" rx="42" fill="#1b1b1b"/>
-      <path d="M220 540l110-120 80 78 70-86 100 128" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="320" cy="300" r="44" fill="#fff"/>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+      <rect width="800" height="600" fill="#111"/>
+      <rect x="120" y="80" width="560" height="440" rx="42" fill="#1b1b1b"/>
+      <path d="M220 390l110-120 80 78 70-86 100 128" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="320" cy="220" r="44" fill="#fff"/>
+    </svg>
+  `)}`;
+}
+
+function notePlaceholder() {
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+      <rect width="120" height="120" rx="18" fill="#111"/>
+      <path d="M74 22v44.4a18 18 0 1 0 8 15V42h20V22H74Z" fill="#fff"/>
     </svg>
   `)}`;
 }
@@ -1023,6 +1038,17 @@ function getAvatarForProfile(profile) {
 function getAvatarForPost(post) {
   const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
   return normalizeAvatar(post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
+}
+
+function tagsForPost(post) {
+  const raw = post.tags;
+  if (!raw) return [];
+  if (Array.isArray(raw)) return raw.map((t) => String(t).trim()).filter(Boolean).slice(0, 8);
+  return String(raw).split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
+}
+
+function songKey(post) {
+  return [post.song_title || post.song || "", post.song_author || post.song_artist || post.song_by || ""].join("|").trim().toLowerCase();
 }
 
 function getStoryQueue() {
@@ -1073,7 +1099,7 @@ async function loadData() {
     state.storyQueue = getStoryQueue();
 
     renderStories();
-    renderFeed(resolveCurrentFeed());
+    await renderFeed(resolveCurrentFeed());
     updateSuggestions();
   } catch (err) {
     console.error(err);
@@ -1098,11 +1124,38 @@ function renderStories() {
   `).join("");
 
   els.stories.querySelectorAll("[data-story-index]").forEach((btn) => {
-    btn.addEventListener("click", () => openStory(Number(btn.dataset.storyIndex)));
+    btn.addEventListener("click", () => openStory(Number(btn.dataset.story-index)));
   });
 }
 
-function renderFeed(filteredPosts = state.posts) {
+async function resolveAlbumCover(post) {
+  const key = songKey(post);
+  if (!key) return "";
+  if (state.coverCache.has(key)) return state.coverCache.get(key);
+
+  const title = String(post.song_title || post.song || "").trim();
+  const artist = String(post.song_author || post.song_artist || post.song_by || "").trim();
+  const term = [title, artist].filter(Boolean).join(" ");
+  if (!term) {
+    state.coverCache.set(key, "");
+    return "";
+  }
+
+  try {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=1`;
+    const res = await fetch(url);
+    const data = await res.json();
+    const artwork = data?.results?.[0]?.artworkUrl100 || "";
+    const cover = artwork ? artwork.replace(/100x100bb\.(jpg|png|jpeg)$/i, "600x600bb.$1") : "";
+    state.coverCache.set(key, cover);
+    return cover;
+  } catch {
+    state.coverCache.set(key, "");
+    return "";
+  }
+}
+
+async function renderFeed(filteredPosts = state.posts) {
   if (!filteredPosts.length) {
     els.feed.innerHTML = `<div class="empty">Nessun post trovato.</div>`;
     return;
@@ -1120,6 +1173,7 @@ function renderFeed(filteredPosts = state.posts) {
     const createdAt = post.created_at || post.inserted_at || post.updated_at || "";
     const likesCount = postLikeCount(post.id);
     const liked = postLikedByMe(post.id) || !!post.liked;
+    const tags = tagsForPost(post);
 
     return `
       <article class="post" data-post-id="${escapeHtml(post.id)}">
@@ -1147,10 +1201,12 @@ function renderFeed(filteredPosts = state.posts) {
           </div>
         </div>
 
+        ${tags.length ? `<div class="tag-row">${tags.map((tag) => `<span class="tag-pill">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
+
         ${caption ? `<div class="caption"><strong>${escapeHtml(username)}</strong> ${escapeHtml(caption)}</div>` : ""}
 
         ${(songTitle || songPreview) ? `
-          <div class="song-card">
+          <div class="song-card" data-song-key="${escapeHtml(songKey(post))}">
             ${songCover ? `<img class="album-cover" src="${songCover}" alt="Album cover">` : `<div class="note-cover" aria-label="No cover"><span class="material-symbols-rounded">music_note</span></div>`}
             <div class="song-info">
               ${songTitle ? `<div class="song-title">${escapeHtml(songTitle)}</div>` : ""}
@@ -1167,6 +1223,31 @@ function renderFeed(filteredPosts = state.posts) {
   wirePostInteractions();
   wireBackgroundAudio();
   wireDoubleTapLike();
+  await resolveMissingCovers();
+}
+
+async function resolveMissingCovers() {
+  const cards = [...document.querySelectorAll(".song-card[data-song-key]")];
+  const targets = cards.filter((card) => card.querySelector(".note-cover"));
+
+  await Promise.all(targets.map(async (card) => {
+    const postEl = card.closest("[data-post-id]");
+    if (!postEl) return;
+    const postId = postEl.dataset.postId;
+    const post = state.posts.find((p) => String(p.id) === String(postId));
+    if (!post) return;
+
+    const cover = await resolveAlbumCover(post);
+    if (!cover) return;
+
+    const note = card.querySelector(".note-cover");
+    if (!note) return;
+    const img = document.createElement("img");
+    img.className = "album-cover";
+    img.alt = "Album cover";
+    img.src = cover;
+    note.replaceWith(img);
+  }));
 }
 
 function wireLazyImages() {
@@ -1264,21 +1345,21 @@ function wirePostInteractions() {
 }
 
 function wireDoubleTapLike() {
-  const seen = new Map();
+  const lastTap = new Map();
 
   document.querySelectorAll("[data-like-zone]").forEach((zone) => {
     zone.addEventListener("click", () => {
       const id = zone.dataset.likeZone;
       const now = Date.now();
-      const prev = seen.get(id) || 0;
+      const prev = lastTap.get(id) || 0;
       if (now - prev < 300) {
         toggleLike(id);
-        seen.delete(id);
+        lastTap.delete(id);
         return;
       }
-      seen.set(id, now);
+      lastTap.set(id, now);
       setTimeout(() => {
-        if (seen.get(id) === now) seen.delete(id);
+        if (lastTap.get(id) === now) lastTap.delete(id);
       }, 320);
     });
 
@@ -1305,14 +1386,7 @@ function wireDoubleTapLike() {
 }
 
 function resolveCurrentFeed() {
-  const q = state.searchQuery.trim().toLowerCase();
-  if (!q) return state.posts;
-  return state.posts.filter((post) => {
-    const username = getUsernameForPost(post).toLowerCase();
-    const caption = String(post.caption || post.text || "").toLowerCase();
-    const songTitle = String(post.song_title || post.song || "").toLowerCase();
-    return username.includes(q) || caption.includes(q) || songTitle.includes(q);
-  });
+  return state.posts;
 }
 
 function updateSuggestions() {
@@ -1329,41 +1403,22 @@ function updateSuggestions() {
       const bio = String(profile.bio || "").toLowerCase();
       return username.includes(q) || bio.includes(q);
     })
-    .slice(0, 6)
+    .slice(0, 8)
     .map((profile) => ({
-      type: "user",
       id: profile.id,
       title: profile.username || profile.full_name || "user",
       subtitle: profile.bio || "Open profile",
       avatar: getAvatarForProfile(profile)
     }));
 
-  const postMatches = state.posts
-    .filter((post) => {
-      const username = getUsernameForPost(post).toLowerCase();
-      const caption = String(post.caption || post.text || "").toLowerCase();
-      const songTitle = String(post.song_title || post.song || "").toLowerCase();
-      return username.includes(q) || caption.includes(q) || songTitle.includes(q);
-    })
-    .slice(0, 6)
-    .map((post) => ({
-      type: "post",
-      id: post.id,
-      title: getUsernameForPost(post),
-      subtitle: (post.caption || post.text || post.song_title || post.song || "Post").toString().slice(0, 80),
-      avatar: getAvatarForPost(post)
-    }));
-
-  const items = [...userMatches, ...postMatches].slice(0, 8);
-
-  if (!items.length) {
+  if (!userMatches.length) {
     els.suggestions.style.display = "none";
     els.suggestions.innerHTML = "";
     return;
   }
 
-  els.suggestions.innerHTML = items.map((item) => `
-    <div class="suggestion" data-suggestion-type="${item.type}" data-suggestion-id="${escapeHtml(item.id)}">
+  els.suggestions.innerHTML = userMatches.map((item) => `
+    <div class="suggestion" data-suggestion-id="${escapeHtml(item.id)}">
       <img class="suggestion-avatar" src="${item.avatar}" alt="">
       <div class="suggestion-meta">
         <div class="suggestion-title">${escapeHtml(item.title)}</div>
@@ -1374,20 +1429,9 @@ function updateSuggestions() {
 
   els.suggestions.style.display = "block";
 
-  els.suggestions.querySelectorAll("[data-suggestion-type]").forEach((node) => {
+  els.suggestions.querySelectorAll("[data-suggestion-id]").forEach((node) => {
     node.addEventListener("click", () => {
-      const type = node.dataset.suggestionType;
-      const id = node.dataset.suggestionId;
-      if (type === "user") {
-        goToProfile(id);
-      } else {
-        const postEl = document.querySelector(`[data-post-id="${CSS.escape(id)}"]`);
-        if (postEl) {
-          postEl.scrollIntoView({ behavior: "smooth", block: "start" });
-          els.search.blur();
-          els.suggestions.style.display = "none";
-        }
-      }
+      goToProfile(node.dataset.suggestionId);
     });
   });
 }
@@ -1502,7 +1546,7 @@ async function openLikesModal(postId) {
   els.likesModal.setAttribute("aria-hidden", "false");
 
   els.likesList.querySelectorAll("[data-open-profile]").forEach((item) => {
-    item.addEventListener("click", () => goToProfile(item.dataset.openProfile));
+    item.addEventListener("click", () => goToProfile(item.dataset.open-profile));
   });
 }
 
@@ -1526,7 +1570,6 @@ els.nextStory.addEventListener("click", (event) => { event.stopPropagation(); ne
 els.search.addEventListener("input", () => {
   state.searchQuery = els.search.value;
   updateSuggestions();
-  renderFeed(resolveCurrentFeed());
 });
 
 els.search.addEventListener("focus", updateSuggestions);
@@ -1575,7 +1618,9 @@ window.goProfile = (id) => {
 window.like = async (id) => {
   if (!id || !state.currentUserId) return;
   await supabase.from("likes").insert({ post_id: id, user_id: state.currentUserId });
-  await reloadLikes();
+  const { data } = await supabase.from("likes").select("*");
+  state.likes = safeArray(data);
+  renderFeed(resolveCurrentFeed());
 };
 
 window.showLikes = async (id) => {
