@@ -2,28 +2,24 @@
 <html lang="it">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Shared.</title>
-  <meta name="theme-color" content="#05070d" />
+  <meta name="theme-color" content="#000000" />
   <style>
     :root {
-      --bg: #05070d;
-      --bg-2: #0a1020;
-      --panel: rgba(16, 22, 40, 0.54);
-      --panel-strong: rgba(18, 26, 48, 0.8);
-      --border: rgba(255, 255, 255, 0.10);
-      --text: rgba(248, 250, 255, 0.96);
-      --muted: rgba(205, 214, 235, 0.70);
-      --muted-2: rgba(205, 214, 235, 0.52);
-      --accent: #86a8ff;
-      --accent-2: #a56bff;
-      --good: #ff4d6d;
-      --shadow: 0 24px 80px rgba(0, 0, 0, 0.42);
+      --bg: #000000;
+      --panel: rgba(255, 255, 255, 0.06);
+      --panel-strong: rgba(255, 255, 255, 0.10);
+      --border: rgba(255, 255, 255, 0.14);
+      --text: #ffffff;
+      --muted: rgba(255, 255, 255, 0.72);
+      --muted-2: rgba(255, 255, 255, 0.50);
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
       --radius-xl: 28px;
       --radius-lg: 22px;
       --radius-md: 16px;
       --radius-sm: 12px;
-      --max-width: 640px;
+      --max-width: 740px;
       --header-h: 72px;
       --safe-top: env(safe-area-inset-top, 0px);
       --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -34,91 +30,104 @@
     body {
       margin: 0;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background:
-        radial-gradient(circle at 20% 0%, rgba(134, 168, 255, 0.22), transparent 28%),
-        radial-gradient(circle at 80% 10%, rgba(165, 107, 255, 0.18), transparent 22%),
-        radial-gradient(circle at 50% 100%, rgba(255, 77, 109, 0.10), transparent 25%),
-        linear-gradient(180deg, #04060b 0%, #060913 45%, #04050a 100%);
+      background: #000;
       color: var(--text);
       overflow: hidden;
     }
 
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      pointer-events: none;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 36px 36px;
-      mask-image: radial-gradient(circle at center, black 35%, transparent 100%);
-      opacity: 0.3;
-    }
-
     .app {
+      width: 100%;
       height: 100dvh;
       display: flex;
       justify-content: center;
-      overflow: hidden;
+      background: #000;
     }
 
     .shell {
       width: 100%;
       max-width: var(--max-width);
       height: 100%;
-      position: relative;
       display: flex;
       flex-direction: column;
       overflow: hidden;
+      background: #000;
     }
 
     .topbar {
       position: sticky;
       top: 0;
       z-index: 30;
-      padding-top: calc(var(--safe-top) + 12px);
-      padding-left: 16px;
-      padding-right: 16px;
+      padding-top: calc(var(--safe-top) + 10px);
+      padding-inline: 14px;
       height: calc(var(--header-h) + var(--safe-top));
-      display: flex;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-      background: linear-gradient(180deg, rgba(9, 12, 22, 0.78), rgba(9, 12, 22, 0.38));
-      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      gap: 10px;
+      background: rgba(0, 0, 0, 0.98);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
+    .topbar-spacer { width: 1px; height: 1px; }
+
     .brand {
+      justify-self: center;
       display: inline-flex;
       align-items: center;
       gap: 10px;
       text-decoration: none;
       color: var(--text);
       font-weight: 900;
-      letter-spacing: -0.04em;
+      letter-spacing: -0.05em;
       font-size: 1.45rem;
       line-height: 1;
-      text-shadow: 0 0 24px rgba(134, 168, 255, 0.28);
     }
 
     .brand-dot {
       width: 10px;
       height: 10px;
       border-radius: 999px;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 0 18px rgba(134, 168, 255, 0.85);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.10);
     }
+
+    .actions-top {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .chip-btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
+      border-radius: 999px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      cursor: pointer;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .chip-btn:hover { transform: translateY(-1px); background: rgba(255,255,255,0.10); }
+    .chip-btn:active { transform: scale(0.97); }
 
     .content {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
+      overflow-x: hidden;
       overscroll-behavior: contain;
       -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
-      padding-bottom: calc(18px + var(--safe-bottom));
+      padding-bottom: calc(12px + var(--safe-bottom));
     }
 
     .content.snap-posts {
@@ -126,23 +135,26 @@
     }
 
     .section {
-      padding: 14px 14px 0;
+      padding: 12px 0 0;
     }
 
-    .section-title {
+    .section-head {
+      padding: 0 14px 10px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin: 4px 2px 10px;
+      gap: 10px;
+    }
+
+    .section-title {
       color: var(--muted);
-      font-size: 0.76rem;
-      letter-spacing: 0.18em;
+      font-size: 0.74rem;
+      letter-spacing: 0.20em;
       text-transform: uppercase;
     }
 
     .stories-wrap {
       position: relative;
-      padding-bottom: 8px;
     }
 
     .stories {
@@ -152,7 +164,7 @@
       gap: 14px;
       overflow-x: auto;
       overflow-y: hidden;
-      padding: 4px 4px 12px;
+      padding: 2px 14px 10px;
       scrollbar-width: none;
     }
     .stories::-webkit-scrollbar { display: none; }
@@ -176,15 +188,15 @@
       height: 68px;
       border-radius: 999px;
       padding: 2px;
-      background: linear-gradient(135deg, rgba(134,168,255,1), rgba(165,107,255,1), rgba(255,77,109,1));
-      box-shadow: 0 0 18px rgba(134, 168, 255, 0.18), 0 0 34px rgba(165, 107, 255, 0.08);
-      transition: transform 180ms ease, filter 180ms ease;
+      background: #fff;
+      transition: transform 180ms ease, opacity 180ms ease;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
     }
 
     .story:active .story-ring,
     .story:hover .story-ring {
       transform: scale(0.98);
-      filter: brightness(1.04);
+      opacity: 0.92;
     }
 
     .story-avatar {
@@ -192,9 +204,9 @@
       height: 100%;
       border-radius: 999px;
       object-fit: cover;
-      background: rgba(255,255,255,0.08);
-      border: 2px solid rgba(7, 9, 15, 0.92);
       display: block;
+      border: 2px solid #000;
+      background: #111;
     }
 
     .story-name {
@@ -207,29 +219,23 @@
     }
 
     .feed {
-      padding: 10px 0 0;
       display: grid;
-      gap: 14px;
+      gap: 12px;
+      padding: 2px 0 0;
     }
 
     .post {
       scroll-snap-align: start;
-      margin: 0 10px;
-      border-radius: 28px;
-      overflow: hidden;
-      background: linear-gradient(180deg, rgba(20, 28, 48, 0.70), rgba(11, 16, 28, 0.84));
-      border: 1px solid var(--border);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      position: relative;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      background: #000;
     }
 
     .post-header {
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 14px 14px 12px;
+      padding: 14px;
     }
 
     .avatar {
@@ -238,16 +244,16 @@
       border-radius: 999px;
       object-fit: cover;
       flex: 0 0 auto;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      background: #111;
     }
 
     .user-meta { min-width: 0; flex: 1; }
 
     .username {
       margin: 0;
-      font-weight: 700;
-      font-size: 0.95rem;
+      font-weight: 800;
+      font-size: 0.96rem;
       line-height: 1.2;
       letter-spacing: -0.02em;
       white-space: nowrap;
@@ -258,14 +264,14 @@
     .post-time {
       margin-top: 3px;
       color: var(--muted-2);
-      font-size: 0.77rem;
+      font-size: 0.76rem;
     }
 
     .post-media {
       position: relative;
-      aspect-ratio: 4 / 5;
       width: 100%;
-      background: rgba(255,255,255,0.04);
+      aspect-ratio: 1 / 1;
+      background: #0b0b0b;
       overflow: hidden;
     }
 
@@ -274,11 +280,10 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      transform: scale(1.01);
     }
 
     .post-body {
-      padding: 12px 14px 14px;
+      padding: 12px 14px 16px;
       display: grid;
       gap: 12px;
     }
@@ -298,9 +303,9 @@
 
     .icon-btn {
       appearance: none;
-      border: 1px solid rgba(255,255,255,0.10);
-      background: rgba(255,255,255,0.06);
-      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.04);
+      color: #fff;
       width: 42px;
       height: 42px;
       border-radius: 999px;
@@ -308,16 +313,13 @@
       align-items: center;
       justify-content: center;
       cursor: pointer;
-      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease;
     }
 
-    .icon-btn:hover { transform: translateY(-1px); }
     .icon-btn:active { transform: scale(0.96); }
-
     .icon-btn.liked {
-      background: rgba(255, 77, 109, 0.18);
-      border-color: rgba(255, 77, 109, 0.35);
-      box-shadow: 0 0 0 4px rgba(255, 77, 109, 0.06);
+      background: rgba(255,255,255,0.16);
+      border-color: rgba(255,255,255,0.34);
     }
 
     .icon {
@@ -330,7 +332,7 @@
     .count,
     .song-title,
     .caption {
-      color: rgba(245, 248, 255, 0.92);
+      color: rgba(255,255,255,0.92);
       font-size: 0.92rem;
       line-height: 1.45;
     }
@@ -345,7 +347,7 @@
       padding: 12px;
       border-radius: 18px;
       background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.10);
     }
 
     .song-label {
@@ -364,7 +366,7 @@
     audio {
       width: 100%;
       display: block;
-      filter: saturate(0.9);
+      filter: grayscale(1) contrast(1.15);
     }
 
     .loading {
@@ -373,11 +375,7 @@
       z-index: 80;
       display: grid;
       place-items: center;
-      background:
-        radial-gradient(circle at 50% 30%, rgba(134,168,255,0.10), transparent 30%),
-        rgba(4, 6, 10, 0.82);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
+      background: #000;
       transition: opacity 240ms ease, visibility 240ms ease;
     }
 
@@ -391,10 +389,10 @@
       display: grid;
       gap: 14px;
       justify-items: center;
-      padding: 28px 22px;
-      border-radius: 28px;
-      background: rgba(18, 24, 42, 0.72);
-      border: 1px solid rgba(255,255,255,0.10);
+      padding: 26px 22px;
+      border-radius: 24px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
       box-shadow: var(--shadow);
       min-width: 220px;
     }
@@ -403,8 +401,8 @@
       width: 42px;
       height: 42px;
       border-radius: 999px;
-      border: 3px solid rgba(255,255,255,0.12);
-      border-top-color: rgba(134,168,255,0.95);
+      border: 3px solid rgba(255,255,255,0.14);
+      border-top-color: #fff;
       animation: spin 0.85s linear infinite;
     }
 
@@ -422,7 +420,7 @@
       z-index: 100;
       display: grid;
       place-items: center;
-      background: rgba(2, 4, 8, 0.94);
+      background: #000;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -444,13 +442,14 @@
       display: flex;
       align-items: stretch;
       justify-content: center;
+      background: #000;
     }
 
     .story-stage {
       position: relative;
       width: 100%;
       height: 100%;
-      background: radial-gradient(circle at 50% 20%, rgba(134,168,255,0.14), transparent 28%), #05070d;
+      background: #000;
     }
 
     .story-stage img {
@@ -458,15 +457,12 @@
       height: 100%;
       object-fit: cover;
       display: block;
-      opacity: 0.98;
     }
 
     .story-gradient {
       position: absolute;
       inset: 0;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,0.42), transparent 18%, transparent 75%, rgba(0,0,0,0.56)),
-        radial-gradient(circle at 50% 40%, transparent 35%, rgba(0,0,0,0.18) 100%);
+      background: linear-gradient(180deg, rgba(0,0,0,0.62), transparent 20%, transparent 78%, rgba(0,0,0,0.72));
       pointer-events: none;
     }
 
@@ -479,7 +475,7 @@
       padding: calc(14px + var(--safe-top)) 12px 12px;
       display: grid;
       gap: 10px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.42), transparent);
+      background: linear-gradient(180deg, rgba(0,0,0,0.56), transparent);
     }
 
     .progress-row {
@@ -490,7 +486,7 @@
 
     .progress {
       height: 3px;
-      background: rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.18);
       border-radius: 999px;
       overflow: hidden;
     }
@@ -499,7 +495,7 @@
       display: block;
       width: 0%;
       height: 100%;
-      background: linear-gradient(90deg, rgba(255,255,255,0.92), rgba(134,168,255,0.92));
+      background: #fff;
       border-radius: inherit;
     }
 
@@ -523,7 +519,7 @@
       height: 36px;
       border-radius: 999px;
       object-fit: cover;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.16);
     }
 
     .story-meta-name {
@@ -537,9 +533,9 @@
       width: 42px;
       height: 42px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.12);
-      background: rgba(255,255,255,0.08);
-      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(255,255,255,0.06);
+      color: #fff;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -565,43 +561,31 @@
       padding: 10px 14px;
       border-radius: 999px;
       background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.12);
-      color: rgba(255,255,255,0.86);
+      border: 1px solid rgba(255,255,255,0.14);
+      color: rgba(255,255,255,0.88);
       font-size: 0.8rem;
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
     }
 
     .empty {
-      margin: 28px 14px 0;
+      margin: 18px 14px 0;
       padding: 22px;
-      border-radius: 24px;
+      border-radius: 22px;
       background: rgba(255,255,255,0.04);
       border: 1px solid rgba(255,255,255,0.08);
       color: var(--muted);
       text-align: center;
     }
 
-    .skeleton {
-      position: relative;
-      overflow: hidden;
-      background: rgba(255,255,255,0.05);
-    }
-
-    .skeleton::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      transform: translateX(-100%);
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.10), transparent);
-      animation: shimmer 1.25s infinite;
-    }
-
-    @keyframes shimmer { 100% { transform: translateX(100%); } }
-
-    @media (min-width: 700px) {
-      .post { margin-inline: 14px; }
-      .section { padding-inline: 16px; }
+    @media (max-width: 420px) {
+      .topbar {
+        grid-template-columns: auto 1fr auto;
+      }
+      .brand { font-size: 1.25rem; }
+      .chip-btn { padding: 9px 10px; font-size: 0.78rem; }
+      .stories { grid-auto-columns: 70px; gap: 12px; }
+      .story-ring { width: 64px; height: 64px; }
     }
   </style>
 </head>
@@ -609,25 +593,30 @@
   <div class="app">
     <div class="shell">
       <header class="topbar">
+        <div class="topbar-spacer"></div>
         <a class="brand" href="#" aria-label="Shared home">
           <span class="brand-dot"></span>
           <span>Shared.</span>
         </a>
+        <div class="actions-top">
+          <button id="uploadStoryBtn" class="chip-btn" type="button">Upload story</button>
+          <button id="uploadPostBtn" class="chip-btn" type="button">Upload post</button>
+        </div>
       </header>
 
       <main id="content" class="content snap-posts" aria-live="polite">
         <section class="section stories-wrap">
-          <div class="section-title">
-            <span>Stories</span>
-            <span id="storiesCount">0</span>
+          <div class="section-head">
+            <div class="section-title">Stories</div>
+            <div id="storiesCount" class="section-title">0</div>
           </div>
           <div id="stories" class="stories" aria-label="Stories horizontal list"></div>
         </section>
 
         <section class="section">
-          <div class="section-title">
-            <span>Feed</span>
-            <span id="postsCount">0</span>
+          <div class="section-head">
+            <div class="section-title">Feed</div>
+            <div id="postsCount" class="section-title">0</div>
           </div>
           <div id="feed" class="feed"></div>
         </section>
@@ -709,8 +698,18 @@
       closeStory: document.getElementById("closeStory"),
       prevStory: document.getElementById("prevStory"),
       nextStory: document.getElementById("nextStory"),
-      content: document.getElementById("content")
+      content: document.getElementById("content"),
+      uploadStoryBtn: document.getElementById("uploadStoryBtn"),
+      uploadPostBtn: document.getElementById("uploadPostBtn")
     };
+
+    els.uploadStoryBtn.addEventListener("click", () => {
+      window.location.href = "upload.html?type=story";
+    });
+
+    els.uploadPostBtn.addEventListener("click", () => {
+      window.location.href = "upload.html";
+    });
 
     function safeArray(value) {
       return Array.isArray(value) ? value : [];
@@ -782,7 +781,7 @@
         const [profilesRes, postsRes, likesRes, userId] = await Promise.all([
           supabase.from("profiles").select("*").order("username", { ascending: true }),
           supabase.from("posts").select("*").order("created_at", { ascending: false }),
-          supabase.from("likes").select("*") ,
+          supabase.from("likes").select("*"),
           getCurrentUserId()
         ]);
 
@@ -829,12 +828,24 @@
         .filter((item) => item.story || item.avatar || item.username);
     }
 
+    function placeholderAvatar(seed) {
+      const label = encodeURIComponent(String(seed || "Shared"));
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+          <rect width="120" height="120" rx="60" fill="#111"/>
+          <circle cx="60" cy="48" r="18" fill="#fff"/>
+          <path d="M24 100c7-20 24-30 36-30s29 10 36 30" fill="#fff"/>
+          <text x="60" y="114" font-family="Arial" font-size="0" fill="#fff">${label}</text>
+        </svg>
+      `)}`;
+    }
+
     function renderStories() {
       state.storyQueue = buildStoriesFromProfiles();
       els.storiesCount.textContent = formatCount(state.storyQueue.length);
 
       if (!state.storyQueue.length) {
-        els.stories.innerHTML = `<div class="empty" style="margin:0; min-width: calc(100% - 8px);">Nessuna storia disponibile.</div>`;
+        els.stories.innerHTML = `<div class="empty" style="margin:0 14px; min-width: calc(100% - 28px);">Nessuna storia disponibile.</div>`;
         return;
       }
 
@@ -850,24 +861,6 @@
       els.stories.querySelectorAll("[data-story-index]").forEach((btn) => {
         btn.addEventListener("click", () => openStory(Number(btn.dataset.storyIndex)));
       });
-    }
-
-    function placeholderAvatar(seed) {
-      const label = encodeURIComponent(String(seed || "Shared"));
-      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stop-color="#86a8ff"/>
-              <stop offset="100%" stop-color="#a56bff"/>
-            </linearGradient>
-          </defs>
-          <rect width="120" height="120" rx="60" fill="#111827"/>
-          <circle cx="60" cy="48" r="18" fill="url(#g)"/>
-          <path d="M24 100c7-20 24-30 36-30s29 10 36 30" fill="url(#g)"/>
-          <text x="60" y="114" font-family="Arial" font-size="0" fill="#fff">${label}</text>
-        </svg>
-      `)}`;
     }
 
     function renderFeed() {
@@ -914,7 +907,6 @@
                   </button>
                   <div class="count" data-like-count="${escapeHtml(post.id)}">${formatCount(likes)} likes</div>
                 </div>
-                <div class="count">${caption ? "" : ""}</div>
               </div>
 
               ${caption ? `<div class="caption"><strong>${escapeHtml(username)}</strong> ${escapeHtml(caption)}</div>` : ""}
@@ -938,13 +930,7 @@
     function tinyBlurDataUri() {
       return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 10">
-          <defs>
-            <linearGradient id="a" x1="0" y1="0" x2="1" y2="1">
-              <stop stop-color="#0d1325" offset="0"/>
-              <stop stop-color="#1e2a4a" offset="1"/>
-            </linearGradient>
-          </defs>
-          <rect width="8" height="10" fill="url(#a)"/>
+          <rect width="8" height="10" fill="#111"/>
         </svg>
       `);
     }
@@ -960,7 +946,7 @@
           img.removeAttribute("data-src");
           observer.unobserve(img);
         });
-      }, { root: els.content, threshold: 0.15, rootMargin: "150px 0px" });
+      }, { root: els.content, threshold: 0.15, rootMargin: "160px 0px" });
 
       images.forEach((img) => io.observe(img));
     }
@@ -983,16 +969,10 @@
 
           try {
             if (currentlyLiked) {
-              await supabase
-                .from("likes")
-                .delete()
-                .eq("post_id", postId)
-                .eq("user_id", state.currentUserId);
+              await supabase.from("likes").delete().eq("post_id", postId).eq("user_id", state.currentUserId);
               state.likedByMe.delete(postId);
             } else {
-              await supabase
-                .from("likes")
-                .insert({ post_id: postId, user_id: state.currentUserId });
+              await supabase.from("likes").insert({ post_id: postId, user_id: state.currentUserId });
               state.likedByMe.add(postId);
             }
           } catch (error) {
