@@ -2,7 +2,7 @@
 <html lang="it">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width([developer.apple.com](https://developer.apple.com/library/archive/documentation/AudioVideo/Conceptual/iTuneSearchAPI/index.html?utm_source=chatgpt.com)), viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Shared.</title>
 <meta name="theme-color" content="#000000">
 
@@ -76,17 +76,7 @@
     gap:10px;
   }
 
-  .search-wrap{
-    position:relative;
-  }
-
-  .search-label{
-    font-size:12px;
-    color:var(--muted-2);
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    margin:0 4px 8px;
-  }
+  .search-wrap{position:relative}
 
   .search{
     width:100%;
@@ -148,6 +138,9 @@
 
   .suggestion-meta{min-width:0;flex:1}
   .suggestion-title{
+    display:flex;
+    align-items:center;
+    gap:6px;
     font-size:14px;
     white-space:nowrap;
     overflow:hidden;
@@ -214,9 +207,7 @@
     z-index:5;
   }
 
-  .stories-section{
-    padding-top:8px;
-  }
+  .stories-section{padding-top:8px;}
 
   .section-head{
     display:flex;
@@ -269,7 +260,7 @@
     display:flex;
     flex-direction:column;
     gap:12px;
-    padding:14px 0 22px;
+    padding:34px 0 22px;
   }
 
   .post{
@@ -298,9 +289,18 @@
   }
 
   .username{
+    display:flex;
+    align-items:center;
+    gap:6px;
     cursor:pointer;
     font-size:15px;
     line-height:1.1;
+  }
+
+  .verified{
+    font-size:16px;
+    color:#fff;
+    flex:0 0 auto;
   }
 
   .post-time{
@@ -413,8 +413,6 @@
     font-size:14px;
     line-height:1.42;
   }
-
-  .caption strong{font-size:14px}
 
   .song-card{
     display:flex;
@@ -537,9 +535,7 @@
   .story-viewer-shell,
   .story-stage{width:100%;height:100%;max-width:100vw;position:relative}
 
-  .story-stage{
-    background:#000;
-  }
+  .story-stage{background:#000}
 
   .story-stage img{
     width:100%;
@@ -725,6 +721,9 @@
   .list-main{min-width:0;flex:1}
 
   .list-name{
+    display:flex;
+    align-items:center;
+    gap:6px;
     font-size:15px;
     white-space:nowrap;
     overflow:hidden;
@@ -764,9 +763,7 @@
       padding:10px;
       gap:10px;
     }
-    .sidebar-top{
-      gap:10px;
-    }
+    .sidebar-top{gap:10px}
     .sidebar-bottom{
       flex-direction:row;
       gap:8px;
@@ -784,12 +781,8 @@
       width:100%;
       height:calc(100vh - 160px);
     }
-    .header{
-      font-size:28px;
-    }
-    .post{
-      width:calc(100vw - 18px);
-    }
+    .header{font-size:28px}
+    .post{width:calc(100vw - 18px)}
   }
 </style>
 </head>
@@ -798,7 +791,6 @@
     <aside class="sidebar">
       <div class="sidebar-top">
         <div class="search-wrap">
-          <div class="search-label">Search profiles</div>
           <input id="search" class="search" placeholder="Search" autocomplete="off">
           <div id="suggestions" class="suggestions"></div>
         </div>
@@ -1040,6 +1032,10 @@ function getAvatarForPost(post) {
   return normalizeAvatar(post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
 }
 
+function isVerified(profile) {
+  return profile?.verified === true || profile?.verified === 'true' || profile?.verified === 1;
+}
+
 function tagsForPost(post) {
   const raw = post.tags;
   if (!raw) return [];
@@ -1124,7 +1120,7 @@ function renderStories() {
   `).join("");
 
   els.stories.querySelectorAll("[data-story-index]").forEach((btn) => {
-    btn.addEventListener("click", () => openStory(Number(btn.dataset.story-index)));
+    btn.addEventListener("click", () => openStory(Number(btn.dataset.storyIndex)));
   });
 }
 
@@ -1163,6 +1159,7 @@ async function renderFeed(filteredPosts = state.posts) {
 
   els.feed.innerHTML = filteredPosts.map((post) => {
     const username = getUsernameForPost(post);
+    const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
     const avatar = getAvatarForPost(post);
     const image = normalizeShared(post.image_url || post.media_url || post.image || "");
     const caption = post.caption || post.text || "";
@@ -1180,7 +1177,10 @@ async function renderFeed(filteredPosts = state.posts) {
         <div class="post-header">
           <img class="avatar" loading="lazy" src="${avatar}" alt="${escapeHtml(username)} avatar">
           <div class="user-meta">
-            <div class="username" data-profile-id="${escapeHtml(post.user_id || post.profile_id || post.id)}">${escapeHtml(username)}</div>
+            <div class="username" data-profile-id="${escapeHtml(post.user_id || post.profile_id || post.id)}">
+              <span>${escapeHtml(username)}</span>
+              ${profile && isVerified(profile) ? `<span class="verified">✓</span>` : ""}
+            </div>
             <div class="post-time">${escapeHtml(timeAgo(createdAt))}</div>
           </div>
         </div>
@@ -1203,7 +1203,7 @@ async function renderFeed(filteredPosts = state.posts) {
 
         ${tags.length ? `<div class="tag-row">${tags.map((tag) => `<span class="tag-pill">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
 
-        ${caption ? `<div class="caption"><strong>${escapeHtml(username)}</strong> ${escapeHtml(caption)}</div>` : ""}
+        ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ""}
 
         ${(songTitle || songPreview) ? `
           <div class="song-card" data-song-key="${escapeHtml(songKey(post))}">
@@ -1408,7 +1408,8 @@ function updateSuggestions() {
       id: profile.id,
       title: profile.username || profile.full_name || "user",
       subtitle: profile.bio || "Open profile",
-      avatar: getAvatarForProfile(profile)
+      avatar: getAvatarForProfile(profile),
+      verified: isVerified(profile)
     }));
 
   if (!userMatches.length) {
@@ -1421,7 +1422,10 @@ function updateSuggestions() {
     <div class="suggestion" data-suggestion-id="${escapeHtml(item.id)}">
       <img class="suggestion-avatar" src="${item.avatar}" alt="">
       <div class="suggestion-meta">
-        <div class="suggestion-title">${escapeHtml(item.title)}</div>
+        <div class="suggestion-title">
+          <span>${escapeHtml(item.title)}</span>
+          ${item.verified ? `<span class="verified">✓</span>` : ""}
+        </div>
         <div class="suggestion-subtitle">${escapeHtml(item.subtitle)}</div>
       </div>
     </div>
@@ -1526,7 +1530,8 @@ async function openLikesModal(postId) {
       id: profile?.id || like.user_id,
       name: profile?.username || profile?.full_name || "user",
       avatar: getAvatarForProfile(profile),
-      subtitle: profile?.bio || "Open profile"
+      subtitle: profile?.bio || "Open profile",
+      verified: isVerified(profile)
     };
   });
 
@@ -1535,7 +1540,10 @@ async function openLikesModal(postId) {
         <div class="list-item" data-open-profile="${escapeHtml(item.id)}">
           <img class="list-avatar" src="${item.avatar}" alt="">
           <div class="list-main">
-            <div class="list-name">${escapeHtml(item.name)}</div>
+            <div class="list-name">
+              <span>${escapeHtml(item.name)}</span>
+              ${item.verified ? `<span class="verified">✓</span>` : ""}
+            </div>
             <div class="list-sub">${escapeHtml(item.subtitle)}</div>
           </div>
         </div>
@@ -1546,7 +1554,7 @@ async function openLikesModal(postId) {
   els.likesModal.setAttribute("aria-hidden", "false");
 
   els.likesList.querySelectorAll("[data-open-profile]").forEach((item) => {
-    item.addEventListener("click", () => goToProfile(item.dataset.open-profile));
+    item.addEventListener("click", () => goToProfile(item.dataset.openProfile));
   });
 }
 
