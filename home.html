@@ -20,8 +20,9 @@
     --panel-2:rgba(255,255,255,.08);
     --panel-3:rgba(255,255,255,.12);
     --danger:#ff3b30;
-    --sidebar-w:240px;
-    --feed-width:560px;
+    --like:#ff2d55;
+    --sidebar-w:300px;
+    --feed-width:460px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
@@ -35,9 +36,7 @@
     overflow:hidden;
   }
 
-  button, input, a{
-    font-family:'Archivo Black', sans-serif;
-  }
+  button, input, a{font-family:'Archivo Black', sans-serif;}
 
   .app{
     width:100%;
@@ -52,21 +51,129 @@
     top:0;
     bottom:0;
     width:var(--sidebar-w);
-    padding:20px 12px;
+    padding:18px 14px;
     display:flex;
     flex-direction:column;
     gap:14px;
     border-right:1px solid rgba(255,255,255,.1);
     background:#000;
     z-index:20;
-    overflow:auto;
+    overflow:hidden;
+  }
+
+  .sidebar-top{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    min-height:0;
+    flex:1;
+  }
+
+  .sidebar-bottom{
+    margin-top:auto;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+
+  .brand-side{
+    font-size:28px;
+    letter-spacing:-.05em;
+    line-height:1;
+    padding:4px 4px 10px;
+  }
+
+  .search-wrap{
+    position:relative;
+  }
+
+  .search-label{
+    font-size:12px;
+    color:var(--muted-2);
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    margin:0 4px 8px;
+  }
+
+  .search{
+    width:100%;
+    display:block;
+    padding:14px 16px;
+    border-radius:18px;
+    border:1px solid rgba(255,255,255,.18);
+    background:#111;
+    color:#fff;
+    outline:none;
+    font-size:15px;
+  }
+
+  .search::placeholder{color:rgba(255,255,255,.4)}
+
+  .suggestions{
+    position:absolute;
+    left:0;
+    right:0;
+    top:calc(100% + 8px);
+    display:none;
+    background:#0b0b0b;
+    border:1px solid rgba(255,255,255,.14);
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 20px 60px rgba(0,0,0,.55);
+    max-height:320px;
+    overflow-y:auto;
+    z-index:30;
+  }
+
+  .suggestion{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
+    cursor:pointer;
+    border-bottom:1px solid rgba(255,255,255,.06);
+  }
+
+  .suggestion:last-child{border-bottom:0}
+  .suggestion:hover{background:rgba(255,255,255,.06)}
+
+  .suggestion-avatar,
+  .avatar,
+  .story img,
+  .album-cover{
+    object-fit:cover;
+    background:#111;
+  }
+
+  .suggestion-avatar{
+    width:34px;
+    height:34px;
+    border-radius:50%;
+    border:1px solid rgba(255,255,255,.1);
+    flex:0 0 auto;
+  }
+
+  .suggestion-meta{min-width:0;flex:1}
+  .suggestion-title{
+    font-size:14px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .suggestion-subtitle{
+    margin-top:3px;
+    font-size:11px;
+    color:var(--muted-2);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .nav-btn{
     display:flex;
     align-items:center;
     gap:12px;
-    padding:14px;
+    padding:14px 15px;
     border-radius:14px;
     border:1px solid rgba(255,255,255,.15);
     background:rgba(255,255,255,.05);
@@ -76,7 +183,7 @@
     text-decoration:none;
     user-select:none;
     line-height:1;
-    font-size:16px;
+    font-size:15px;
   }
 
   .nav-btn:hover{background:rgba(255,255,255,.1)}
@@ -105,8 +212,8 @@
   .header{
     text-align:center;
     padding:18px 12px 14px;
-    font-size:32px;
-    letter-spacing:-.04em;
+    font-size:30px;
+    letter-spacing:-.05em;
     border-bottom:1px solid rgba(255,255,255,.08);
     position:sticky;
     top:0;
@@ -114,104 +221,36 @@
     z-index:5;
   }
 
-  .search-wrap{
-    position:sticky;
-    top:72px;
-    z-index:4;
-    background:#000;
-    padding:12px 12px 14px;
-    border-bottom:1px solid rgba(255,255,255,.08);
+  .stories-section{
+    padding-top:8px;
   }
 
-  .search{
-    width:100%;
-    display:block;
-    padding:14px 16px;
-    border-radius:18px;
-    border:1px solid rgba(255,255,255,.18);
-    background:#111;
-    color:#fff;
-    outline:none;
-    font-size:16px;
-  }
-
-  .search::placeholder{color:rgba(255,255,255,.4)}
-
-  .suggestions{
-    position:absolute;
-    left:12px;
-    right:12px;
-    top:calc(100% - 2px);
-    display:none;
-    background:#0b0b0b;
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:16px;
-    overflow:hidden;
-    box-shadow:0 20px 60px rgba(0,0,0,.55);
-    max-height:320px;
-    overflow-y:auto;
-  }
-
-  .suggestion{
+  .section-head{
     display:flex;
     align-items:center;
-    gap:12px;
-    padding:12px 14px;
-    cursor:pointer;
-    border-bottom:1px solid rgba(255,255,255,.06);
+    justify-content:space-between;
+    padding:0 12px 10px;
   }
 
-  .suggestion:last-child{border-bottom:0}
-  .suggestion:hover{background:rgba(255,255,255,.06)}
-
-  .suggestion-avatar,
-  .avatar,
-  .story img,
-  .album-cover{
-    object-fit:cover;
-    background:#111;
-  }
-
-  .suggestion-avatar{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,.1);
-  }
-
-  .suggestion-meta{
-    min-width:0;
-    flex:1;
-  }
-
-  .suggestion-title{
-    font-size:15px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .suggestion-subtitle{
-    margin-top:3px;
+  .section-title{
     font-size:12px;
     color:var(--muted-2);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    letter-spacing:.14em;
+    text-transform:uppercase;
   }
 
   .stories{
     display:flex;
     gap:14px;
     overflow-x:auto;
-    padding:14px 12px 8px;
+    padding:8px 12px 6px;
     scrollbar-width:none;
   }
 
   .stories::-webkit-scrollbar{display:none}
 
   .story{
-    min-width:74px;
+    min-width:70px;
     text-align:center;
     cursor:pointer;
     flex:0 0 auto;
@@ -227,7 +266,7 @@
   }
 
   .story div{
-    font-size:12px;
+    font-size:11px;
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
@@ -236,8 +275,8 @@
   .feed{
     display:flex;
     flex-direction:column;
-    gap:20px;
-    padding:18px 0 28px;
+    gap:14px;
+    padding:16px 0 28px;
   }
 
   .post{
@@ -245,7 +284,7 @@
     width:min(var(--feed-width), calc(100vw - var(--sidebar-w) - 24px));
     margin:0 auto;
     border:1px solid rgba(255,255,255,.15);
-    border-radius:20px;
+    border-radius:18px;
     overflow:hidden;
     background:#000;
   }
@@ -254,12 +293,12 @@
     display:flex;
     align-items:center;
     gap:12px;
-    padding:12px;
+    padding:10px 11px;
   }
 
   .avatar{
-    width:40px;
-    height:40px;
+    width:34px;
+    height:34px;
     border-radius:50%;
     border:1px solid rgba(255,255,255,.12);
     flex:0 0 auto;
@@ -267,22 +306,51 @@
 
   .username{
     cursor:pointer;
-    font-size:16px;
+    font-size:15px;
     line-height:1.1;
   }
 
   .post-time{
     margin-top:4px;
-    font-size:11px;
+    font-size:10px;
     color:var(--muted-2);
+  }
+
+  .media{
+    position:relative;
+    width:100%;
+    aspect-ratio:1/1;
+    background:#111;
+    overflow:hidden;
   }
 
   .media img{
     width:100%;
-    aspect-ratio:1/1;
+    height:100%;
     display:block;
     object-fit:cover;
-    background:#111;
+  }
+
+  .like-pop{
+    position:absolute;
+    inset:auto auto 50% 50%;
+    transform:translate(-50%, 50%) scale(.8);
+    pointer-events:none;
+    opacity:0;
+    z-index:3;
+    color:var(--like);
+    filter:drop-shadow(0 6px 20px rgba(0,0,0,.6));
+    transition:opacity .15s ease, transform .15s ease;
+  }
+
+  .like-pop.show{
+    opacity:1;
+    transform:translate(-50%, 50%) scale(1);
+  }
+
+  .like-pop .material-symbols-rounded{
+    font-size:72px;
+    font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;
   }
 
   .actions{
@@ -290,7 +358,7 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    padding:10px 12px 0;
+    padding:10px 11px 0;
   }
 
   .like-row{
@@ -300,8 +368,8 @@
   }
 
   .like-btn{
-    width:42px;
-    height:42px;
+    width:40px;
+    height:40px;
     border-radius:999px;
     border:1px solid rgba(255,255,255,.14);
     background:rgba(255,255,255,.05);
@@ -311,48 +379,66 @@
     justify-content:center;
     cursor:pointer;
     transition:.18s;
+    flex:0 0 auto;
   }
 
   .like-btn:hover{background:rgba(255,255,255,.1)}
   .like-btn:active{transform:scale(.96)}
-  .like-btn.liked{background:rgba(255,255,255,.14)}
+  .like-btn.liked{color:var(--like);background:rgba(255,45,85,.08);border-color:rgba(255,45,85,.28)}
 
-  .material-symbols-rounded{
-    font-variation-settings:'FILL' 0,'wght' 400,'GRAD' 0,'opsz' 24;
+  .like-btn .material-symbols-rounded{
+    font-size:20px;
+    font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 24;
   }
 
   .count{
-    font-size:13px;
+    font-size:12px;
     color:var(--muted);
     cursor:pointer;
     user-select:none;
   }
 
   .caption{
-    padding:10px 12px 0;
-    font-size:15px;
-    line-height:1.45;
+    padding:10px 11px 0;
+    font-size:14px;
+    line-height:1.42;
   }
 
-  .caption strong{font-size:15px}
+  .caption strong{font-size:14px}
 
   .song-card{
     display:flex;
     align-items:center;
     gap:12px;
-    padding:12px;
-    margin:12px;
-    border-radius:18px;
+    padding:11px;
+    margin:11px;
+    border-radius:16px;
     background:rgba(255,255,255,.05);
     border:1px solid rgba(255,255,255,.08);
   }
 
   .album-cover{
-    width:52px;
-    height:52px;
+    width:46px;
+    height:46px;
     border-radius:10px;
-    flex:0 0 auto;
     border:1px solid rgba(255,255,255,.12);
+    flex:0 0 auto;
+  }
+
+  .note-cover{
+    width:46px;
+    height:46px;
+    border-radius:10px;
+    border:1px solid rgba(255,255,255,.12);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:#111;
+    flex:0 0 auto;
+  }
+
+  .note-cover .material-symbols-rounded{
+    font-size:24px;
   }
 
   .song-info{
@@ -361,7 +447,7 @@
   }
 
   .song-title{
-    font-size:15px;
+    font-size:14px;
     line-height:1.2;
     white-space:nowrap;
     overflow:hidden;
@@ -370,16 +456,14 @@
 
   .song-author{
     margin-top:4px;
-    font-size:12px;
+    font-size:11px;
     color:var(--muted-2);
     white-space:nowrap;
     overflow:hidden;
     text-overflow:ellipsis;
   }
 
-  audio.bg-audio{
-    display:none;
-  }
+  audio.bg-audio{display:none}
 
   .loading{
     position:fixed;
@@ -417,13 +501,9 @@
     animation:spin .85s linear infinite;
   }
 
-  .loading-text{
-    font-size:18px;
-  }
+  .loading-text{font-size:18px}
 
-  @keyframes spin{
-    to{transform:rotate(360deg)}
-  }
+  @keyframes spin{to{transform:rotate(360deg)}}
 
   .story-viewer{
     position:fixed;
@@ -444,17 +524,10 @@
     pointer-events:auto;
   }
 
-  .story-viewer-shell{
-    position:relative;
-    width:100%;
-    height:100%;
-    max-width:100vw;
-  }
+  .story-viewer-shell,
+  .story-stage{width:100%;height:100%;max-width:100vw;position:relative}
 
   .story-stage{
-    width:100%;
-    height:100%;
-    position:relative;
     background:#000;
   }
 
@@ -603,9 +676,7 @@
     margin-bottom:12px;
   }
 
-  .modal-title{
-    font-size:18px;
-  }
+  .modal-title{font-size:18px}
 
   .modal-close{
     width:38px;
@@ -641,10 +712,7 @@
     flex:0 0 auto;
   }
 
-  .list-main{
-    min-width:0;
-    flex:1;
-  }
+  .list-main{min-width:0;flex:1}
 
   .list-name{
     font-size:15px;
@@ -681,39 +749,37 @@
       width:100%;
       height:auto;
       bottom:auto;
-      flex-direction:row;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
       border-right:0;
       border-bottom:1px solid rgba(255,255,255,.1);
       padding:10px;
+      gap:10px;
     }
-    .nav-group{
-      display:flex;
+    .sidebar-top{
+      gap:10px;
+    }
+    .sidebar-bottom{
+      flex-direction:row;
       gap:8px;
-      overflow-x:auto;
     }
     .nav-btn{
       padding:12px 14px;
       font-size:13px;
       border-radius:12px;
       white-space:nowrap;
-      min-width:0;
     }
     .main{
       margin-left:0;
       width:100%;
-      height:calc(100vh - 74px);
-    }
-    .post{
-      width:calc(100vw - 18px);
+      height:calc(100vh - 160px);
     }
     .header{
       font-size:28px;
     }
-    .search-wrap{
-      top:62px;
+    .post{
+      width:calc(100vw - 18px);
+    }
+    .brand-side{
+      font-size:24px;
     }
   }
 </style>
@@ -721,7 +787,17 @@
 <body>
   <div class="app">
     <aside class="sidebar">
-      <div class="nav-group" style="display:flex; flex-direction:column; gap:14px; width:100%;">
+      <div class="sidebar-top">
+        <div class="brand-side">Shared.</div>
+
+        <div class="search-wrap">
+          <div class="search-label">Search</div>
+          <input id="search" class="search" placeholder="Search" autocomplete="off">
+          <div id="suggestions" class="suggestions"></div>
+        </div>
+      </div>
+
+      <div class="sidebar-bottom">
         <button class="nav-btn" type="button" onclick="goUpload('post')">
           <span class="material-symbols-rounded">upload</span>
           <span>Upload post</span>
@@ -741,23 +817,24 @@
           <span class="material-symbols-rounded">info</span>
           <span>About</span>
         </a>
-      </div>
 
-      <button class="nav-btn logout" type="button" onclick="logout()">
-        <span class="material-symbols-rounded">logout</span>
-        <span>Logout</span>
-      </button>
+        <button class="nav-btn logout" type="button" onclick="logout()">
+          <span class="material-symbols-rounded">logout</span>
+          <span>Logout</span>
+        </button>
+      </div>
     </aside>
 
     <main class="main" id="mainScroll">
       <div class="header">Shared.</div>
 
-      <div class="search-wrap">
-        <input id="search" class="search" placeholder="Search" autocomplete="off">
-        <div id="suggestions" class="suggestions"></div>
-      </div>
+      <section id="storiesSection" class="stories-section">
+        <div class="section-head">
+          <div class="section-title">Stories</div>
+        </div>
+        <div id="stories" class="stories"></div>
+      </section>
 
-      <div id="stories" class="stories"></div>
       <div id="feed" class="feed"></div>
     </main>
   </div>
@@ -836,10 +913,9 @@ const state = {
 const els = {
   loading: document.getElementById("loading"),
   mainScroll: document.getElementById("mainScroll"),
+  storiesSection: document.getElementById("storiesSection"),
   stories: document.getElementById("stories"),
   feed: document.getElementById("feed"),
-  storiesCount: null,
-  postsCount: null,
   storyViewer: document.getElementById("storyViewer"),
   storyImage: document.getElementById("storyImage"),
   storyAvatar: document.getElementById("storyAvatar"),
@@ -1009,10 +1085,11 @@ async function loadData() {
 
 function renderStories() {
   if (!state.storyQueue.length) {
-    els.stories.innerHTML = `<div class="empty" style="margin:0 14px; min-width: calc(100% - 28px);">Nessuna storia disponibile.</div>`;
+    els.storiesSection.style.display = "none";
     return;
   }
 
+  els.storiesSection.style.display = "block";
   els.stories.innerHTML = state.storyQueue.map((story, index) => `
     <button class="story" data-story-index="${index}" type="button" aria-label="Open story from ${escapeHtml(story.username)}">
       <img loading="lazy" src="${story.avatar || defaultProfileIcon()}" alt="${escapeHtml(story.username)} avatar">
@@ -1039,7 +1116,7 @@ function renderFeed(filteredPosts = state.posts) {
     const songTitle = post.song_title || post.song || "";
     const songAuthor = post.song_author || post.song_artist || post.song_by || "";
     const songPreview = post.song_preview || post.audio_url || "";
-    const songCover = normalizeShared(post.song_cover || post.album_cover || post.album_image || post.cover_url || "");
+    const songCover = normalizeShared(post.song_cover || post.album_cover || post.album_image || post.cover_url || post.artwork_url || post.album_art || "");
     const createdAt = post.created_at || post.inserted_at || post.updated_at || "";
     const likesCount = postLikeCount(post.id);
     const liked = postLikedByMe(post.id) || !!post.liked;
@@ -1054,33 +1131,34 @@ function renderFeed(filteredPosts = state.posts) {
           </div>
         </div>
 
-        <div class="media">
+        <div class="media" data-like-zone="${escapeHtml(post.id)}">
           <img class="lazy-media" loading="lazy" data-src="${escapeHtml(image)}" alt="Post by ${escapeHtml(username)}" src="${placeholderImage()}">
-        </div>
-
-        <div class="post-body">
-          <div class="actions">
-            <div class="like-row">
-              <button class="like-btn ${liked ? "liked" : ""}" data-like-btn="${escapeHtml(post.id)}" type="button" aria-label="Like post">
-                <span class="material-symbols-rounded">favorite</span>
-              </button>
-              <div class="count" data-like-count="${escapeHtml(post.id)}">${formatCount(likesCount)} likes</div>
-            </div>
+          <div class="like-pop" aria-hidden="true">
+            <span class="material-symbols-rounded">favorite</span>
           </div>
-
-          ${caption ? `<div class="caption"><strong>${escapeHtml(username)}</strong> ${escapeHtml(caption)}</div>` : ""}
-
-          ${(songTitle || songPreview) ? `
-            <div class="song-card">
-              <img class="album-cover" src="${songCover || defaultProfileIcon()}" alt="Album cover">
-              <div class="song-info">
-                ${songTitle ? `<div class="song-title">${escapeHtml(songTitle)}</div>` : ""}
-                ${songAuthor ? `<div class="song-author">${escapeHtml(songAuthor)}</div>` : ""}
-              </div>
-              ${songPreview ? `<audio class="bg-audio" autoplay loop preload="auto" playsinline src="${escapeHtml(songPreview)}"></audio>` : ""}
-            </div>
-          ` : ""}
         </div>
+
+        <div class="actions">
+          <div class="like-row">
+            <button class="like-btn ${liked ? "liked" : ""}" data-like-btn="${escapeHtml(post.id)}" type="button" aria-label="Like post">
+              <span class="material-symbols-rounded">favorite</span>
+            </button>
+            <div class="count" data-like-count="${escapeHtml(post.id)}">${formatCount(likesCount)} likes</div>
+          </div>
+        </div>
+
+        ${caption ? `<div class="caption"><strong>${escapeHtml(username)}</strong> ${escapeHtml(caption)}</div>` : ""}
+
+        ${(songTitle || songPreview) ? `
+          <div class="song-card">
+            ${songCover ? `<img class="album-cover" src="${songCover}" alt="Album cover">` : `<div class="note-cover" aria-label="No cover"><span class="material-symbols-rounded">music_note</span></div>`}
+            <div class="song-info">
+              ${songTitle ? `<div class="song-title">${escapeHtml(songTitle)}</div>` : ""}
+              ${songAuthor ? `<div class="song-author">${escapeHtml(songAuthor)}</div>` : ""}
+            </div>
+            ${songPreview ? `<audio class="bg-audio" autoplay loop preload="auto" playsinline src="${escapeHtml(songPreview)}"></audio>` : ""}
+          </div>
+        ` : ""}
       </article>
     `;
   }).join("");
@@ -1088,6 +1166,7 @@ function renderFeed(filteredPosts = state.posts) {
   wireLazyImages();
   wirePostInteractions();
   wireBackgroundAudio();
+  wireDoubleTapLike();
 }
 
 function wireLazyImages() {
@@ -1121,6 +1200,52 @@ function wireBackgroundAudio() {
   });
 }
 
+function toggleLike(postId) {
+  const btn = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
+  const countEl = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
+  if (!btn || !countEl) return;
+
+  const liked = btn.classList.contains("liked");
+  const currentCount = postLikeCount(postId);
+  const nextCount = liked ? Math.max(0, currentCount - 1) : currentCount + 1;
+
+  btn.classList.toggle("liked", !liked);
+  countEl.textContent = `${formatCount(nextCount)} likes`;
+
+  showLikePulse(postId);
+  persistLike(postId, liked).catch((error) => {
+    console.error(error);
+    btn.classList.toggle("liked", liked);
+    countEl.textContent = `${formatCount(currentCount)} likes`;
+  });
+}
+
+function showLikePulse(postId) {
+  const media = document.querySelector(`[data-like-zone="${CSS.escape(postId)}"]`);
+  const pulse = media?.querySelector(".like-pop");
+  if (!pulse) return;
+  pulse.classList.add("show");
+  setTimeout(() => pulse.classList.remove("show"), 220);
+}
+
+async function persistLike(postId, wasLiked) {
+  if (!state.currentUserId) return;
+
+  if (wasLiked) {
+    const existing = state.likes.find((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId) && String(like.user_id) === String(state.currentUserId));
+    if (existing?.id) {
+      await supabase.from("likes").delete().eq("id", existing.id);
+    } else {
+      await supabase.from("likes").delete().eq("post_id", postId).eq("user_id", state.currentUserId);
+    }
+  } else {
+    await supabase.from("likes").insert({ post_id: postId, user_id: state.currentUserId });
+  }
+
+  const { data } = await supabase.from("likes").select("*");
+  state.likes = safeArray(data);
+}
+
 function wirePostInteractions() {
   document.querySelectorAll("[data-profile-id]").forEach((nameEl) => {
     nameEl.addEventListener("click", () => {
@@ -1130,38 +1255,7 @@ function wirePostInteractions() {
   });
 
   document.querySelectorAll("[data-like-btn]").forEach((btn) => {
-    btn.addEventListener("click", async () => {
-      const postId = btn.dataset.likeBtn;
-      if (!postId) return;
-
-      const liked = btn.classList.contains("liked");
-      const countEl = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
-      const currentCount = postLikeCount(postId);
-      const nextCount = liked ? Math.max(0, currentCount - 1) : currentCount + 1;
-
-      btn.classList.toggle("liked");
-      if (countEl) countEl.textContent = `${formatCount(nextCount)} likes`;
-
-      if (!state.currentUserId) return;
-
-      try {
-        if (liked) {
-          const existing = state.likes.find((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId) && String(like.user_id) === String(state.currentUserId));
-          if (existing?.id) {
-            await supabase.from("likes").delete().eq("id", existing.id);
-          } else {
-            await supabase.from("likes").delete().eq("post_id", postId).eq("user_id", state.currentUserId);
-          }
-        } else {
-          await supabase.from("likes").insert({ post_id: postId, user_id: state.currentUserId });
-        }
-        await reloadLikes();
-      } catch (error) {
-        console.error(error);
-        btn.classList.toggle("liked");
-        if (countEl) countEl.textContent = `${formatCount(currentCount)} likes`;
-      }
-    });
+    btn.addEventListener("click", () => toggleLike(btn.dataset.likeBtn));
   });
 
   document.querySelectorAll("[data-like-count]").forEach((countEl) => {
@@ -1169,16 +1263,50 @@ function wirePostInteractions() {
   });
 }
 
-async function reloadLikes() {
-  const { data } = await supabase.from("likes").select("*");
-  state.likes = safeArray(data);
-  renderFeed(resolveCurrentFeed());
+function wireDoubleTapLike() {
+  const seen = new Map();
+
+  document.querySelectorAll("[data-like-zone]").forEach((zone) => {
+    zone.addEventListener("click", () => {
+      const id = zone.dataset.likeZone;
+      const now = Date.now();
+      const prev = seen.get(id) || 0;
+      if (now - prev < 300) {
+        toggleLike(id);
+        seen.delete(id);
+        return;
+      }
+      seen.set(id, now);
+      setTimeout(() => {
+        if (seen.get(id) === now) seen.delete(id);
+      }, 320);
+    });
+
+    zone.addEventListener("dblclick", () => {
+      toggleLike(zone.dataset.likeZone);
+    });
+  });
+
+  let touchStartTs = 0;
+  let lastTouchPost = null;
+  document.querySelectorAll("[data-like-zone]").forEach((zone) => {
+    zone.addEventListener("touchend", () => {
+      const id = zone.dataset.likeZone;
+      const now = Date.now();
+      if (lastTouchPost === id && now - touchStartTs < 320) {
+        toggleLike(id);
+        lastTouchPost = null;
+        return;
+      }
+      touchStartTs = now;
+      lastTouchPost = id;
+    }, { passive: true });
+  });
 }
 
 function resolveCurrentFeed() {
   const q = state.searchQuery.trim().toLowerCase();
   if (!q) return state.posts;
-
   return state.posts.filter((post) => {
     const username = getUsernameForPost(post).toLowerCase();
     const caption = String(post.caption || post.text || "").toLowerCase();
@@ -1402,7 +1530,6 @@ els.search.addEventListener("input", () => {
 });
 
 els.search.addEventListener("focus", updateSuggestions);
-
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".search-wrap")) {
     els.suggestions.style.display = "none";
