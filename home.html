@@ -7,31 +7,31 @@
   <meta name="theme-color" content="#000000" />
   <style>
     :root {
-      --bg: #000000;
-      --panel: rgba(255, 255, 255, 0.05);
-      --panel-2: rgba(255, 255, 255, 0.08);
-      --panel-3: rgba(255, 255, 255, 0.12);
-      --border: rgba(255, 255, 255, 0.14);
-      --text: #ffffff;
-      --muted: rgba(255, 255, 255, 0.68);
-      --muted-2: rgba(255, 255, 255, 0.48);
-      --shadow: 0 22px 70px rgba(0, 0, 0, 0.55);
+      --bg: #000;
+      --text: #fff;
+      --muted: rgba(255,255,255,.68);
+      --muted-2: rgba(255,255,255,.48);
+      --border: rgba(255,255,255,.14);
+      --panel: rgba(255,255,255,.05);
+      --panel-2: rgba(255,255,255,.08);
+      --panel-3: rgba(255,255,255,.12);
+      --danger: #ff3b30;
+      --max-width: 1240px;
+      --feed-width: 560px;
+      --sidebar-w: 104px;
+      --safe-top: env(safe-area-inset-top, 0px);
+      --safe-bottom: env(safe-area-inset-bottom, 0px);
+      --header-h: 72px;
       --radius-xl: 28px;
       --radius-lg: 22px;
       --radius-md: 16px;
-      --radius-sm: 12px;
-      --max-width: 1180px;
-      --feed-width: 560px;
-      --header-h: 76px;
-      --safe-top: env(safe-area-inset-top, 0px);
-      --safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
     * { box-sizing: border-box; }
     html, body { height: 100%; }
     body {
       margin: 0;
-      background: var(--bg);
+      background: #000;
       color: var(--text);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       overflow: hidden;
@@ -51,10 +51,102 @@
       width: 100%;
       max-width: var(--max-width);
       height: 100%;
+      position: relative;
+      display: flex;
+      background: #000;
+      overflow: hidden;
+    }
+
+    /* FIXED SIDEBAR */
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-w);
+      padding: calc(14px + var(--safe-top)) 12px calc(14px + var(--safe-bottom));
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      border-right: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.98);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      z-index: 60;
+    }
+
+    .sidebar-top,
+    .sidebar-mid,
+    .sidebar-bottom {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .sidebar-brand {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      font-size: 1.1rem;
+      user-select: none;
+      padding: 6px 0 10px;
+    }
+
+    .sidebar-btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--panel);
+      color: #fff;
+      border-radius: 18px;
+      padding: 12px 10px;
+      text-align: center;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 0.76rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease;
+      line-height: 1.1;
+      min-height: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .sidebar-btn:hover { background: var(--panel-2); transform: translateY(-1px); }
+    .sidebar-btn:active { transform: scale(0.97); }
+
+    .sidebar-btn .mini {
+      font-size: 0.66rem;
+      color: var(--muted-2);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+
+    .sidebar-btn.logout {
+      border-color: rgba(255,59,48,.28);
+      background: rgba(255,59,48,.08);
+      color: #ff8e87;
+    }
+
+    .sidebar-btn.logout:hover { background: rgba(255,59,48,.13); }
+
+    /* MAIN AREA */
+    .main {
+      width: 100%;
+      margin-left: var(--sidebar-w);
+      height: 100%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      background: #000;
     }
 
     .topbar {
@@ -62,13 +154,13 @@
       top: 0;
       z-index: 40;
       display: grid;
-      grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+      grid-template-columns: 1fr auto 1fr;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       padding: calc(12px + var(--safe-top)) 14px 12px;
       height: calc(var(--header-h) + var(--safe-top));
-      border-bottom: 1px solid rgba(255, 255, 255, 0.10);
-      background: rgba(0, 0, 0, 0.96);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.96);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
@@ -78,7 +170,7 @@
       display: inline-flex;
       align-items: center;
       gap: 10px;
-      color: var(--text);
+      color: #fff;
       text-decoration: none;
       font-weight: 900;
       letter-spacing: -0.055em;
@@ -92,54 +184,24 @@
       height: 10px;
       border-radius: 999px;
       background: #fff;
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.10);
+      box-shadow: 0 0 0 3px rgba(255,255,255,.10);
       flex: 0 0 auto;
     }
 
-    .top-actions {
-      justify-self: end;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .chip-btn {
-      appearance: none;
-      border: 1px solid var(--border);
-      background: var(--panel);
-      color: #fff;
-      border-radius: 999px;
-      padding: 10px 12px;
-      font-size: 0.82rem;
-      font-weight: 700;
-      letter-spacing: -0.01em;
-      cursor: pointer;
-      text-decoration: none;
-      white-space: nowrap;
-      transition: transform 160ms ease, background 160ms ease, border-color 160ms ease, opacity 160ms ease;
-    }
-
-    .chip-btn:hover {
-      background: var(--panel-2);
-      transform: translateY(-1px);
-    }
-
-    .chip-btn:active { transform: scale(0.97); }
+    .top-spacer { width: 1px; height: 1px; }
 
     .content {
       flex: 1;
       min-height: 0;
       overflow-y: auto;
       overflow-x: hidden;
-      -webkit-overflow-scrolling: touch;
       overscroll-behavior: contain;
+      -webkit-overflow-scrolling: touch;
       scroll-behavior: smooth;
       padding-bottom: calc(18px + var(--safe-bottom));
     }
 
-    .section {
-      padding-top: 12px;
-    }
+    .section { padding-top: 12px; }
 
     .section-head {
       display: flex;
@@ -173,8 +235,8 @@
       transition: background 160ms ease, border-color 160ms ease;
     }
 
-    .search::placeholder { color: rgba(255,255,255,0.42); }
-    .search:focus { background: var(--panel-2); border-color: rgba(255,255,255,0.22); }
+    .search::placeholder { color: rgba(255,255,255,.42); }
+    .search:focus { background: var(--panel-2); border-color: rgba(255,255,255,.24); }
 
     .suggestions {
       position: absolute;
@@ -187,7 +249,7 @@
       border-radius: 16px;
       overflow: hidden;
       display: none;
-      box-shadow: var(--shadow);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
       max-height: 320px;
       overflow-y: auto;
     }
@@ -198,28 +260,25 @@
       gap: 10px;
       padding: 12px 14px;
       cursor: pointer;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid rgba(255,255,255,.06);
       transition: background 140ms ease;
     }
 
     .suggestion:last-child { border-bottom: 0; }
-    .suggestion:hover { background: rgba(255,255,255,0.05); }
+    .suggestion:hover { background: rgba(255,255,255,.05); }
 
-    .suggestion-avatar {
+    .suggestion-avatar,
+    .default-avatar {
       width: 32px;
       height: 32px;
       border-radius: 50%;
       object-fit: cover;
       background: #111;
       flex: 0 0 auto;
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,.10);
     }
 
-    .suggestion-meta {
-      min-width: 0;
-      flex: 1;
-    }
-
+    .suggestion-meta { min-width: 0; flex: 1; }
     .suggestion-title {
       font-size: 0.92rem;
       font-weight: 700;
@@ -228,7 +287,6 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .suggestion-subtitle {
       margin-top: 2px;
       font-size: 0.76rem;
@@ -271,7 +329,7 @@
       border-radius: 999px;
       padding: 2px;
       background: #fff;
-      box-shadow: 0 0 0 1px rgba(255,255,255,0.12);
+      box-shadow: 0 0 0 1px rgba(255,255,255,.12);
       transition: transform 160ms ease, opacity 160ms ease;
     }
 
@@ -300,22 +358,24 @@
       color: var(--muted);
     }
 
-    /* FEED */
+    /* FEED WITH SNAP */
     .feed {
       display: flex;
       flex-direction: column;
       gap: 14px;
       padding: 4px 0 0;
+      scroll-snap-type: y mandatory;
     }
 
     .post {
-      width: min(var(--feed-width), calc(100vw - 24px));
+      scroll-snap-align: start;
+      width: min(var(--feed-width), calc(100vw - var(--sidebar-w) - 28px));
       margin: 0 auto;
       border: 1px solid var(--border);
       border-radius: 24px;
       overflow: hidden;
       background: #000;
-      box-shadow: 0 16px 40px rgba(0,0,0,0.25);
+      box-shadow: 0 16px 40px rgba(0,0,0,.28);
     }
 
     .post-header {
@@ -331,7 +391,7 @@
       border-radius: 50%;
       object-fit: cover;
       background: #111;
-      border: 1px solid rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,.12);
       flex: 0 0 auto;
     }
 
@@ -341,6 +401,7 @@
       letter-spacing: -0.02em;
       cursor: pointer;
       line-height: 1.1;
+      user-select: none;
     }
 
     .post-time {
@@ -401,7 +462,7 @@
 
     .icon-btn:hover { background: var(--panel-2); }
     .icon-btn:active { transform: scale(0.96); }
-    .icon-btn.liked { background: var(--panel-3); border-color: rgba(255,255,255,0.26); }
+    .icon-btn.liked { background: var(--panel-3); border-color: rgba(255,255,255,.28); }
 
     .icon {
       width: 20px;
@@ -413,7 +474,7 @@
     .count,
     .song-title,
     .caption {
-      color: rgba(255,255,255,0.92);
+      color: rgba(255,255,255,.92);
       font-size: 0.92rem;
       line-height: 1.45;
     }
@@ -432,8 +493,8 @@
       gap: 8px;
       padding: 12px;
       border-radius: 18px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
     }
 
     .song-label {
@@ -443,16 +504,9 @@
       color: var(--muted-2);
     }
 
-    .audio-wrap {
-      width: 100%;
-      overflow: hidden;
-      border-radius: 12px;
-    }
-
-    audio {
-      width: 100%;
-      display: block;
-      filter: grayscale(1) contrast(1.08);
+    .song-title {
+      font-size: 0.92rem;
+      color: #fff;
     }
 
     /* LOADING */
@@ -478,9 +532,9 @@
       justify-items: center;
       padding: 26px 22px;
       border-radius: 24px;
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.12);
-      box-shadow: var(--shadow);
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
       min-width: 220px;
     }
 
@@ -488,9 +542,9 @@
       width: 42px;
       height: 42px;
       border-radius: 999px;
-      border: 3px solid rgba(255,255,255,0.14);
+      border: 3px solid rgba(255,255,255,.14);
       border-top-color: #fff;
-      animation: spin 0.85s linear infinite;
+      animation: spin .85s linear infinite;
     }
 
     .loading-text {
@@ -548,7 +602,7 @@
     .story-gradient {
       position: absolute;
       inset: 0;
-      background: linear-gradient(180deg, rgba(0,0,0,0.62), transparent 18%, transparent 78%, rgba(0,0,0,0.72));
+      background: linear-gradient(180deg, rgba(0,0,0,.62), transparent 18%, transparent 78%, rgba(0,0,0,.72));
       pointer-events: none;
     }
 
@@ -561,7 +615,7 @@
       padding: calc(14px + var(--safe-top)) 12px 12px;
       display: grid;
       gap: 10px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.56), transparent);
+      background: linear-gradient(180deg, rgba(0,0,0,.56), transparent);
     }
 
     .progress-row {
@@ -572,7 +626,7 @@
 
     .progress {
       height: 3px;
-      background: rgba(255,255,255,0.18);
+      background: rgba(255,255,255,.18);
       border-radius: 999px;
       overflow: hidden;
     }
@@ -605,7 +659,7 @@
       height: 36px;
       border-radius: 50%;
       object-fit: cover;
-      border: 1px solid rgba(255,255,255,0.16);
+      border: 1px solid rgba(255,255,255,.16);
       background: #111;
     }
 
@@ -620,8 +674,8 @@
       width: 42px;
       height: 42px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,0.16);
-      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
       color: #fff;
       display: inline-flex;
       align-items: center;
@@ -647,9 +701,9 @@
       z-index: 2;
       padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(255,255,255,0.08);
-      border: 1px solid rgba(255,255,255,0.14);
-      color: rgba(255,255,255,0.88);
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.14);
+      color: rgba(255,255,255,.88);
       font-size: 0.8rem;
       backdrop-filter: blur(14px);
       -webkit-backdrop-filter: blur(14px);
@@ -663,7 +717,7 @@
       display: none;
       align-items: center;
       justify-content: center;
-      background: rgba(0,0,0,0.88);
+      background: rgba(0,0,0,.88);
       padding: 16px;
     }
 
@@ -676,7 +730,7 @@
       background: #0b0b0b;
       border: 1px solid var(--border);
       border-radius: 22px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
       padding: 14px;
     }
 
@@ -715,7 +769,7 @@
       transition: background 140ms ease;
     }
 
-    .list-item:hover { background: rgba(255,255,255,0.05); }
+    .list-item:hover { background: rgba(255,255,255,.05); }
 
     .list-avatar {
       width: 34px;
@@ -723,7 +777,7 @@
       border-radius: 50%;
       object-fit: cover;
       background: #111;
-      border: 1px solid rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,.10);
       flex: 0 0 auto;
     }
 
@@ -750,32 +804,66 @@
       margin: 16px 14px 0;
       padding: 22px;
       border-radius: 22px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
       color: var(--muted);
       text-align: center;
     }
 
-    @media (max-width: 620px) {
+    /* MOBILE */
+    @media (max-width: 860px) {
+      .shell { display: block; }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        bottom: auto;
+        right: 0;
+        border-right: 0;
+        border-bottom: 1px solid rgba(255,255,255,.10);
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: calc(10px + var(--safe-top)) 10px 10px;
+        gap: 10px;
+      }
+
+      .sidebar-top,
+      .sidebar-mid,
+      .sidebar-bottom {
+        flex-direction: row;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .sidebar-brand {
+        width: auto;
+        padding: 0 8px 0 4px;
+      }
+
+      .sidebar-btn {
+        min-height: 44px;
+        padding: 10px 10px;
+        border-radius: 14px;
+        font-size: 0.68rem;
+      }
+
+      .main {
+        margin-left: 0;
+        padding-top: calc(88px + var(--safe-top));
+      }
+
       .post {
-        width: calc(100vw - 20px);
+        width: calc(100vw - 16px);
       }
 
       .topbar {
-        grid-template-columns: 1fr auto;
+        display: none;
       }
+    }
 
-      .brand {
-        justify-self: start;
-      }
-
-      .top-actions {
-        gap: 6px;
-      }
-
-      .chip-btn {
-        padding: 9px 10px;
-        font-size: 0.76rem;
+    @media (min-width: 861px) {
+      .main {
+        margin-left: var(--sidebar-w);
       }
     }
   </style>
@@ -783,45 +871,76 @@
 <body>
   <div class="app">
     <div class="shell">
-      <header class="topbar">
-        <div></div>
-        <a class="brand" href="#" aria-label="Shared home">
-          <span class="brand-dot"></span>
-          <span>Shared.</span>
-        </a>
-        <div class="top-actions">
-          <button id="uploadStoryBtn" class="chip-btn" type="button">Upload story</button>
-          <button id="uploadPostBtn" class="chip-btn" type="button">Upload post</button>
+      <aside class="sidebar">
+        <div class="sidebar-top">
+          <div class="sidebar-brand">Shared.</div>
+          <button id="uploadPostBtn" class="sidebar-btn" type="button">
+            <span>Upload post</span>
+            <span class="mini">post</span>
+          </button>
+          <button id="uploadStoryBtn" class="sidebar-btn" type="button">
+            <span>Upload story</span>
+            <span class="mini">story</span>
+          </button>
         </div>
-      </header>
 
-      <main id="content" class="content" aria-live="polite">
-        <section class="section">
-          <div class="section-head">
-            <div class="section-title">Search</div>
-            <div class="section-title">Users & posts</div>
-          </div>
-          <div class="search-wrap">
-            <input id="search" class="search" autocomplete="off" placeholder="Search posts or users..." />
-            <div id="suggestions" class="suggestions"></div>
-          </div>
-        </section>
+        <div class="sidebar-mid">
+          <a class="sidebar-btn" href="settings.html">
+            <span>Settings</span>
+            <span class="mini">profile</span>
+          </a>
+          <a class="sidebar-btn" href="about.html">
+            <span>About</span>
+            <span class="mini">info</span>
+          </a>
+        </div>
 
-        <section class="section stories-wrap">
-          <div class="section-head">
-            <div class="section-title">Stories</div>
-            <div id="storiesCount" class="section-title">0</div>
-          </div>
-          <div id="stories" class="stories" aria-label="Stories horizontal list"></div>
-        </section>
+        <div class="sidebar-bottom">
+          <button id="logoutBtn" class="sidebar-btn logout" type="button">
+            <span>Logout</span>
+            <span class="mini">exit</span>
+          </button>
+        </div>
+      </aside>
 
-        <section class="section">
-          <div class="section-head">
-            <div class="section-title">Feed</div>
-            <div id="postsCount" class="section-title">0</div>
-          </div>
-          <div id="feed" class="feed"></div>
-        </section>
+      <main class="main">
+        <header class="topbar">
+          <div class="top-spacer"></div>
+          <a class="brand" href="#" aria-label="Shared home">
+            <span class="brand-dot"></span>
+            <span>Shared.</span>
+          </a>
+          <div></div>
+        </header>
+
+        <div id="content" class="content" aria-live="polite">
+          <section class="section">
+            <div class="section-head">
+              <div class="section-title">Search</div>
+              <div class="section-title">Users & posts</div>
+            </div>
+            <div class="search-wrap">
+              <input id="search" class="search" autocomplete="off" placeholder="Search posts or users..." />
+              <div id="suggestions" class="suggestions"></div>
+            </div>
+          </section>
+
+          <section class="section stories-wrap">
+            <div class="section-head">
+              <div class="section-title">Stories</div>
+              <div id="storiesCount" class="section-title">0</div>
+            </div>
+            <div id="stories" class="stories" aria-label="Stories horizontal list"></div>
+          </section>
+
+          <section class="section">
+            <div class="section-head">
+              <div class="section-title">Feed</div>
+              <div id="postsCount" class="section-title">0</div>
+            </div>
+            <div id="feed" class="feed"></div>
+          </section>
+        </div>
       </main>
     </div>
   </div>
@@ -893,7 +1012,6 @@
       storyRaf: null,
       storyStartTs: 0,
       storyDurationMs: 30000,
-      activePostLikes: null,
       searchQuery: ""
     };
 
@@ -914,6 +1032,7 @@
       nextStory: document.getElementById("nextStory"),
       uploadStoryBtn: document.getElementById("uploadStoryBtn"),
       uploadPostBtn: document.getElementById("uploadPostBtn"),
+      logoutBtn: document.getElementById("logoutBtn"),
       search: document.getElementById("search"),
       suggestions: document.getElementById("suggestions"),
       likesModal: document.getElementById("likesModal"),
@@ -925,7 +1044,15 @@
     });
 
     els.uploadPostBtn.addEventListener("click", () => {
-      window.location.href = "upload.html";
+      window.location.href = "upload.html?type=post";
+    });
+
+    els.logoutBtn.addEventListener("click", async () => {
+      try {
+        await supabase.auth.signOut();
+      } finally {
+        window.location.href = "index.html";
+      }
     });
 
     function safeArray(v) {
@@ -962,14 +1089,12 @@
       return date.toLocaleDateString([], { month: "short", day: "numeric" });
     }
 
-    function placeholderAvatar(seed = "Shared") {
-      const label = encodeURIComponent(String(seed).slice(0, 1).toUpperCase());
+    function defaultProfileIcon() {
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
           <rect width="120" height="120" rx="60" fill="#111"/>
-          <circle cx="60" cy="50" r="18" fill="#fff"/>
+          <circle cx="60" cy="48" r="18" fill="#fff"/>
           <path d="M24 102c7-20 24-30 36-30s29 10 36 30" fill="#fff"/>
-          <text x="60" y="71" text-anchor="middle" font-size="22" font-family="Arial" fill="#000" font-weight="700">${label}</text>
         </svg>
       `)}`;
     }
@@ -1007,7 +1132,7 @@
     }
 
     function getProfileById(id) {
-      return state.profiles.find((p) => p.id === id) || null;
+      return state.profiles.find((p) => String(p.id) === String(id)) || null;
     }
 
     function getUsernameForPost(post) {
@@ -1015,10 +1140,14 @@
       return post.username || profile?.username || profile?.full_name || "user";
     }
 
+    function getAvatarForProfile(profile) {
+      if (!profile) return defaultProfileIcon();
+      return normalizeAvatar(profile.avatar_url || profile.avatar || profile.profile_image || "") || defaultProfileIcon();
+    }
+
     function getAvatarForPost(post) {
       const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
-      const avatar = post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "";
-      return normalizeAvatar(avatar);
+      return normalizeAvatar(post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
     }
 
     function getStoryQueue() {
@@ -1029,7 +1158,7 @@
           return {
             id: profile.id,
             username: profile.username || profile.full_name || "user",
-            avatar: normalizeAvatar(avatarPath),
+            avatar: normalizeAvatar(avatarPath) || defaultProfileIcon(),
             story: normalizeStory(storyPath),
             profile
           };
@@ -1038,13 +1167,19 @@
     }
 
     function postLikeCount(postId) {
-      return state.likes.filter((like) => (like.post_id ?? like.postId ?? like.postid) === postId).length;
+      return state.likes.filter((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId)).length;
     }
 
     function postLikedByMe(postId) {
       return state.currentUserId
-        ? state.likes.some((like) => (like.post_id ?? like.postId ?? like.postid) === postId && like.user_id === state.currentUserId)
+        ? state.likes.some((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId) && String(like.user_id) === String(state.currentUserId))
         : false;
+    }
+
+    async function getCurrentUserId() {
+      const { data, error } = await supabase.auth.getUser();
+      if (error) return null;
+      return data?.user?.id || null;
     }
 
     async function loadData() {
@@ -1060,10 +1195,10 @@
         state.posts = safeArray(postsData);
         state.likes = safeArray(likesData);
         state.currentUserId = currentUserId;
-
         state.storyQueue = getStoryQueue();
+
         renderStories();
-        renderFeed();
+        renderFeed(resolveCurrentFeed());
         updateSuggestions();
       } catch (err) {
         console.error(err);
@@ -1071,12 +1206,6 @@
       } finally {
         els.loading.classList.add("hidden");
       }
-    }
-
-    async function getCurrentUserId() {
-      const { data, error } = await supabase.auth.getUser();
-      if (error) return null;
-      return data?.user?.id || null;
     }
 
     function renderStories() {
@@ -1090,7 +1219,7 @@
       els.stories.innerHTML = state.storyQueue.map((story, index) => `
         <button class="story" data-story-index="${index}" type="button" aria-label="Open story from ${escapeHtml(story.username)}">
           <span class="story-ring">
-            <img class="story-avatar" loading="lazy" src="${story.avatar || placeholderAvatar(story.username)}" alt="${escapeHtml(story.username)} avatar" />
+            <img class="story-avatar" loading="lazy" src="${story.avatar || defaultProfileIcon()}" alt="${escapeHtml(story.username)} avatar" />
           </span>
           <span class="story-name">${escapeHtml(story.username)}</span>
         </button>
@@ -1123,7 +1252,7 @@
         return `
           <article class="post" data-post-id="${escapeHtml(post.id)}">
             <div class="post-header">
-              <img class="avatar" loading="lazy" src="${avatar || placeholderAvatar(username)}" alt="${escapeHtml(username)} avatar" />
+              <img class="avatar" loading="lazy" src="${avatar}" alt="${escapeHtml(username)} avatar" />
               <div class="user-meta">
                 <div class="username" data-profile-id="${escapeHtml(post.user_id || post.profile_id || post.id)}">${escapeHtml(username)}</div>
                 <div class="post-time">${escapeHtml(timeAgo(createdAt))}</div>
@@ -1152,7 +1281,7 @@
                 <div class="song-card">
                   <div class="song-label">Music</div>
                   ${songTitle ? `<div class="song-title">${escapeHtml(songTitle)}</div>` : ""}
-                  ${songPreview ? `<div class="audio-wrap"><audio controls preload="none" src="${escapeHtml(songPreview)}"></audio></div>` : ""}
+                  ${songPreview ? `<div class="song-title">Playing in background</div><audio class="bg-audio" hidden autoplay loop preload="auto" playsinline src="${escapeHtml(songPreview)}"></audio>` : ""}
                 </div>
               ` : ""}
             </div>
@@ -1162,6 +1291,7 @@
 
       wireLazyImages();
       wirePostInteractions();
+      wireBackgroundAudio();
     }
 
     function wireLazyImages() {
@@ -1178,6 +1308,21 @@
       }, { root: els.content, threshold: 0.15, rootMargin: "160px 0px" });
 
       images.forEach((img) => io.observe(img));
+    }
+
+    function wireBackgroundAudio() {
+      document.querySelectorAll("audio.bg-audio").forEach((audio) => {
+        audio.volume = 0.22;
+        const attemptPlay = async () => {
+          try {
+            await audio.play();
+          } catch {
+            /* autoplay may be blocked until user interacts */
+          }
+        };
+        attemptPlay();
+        audio.addEventListener("loadedmetadata", attemptPlay, { once: true });
+      });
     }
 
     function wirePostInteractions() {
@@ -1205,7 +1350,7 @@
 
           try {
             if (liked) {
-              const existing = state.likes.find((like) => (like.post_id ?? like.postId ?? like.postid) === postId && like.user_id === state.currentUserId);
+              const existing = state.likes.find((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId) && String(like.user_id) === String(state.currentUserId));
               if (existing?.id) {
                 await supabase.from("likes").delete().eq("id", existing.id);
               } else {
@@ -1231,9 +1376,7 @@
     async function reloadLikes() {
       const { data } = await supabase.from("likes").select("*");
       state.likes = safeArray(data);
-      state.storyQueue = getStoryQueue();
       renderFeed(resolveCurrentFeed());
-      renderStories();
     }
 
     function resolveCurrentFeed() {
@@ -1267,7 +1410,7 @@
           id: profile.id,
           title: profile.username || profile.full_name || "user",
           subtitle: profile.bio || "Open profile",
-          avatar: normalizeAvatar(profile.avatar_url || profile.avatar || profile.profile_image || "") || placeholderAvatar(profile.username || profile.full_name || "u")
+          avatar: getAvatarForProfile(profile)
         }));
 
       const postMatches = state.posts
@@ -1283,7 +1426,7 @@
           id: post.id,
           title: getUsernameForPost(post),
           subtitle: (post.caption || post.text || post.song_title || post.song || "Post").toString().slice(0, 80),
-          avatar: getAvatarForPost(post) || placeholderAvatar(getUsernameForPost(post))
+          avatar: getAvatarForPost(post)
         }));
 
       const items = [...userMatches, ...postMatches].slice(0, 8);
@@ -1315,7 +1458,7 @@
           } else {
             const postEl = document.querySelector(`[data-post-id="${CSS.escape(id)}"]`);
             if (postEl) {
-              postEl.scrollIntoView({ behavior: "smooth", block: "center" });
+              postEl.scrollIntoView({ behavior: "smooth", block: "start" });
               els.search.blur();
               els.suggestions.style.display = "none";
             }
@@ -1362,8 +1505,8 @@
     function renderStory() {
       const story = state.storyQueue[state.storyIndex];
       if (!story) return;
-      els.storyImage.src = story.story || story.avatar || placeholderAvatar(story.username);
-      els.storyAvatar.src = story.avatar || placeholderAvatar(story.username);
+      els.storyImage.src = story.story || story.avatar || defaultProfileIcon();
+      els.storyAvatar.src = story.avatar || defaultProfileIcon();
       els.storyName.textContent = story.username;
       renderProgressBars();
     }
@@ -1425,11 +1568,11 @@
 
       const likesForPost = state.likes.filter((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId));
       const items = likesForPost.map((like) => {
-        const profile = getProfileById(like.user_id) || state.profiles.find((p) => p.id === like.user_id);
+        const profile = getProfileById(like.user_id);
         return {
           id: profile?.id || like.user_id,
           name: profile?.username || profile?.full_name || "user",
-          avatar: normalizeAvatar(profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || placeholderAvatar(profile?.username || profile?.full_name || "u"),
+          avatar: getAvatarForProfile(profile),
           subtitle: profile?.bio || "Open profile"
         };
       });
