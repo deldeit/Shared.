@@ -17,11 +17,10 @@
     --panel:rgba(255,255,255,.05);
     --panel-2:rgba(255,255,255,.08);
     --panel-3:rgba(255,255,255,.12);
-    --like:#ff2d55;
     --danger:#ff3b30;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --max-width: 720px;
+    --max-width: 760px;
   }
 
   * { box-sizing: border-box; }
@@ -34,9 +33,7 @@
     overflow: hidden;
   }
 
-  button, input, textarea, select {
-    font: inherit;
-  }
+  button, input, textarea, select { font: inherit; }
 
   .page {
     width: 100%;
@@ -86,9 +83,7 @@
     padding: 10px 12px;
   }
 
-  .back .material-symbols-rounded {
-    font-size: 20px;
-  }
+  .back .material-symbols-rounded { font-size: 20px; }
 
   .brand {
     justify-self: center;
@@ -166,8 +161,7 @@
   }
 
   .input,
-  .textarea,
-  .select {
+  .textarea {
     width: 100%;
     border-radius: 18px;
     border: 1px solid rgba(255,255,255,.14);
@@ -185,38 +179,66 @@
   }
 
   .input::placeholder,
-  .textarea::placeholder {
-    color: rgba(255,255,255,.40);
+  .textarea::placeholder { color: rgba(255,255,255,.40); }
+
+  .search-wrap {
+    position: relative;
   }
 
-  .row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
+  .suggestions {
+    position: absolute;
+    z-index: 20;
+    left: 0;
+    right: 0;
+    top: calc(100% + 8px);
+    background: #0b0b0b;
+    border: 1px solid rgba(255,255,255,.14);
+    border-radius: 16px;
+    overflow: hidden;
+    display: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,.55);
+    max-height: 280px;
+    overflow-y: auto;
   }
 
-  .toggle-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .toggle {
-    flex: 1 1 160px;
+  .suggestion {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 10px;
-    padding: 14px 15px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.14);
-    background: var(--panel);
-    color: #fff;
+    padding: 12px 14px;
     cursor: pointer;
-    user-select: none;
+    border-bottom: 1px solid rgba(255,255,255,.06);
+    transition: background .14s ease;
   }
 
-  .toggle input { accent-color: #fff; }
+  .suggestion:last-child { border-bottom: 0; }
+  .suggestion:hover { background: rgba(255,255,255,.05); }
+
+  .suggestion-thumb {
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
+    object-fit: cover;
+    border: 1px solid rgba(255,255,255,.10);
+    background: #111;
+    flex: 0 0 auto;
+  }
+
+  .suggestion-meta { min-width: 0; flex: 1; }
+  .suggestion-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .suggestion-subtitle {
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--muted-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   .dropzone {
     position: relative;
@@ -246,15 +268,8 @@
     border: 1px solid rgba(255,255,255,.10);
   }
 
-  .dropzone-icon .material-symbols-rounded {
-    font-size: 28px;
-  }
-
-  .dropzone-title {
-    font-size: 1rem;
-    text-align: center;
-  }
-
+  .dropzone-icon .material-symbols-rounded { font-size: 28px; }
+  .dropzone-title { font-size: 1rem; text-align: center; }
   .dropzone-subtitle {
     color: var(--muted);
     font-size: .82rem;
@@ -278,7 +293,8 @@
   }
 
   .preview.show { display: block; }
-  .preview img {
+  .preview img,
+  .preview video {
     display: block;
     width: 100%;
     max-height: 360px;
@@ -373,9 +389,7 @@
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
-  .error {
-    color: #ff8a85;
-  }
+  .error { color: #ff8a85; }
 
   @media (max-width: 640px) {
     .shell {
@@ -385,15 +399,10 @@
     .topbar {
       grid-template-columns: auto 1fr auto;
     }
-    .brand {
-      font-size: 1.1rem;
-    }
+    .brand { font-size: 1.1rem; }
     .type-chip {
       font-size: 11px;
       padding: 9px 10px;
-    }
-    .row {
-      grid-template-columns: 1fr;
     }
     .btn { flex: 1 1 100%; }
   }
@@ -408,13 +417,13 @@
           <span>Back</span>
         </a>
         <div class="brand">Shared.</div>
-        <div id="typeChip" class="type-chip">post</div>
+        <div class="type-chip">post</div>
       </header>
 
       <main class="content">
         <section class="hero">
-          <div id="pageTitle" class="hero-title">Create a post</div>
-          <div id="pageSubtitle" class="hero-subtitle">Upload media, set text, add tags, and publish in the same visual style as the feed.</div>
+          <div class="hero-title">Create a post</div>
+          <div class="hero-subtitle">Upload media, choose a music track and a location, then publish it to the feed.</div>
         </section>
 
         <section class="card">
@@ -432,16 +441,29 @@
               <div id="preview" class="preview"></div>
             </div>
 
-            <div class="row">
-              <div class="field">
-                <div class="label">Title</div>
-                <input id="titleInput" class="input" type="text" placeholder="Song title or post title">
-              </div>
-              <div class="field">
-                <div class="label">Author</div>
-                <input id="authorInput" class="input" type="text" placeholder="Song author or artist">
-              </div>
+            <div class="field search-wrap">
+              <div class="label">Music search</div>
+              <input id="musicSearch" class="input" type="text" placeholder="Search music on Deezer" autocomplete="off" />
+              <div id="musicSuggestions" class="suggestions"></div>
             </div>
+
+            <input id="musicTitle" type="hidden">
+            <input id="musicArtist" type="hidden">
+            <input id="musicPreviewInput" type="hidden">
+            <input id="musicCoverInput" type="hidden">
+
+            <div id="musicSelected" class="hero" style="display:none; margin: 0;">
+              <div class="hero-title" id="musicSelectedTitle"></div>
+              <div class="hero-subtitle" id="musicSelectedArtist"></div>
+            </div>
+
+            <div class="field search-wrap">
+              <div class="label">Location</div>
+              <input id="locationSearch" class="input" type="text" placeholder="Search a place" autocomplete="off" />
+              <div id="locationSuggestions" class="suggestions"></div>
+            </div>
+
+            <input id="locationInput" type="hidden">
 
             <div class="field">
               <div class="label">Caption</div>
@@ -450,29 +472,7 @@
 
             <div class="field">
               <div class="label">Tags</div>
-              <input id="tagsInput" class="input" type="text" placeholder="music, art, night">
-            </div>
-
-            <div class="toggle-row">
-              <label class="toggle">
-                <span>Use as story</span>
-                <input id="storyToggle" type="checkbox">
-              </label>
-              <label class="toggle">
-                <span>Add music</span>
-                <input id="musicToggle" type="checkbox" checked>
-              </label>
-            </div>
-
-            <div id="musicFields" class="grid">
-              <div class="field">
-                <div class="label">Music preview URL</div>
-                <input id="musicPreviewInput" class="input" type="url" placeholder="https://...">
-              </div>
-              <div class="field">
-                <div class="label">Music cover URL</div>
-                <input id="musicCoverInput" class="input" type="url" placeholder="Optional cover image URL">
-              </div>
+              <input id="tagsInput" class="input" type="text" placeholder="music, art, night" />
             </div>
 
             <div class="actions">
@@ -492,8 +492,7 @@
 
             <div id="status" class="status"></div>
             <div class="mini-note">
-              If the cover is not provided, the homepage will try to fetch one automatically.
-              The file will be sent to the appropriate storage bucket, then the row will be inserted into Supabase.
+              Posts are visible to everyone. Share carefully and avoid publishing anything private or sensitive.
             </div>
           </form>
         </section>
@@ -515,13 +514,10 @@ const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const params = new URLSearchParams(location.search);
-const type = (params.get("type") || "post").toLowerCase() === "story" ? "story" : "post";
+const BUCKET_SHARED = "shared";
 
 const els = {
-  typeChip: document.getElementById("typeChip"),
-  pageTitle: document.getElementById("pageTitle"),
-  pageSubtitle: document.getElementById("pageSubtitle"),
+  typeChip: document.querySelector(".type-chip"),
   form: document.getElementById("uploadForm"),
   fileInput: document.getElementById("fileInput"),
   dropzone: document.getElementById("dropzone"),
@@ -529,36 +525,33 @@ const els = {
   dropTitle: document.getElementById("dropTitle"),
   dropSubtitle: document.getElementById("dropSubtitle"),
   preview: document.getElementById("preview"),
-  titleInput: document.getElementById("titleInput"),
-  authorInput: document.getElementById("authorInput"),
-  captionInput: document.getElementById("captionInput"),
-  tagsInput: document.getElementById("tagsInput"),
-  storyToggle: document.getElementById("storyToggle"),
-  musicToggle: document.getElementById("musicToggle"),
-  musicFields: document.getElementById("musicFields"),
+  musicSearch: document.getElementById("musicSearch"),
+  musicSuggestions: document.getElementById("musicSuggestions"),
+  musicTitle: document.getElementById("musicTitle"),
+  musicArtist: document.getElementById("musicArtist"),
   musicPreviewInput: document.getElementById("musicPreviewInput"),
   musicCoverInput: document.getElementById("musicCoverInput"),
+  musicSelected: document.getElementById("musicSelected"),
+  musicSelectedTitle: document.getElementById("musicSelectedTitle"),
+  musicSelectedArtist: document.getElementById("musicSelectedArtist"),
+  locationSearch: document.getElementById("locationSearch"),
+  locationSuggestions: document.getElementById("locationSuggestions"),
+  locationInput: document.getElementById("locationInput"),
+  captionInput: document.getElementById("captionInput"),
+  tagsInput: document.getElementById("tagsInput"),
   submitBtn: document.getElementById("submitBtn"),
   clearBtn: document.getElementById("clearBtn"),
   status: document.getElementById("status"),
   loading: document.getElementById("loading")
 };
 
-const BUCKET_SHARED = "shared";
-const BUCKET_STORIES = "stories";
-
 let selectedFile = null;
 let currentUser = null;
-
-function setMode() {
-  els.typeChip.textContent = type;
-  els.pageTitle.textContent = type === "story" ? "Create a story" : "Create a post";
-  els.pageSubtitle.textContent = type === "story"
-    ? "Upload a story that will appear in the story viewer and the story strip."
-    : "Upload a post with caption, tags, and optional music.";
-  els.storyToggle.checked = type === "story";
-  els.storyToggle.disabled = type === "story";
-}
+let musicController = null;
+let locationController = null;
+let musicDebounce = null;
+let locationDebounce = null;
+let musicJsonpId = 0;
 
 function setStatus(message, isError = false) {
   els.status.textContent = message || "";
@@ -607,93 +600,218 @@ async function getCurrentUser() {
   return data?.user || null;
 }
 
-async function uploadFile(file, bucket) {
+async function imageFileToJpeg800(file) {
+  const bitmapUrl = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.src = bitmapUrl;
+    await img.decode();
+
+    const canvas = document.createElement("canvas");
+    canvas.width = 800;
+    canvas.height = 800;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("Canvas unavailable");
+
+    const size = Math.min(img.width, img.height);
+    const sx = Math.floor((img.width - size) / 2);
+    const sy = Math.floor((img.height - size) / 2);
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, 800, 800);
+    ctx.drawImage(img, sx, sy, size, size, 0, 0, 800, 800);
+
+    const blob = await new Promise((resolve, reject) => {
+      canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Image conversion failed")), "image/jpeg", 0.92);
+    });
+
+    return { blob, ext: "jpg", type: "image/jpeg" };
+  } finally {
+    URL.revokeObjectURL(bitmapUrl);
+  }
+}
+
+async function prepareUploadAsset(file) {
+  if (file.type.startsWith("image/")) {
+    return imageFileToJpeg800(file);
+  }
+  return { blob: file, ext: (file.name.split('.').pop() || "bin").toLowerCase(), type: file.type || "application/octet-stream" };
+}
+
+async function uploadFile(file) {
   const stamp = Date.now();
   const safe = fileNameSafe(file.name || `upload_${stamp}`);
-  const path = `${currentUser?.id || "anonymous"}/${stamp}_${safe}`;
+  const prepared = await prepareUploadAsset(file);
+  const fileNameBase = safe.replace(/\.[^.]+$/, "");
+  const path = `${currentUser?.id || "anonymous"}/${stamp}_${fileNameBase}.${prepared.ext}`;
 
   const { error: uploadError } = await supabase.storage
-    .from(bucket)
-    .upload(path, file, {
+    .from(BUCKET_SHARED)
+    .upload(path, prepared.blob, {
       cacheControl: "3600",
       upsert: false,
-      contentType: file.type || "application/octet-stream"
+      contentType: prepared.type
     });
 
   if (uploadError) throw uploadError;
 
-  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  const { data } = supabase.storage.from(BUCKET_SHARED).getPublicUrl(path);
   return data?.publicUrl || "";
 }
 
-async function submitPostOrStory(file) {
+function showMusicSelection(track) {
+  if (!track) {
+    els.musicSelected.style.display = "none";
+    return;
+  }
+  els.musicSelectedTitle.textContent = track.title || "";
+  els.musicSelectedArtist.textContent = track.artist || "";
+  els.musicSelected.style.display = "block";
+}
+
+function clearMusicSelection() {
+  els.musicTitle.value = "";
+  els.musicArtist.value = "";
+  els.musicPreviewInput.value = "";
+  els.musicCoverInput.value = "";
+  els.musicSearch.value = "";
+  els.musicSuggestions.innerHTML = "";
+  els.musicSuggestions.style.display = "none";
+  els.musicSelected.style.display = "none";
+}
+
+function clearLocation() {
+  els.locationInput.value = "";
+  els.locationSearch.value = "";
+  els.locationSuggestions.innerHTML = "";
+  els.locationSuggestions.style.display = "none";
+}
+
+function clearForm() {
+  selectedFile = null;
+  els.fileInput.value = "";
+  els.captionInput.value = "";
+  els.tagsInput.value = "";
+  clearMusicSelection();
+  clearLocation();
+  resetPreview();
+  setStatus("");
+}
+
+function openSuggestions(box, items, renderItem) {
+  if (!items.length) {
+    box.innerHTML = "";
+    box.style.display = "none";
+    return;
+  }
+  box.innerHTML = items.map(renderItem).join("");
+  box.style.display = "block";
+}
+
+function hideSuggestions(box) {
+  box.style.display = "none";
+  box.innerHTML = "";
+}
+
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = `__deezer_cb_${++musicJsonpId}`;
+    const script = document.createElement("script");
+    const cleanup = () => {
+      delete window[cb];
+      script.remove();
+    };
+    window[cb] = (data) => {
+      cleanup();
+      resolve(data);
+    };
+    script.onerror = () => {
+      cleanup();
+      reject(new Error("Music search failed"));
+    };
+    script.src = `${url}${url.includes("?") ? "&" : "?"}output=jsonp&callback=${cb}`;
+    document.head.appendChild(script);
+  });
+}
+
+async function searchDeezerTracks(query) {
+  const data = await jsonp(`https://api.deezer.com/search?q=${encodeURIComponent(query)}`);
+  return Array.isArray(data?.data) ? data.data.slice(0, 6) : [];
+}
+
+async function searchLocations(query) {
+  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(query)}`, {
+    headers: { "Accept-Language": "it" }
+  });
+  const data = await res.json();
+  return Array.isArray(data) ? data.slice(0, 6) : [];
+}
+
+async function getCurrentMusicSuggestions(query) {
+  try {
+    const tracks = await searchDeezerTracks(query);
+    return tracks.map((t) => ({
+      id: String(t.id),
+      title: t.title || "",
+      artist: t.artist?.name || "",
+      cover: t.album?.cover_xl || t.album?.cover_big || t.album?.cover_medium || t.album?.cover || "",
+      preview: t.preview || ""
+    }));
+  } catch {
+    return [];
+  }
+}
+
+async function pickMusic(track) {
+  if (!track) return;
+  els.musicTitle.value = track.title || "";
+  els.musicArtist.value = track.artist || "";
+  els.musicPreviewInput.value = track.preview || "";
+  els.musicCoverInput.value = track.cover || "";
+  showMusicSelection(track);
+  hideSuggestions(els.musicSuggestions);
+}
+
+async function pickLocation(item) {
+  if (!item) return;
+  const label = item.display_name || [item.name, item.address?.city, item.address?.town, item.address?.village, item.address?.country].filter(Boolean).join(", ");
+  els.locationInput.value = label || "";
+  els.locationSearch.value = label || "";
+  hideSuggestions(els.locationSuggestions);
+}
+
+async function submitPost(file) {
   if (!currentUser) throw new Error("You must be logged in.");
   if (!file) throw new Error("Choose a file first.");
 
-  const isStory = els.storyToggle.checked;
-  const bucket = isStory ? BUCKET_STORIES : BUCKET_SHARED;
-  const mediaUrl = await uploadFile(file, bucket);
-  const title = els.titleInput.value.trim();
-  const author = els.authorInput.value.trim();
+  const mediaUrl = await uploadFile(file);
   const caption = els.captionInput.value.trim();
   const tags = detectTextTags(els.tagsInput.value);
-  const musicPreview = els.musicToggle.checked ? els.musicPreviewInput.value.trim() : "";
-  const musicCover = els.musicToggle.checked ? els.musicCoverInput.value.trim() : "";
-
-  if (isStory) {
-    const { error } = await supabase.from("profiles").update({
-      story_url: mediaUrl,
-      updated_at: new Date().toISOString()
-    }).eq("id", currentUser.id);
-    if (error) throw error;
-    return;
-  }
+  const location = els.locationInput.value.trim();
+  const songTitle = els.musicTitle.value.trim();
+  const songArtist = els.musicArtist.value.trim();
+  const songPreview = els.musicPreviewInput.value.trim();
+  const songCover = els.musicCoverInput.value.trim();
 
   const { error } = await supabase.from("posts").insert({
     user_id: currentUser.id,
     image_url: mediaUrl,
     caption,
     tags,
-    song_title: title || null,
-    song_author: author || null,
-    song_preview: musicPreview || null,
-    song_cover: musicCover || null,
+    location: location || null,
+    song_title: songTitle || null,
+    song_author: songArtist || null,
+    song_preview: songPreview || null,
+    song_cover: songCover || null,
     created_at: new Date().toISOString()
   });
 
   if (error) throw error;
 }
 
-function clearForm() {
-  selectedFile = null;
-  els.fileInput.value = "";
-  els.titleInput.value = "";
-  els.authorInput.value = "";
-  els.captionInput.value = "";
-  els.tagsInput.value = "";
-  els.musicPreviewInput.value = "";
-  els.musicCoverInput.value = "";
-  els.storyToggle.checked = type === "story";
-  els.musicToggle.checked = true;
-  els.musicFields.style.display = "grid";
-  resetPreview();
-  setStatus("");
-}
-
-setMode();
-
+setStatus("Ready to publish.");
 currentUser = await getCurrentUser();
-if (!currentUser) {
-  setStatus("You must be signed in to upload.", true);
-}
-
-els.storyToggle.addEventListener("change", () => {
-  if (type === "story") els.storyToggle.checked = true;
-});
-
-els.musicToggle.addEventListener("change", () => {
-  els.musicFields.style.display = els.musicToggle.checked ? "grid" : "none";
-});
+if (!currentUser) setStatus("You must be signed in to upload.", true);
 
 els.fileInput.addEventListener("change", (e) => {
   const file = e.target.files?.[0] || null;
@@ -732,7 +850,84 @@ els.dropzone.addEventListener("keydown", (e) => {
   }
 });
 
-els.clearBtn.addEventListener("click", clearForm);
+els.musicSearch.addEventListener("input", () => {
+  const q = els.musicSearch.value.trim();
+  clearTimeout(musicDebounce);
+  if (q.length < 2) {
+    hideSuggestions(els.musicSuggestions);
+    return;
+  }
+  musicDebounce = setTimeout(async () => {
+    const results = await getCurrentMusicSuggestions(q);
+    openSuggestions(els.musicSuggestions, results, (item) => `
+      <div class="suggestion" data-music-id="${escapeHtml(item.id)}">
+        <img class="suggestion-thumb" src="${item.cover || ''}" alt="">
+        <div class="suggestion-meta">
+          <div class="suggestion-title">${escapeHtml(item.title)}</div>
+          <div class="suggestion-subtitle">${escapeHtml(item.artist || '')}</div>
+        </div>
+      </div>
+    `);
+    els.musicSuggestions.querySelectorAll("[data-music-id]").forEach((el) => {
+      const item = results.find((r) => String(r.id) === String(el.dataset.musicId));
+      el.addEventListener("click", () => pickMusic(item));
+    });
+  }, 250);
+});
+
+els.locationSearch.addEventListener("input", () => {
+  const q = els.locationSearch.value.trim();
+  clearTimeout(locationDebounce);
+  if (q.length < 2) {
+    hideSuggestions(els.locationSuggestions);
+    return;
+  }
+  locationDebounce = setTimeout(async () => {
+    try {
+      const results = await searchLocations(q);
+      openSuggestions(els.locationSuggestions, results, (item) => `
+        <div class="suggestion" data-location-name="${escapeHtml(item.display_name || '')}">
+          <div class="suggestion-meta">
+            <div class="suggestion-title">${escapeHtml(item.name || item.display_name || '')}</div>
+            <div class="suggestion-subtitle">${escapeHtml(item.display_name || '')}</div>
+          </div>
+        </div>
+      `);
+      els.locationSuggestions.querySelectorAll("[data-location-name]").forEach((el) => {
+        const item = results.find((r) => (r.display_name || '') === el.dataset.locationName);
+        el.addEventListener("click", () => pickLocation(item));
+      });
+    } catch {
+      hideSuggestions(els.locationSuggestions);
+    }
+  }, 250);
+});
+
+els.musicSearch.addEventListener("focus", () => {
+  if (els.musicSearch.value.trim().length >= 2) els.musicSearch.dispatchEvent(new Event("input"));
+});
+
+els.locationSearch.addEventListener("focus", () => {
+  if (els.locationSearch.value.trim().length >= 2) els.locationSearch.dispatchEvent(new Event("input"));
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-wrap")) {
+    hideSuggestions(els.musicSuggestions);
+    hideSuggestions(els.locationSuggestions);
+  }
+});
+
+els.clearBtn.addEventListener("click", () => {
+  selectedFile = null;
+  els.fileInput.value = "";
+  els.captionInput.value = "";
+  els.tagsInput.value = "";
+  clearMusicSelection();
+  clearLocation();
+  resetPreview();
+  setStatus("Ready to publish.");
+});
 
 els.form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -748,8 +943,8 @@ els.form.addEventListener("submit", async (e) => {
   try {
     showLoading(true);
     setStatus("Publishing…");
-    await submitPostOrStory(selectedFile);
-    setStatus(type === "story" ? "Story published." : "Post published.");
+    await submitPost(selectedFile);
+    setStatus("Post published.");
     setTimeout(() => {
       window.location.href = "index.html";
     }, 700);
@@ -760,10 +955,6 @@ els.form.addEventListener("submit", async (e) => {
     showLoading(false);
   }
 });
-
-if (type === "story") {
-  els.musicFields.style.display = "none";
-}
 </script>
 </body>
 </html>
