@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Shared. — Upload</title>
+<meta name="theme-color" content="#000000" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
+<style>
+  :root {
+    --bg:#000;
+    --text:#fff;
+    --muted:rgba(255,255,255,.68);
+    --muted-2:rgba(255,255,255,.48);
+    --border:rgba(255,255,255,.14);
+    --panel:rgba(255,255,255,.05);
+    --panel-2:rgba(255,255,255,.08);
+    --panel-3:rgba(255,255,255,.12);
+    --like:#ff2d55;
+    --danger:#ff3b30;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --max-width: 720px;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Archivo Black', sans-serif;
+    overflow: hidden;
+  }
+
+  button, input, textarea, select {
+    font: inherit;
+  }
+
+  .page {
+    width: 100%;
+    height: 100dvh;
+    display: flex;
+    justify-content: center;
+    background: #000;
+  }
+
+  .shell {
+    width: 100%;
+    max-width: var(--max-width);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-left: 1px solid rgba(255,255,255,.08);
+    border-right: 1px solid rgba(255,255,255,.08);
+  }
+
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: calc(72px + var(--safe-top));
+    padding: calc(12px + var(--safe-top)) 14px 12px;
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,.10);
+    background: rgba(0,0,0,.96);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .back {
+    justify-self: start;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: var(--panel);
+    border-radius: 999px;
+    padding: 10px 12px;
+  }
+
+  .back .material-symbols-rounded {
+    font-size: 20px;
+  }
+
+  .brand {
+    justify-self: center;
+    font-size: 1.35rem;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    user-select: none;
+  }
+
+  .type-chip {
+    justify-self: end;
+    padding: 10px 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  .content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 16px 14px calc(18px + var(--safe-bottom));
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .hero {
+    margin: 4px 0 14px;
+    padding: 18px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.05);
+  }
+
+  .hero-title {
+    font-size: 1.45rem;
+    letter-spacing: -0.05em;
+    line-height: 1;
+  }
+
+  .hero-subtitle {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: .88rem;
+    line-height: 1.45;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 24px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: rgba(255,255,255,.04);
+    box-shadow: 0 18px 60px rgba(0,0,0,.35);
+  }
+
+  .grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .field {
+    display: grid;
+    gap: 8px;
+  }
+
+  .label {
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .input,
+  .textarea,
+  .select {
+    width: 100%;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: #111;
+    color: #fff;
+    outline: none;
+    padding: 14px 15px;
+    font-size: 15px;
+  }
+
+  .textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.45;
+  }
+
+  .input::placeholder,
+  .textarea::placeholder {
+    color: rgba(255,255,255,.40);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .toggle-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .toggle {
+    flex: 1 1 160px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 14px 15px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: var(--panel);
+    color: #fff;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .toggle input { accent-color: #fff; }
+
+  .dropzone {
+    position: relative;
+    display: grid;
+    gap: 12px;
+    place-items: center;
+    min-height: 180px;
+    padding: 18px;
+    border-radius: 24px;
+    border: 1px dashed rgba(255,255,255,.22);
+    background: rgba(255,255,255,.03);
+    overflow: hidden;
+  }
+
+  .dropzone.dragover {
+    border-color: rgba(255,255,255,.45);
+    background: rgba(255,255,255,.06);
+  }
+
+  .dropzone-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.10);
+  }
+
+  .dropzone-icon .material-symbols-rounded {
+    font-size: 28px;
+  }
+
+  .dropzone-title {
+    font-size: 1rem;
+    text-align: center;
+  }
+
+  .dropzone-subtitle {
+    color: var(--muted);
+    font-size: .82rem;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .file-input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .preview {
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    display: none;
+    border: 1px solid rgba(255,255,255,.12);
+  }
+
+  .preview.show { display: block; }
+  .preview img {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: cover;
+    background: #111;
+  }
+
+  .status {
+    min-height: 20px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .actions {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+
+  .btn {
+    appearance: none;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    border-radius: 18px;
+    padding: 14px 16px;
+    cursor: pointer;
+    transition: transform .18s ease, background .18s ease, border-color .18s ease;
+    flex: 1 1 180px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .btn:hover { background: rgba(255,255,255,.10); }
+  .btn:active { transform: scale(.98); }
+
+  .btn.primary {
+    background: #fff;
+    color: #000;
+    border-color: #fff;
+  }
+
+  .btn.primary:hover { background: rgba(255,255,255,.92); }
+
+  .btn.danger {
+    background: rgba(255,59,48,.12);
+    color: #ff7a73;
+    border-color: rgba(255,59,48,.28);
+  }
+
+  .mini-note {
+    margin-top: 10px;
+    color: var(--muted-2);
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .loading {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: none;
+    place-items: center;
+    background: rgba(0,0,0,.92);
+    backdrop-filter: blur(10px);
+  }
+
+  .loading.show { display: grid; }
+
+  .loading-card {
+    display: grid;
+    gap: 14px;
+    justify-items: center;
+    padding: 28px 24px;
+    border-radius: 24px;
+    background: rgba(255,255,255,.06);
+    border: 1px solid rgba(255,255,255,.12);
+    min-width: 220px;
+  }
+
+  .spinner {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,.14);
+    border-top-color: #fff;
+    animation: spin .85s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .error {
+    color: #ff8a85;
+  }
+
+  @media (max-width: 640px) {
+    .shell {
+      border-left: 0;
+      border-right: 0;
+    }
+    .topbar {
+      grid-template-columns: auto 1fr auto;
+    }
+    .brand {
+      font-size: 1.1rem;
+    }
+    .type-chip {
+      font-size: 11px;
+      padding: 9px 10px;
+    }
+    .row {
+      grid-template-columns: 1fr;
+    }
+    .btn { flex: 1 1 100%; }
+  }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="shell">
+      <header class="topbar">
+        <a class="back" href="javascript:history.back()" aria-label="Go back">
+          <span class="material-symbols-rounded">arrow_back</span>
+          <span>Back</span>
+        </a>
+        <div class="brand">Shared.</div>
+        <div id="typeChip" class="type-chip">post</div>
+      </header>
+
+      <main class="content">
+        <section class="hero">
+          <div id="pageTitle" class="hero-title">Create a post</div>
+          <div id="pageSubtitle" class="hero-subtitle">Upload media, set text, add tags, and publish in the same visual style as the feed.</div>
+        </section>
+
+        <section class="card">
+          <form id="uploadForm" class="grid">
+            <div class="field">
+              <div class="label">Media</div>
+              <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Choose a file">
+                <div class="dropzone-icon">
+                  <span class="material-symbols-rounded" id="dropIcon">image</span>
+                </div>
+                <div class="dropzone-title" id="dropTitle">Choose an image or video</div>
+                <div class="dropzone-subtitle" id="dropSubtitle">Tap to select a file</div>
+                <input id="fileInput" class="file-input" type="file" accept="image/*,video/*" />
+              </div>
+              <div id="preview" class="preview"></div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <div class="label">Title</div>
+                <input id="titleInput" class="input" type="text" placeholder="Song title or post title">
+              </div>
+              <div class="field">
+                <div class="label">Author</div>
+                <input id="authorInput" class="input" type="text" placeholder="Song author or artist">
+              </div>
+            </div>
+
+            <div class="field">
+              <div class="label">Caption</div>
+              <textarea id="captionInput" class="textarea" placeholder="Write a caption"></textarea>
+            </div>
+
+            <div class="field">
+              <div class="label">Tags</div>
+              <input id="tagsInput" class="input" type="text" placeholder="music, art, night">
+            </div>
+
+            <div class="toggle-row">
+              <label class="toggle">
+                <span>Use as story</span>
+                <input id="storyToggle" type="checkbox">
+              </label>
+              <label class="toggle">
+                <span>Add music</span>
+                <input id="musicToggle" type="checkbox" checked>
+              </label>
+            </div>
+
+            <div id="musicFields" class="grid">
+              <div class="field">
+                <div class="label">Music preview URL</div>
+                <input id="musicPreviewInput" class="input" type="url" placeholder="https://...">
+              </div>
+              <div class="field">
+                <div class="label">Music cover URL</div>
+                <input id="musicCoverInput" class="input" type="url" placeholder="Optional cover image URL">
+              </div>
+            </div>
+
+            <div class="actions">
+              <button id="submitBtn" class="btn primary" type="submit">
+                <span class="material-symbols-rounded">cloud_upload</span>
+                <span>Publish</span>
+              </button>
+              <button id="clearBtn" class="btn" type="button">
+                <span class="material-symbols-rounded">restart_alt</span>
+                <span>Clear</span>
+              </button>
+              <button id="cancelBtn" class="btn danger" type="button" onclick="location.href='index.html'">
+                <span class="material-symbols-rounded">close</span>
+                <span>Cancel</span>
+              </button>
+            </div>
+
+            <div id="status" class="status"></div>
+            <div class="mini-note">
+              If the cover is not provided, the homepage will try to fetch one automatically.
+              The file will be sent to the appropriate storage bucket, then the row will be inserted into Supabase.
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <div id="loading" class="loading" aria-hidden="true">
+    <div class="loading-card">
+      <div class="spinner"></div>
+      <div class="hero-title">Uploading…</div>
+    </div>
+  </div>
+
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const params = new URLSearchParams(location.search);
+const type = (params.get("type") || "post").toLowerCase() === "story" ? "story" : "post";
+
+const els = {
+  typeChip: document.getElementById("typeChip"),
+  pageTitle: document.getElementById("pageTitle"),
+  pageSubtitle: document.getElementById("pageSubtitle"),
+  form: document.getElementById("uploadForm"),
+  fileInput: document.getElementById("fileInput"),
+  dropzone: document.getElementById("dropzone"),
+  dropIcon: document.getElementById("dropIcon"),
+  dropTitle: document.getElementById("dropTitle"),
+  dropSubtitle: document.getElementById("dropSubtitle"),
+  preview: document.getElementById("preview"),
+  titleInput: document.getElementById("titleInput"),
+  authorInput: document.getElementById("authorInput"),
+  captionInput: document.getElementById("captionInput"),
+  tagsInput: document.getElementById("tagsInput"),
+  storyToggle: document.getElementById("storyToggle"),
+  musicToggle: document.getElementById("musicToggle"),
+  musicFields: document.getElementById("musicFields"),
+  musicPreviewInput: document.getElementById("musicPreviewInput"),
+  musicCoverInput: document.getElementById("musicCoverInput"),
+  submitBtn: document.getElementById("submitBtn"),
+  clearBtn: document.getElementById("clearBtn"),
+  status: document.getElementById("status"),
+  loading: document.getElementById("loading")
+};
+
+const BUCKET_SHARED = "shared";
+const BUCKET_STORIES = "stories";
+
+let selectedFile = null;
+let currentUser = null;
+
+function setMode() {
+  els.typeChip.textContent = type;
+  els.pageTitle.textContent = type === "story" ? "Create a story" : "Create a post";
+  els.pageSubtitle.textContent = type === "story"
+    ? "Upload a story that will appear in the story viewer and the story strip."
+    : "Upload a post with caption, tags, and optional music.";
+  els.storyToggle.checked = type === "story";
+  els.storyToggle.disabled = type === "story";
+}
+
+function setStatus(message, isError = false) {
+  els.status.textContent = message || "";
+  els.status.className = `status${isError ? " error" : ""}`;
+}
+
+function showLoading(show) {
+  els.loading.classList.toggle("show", !!show);
+}
+
+function resetPreview() {
+  els.preview.className = "preview";
+  els.preview.innerHTML = "";
+}
+
+function renderPreview(file) {
+  resetPreview();
+  if (!file) return;
+
+  const url = URL.createObjectURL(file);
+  const isVideo = file.type.startsWith("video/");
+  const node = document.createElement(isVideo ? "video" : "img");
+  node.src = url;
+  if (isVideo) {
+    node.controls = true;
+    node.muted = true;
+    node.playsInline = true;
+    node.autoplay = true;
+    node.loop = true;
+  }
+  els.preview.appendChild(node);
+  els.preview.classList.add("show");
+}
+
+function fileNameSafe(name) {
+  return name.replace(/[^a-zA-Z0-9_.-]/g, "_");
+}
+
+function detectTextTags(value) {
+  return String(value || "").split(",").map((t) => t.trim()).filter(Boolean);
+}
+
+async function getCurrentUser() {
+  const { data, error } = await supabase.auth.getUser();
+  if (error) return null;
+  return data?.user || null;
+}
+
+async function uploadFile(file, bucket) {
+  const stamp = Date.now();
+  const safe = fileNameSafe(file.name || `upload_${stamp}`);
+  const path = `${currentUser?.id || "anonymous"}/${stamp}_${safe}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from(bucket)
+    .upload(path, file, {
+      cacheControl: "3600",
+      upsert: false,
+      contentType: file.type || "application/octet-stream"
+    });
+
+  if (uploadError) throw uploadError;
+
+  const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return data?.publicUrl || "";
+}
+
+async function submitPostOrStory(file) {
+  if (!currentUser) throw new Error("You must be logged in.");
+  if (!file) throw new Error("Choose a file first.");
+
+  const isStory = els.storyToggle.checked;
+  const bucket = isStory ? BUCKET_STORIES : BUCKET_SHARED;
+  const mediaUrl = await uploadFile(file, bucket);
+  const title = els.titleInput.value.trim();
+  const author = els.authorInput.value.trim();
+  const caption = els.captionInput.value.trim();
+  const tags = detectTextTags(els.tagsInput.value);
+  const musicPreview = els.musicToggle.checked ? els.musicPreviewInput.value.trim() : "";
+  const musicCover = els.musicToggle.checked ? els.musicCoverInput.value.trim() : "";
+
+  if (isStory) {
+    const { error } = await supabase.from("profiles").update({
+      story_url: mediaUrl,
+      updated_at: new Date().toISOString()
+    }).eq("id", currentUser.id);
+    if (error) throw error;
+    return;
+  }
+
+  const { error } = await supabase.from("posts").insert({
+    user_id: currentUser.id,
+    image_url: mediaUrl,
+    caption,
+    tags,
+    song_title: title || null,
+    song_author: author || null,
+    song_preview: musicPreview || null,
+    song_cover: musicCover || null,
+    created_at: new Date().toISOString()
+  });
+
+  if (error) throw error;
+}
+
+function clearForm() {
+  selectedFile = null;
+  els.fileInput.value = "";
+  els.titleInput.value = "";
+  els.authorInput.value = "";
+  els.captionInput.value = "";
+  els.tagsInput.value = "";
+  els.musicPreviewInput.value = "";
+  els.musicCoverInput.value = "";
+  els.storyToggle.checked = type === "story";
+  els.musicToggle.checked = true;
+  els.musicFields.style.display = "grid";
+  resetPreview();
+  setStatus("");
+}
+
+setMode();
+
+currentUser = await getCurrentUser();
+if (!currentUser) {
+  setStatus("You must be signed in to upload.", true);
+}
+
+els.storyToggle.addEventListener("change", () => {
+  if (type === "story") els.storyToggle.checked = true;
+});
+
+els.musicToggle.addEventListener("change", () => {
+  els.musicFields.style.display = els.musicToggle.checked ? "grid" : "none";
+});
+
+els.fileInput.addEventListener("change", (e) => {
+  const file = e.target.files?.[0] || null;
+  selectedFile = file;
+  if (file) {
+    renderPreview(file);
+    setStatus(`${file.name}`);
+  }
+});
+
+els.dropzone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  els.dropzone.classList.add("dragover");
+});
+
+els.dropzone.addEventListener("dragleave", () => {
+  els.dropzone.classList.remove("dragover");
+});
+
+els.dropzone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  els.dropzone.classList.remove("dragover");
+  const file = e.dataTransfer.files?.[0] || null;
+  if (!file) return;
+  selectedFile = file;
+  els.fileInput.files = e.dataTransfer.files;
+  renderPreview(file);
+  setStatus(`${file.name}`);
+});
+
+els.dropzone.addEventListener("click", () => els.fileInput.click());
+els.dropzone.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    els.fileInput.click();
+  }
+});
+
+els.clearBtn.addEventListener("click", clearForm);
+
+els.form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!selectedFile) {
+    setStatus("Choose a media file first.", true);
+    return;
+  }
+  if (!currentUser) {
+    setStatus("You must be signed in to upload.", true);
+    return;
+  }
+
+  try {
+    showLoading(true);
+    setStatus("Publishing…");
+    await submitPostOrStory(selectedFile);
+    setStatus(type === "story" ? "Story published." : "Post published.");
+    setTimeout(() => {
+      window.location.href = "index.html";
+    }, 700);
+  } catch (err) {
+    console.error(err);
+    setStatus(err?.message || "Upload failed.", true);
+  } finally {
+    showLoading(false);
+  }
+});
+
+if (type === "story") {
+  els.musicFields.style.display = "none";
+}
+</script>
+</body>
+</html>
