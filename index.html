@@ -24,200 +24,237 @@ body{
   background:#0f0f0f;
   border:1px solid #222;
   border-radius:20px;
-  padding:22px;
+  padding:28px 22px 22px;
   box-shadow:0 20px 60px rgba(0,0,0,.35);
 }
 h1{
-  margin:0 0 16px;
+  margin:0 0 20px;
   text-align:center;
   font-size:28px;
   letter-spacing:1px;
 }
-input{
+.tabs{
+  display:flex;
+  gap:8px;
+  margin-bottom:20px;
+}
+.tab{
+  flex:1;
+  padding:10px;
+  border-radius:999px;
+  border:1px solid #333;
+  background:transparent;
+  color:#666;
+  font-family:'Archivo Black', sans-serif;
+  font-size:13px;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:0.15s ease;
+}
+.tab.active{
+  background:#fff;
+  color:#000;
+  border-color:#fff;
+}
+.tab:not(.active):hover{
+  border-color:#555;
+  color:#aaa;
+}
+.fields{ display:flex; flex-direction:column; gap:10px; }
+input[type="text"],
+input[type="email"],
+input[type="password"]{
   width:100%;
-  padding:12px;
-  margin-top:10px;
+  padding:12px 14px;
   border-radius:14px;
   border:1px solid #222;
   background:#000;
   color:#fff;
   font-family:'Archivo Black', sans-serif;
+  font-size:13px;
   outline:none;
-  font-size:14px;
+  transition:border-color 0.15s;
 }
 input:focus{ border-color:#444; }
-button{
+.checkbox-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-top:2px;
+}
+.checkbox-row input[type="checkbox"]{
+  width:16px;
+  height:16px;
+  accent-color:#fff;
+  cursor:pointer;
+  flex-shrink:0;
+}
+.checkbox-row label{
+  font-size:11px;
+  color:#666;
+  cursor:pointer;
+  line-height:1.4;
+}
+.checkbox-row a{
+  color:#aaa;
+  text-decoration:underline;
+}
+.submit{
   width:100%;
   padding:14px;
-  margin-top:10px;
+  margin-top:14px;
   border-radius:16px;
   border:none;
-  font-family:'Archivo Black', sans-serif;
-  cursor:pointer;
-  transition:0.15s ease;
-  letter-spacing:1px;
-  font-size:14px;
-}
-button:disabled{ opacity:.6; cursor:not-allowed; }
-.primary{
   background:linear-gradient(135deg,#ffffff,#d0d0d0);
   color:#000;
+  font-family:'Archivo Black', sans-serif;
+  font-size:14px;
+  letter-spacing:1px;
+  cursor:pointer;
+  transition:0.15s ease;
 }
-.primary:hover:not(:disabled){ transform:scale(1.02); }
-.secondary{
-  background:#000;
-  color:#fff;
-  border:1px solid #333;
-}
-.secondary:hover:not(:disabled){ background:#111; }
-.small{
+.submit:hover:not(:disabled){ transform:scale(1.02); }
+.submit:disabled{ opacity:.6; cursor:not-allowed; }
+.status{
   font-size:11px;
-  opacity:0.7;
+  color:#888;
   margin-top:12px;
   text-align:center;
   min-height:14px;
   word-break:break-word;
 }
-#usernameField{ display:none; }
+.fade-enter{ animation: fadeIn 0.18s ease; }
+@keyframes fadeIn{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:translateY(0); } }
 </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Shared.</h1>
+<div class="card">
+  <h1>Shared.</h1>
 
-    <div id="usernameField">
-      <input id="username" type="text" placeholder="Username" autocomplete="username">
-    </div>
-    <input id="email" type="email" placeholder="Email" autocomplete="email">
-    <input id="password" type="password" placeholder="Password" autocomplete="current-password">
-
-    <button type="button" class="primary" id="signinBtn">SIGN IN</button>
-    <button type="button" class="secondary" id="signupBtn">CREATE ACCOUNT</button>
-
-    <div class="small" id="status"></div>
+  <div class="tabs">
+    <button class="tab active" id="tabLogin">LOGIN</button>
+    <button class="tab" id="tabSignup">SIGN UP</button>
   </div>
 
-  <script type="module">
-    import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+  <div class="fields" id="fields"></div>
 
-    const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-    const API_URL = "https://api.sharedweb.org";
+  <button class="submit" id="submitBtn">LOGIN</button>
+  <div class="status" id="status"></div>
+</div>
 
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const SUPABASE_URL     = "https://cnhaonawapuahzoctqav.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+const API_URL          = "https://api.sharedweb.org";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
+});
+
+const tabLogin  = document.getElementById("tabLogin");
+const tabSignup = document.getElementById("tabSignup");
+const fields    = document.getElementById("fields");
+const submitBtn = document.getElementById("submitBtn");
+const statusEl  = document.getElementById("status");
+
+let mode = "login";
+
+function setStatus(t) { statusEl.textContent = t || ""; }
+function setLoading(v) { submitBtn.disabled = v; }
+function goHome() { window.location.replace("./home.html"); }
+
+function renderFields() {
+  fields.innerHTML = "";
+  fields.classList.remove("fade-enter");
+  void fields.offsetWidth;
+  fields.classList.add("fade-enter");
+
+  if (mode === "login") {
+    fields.innerHTML = `
+      <input id="f_email" type="email" placeholder="Email" autocomplete="email">
+      <input id="f_password" type="password" placeholder="Password" autocomplete="current-password">
+    `;
+    submitBtn.textContent = "LOGIN";
+  } else {
+    fields.innerHTML = `
+      <input id="f_username" type="text" placeholder="Username" autocomplete="username">
+      <input id="f_email" type="email" placeholder="Email" autocomplete="email">
+      <input id="f_password" type="password" placeholder="Password" autocomplete="new-password">
+      <div class="checkbox-row">
+        <input type="checkbox" id="f_terms">
+        <label for="f_terms">I agree to the <a href="#">terms and conditions</a></label>
+      </div>
+    `;
+    submitBtn.textContent = "SIGN UP";
+  }
+}
+
+tabLogin.addEventListener("click", () => {
+  if (mode === "login") return;
+  mode = "login";
+  tabLogin.classList.add("active");
+  tabSignup.classList.remove("active");
+  setStatus("");
+  renderFields();
+});
+
+tabSignup.addEventListener("click", () => {
+  if (mode === "signup") return;
+  mode = "signup";
+  tabSignup.classList.add("active");
+  tabLogin.classList.remove("active");
+  setStatus("");
+  renderFields();
+});
+
+submitBtn.addEventListener("click", async () => {
+  setStatus("");
+  if (mode === "login") {
+    const email    = document.getElementById("f_email")?.value.trim();
+    const password = document.getElementById("f_password")?.value;
+    if (!email || !password) { setStatus("ENTER EMAIL AND PASSWORD"); return; }
+    setLoading(true); setStatus("SIGNING IN...");
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) { setStatus(error.message); return; }
+    goHome();
+  } else {
+    const username = document.getElementById("f_username")?.value.trim();
+    const email    = document.getElementById("f_email")?.value.trim();
+    const password = document.getElementById("f_password")?.value;
+    const terms    = document.getElementById("f_terms")?.checked;
+    if (!username || !email || !password) { setStatus("FILL IN ALL FIELDS"); return; }
+    if (password.length < 6) { setStatus("PASSWORD MIN 6 CHARACTERS"); return; }
+    if (!terms) { setStatus("ACCEPT THE TERMS AND CONDITIONS"); return; }
+    setLoading(true); setStatus("CREATING ACCOUNT...");
+    const { data, error } = await supabase.auth.signUp({
+      email, password,
+      options: { data: { display_name: username } }
     });
-
-    const status      = document.getElementById("status");
-    const signinBtn   = document.getElementById("signinBtn");
-    const signupBtn   = document.getElementById("signupBtn");
-    const usernameField = document.getElementById("usernameField");
-
-    let mode = "signin"; // "signin" | "signup"
-
-    function setStatus(text) { status.textContent = text || ""; }
-    function setLoading(v) { signinBtn.disabled = v; signupBtn.disabled = v; }
-
-    function goHome() { window.location.replace("./home.html"); }
-
-    // Mostra/nascondi campo username in base alla modalità
-    signupBtn.addEventListener("click", () => {
-      if (mode === "signin") {
-        mode = "signup";
-        usernameField.style.display = "block";
-        signinBtn.textContent = "SIGN IN";
-        signupBtn.textContent = "CONFIRM SIGN UP";
-        setStatus("Fill in all fields to create your account.");
-      } else {
-        doSignUp();
-      }
-    });
-
-    signinBtn.addEventListener("click", () => {
-      if (mode === "signup") {
-        mode = "signin";
-        usernameField.style.display = "none";
-        signupBtn.textContent = "CREATE ACCOUNT";
-        setStatus("");
-      } else {
-        doSignIn();
-      }
-    });
-
-    // Controlla sessione esistente
-    supabase.auth.getSession().then(({ data }) => {
-      if (data?.session) goHome();
-    });
-
-    supabase.auth.onAuthStateChange((event, session) => {
-      if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) goHome();
-    });
-
-    async function doSignIn() {
-      const email    = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-
-      if (!email || !password) { setStatus("ENTER EMAIL AND PASSWORD"); return; }
-
-      setStatus("SIGNING IN...");
-      setLoading(true);
-
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-      setLoading(false);
-      if (error) { setStatus(error.message); return; }
-      goHome();
+    if (error) { setStatus(error.message); setLoading(false); return; }
+    const userId = data?.user?.id;
+    if (userId) {
+      try {
+        await fetch(`${API_URL}/profiles`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ user_id: userId, username })
+        });
+      } catch(e) { console.warn("Profile server unreachable:", e); }
     }
+    setLoading(false);
+    goHome();
+  }
+});
 
-    async function doSignUp() {
-      const email    = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const username = document.getElementById("username").value.trim();
+supabase.auth.getSession().then(({ data }) => { if (data?.session) goHome(); });
+supabase.auth.onAuthStateChange((event, session) => {
+  if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) goHome();
+});
 
-      if (!email || !password || !username) {
-        setStatus("ENTER USERNAME, EMAIL AND PASSWORD");
-        return;
-      }
-      if (password.length < 6) { setStatus("PASSWORD MIN 6 CHARACTERS"); return; }
-
-      setStatus("CREATING ACCOUNT...");
-      setLoading(true);
-
-      // 1. Registra su Supabase Auth
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { display_name: username } }
-      });
-
-      if (error) { setStatus(error.message); setLoading(false); return; }
-
-      const userId = data?.user?.id;
-
-      // 2. Crea profilo sul server locale
-      if (userId) {
-        try {
-          const res = await fetch(`${API_URL}/profiles`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ user_id: userId, username })
-          });
-          if (!res.ok) {
-            const err = await res.json();
-            // Username duplicato o altro errore lato server
-            setStatus(err.detail || "PROFILE ERROR");
-            setLoading(false);
-            return;
-          }
-        } catch (e) {
-          // Il server non è raggiungibile — non blocca il login
-          console.warn("Profile server unreachable:", e);
-        }
-      }
-
-      setLoading(false);
-      goHome();
-    }
-  </script>
+renderFields();
+</script>
 </body>
 </html>
