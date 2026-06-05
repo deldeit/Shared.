@@ -51,15 +51,8 @@ h1{
   cursor:pointer;
   transition:0.15s ease;
 }
-.tab.active{
-  background:#fff;
-  color:#000;
-  border-color:#fff;
-}
-.tab:not(.active):hover{
-  border-color:#555;
-  color:#aaa;
-}
+.tab.active{ background:#fff; color:#000; border-color:#fff; }
+.tab:not(.active):hover{ border-color:#555; color:#aaa; }
 .fields{ display:flex; flex-direction:column; gap:10px; }
 input[type="text"],
 input[type="email"],
@@ -83,22 +76,13 @@ input:focus{ border-color:#444; }
   margin-top:2px;
 }
 .checkbox-row input[type="checkbox"]{
-  width:16px;
-  height:16px;
+  width:16px; height:16px;
   accent-color:#fff;
   cursor:pointer;
   flex-shrink:0;
 }
-.checkbox-row label{
-  font-size:11px;
-  color:#666;
-  cursor:pointer;
-  line-height:1.4;
-}
-.checkbox-row a{
-  color:#aaa;
-  text-decoration:underline;
-}
+.checkbox-row label{ font-size:11px; color:#666; cursor:pointer; line-height:1.4; }
+.checkbox-row a{ color:#aaa; text-decoration:underline; }
 .submit{
   width:100%;
   padding:14px;
@@ -115,14 +99,7 @@ input:focus{ border-color:#444; }
 }
 .submit:hover:not(:disabled){ transform:scale(1.02); }
 .submit:disabled{ opacity:.6; cursor:not-allowed; }
-.status{
-  font-size:11px;
-  color:#888;
-  margin-top:12px;
-  text-align:center;
-  min-height:14px;
-  word-break:break-word;
-}
+.status{ font-size:11px; color:#888; margin-top:12px; text-align:center; min-height:14px; word-break:break-word; }
 .fade-enter{ animation: fadeIn 0.18s ease; }
 @keyframes fadeIn{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:translateY(0); } }
 </style>
@@ -130,28 +107,17 @@ input:focus{ border-color:#444; }
 <body>
 <div class="card">
   <h1>Shared.</h1>
-
   <div class="tabs">
     <button class="tab active" id="tabLogin">LOGIN</button>
     <button class="tab" id="tabSignup">SIGN UP</button>
   </div>
-
   <div class="fields" id="fields"></div>
-
   <button class="submit" id="submitBtn">LOGIN</button>
   <div class="status" id="status"></div>
 </div>
 
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
-
-const SUPABASE_URL     = "https://cnhaonawapuahzoctqav.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-const API_URL          = "https://api.sharedweb.org";
-
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
-});
+<script>
+const API = "https://api.sharedweb.org";
 
 const tabLogin  = document.getElementById("tabLogin");
 const tabSignup = document.getElementById("tabSignup");
@@ -161,16 +127,17 @@ const statusEl  = document.getElementById("status");
 
 let mode = "login";
 
-function setStatus(t) { statusEl.textContent = t || ""; }
+function setStatus(t, color) {
+  statusEl.textContent = t || "";
+  statusEl.style.color = color || "#888";
+}
 function setLoading(v) { submitBtn.disabled = v; }
 function goHome() { window.location.replace("./home.html"); }
 
 function renderFields() {
-  fields.innerHTML = "";
   fields.classList.remove("fade-enter");
   void fields.offsetWidth;
   fields.classList.add("fade-enter");
-
   if (mode === "login") {
     fields.innerHTML = `
       <input id="f_email" type="email" placeholder="Email" autocomplete="email">
@@ -211,15 +178,31 @@ tabSignup.addEventListener("click", () => {
 
 submitBtn.addEventListener("click", async () => {
   setStatus("");
+
   if (mode === "login") {
     const email    = document.getElementById("f_email")?.value.trim();
     const password = document.getElementById("f_password")?.value;
     if (!email || !password) { setStatus("ENTER EMAIL AND PASSWORD"); return; }
-    setLoading(true); setStatus("SIGNING IN...");
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
-    if (error) { setStatus(error.message); return; }
-    goHome();
+
+    setLoading(true);
+    setStatus("SIGNING IN...");
+    try {
+      const res = await fetch(`${API}/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { setStatus(data.detail || "LOGIN FAILED"); setLoading(false); return; }
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("username", data.username);
+      goHome();
+    } catch(e) {
+      setStatus("SERVER UNREACHABLE", "#e05");
+      setLoading(false);
+    }
+
   } else {
     const username = document.getElementById("f_username")?.value.trim();
     const email    = document.getElementById("f_email")?.value.trim();
@@ -228,31 +211,30 @@ submitBtn.addEventListener("click", async () => {
     if (!username || !email || !password) { setStatus("FILL IN ALL FIELDS"); return; }
     if (password.length < 6) { setStatus("PASSWORD MIN 6 CHARACTERS"); return; }
     if (!terms) { setStatus("ACCEPT THE TERMS AND CONDITIONS"); return; }
-    setLoading(true); setStatus("CREATING ACCOUNT...");
-    const { data, error } = await supabase.auth.signUp({
-      email, password,
-      options: { data: { display_name: username } }
-    });
-    if (error) { setStatus(error.message); setLoading(false); return; }
-    const userId = data?.user?.id;
-    if (userId) {
-      try {
-        await fetch(`${API_URL}/profiles`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ user_id: userId, username })
-        });
-      } catch(e) { console.warn("Profile server unreachable:", e); }
+
+    setLoading(true);
+    setStatus("CREATING ACCOUNT...");
+    try {
+      const res = await fetch(`${API}/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, email, password })
+      });
+      const data = await res.json();
+      if (!res.ok) { setStatus(data.detail || "SIGNUP FAILED"); setLoading(false); return; }
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user_id", data.user_id);
+      localStorage.setItem("username", data.username);
+      goHome();
+    } catch(e) {
+      setStatus("SERVER UNREACHABLE", "#e05");
+      setLoading(false);
     }
-    setLoading(false);
-    goHome();
   }
 });
 
-supabase.auth.getSession().then(({ data }) => { if (data?.session) goHome(); });
-supabase.auth.onAuthStateChange((event, session) => {
-  if ((event === "SIGNED_IN" || event === "TOKEN_REFRESHED") && session) goHome();
-});
+// Controlla se già loggato
+if (localStorage.getItem("token")) goHome();
 
 renderFields();
 </script>
