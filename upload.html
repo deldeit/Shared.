@@ -9,32 +9,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
 <style>
   :root {
-    --bg:#000;
-    --text:#fff;
-    --muted:rgba(255,255,255,.68);
-    --muted-2:rgba(255,255,255,.48);
-    --border:rgba(255,255,255,.14);
-    --panel:rgba(255,255,255,.05);
-    --panel-2:rgba(255,255,255,.08);
-    --panel-3:rgba(255,255,255,.12);
-    --danger:#ff3b30;
+    --bg: #000;
+    --text: #fff;
+    --muted: rgba(255,255,255,.68);
+    --muted-2: rgba(255,255,255,.42);
+    --border: rgba(255,255,255,.12);
+    --panel: rgba(255,255,255,.05);
+    --panel-2: rgba(255,255,255,.08);
+    --danger: #ff3b30;
+    --accent: #fff;
+    --squircle: 24px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --max-width: 760px;
+    --max-w: 680px;
   }
 
-  * { box-sizing: border-box; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
+
   body {
-    margin: 0;
     background: var(--bg);
     color: var(--text);
     font-family: 'Archivo Black', sans-serif;
     overflow: hidden;
   }
 
-  button, input, textarea, select { font: inherit; }
+  button, input, textarea, select { font-family: inherit; }
 
+  /* ─── PAGE LAYOUT ─────────────────────────── */
   .page {
     width: 100%;
     height: 100dvh;
@@ -45,236 +47,151 @@
 
   .shell {
     width: 100%;
-    max-width: var(--max-width);
+    max-width: var(--max-w);
     height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    border-left: 1px solid rgba(255,255,255,.08);
-    border-right: 1px solid rgba(255,255,255,.08);
+    border-left: 1px solid rgba(255,255,255,.07);
+    border-right: 1px solid rgba(255,255,255,.07);
   }
 
+  /* ─── TOPBAR ──────────────────────────────── */
   .topbar {
-    position: sticky;
-    top: 0;
-    z-index: 20;
-    height: calc(72px + var(--safe-top));
-    padding: calc(12px + var(--safe-top)) 14px 12px;
+    flex: 0 0 auto;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,.10);
-    background: rgba(0,0,0,.96);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
+    padding: calc(12px + var(--safe-top)) 16px 12px;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    background: rgba(0,0,0,.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    z-index: 10;
   }
 
-  .back {
+  .back-btn {
     justify-self: start;
     display: inline-flex;
     align-items: center;
-    gap: 10px;
-    color: var(--text);
-    text-decoration: none;
-    font-size: 14px;
-    border: 1px solid rgba(255,255,255,.14);
-    background: var(--panel);
+    gap: 8px;
+    padding: 10px 14px;
     border-radius: 999px;
-    padding: 10px 12px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.05);
+    color: #fff;
+    text-decoration: none;
+    font-size: 13px;
+    transition: background .18s;
+    cursor: pointer;
   }
 
-  .back .material-symbols-rounded { font-size: 20px; }
+  .back-btn:hover { background: rgba(255,255,255,.1); }
+  .back-btn .material-symbols-rounded { font-size: 18px; }
 
   .brand {
     justify-self: center;
-    font-size: 1.35rem;
-    letter-spacing: -0.05em;
-    line-height: 1;
+    font-size: 1.5rem;
+    letter-spacing: -.06em;
     user-select: none;
   }
 
-  .type-chip {
+  .type-badge {
     justify-self: end;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.14);
-    background: var(--panel);
-    color: var(--muted);
-    font-size: 12px;
-    letter-spacing: .12em;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.05);
+    color: var(--muted-2);
+    font-size: 11px;
+    letter-spacing: .14em;
     text-transform: uppercase;
   }
 
+  /* ─── SCROLLABLE CONTENT ─────────────────── */
   .content {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 16px 14px calc(18px + var(--safe-bottom));
+    padding: 20px 16px calc(24px + var(--safe-bottom));
     -webkit-overflow-scrolling: touch;
-  }
-
-  .hero {
-    margin: 4px 0 14px;
-    padding: 18px;
-    border-radius: 24px;
-    border: 1px solid rgba(255,255,255,.10);
-    background: rgba(255,255,255,.05);
-  }
-
-  .hero-title {
-    font-size: 1.45rem;
-    letter-spacing: -0.05em;
-    line-height: 1;
-  }
-
-  .hero-subtitle {
-    margin-top: 10px;
-    color: var(--muted);
-    font-size: .88rem;
-    line-height: 1.45;
-  }
-
-  .card {
-    padding: 16px;
-    border-radius: 24px;
-    border: 1px solid rgba(255,255,255,.10);
-    background: rgba(255,255,255,.04);
-    box-shadow: 0 18px 60px rgba(0,0,0,.35);
-  }
-
-  .grid {
-    display: grid;
+    display: flex;
+    flex-direction: column;
     gap: 14px;
   }
 
-  .field {
-    display: grid;
-    gap: 8px;
-  }
-
-  .label {
-    font-size: 12px;
-    letter-spacing: .14em;
+  /* ─── SECTION LABEL ──────────────────────── */
+  .section-label {
+    font-size: 11px;
+    letter-spacing: .16em;
     text-transform: uppercase;
     color: var(--muted-2);
+    padding: 0 2px;
   }
 
-  .input,
-  .textarea {
-    width: 100%;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.14);
-    background: #111;
-    color: #fff;
-    outline: none;
-    padding: 14px 15px;
-    font-size: 15px;
-  }
-
-  .textarea {
-    min-height: 120px;
-    resize: vertical;
-    line-height: 1.45;
-  }
-
-  .input::placeholder,
-  .textarea::placeholder { color: rgba(255,255,255,.40); }
-
-  .search-wrap {
-    position: relative;
-  }
-
-  .suggestions {
-    position: absolute;
-    z-index: 20;
-    left: 0;
-    right: 0;
-    top: calc(100% + 8px);
-    background: #0b0b0b;
-    border: 1px solid rgba(255,255,255,.14);
-    border-radius: 16px;
-    overflow: hidden;
-    display: none;
-    box-shadow: 0 20px 60px rgba(0,0,0,.55);
-    max-height: 280px;
-    overflow-y: auto;
-  }
-
-  .suggestion {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px 14px;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,.06);
-    transition: background .14s ease;
-  }
-
-  .suggestion:last-child { border-bottom: 0; }
-  .suggestion:hover { background: rgba(255,255,255,.05); }
-
-  .suggestion-thumb {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    object-fit: cover;
+  /* ─── SQUIRCLE CARD ──────────────────────── */
+  .card {
+    border-radius: var(--squircle);
     border: 1px solid rgba(255,255,255,.10);
-    background: #111;
-    flex: 0 0 auto;
+    background: rgba(255,255,255,.04);
+    box-shadow: 0 8px 32px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03);
+    overflow: hidden;
   }
 
-  .suggestion-meta { min-width: 0; flex: 1; }
-  .suggestion-title {
-    font-size: 14px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .suggestion-subtitle {
-    margin-top: 3px;
-    font-size: 11px;
-    color: var(--muted-2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  .card-body {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
   }
 
+  /* ─── DROPZONE ────────────────────────────── */
   .dropzone {
     position: relative;
-    display: grid;
-    gap: 12px;
-    place-items: center;
-    min-height: 180px;
-    padding: 18px;
-    border-radius: 24px;
-    border: 1px dashed rgba(255,255,255,.22);
+    min-height: 168px;
+    border-radius: 18px;
+    border: 1.5px dashed rgba(255,255,255,.2);
     background: rgba(255,255,255,.03);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 20px;
+    cursor: pointer;
+    transition: border-color .2s, background .2s;
     overflow: hidden;
   }
 
+  .dropzone:hover,
   .dropzone.dragover {
-    border-color: rgba(255,255,255,.45);
+    border-color: rgba(255,255,255,.4);
     background: rgba(255,255,255,.06);
   }
 
-  .dropzone-icon {
-    width: 56px;
-    height: 56px;
-    border-radius: 18px;
-    display: grid;
-    place-items: center;
-    background: rgba(255,255,255,.06);
+  .dz-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.07);
     border: 1px solid rgba(255,255,255,.10);
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 
-  .dropzone-icon .material-symbols-rounded { font-size: 28px; }
-  .dropzone-title { font-size: 1rem; text-align: center; }
-  .dropzone-subtitle {
-    color: var(--muted);
-    font-size: .82rem;
+  .dz-icon .material-symbols-rounded { font-size: 26px; }
+
+  .dz-title {
+    font-size: .95rem;
     text-align: center;
-    line-height: 1.4;
+  }
+
+  .dz-sub {
+    font-size: .78rem;
+    color: var(--muted-2);
+    text-align: center;
   }
 
   .file-input {
@@ -284,677 +201,834 @@
     cursor: pointer;
   }
 
+  /* ─── PREVIEW ─────────────────────────────── */
   .preview {
-    width: 100%;
-    border-radius: 20px;
-    overflow: hidden;
     display: none;
-    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,.10);
+    position: relative;
   }
 
   .preview.show { display: block; }
+
   .preview img,
   .preview video {
     display: block;
     width: 100%;
-    max-height: 360px;
+    max-height: 340px;
     object-fit: cover;
     background: #111;
   }
 
-  .status {
-    min-height: 20px;
-    color: var(--muted);
-    font-size: 12px;
+  .preview-remove {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.18);
+    background: rgba(0,0,0,.72);
+    backdrop-filter: blur(10px);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
   }
 
+  .preview-remove .material-symbols-rounded { font-size: 18px; }
+
+  /* ─── FIELD ──────────────────────────────── */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .input,
+  .textarea {
+    width: 100%;
+    background: #0d0d0d;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 16px;
+    color: #fff;
+    outline: none;
+    padding: 13px 15px;
+    font-size: 14px;
+    transition: border-color .18s;
+  }
+
+  .input:focus,
+  .textarea:focus {
+    border-color: rgba(255,255,255,.35);
+  }
+
+  .input::placeholder,
+  .textarea::placeholder { color: rgba(255,255,255,.3); }
+
+  .textarea {
+    min-height: 100px;
+    resize: vertical;
+    line-height: 1.5;
+  }
+
+  /* ─── SEARCH + SUGGESTIONS ──────────────── */
+  .search-wrap { position: relative; }
+
+  .suggestions {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 6px);
+    z-index: 30;
+    background: #0b0b0b;
+    border: 1px solid rgba(255,255,255,.13);
+    border-radius: 18px;
+    overflow: hidden;
+    display: none;
+    box-shadow: 0 20px 60px rgba(0,0,0,.6);
+    max-height: 260px;
+    overflow-y: auto;
+  }
+
+  .suggestion {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 11px 14px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    transition: background .14s;
+  }
+
+  .suggestion:last-child { border-bottom: 0; }
+  .suggestion:hover { background: rgba(255,255,255,.05); }
+
+  .sug-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #111;
+    border: 1px solid rgba(255,255,255,.08);
+    flex: 0 0 auto;
+  }
+
+  .sug-meta { min-width: 0; flex: 1; }
+
+  .sug-title {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sug-sub {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--muted-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ─── MUSIC SELECTED PILL ────────────────── */
+  .music-pill {
+    display: none;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.05);
+    border: 1px solid rgba(255,255,255,.10);
+  }
+
+  .music-pill.show { display: flex; }
+
+  .music-pill-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #111;
+    border: 1px solid rgba(255,255,255,.08);
+    flex: 0 0 auto;
+  }
+
+  .music-pill-info { min-width: 0; flex: 1; }
+
+  .music-pill-title {
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-pill-artist {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--muted-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-pill-clear {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.05);
+    color: var(--muted-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+  }
+
+  .music-pill-clear .material-symbols-rounded { font-size: 15px; }
+
+  /* ─── PROGRESS BAR (upload) ──────────────── */
+  .progress-wrap {
+    display: none;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .progress-wrap.show { display: flex; }
+
+  .progress-track {
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(255,255,255,.10);
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    border-radius: 999px;
+    background: #fff;
+    width: 0%;
+    transition: width .3s ease;
+  }
+
+  .progress-label {
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ─── STATUS ─────────────────────────────── */
+  .status {
+    font-size: 12px;
+    min-height: 18px;
+    color: var(--muted);
+    padding: 0 2px;
+  }
+
+  .status.error { color: #ff8a85; }
+  .status.ok    { color: #5edb78; }
+
+  /* ─── ACTIONS ROW ────────────────────────── */
   .actions {
     display: flex;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-top: 2px;
   }
 
   .btn {
     appearance: none;
-    border: 1px solid rgba(255,255,255,.14);
-    background: rgba(255,255,255,.06);
-    color: #fff;
-    border-radius: 18px;
-    padding: 14px 16px;
-    cursor: pointer;
-    transition: transform .18s ease, background .18s ease, border-color .18s ease;
-    flex: 1 1 180px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    border: 1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.06);
+    color: #fff;
+    font-family: inherit;
+    font-size: 14px;
+    cursor: pointer;
+    flex: 1 1 150px;
+    transition: background .18s, transform .14s, box-shadow .18s;
   }
 
-  .btn:hover { background: rgba(255,255,255,.10); }
-  .btn:active { transform: scale(.98); }
+  .btn:hover { background: rgba(255,255,255,.12); }
+  .btn:active { transform: scale(.97); }
+
+  .btn .material-symbols-rounded { font-size: 20px; }
 
   .btn.primary {
     background: #fff;
     color: #000;
     border-color: #fff;
+    box-shadow: 0 4px 20px rgba(255,255,255,.12);
   }
 
-  .btn.primary:hover { background: rgba(255,255,255,.92); }
+  .btn.primary:hover { background: rgba(255,255,255,.9); }
+
+  .btn.primary:disabled {
+    background: rgba(255,255,255,.18);
+    color: rgba(0,0,0,.4);
+    box-shadow: none;
+    cursor: not-allowed;
+  }
+
+  .btn.ghost {
+    flex: 0 0 auto;
+    padding: 14px;
+  }
 
   .btn.danger {
-    background: rgba(255,59,48,.12);
-    color: #ff7a73;
-    border-color: rgba(255,59,48,.28);
+    background: rgba(255,59,48,.1);
+    color: #ff8a85;
+    border-color: rgba(255,59,48,.24);
+    flex: 0 0 auto;
   }
 
-  .mini-note {
-    margin-top: 10px;
-    color: var(--muted-2);
+  .btn.danger:hover { background: rgba(255,59,48,.18); }
+
+  /* ─── FOOTNOTE ───────────────────────────── */
+  .footnote {
     font-size: 11px;
-    line-height: 1.5;
+    color: var(--muted-2);
+    line-height: 1.55;
+    padding: 0 2px;
   }
 
-  .loading {
-    position: fixed;
-    inset: 0;
-    z-index: 100;
-    display: none;
-    place-items: center;
-    background: rgba(0,0,0,.92);
-    backdrop-filter: blur(10px);
-  }
-
-  .loading.show { display: grid; }
-
-  .loading-card {
-    display: grid;
-    gap: 14px;
-    justify-items: center;
-    padding: 28px 24px;
-    border-radius: 24px;
+  /* ─── DIVIDER ────────────────────────────── */
+  .divider {
+    height: 1px;
     background: rgba(255,255,255,.06);
-    border: 1px solid rgba(255,255,255,.12);
-    min-width: 220px;
+    border: 0;
   }
 
-  .spinner {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    border: 3px solid rgba(255,255,255,.14);
-    border-top-color: #fff;
-    animation: spin .85s linear infinite;
+  /* ─── PAGE FADE-IN ───────────────────────── */
+  .card {
+    animation: fadeUp .32s cubic-bezier(.4,0,.2,1) both;
   }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
+  .card:nth-child(2) { animation-delay: .06s; }
+  .card:nth-child(3) { animation-delay: .12s; }
 
-  .error { color: #ff8a85; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
 
-  @media (max-width: 640px) {
-    .shell {
-      border-left: 0;
-      border-right: 0;
-    }
-    .topbar {
-      grid-template-columns: auto 1fr auto;
-    }
-    .brand { font-size: 1.1rem; }
-    .type-chip {
-      font-size: 11px;
-      padding: 9px 10px;
-    }
+  /* ─── MOBILE ──────────────────────────────── */
+  @media (max-width: 600px) {
+    .shell { border: 0; }
+    .brand { font-size: 1.2rem; }
     .btn { flex: 1 1 100%; }
+    .btn.ghost, .btn.danger { flex: 0 0 auto; }
   }
 </style>
 </head>
 <body>
-  <div class="page">
-    <div class="shell">
-      <header class="topbar">
-        <a class="back" href="javascript:history.back()" aria-label="Go back">
-          <span class="material-symbols-rounded">arrow_back</span>
-          <span>Back</span>
-        </a>
-        <div class="brand">Shared.</div>
-        <div class="type-chip">post</div>
-      </header>
+<div class="page">
+  <div class="shell">
 
-      <main class="content">
-        <section class="hero">
-          <div class="hero-title">Create a post</div>
-          <div class="hero-subtitle">Upload media, choose a music track and a location, then publish it to the feed.</div>
-        </section>
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <a class="back-btn" href="javascript:history.back()" aria-label="Go back">
+        <span class="material-symbols-rounded">arrow_back</span>
+        <span>Back</span>
+      </a>
+      <div class="brand">Shared.</div>
+      <div id="typeChipEl" class="type-badge">post</div>
+    </header>
 
-        <section class="card">
-          <form id="uploadForm" class="grid">
-            <div class="field">
-              <div class="label">Media</div>
-              <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Choose a file">
-                <div class="dropzone-icon">
-                  <span class="material-symbols-rounded" id="dropIcon">image</span>
-                </div>
-                <div class="dropzone-title" id="dropTitle">Choose an image or video</div>
-                <div class="dropzone-subtitle" id="dropSubtitle">Tap to select a file</div>
-                <input id="fileInput" class="file-input" type="file" accept="image/*,video/*" />
-              </div>
-              <div id="preview" class="preview"></div>
+    <!-- CONTENT -->
+    <main class="content" id="content">
+
+      <!-- MEDIA CARD -->
+      <div class="card">
+        <div class="card-body">
+          <div class="section-label">Media</div>
+
+          <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Choose a file">
+            <div class="dz-icon">
+              <span class="material-symbols-rounded" id="dzIcon">image</span>
             </div>
+            <div class="dz-title" id="dzTitle">Choose an image or video</div>
+            <div class="dz-sub">Drag & drop or tap to browse</div>
+            <input id="fileInput" class="file-input" type="file" accept="image/*,video/*" aria-label="File input" />
+          </div>
 
-            <div class="field search-wrap">
-              <div class="label">Music search</div>
-              <input id="musicSearch" class="input" type="text" placeholder="Search music on Deezer" autocomplete="off" />
-              <div id="musicSuggestions" class="suggestions"></div>
+          <div id="preview" class="preview">
+            <button class="preview-remove" id="previewRemove" type="button" aria-label="Remove file">
+              <span class="material-symbols-rounded">close</span>
+            </button>
+          </div>
+
+          <!-- Upload progress (shown only while uploading) -->
+          <div id="progressWrap" class="progress-wrap">
+            <div class="progress-label" id="progressLabel">Uploading…</div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
             </div>
+          </div>
+        </div>
+      </div>
 
-            <input id="musicTitle" type="hidden">
-            <input id="musicArtist" type="hidden">
-            <input id="musicPreviewInput" type="hidden">
-            <input id="musicCoverInput" type="hidden">
+      <!-- DETAILS CARD -->
+      <div class="card">
+        <div class="card-body">
+          <div class="section-label">Details</div>
 
-            <div id="musicSelected" class="hero" style="display:none; margin: 0;">
-              <div class="hero-title" id="musicSelectedTitle"></div>
-              <div class="hero-subtitle" id="musicSelectedArtist"></div>
+          <!-- Caption -->
+          <div class="field">
+            <div class="field-label">Caption</div>
+            <textarea id="captionInput" class="textarea" placeholder="Write a caption…"></textarea>
+          </div>
+
+          <!-- Tags -->
+          <div class="field">
+            <div class="field-label">Tags</div>
+            <input id="tagsInput" class="input" type="text" placeholder="music, art, night" autocomplete="off" />
+          </div>
+
+          <!-- Location -->
+          <div class="field search-wrap">
+            <div class="field-label">Location</div>
+            <input id="locationSearch" class="input" type="text" placeholder="Search a place" autocomplete="off" />
+            <div id="locationSuggestions" class="suggestions"></div>
+          </div>
+          <input id="locationInput" type="hidden" />
+        </div>
+      </div>
+
+      <!-- MUSIC CARD -->
+      <div class="card">
+        <div class="card-body">
+          <div class="section-label">Music</div>
+
+          <!-- Selected music pill -->
+          <div id="musicPill" class="music-pill">
+            <img id="musicPillCover" class="music-pill-cover" src="" alt="" />
+            <div class="music-pill-info">
+              <div id="musicPillTitle" class="music-pill-title"></div>
+              <div id="musicPillArtist" class="music-pill-artist"></div>
             </div>
+            <button class="music-pill-clear" id="musicPillClear" type="button" aria-label="Remove track">
+              <span class="material-symbols-rounded">close</span>
+            </button>
+          </div>
 
-            <div class="field search-wrap">
-              <div class="label">Location</div>
-              <input id="locationSearch" class="input" type="text" placeholder="Search a place" autocomplete="off" />
-              <div id="locationSuggestions" class="suggestions"></div>
-            </div>
+          <div class="field search-wrap">
+            <div class="field-label">Search track</div>
+            <input id="musicSearch" class="input" type="text" placeholder="Search on Deezer…" autocomplete="off" />
+            <div id="musicSuggestions" class="suggestions"></div>
+          </div>
 
-            <input id="locationInput" type="hidden">
+          <input id="musicTitle" type="hidden" />
+          <input id="musicArtist" type="hidden" />
+          <input id="musicPreviewInput" type="hidden" />
+          <input id="musicCoverInput" type="hidden" />
+        </div>
+      </div>
 
-            <div class="field">
-              <div class="label">Caption</div>
-              <textarea id="captionInput" class="textarea" placeholder="Write a caption"></textarea>
-            </div>
+      <!-- ACTIONS CARD -->
+      <div class="card">
+        <div class="card-body">
+          <div id="status" class="status">Ready to publish.</div>
 
-            <div class="field">
-              <div class="label">Tags</div>
-              <input id="tagsInput" class="input" type="text" placeholder="music, art, night" />
-            </div>
+          <div class="actions">
+            <button id="submitBtn" class="btn primary" type="button">
+              <span class="material-symbols-rounded">cloud_upload</span>
+              <span>Publish</span>
+            </button>
+            <button id="clearBtn" class="btn ghost" type="button" aria-label="Clear form">
+              <span class="material-symbols-rounded">restart_alt</span>
+            </button>
+            <button id="cancelBtn" class="btn danger" type="button">
+              <span class="material-symbols-rounded">close</span>
+            </button>
+          </div>
 
-            <div class="actions">
-              <button id="submitBtn" class="btn primary" type="submit">
-                <span class="material-symbols-rounded">cloud_upload</span>
-                <span>Publish</span>
-              </button>
-              <button id="clearBtn" class="btn" type="button">
-                <span class="material-symbols-rounded">restart_alt</span>
-                <span>Clear</span>
-              </button>
-              <button id="cancelBtn" class="btn danger" type="button" onclick="location.href='index.html'">
-                <span class="material-symbols-rounded">close</span>
-                <span>Cancel</span>
-              </button>
-            </div>
+          <div class="footnote">
+            Posts are visible to everyone. Share carefully and avoid publishing anything private or sensitive.
+          </div>
+        </div>
+      </div>
 
-            <div id="status" class="status"></div>
-            <div class="mini-note">
-              Posts are visible to everyone. Share carefully and avoid publishing anything private or sensitive.
-            </div>
-          </form>
-        </section>
-      </main>
-    </div>
+    </main>
   </div>
-
-  <div id="loading" class="loading" aria-hidden="true">
-    <div class="loading-card">
-      <div class="spinner"></div>
-      <div class="hero-title">Uploading…</div>
-    </div>
-  </div>
+</div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+const SUPABASE_URL     = "https://cnhaonawapuahzoctqav.supabase.co";
+const SUPABASE_ANON_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const BUCKET_SHARED = "shared";
 
+// ─── ELEMENT REFS ─────────────────────────────────────
 const els = {
-  typeChip: document.querySelector(".type-chip"),
-  form: document.getElementById("uploadForm"),
-  fileInput: document.getElementById("fileInput"),
-  dropzone: document.getElementById("dropzone"),
-  dropIcon: document.getElementById("dropIcon"),
-  dropTitle: document.getElementById("dropTitle"),
-  dropSubtitle: document.getElementById("dropSubtitle"),
-  preview: document.getElementById("preview"),
-  musicSearch: document.getElementById("musicSearch"),
-  musicSuggestions: document.getElementById("musicSuggestions"),
-  musicTitle: document.getElementById("musicTitle"),
-  musicArtist: document.getElementById("musicArtist"),
-  musicPreviewInput: document.getElementById("musicPreviewInput"),
-  musicCoverInput: document.getElementById("musicCoverInput"),
-  musicSelected: document.getElementById("musicSelected"),
-  musicSelectedTitle: document.getElementById("musicSelectedTitle"),
-  musicSelectedArtist: document.getElementById("musicSelectedArtist"),
-  locationSearch: document.getElementById("locationSearch"),
+  typeChip:          document.getElementById("typeChipEl"),
+  dropzone:          document.getElementById("dropzone"),
+  dzIcon:            document.getElementById("dzIcon"),
+  dzTitle:           document.getElementById("dzTitle"),
+  fileInput:         document.getElementById("fileInput"),
+  preview:           document.getElementById("preview"),
+  previewRemove:     document.getElementById("previewRemove"),
+  progressWrap:      document.getElementById("progressWrap"),
+  progressFill:      document.getElementById("progressFill"),
+  progressLabel:     document.getElementById("progressLabel"),
+  captionInput:      document.getElementById("captionInput"),
+  tagsInput:         document.getElementById("tagsInput"),
+  locationSearch:    document.getElementById("locationSearch"),
   locationSuggestions: document.getElementById("locationSuggestions"),
-  locationInput: document.getElementById("locationInput"),
-  captionInput: document.getElementById("captionInput"),
-  tagsInput: document.getElementById("tagsInput"),
-  submitBtn: document.getElementById("submitBtn"),
-  clearBtn: document.getElementById("clearBtn"),
-  status: document.getElementById("status"),
-  loading: document.getElementById("loading")
+  locationInput:     document.getElementById("locationInput"),
+  musicPill:         document.getElementById("musicPill"),
+  musicPillCover:    document.getElementById("musicPillCover"),
+  musicPillTitle:    document.getElementById("musicPillTitle"),
+  musicPillArtist:   document.getElementById("musicPillArtist"),
+  musicPillClear:    document.getElementById("musicPillClear"),
+  musicSearch:       document.getElementById("musicSearch"),
+  musicSuggestions:  document.getElementById("musicSuggestions"),
+  musicTitle:        document.getElementById("musicTitle"),
+  musicArtist:       document.getElementById("musicArtist"),
+  musicPreviewInput: document.getElementById("musicPreviewInput"),
+  musicCoverInput:   document.getElementById("musicCoverInput"),
+  status:            document.getElementById("status"),
+  submitBtn:         document.getElementById("submitBtn"),
+  clearBtn:          document.getElementById("clearBtn"),
+  cancelBtn:         document.getElementById("cancelBtn"),
 };
 
-let selectedFile = null;
-let currentUser = null;
-let musicController = null;
-let locationController = null;
+// ─── STATE ────────────────────────────────────────────
+let selectedFile  = null;
+let currentUser   = null;
 let musicDebounce = null;
-let locationDebounce = null;
-let musicJsonpId = 0;
+let locDebounce   = null;
+let jsonpId       = 0;
 
-function setStatus(message, isError = false) {
-  els.status.textContent = message || "";
-  els.status.className = `status${isError ? " error" : ""}`;
+// ─── INIT ─────────────────────────────────────────────
+const params = new URLSearchParams(location.search);
+const uploadType = params.get("type") || "post";
+els.typeChip.textContent = uploadType;
+
+const { data: authData } = await supabase.auth.getUser();
+currentUser = authData?.user || null;
+if (!currentUser) setStatus("You must be signed in to upload.", "error");
+
+// ─── STATUS ───────────────────────────────────────────
+function setStatus(msg, type = "") {
+  els.status.textContent = msg || "";
+  els.status.className   = `status${type ? " " + type : ""}`;
 }
 
-function showLoading(show) {
-  els.loading.classList.toggle("show", !!show);
+// ─── PROGRESS ─────────────────────────────────────────
+function showProgress(pct, label = "Uploading…") {
+  els.progressWrap.classList.add("show");
+  els.progressFill.style.width = `${pct}%`;
+  els.progressLabel.textContent = label;
 }
 
-function resetPreview() {
-  els.preview.className = "preview";
-  els.preview.innerHTML = "";
+function hideProgress() {
+  els.progressWrap.classList.remove("show");
+  els.progressFill.style.width = "0%";
 }
 
+// ─── PREVIEW ──────────────────────────────────────────
 function renderPreview(file) {
-  resetPreview();
-  if (!file) return;
+  // Clear old media nodes (keep the remove button)
+  [...els.preview.children].forEach((c) => { if (c !== els.previewRemove) c.remove(); });
 
-  const url = URL.createObjectURL(file);
-  const isVideo = file.type.startsWith("video/");
-  const node = document.createElement(isVideo ? "video" : "img");
-  node.src = url;
-  if (isVideo) {
-    node.controls = true;
-    node.muted = true;
-    node.playsInline = true;
-    node.autoplay = true;
-    node.loop = true;
-  }
-  els.preview.appendChild(node);
+  if (!file) { els.preview.classList.remove("show"); return; }
+
+  const url    = URL.createObjectURL(file);
+  const isVideo= file.type.startsWith("video/");
+  const node   = document.createElement(isVideo ? "video" : "img");
+  node.src     = url;
+  if (isVideo) { node.controls = true; node.muted = true; node.playsInline = true; node.loop = true; }
+  els.preview.insertBefore(node, els.previewRemove);
   els.preview.classList.add("show");
 }
 
-function fileNameSafe(name) {
-  return name.replace(/[^a-zA-Z0-9_.-]/g, "_");
-}
-
-function detectTextTags(value) {
-  return String(value || "").split(",").map((t) => t.trim()).filter(Boolean);
-}
-
-async function getCurrentUser() {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) return null;
-  return data?.user || null;
-}
-
-async function imageFileToJpeg800(file) {
-  const bitmapUrl = URL.createObjectURL(file);
-  try {
-    const img = new Image();
-    img.src = bitmapUrl;
-    await img.decode();
-
-    const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 800;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) throw new Error("Canvas unavailable");
-
-    const size = Math.min(img.width, img.height);
-    const sx = Math.floor((img.width - size) / 2);
-    const sy = Math.floor((img.height - size) / 2);
-
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, 800, 800);
-    ctx.drawImage(img, sx, sy, size, size, 0, 0, 800, 800);
-
-    const blob = await new Promise((resolve, reject) => {
-      canvas.toBlob((b) => b ? resolve(b) : reject(new Error("Image conversion failed")), "image/jpeg", 0.92);
-    });
-
-    return { blob, ext: "jpg", type: "image/jpeg" };
-  } finally {
-    URL.revokeObjectURL(bitmapUrl);
-  }
-}
-
-async function prepareUploadAsset(file) {
-  if (file.type.startsWith("image/")) {
-    return imageFileToJpeg800(file);
-  }
-  return { blob: file, ext: (file.name.split('.').pop() || "bin").toLowerCase(), type: file.type || "application/octet-stream" };
-}
-
-async function uploadFile(file) {
-  const stamp = Date.now();
-  const safe = fileNameSafe(file.name || `upload_${stamp}`);
-  const prepared = await prepareUploadAsset(file);
-  const fileNameBase = safe.replace(/\.[^.]+$/, "");
-  const path = `${currentUser?.id || "anonymous"}/${stamp}_${fileNameBase}.${prepared.ext}`;
-
-  const { error: uploadError } = await supabase.storage
-    .from(BUCKET_SHARED)
-    .upload(path, prepared.blob, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: prepared.type
-    });
-
-  if (uploadError) throw uploadError;
-
-  const { data } = supabase.storage.from(BUCKET_SHARED).getPublicUrl(path);
-  return data?.publicUrl || "";
-}
-
-function showMusicSelection(track) {
-  if (!track) {
-    els.musicSelected.style.display = "none";
-    return;
-  }
-  els.musicSelectedTitle.textContent = track.title || "";
-  els.musicSelectedArtist.textContent = track.artist || "";
-  els.musicSelected.style.display = "block";
-}
-
-function clearMusicSelection() {
-  els.musicTitle.value = "";
-  els.musicArtist.value = "";
-  els.musicPreviewInput.value = "";
-  els.musicCoverInput.value = "";
-  els.musicSearch.value = "";
-  els.musicSuggestions.innerHTML = "";
-  els.musicSuggestions.style.display = "none";
-  els.musicSelected.style.display = "none";
-}
-
-function clearLocation() {
-  els.locationInput.value = "";
-  els.locationSearch.value = "";
-  els.locationSuggestions.innerHTML = "";
-  els.locationSuggestions.style.display = "none";
-}
-
-function clearForm() {
+function clearPreview() {
   selectedFile = null;
   els.fileInput.value = "";
-  els.captionInput.value = "";
-  els.tagsInput.value = "";
-  clearMusicSelection();
-  clearLocation();
-  resetPreview();
-  setStatus("");
+  [...els.preview.children].forEach((c) => { if (c !== els.previewRemove) c.remove(); });
+  els.preview.classList.remove("show");
 }
 
-function openSuggestions(box, items, renderItem) {
-  if (!items.length) {
-    box.innerHTML = "";
-    box.style.display = "none";
-    return;
-  }
-  box.innerHTML = items.map(renderItem).join("");
-  box.style.display = "block";
-}
+els.previewRemove.addEventListener("click", clearPreview);
 
-function hideSuggestions(box) {
-  box.style.display = "none";
-  box.innerHTML = "";
-}
-
-function jsonp(url) {
-  return new Promise((resolve, reject) => {
-    const cb = `__deezer_cb_${++musicJsonpId}`;
-    const script = document.createElement("script");
-    const cleanup = () => {
-      delete window[cb];
-      script.remove();
-    };
-    window[cb] = (data) => {
-      cleanup();
-      resolve(data);
-    };
-    script.onerror = () => {
-      cleanup();
-      reject(new Error("Music search failed"));
-    };
-    script.src = `${url}${url.includes("?") ? "&" : "?"}output=jsonp&callback=${cb}`;
-    document.head.appendChild(script);
-  });
-}
-
-async function searchDeezerTracks(query) {
-  const data = await jsonp(`https://api.deezer.com/search?q=${encodeURIComponent(query)}`);
-  return Array.isArray(data?.data) ? data.data.slice(0, 6) : [];
-}
-
-async function searchLocations(query) {
-  const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(query)}`, {
-    headers: { "Accept-Language": "it" }
-  });
-  const data = await res.json();
-  return Array.isArray(data) ? data.slice(0, 6) : [];
-}
-
-async function getCurrentMusicSuggestions(query) {
-  try {
-    const tracks = await searchDeezerTracks(query);
-    return tracks.map((t) => ({
-      id: String(t.id),
-      title: t.title || "",
-      artist: t.artist?.name || "",
-      cover: t.album?.cover_xl || t.album?.cover_big || t.album?.cover_medium || t.album?.cover || "",
-      preview: t.preview || ""
-    }));
-  } catch {
-    return [];
-  }
-}
-
-async function pickMusic(track) {
-  if (!track) return;
-  els.musicTitle.value = track.title || "";
-  els.musicArtist.value = track.artist || "";
-  els.musicPreviewInput.value = track.preview || "";
-  els.musicCoverInput.value = track.cover || "";
-  showMusicSelection(track);
-  hideSuggestions(els.musicSuggestions);
-}
-
-async function pickLocation(item) {
-  if (!item) return;
-  const label = item.display_name || [item.name, item.address?.city, item.address?.town, item.address?.village, item.address?.country].filter(Boolean).join(", ");
-  els.locationInput.value = label || "";
-  els.locationSearch.value = label || "";
-  hideSuggestions(els.locationSuggestions);
-}
-
-async function submitPost(file) {
-  if (!currentUser) throw new Error("You must be logged in.");
-  if (!file) throw new Error("Choose a file first.");
-
-  const mediaUrl = await uploadFile(file);
-  const caption = els.captionInput.value.trim();
-  const tags = detectTextTags(els.tagsInput.value);
-  const location = els.locationInput.value.trim();
-  const songTitle = els.musicTitle.value.trim();
-  const songArtist = els.musicArtist.value.trim();
-  const songPreview = els.musicPreviewInput.value.trim();
-  const songCover = els.musicCoverInput.value.trim();
-
-  const { error } = await supabase.from("posts").insert({
-    user_id: currentUser.id,
-    image_url: mediaUrl,
-    caption,
-    tags,
-    location: location || null,
-    song_title: songTitle || null,
-    song_author: songArtist || null,
-    song_preview: songPreview || null,
-    song_cover: songCover || null,
-    created_at: new Date().toISOString()
-  });
-
-  if (error) throw error;
-}
-
-setStatus("Ready to publish.");
-currentUser = await getCurrentUser();
-if (!currentUser) setStatus("You must be signed in to upload.", true);
-
+// ─── FILE INPUT ───────────────────────────────────────
 els.fileInput.addEventListener("change", (e) => {
   const file = e.target.files?.[0] || null;
+  if (!file) return;
   selectedFile = file;
-  if (file) {
-    renderPreview(file);
-    setStatus(`${file.name}`);
-  }
+  renderPreview(file);
+  setStatus(file.name);
 });
 
-els.dropzone.addEventListener("dragover", (e) => {
-  e.preventDefault();
-  els.dropzone.classList.add("dragover");
+els.dropzone.addEventListener("click", () => els.fileInput.click());
+els.dropzone.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); els.fileInput.click(); }
 });
 
-els.dropzone.addEventListener("dragleave", () => {
-  els.dropzone.classList.remove("dragover");
-});
-
+els.dropzone.addEventListener("dragover",  (e) => { e.preventDefault(); els.dropzone.classList.add("dragover"); });
+els.dropzone.addEventListener("dragleave", ()  => els.dropzone.classList.remove("dragover"));
 els.dropzone.addEventListener("drop", (e) => {
   e.preventDefault();
   els.dropzone.classList.remove("dragover");
   const file = e.dataTransfer.files?.[0] || null;
   if (!file) return;
   selectedFile = file;
-  els.fileInput.files = e.dataTransfer.files;
   renderPreview(file);
-  setStatus(`${file.name}`);
+  setStatus(file.name);
 });
 
-els.dropzone.addEventListener("click", () => els.fileInput.click());
-els.dropzone.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" || e.key === " ") {
-    e.preventDefault();
-    els.fileInput.click();
+// ─── SUGGESTIONS HELPERS ──────────────────────────────
+function openSuggestions(box, items, renderItem) {
+  if (!items.length) { box.innerHTML = ""; box.style.display = "none"; return; }
+  box.innerHTML = items.map(renderItem).join("");
+  box.style.display = "block";
+}
+
+function hideSugg(box) { box.style.display = "none"; box.innerHTML = ""; }
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".search-wrap")) {
+    hideSugg(els.musicSuggestions);
+    hideSugg(els.locationSuggestions);
   }
 });
+
+// ─── MUSIC SEARCH (Deezer JSONP) ──────────────────────
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = `__jsonp_${++jsonpId}`;
+    const s  = document.createElement("script");
+    const cleanup = () => { delete window[cb]; s.remove(); };
+    window[cb] = (d) => { cleanup(); resolve(d); };
+    s.onerror  = () => { cleanup(); reject(new Error("JSONP error")); };
+    s.src = `${url}${url.includes("?") ? "&" : "?"}output=jsonp&callback=${cb}`;
+    document.head.appendChild(s);
+  });
+}
+
+async function searchDeezer(q) {
+  try {
+    const d = await jsonp(`https://api.deezer.com/search?q=${encodeURIComponent(q)}`);
+    return Array.isArray(d?.data) ? d.data.slice(0, 6) : [];
+  } catch { return []; }
+}
+
+function escHtml(str) {
+  return String(str ?? "")
+    .replaceAll("&","&amp;").replaceAll("<","&lt;")
+    .replaceAll(">","&gt;").replaceAll('"',"&quot;");
+}
 
 els.musicSearch.addEventListener("input", () => {
   const q = els.musicSearch.value.trim();
   clearTimeout(musicDebounce);
-  if (q.length < 2) {
-    hideSuggestions(els.musicSuggestions);
-    return;
-  }
+  if (q.length < 2) { hideSugg(els.musicSuggestions); return; }
   musicDebounce = setTimeout(async () => {
-    const results = await getCurrentMusicSuggestions(q);
-    openSuggestions(els.musicSuggestions, results, (item) => `
-      <div class="suggestion" data-music-id="${escapeHtml(item.id)}">
-        <img class="suggestion-thumb" src="${item.cover || ''}" alt="">
-        <div class="suggestion-meta">
-          <div class="suggestion-title">${escapeHtml(item.title)}</div>
-          <div class="suggestion-subtitle">${escapeHtml(item.artist || '')}</div>
+    const tracks = await searchDeezer(q);
+    const items  = tracks.map((t) => ({
+      id:      String(t.id),
+      title:   t.title  || "",
+      artist:  t.artist?.name || "",
+      cover:   t.album?.cover_xl || t.album?.cover_big || t.album?.cover_medium || "",
+      preview: t.preview || ""
+    }));
+    openSuggestions(els.musicSuggestions, items, (item) => `
+      <div class="suggestion" data-mid="${escHtml(item.id)}">
+        <img class="sug-thumb" src="${escHtml(item.cover)}" alt="">
+        <div class="sug-meta">
+          <div class="sug-title">${escHtml(item.title)}</div>
+          <div class="sug-sub">${escHtml(item.artist)}</div>
         </div>
       </div>
     `);
-    els.musicSuggestions.querySelectorAll("[data-music-id]").forEach((el) => {
-      const item = results.find((r) => String(r.id) === String(el.dataset.musicId));
+    els.musicSuggestions.querySelectorAll("[data-mid]").forEach((el) => {
+      const item = items.find((r) => r.id === el.dataset.mid);
       el.addEventListener("click", () => pickMusic(item));
     });
-  }, 250);
+  }, 240);
 });
+
+function pickMusic(track) {
+  if (!track) return;
+  els.musicTitle.value        = track.title   || "";
+  els.musicArtist.value       = track.artist  || "";
+  els.musicPreviewInput.value = track.preview || "";
+  els.musicCoverInput.value   = track.cover   || "";
+  // Show pill
+  els.musicPillCover.src      = track.cover   || "";
+  els.musicPillTitle.textContent  = track.title  || "";
+  els.musicPillArtist.textContent = track.artist || "";
+  els.musicPill.classList.add("show");
+  els.musicSearch.value = "";
+  hideSugg(els.musicSuggestions);
+}
+
+function clearMusic() {
+  els.musicTitle.value = els.musicArtist.value = els.musicPreviewInput.value = els.musicCoverInput.value = "";
+  els.musicSearch.value = "";
+  els.musicPill.classList.remove("show");
+  hideSugg(els.musicSuggestions);
+}
+
+els.musicPillClear.addEventListener("click", clearMusic);
+
+// ─── LOCATION SEARCH (Nominatim) ──────────────────────
+async function searchNominatim(q) {
+  try {
+    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`, {
+      headers: { "Accept-Language": "it" }
+    });
+    const data = await res.json();
+    return Array.isArray(data) ? data.slice(0, 6) : [];
+  } catch { return []; }
+}
 
 els.locationSearch.addEventListener("input", () => {
   const q = els.locationSearch.value.trim();
-  clearTimeout(locationDebounce);
-  if (q.length < 2) {
-    hideSuggestions(els.locationSuggestions);
-    return;
-  }
-  locationDebounce = setTimeout(async () => {
-    try {
-      const results = await searchLocations(q);
-      openSuggestions(els.locationSuggestions, results, (item) => `
-        <div class="suggestion" data-location-name="${escapeHtml(item.display_name || '')}">
-          <div class="suggestion-meta">
-            <div class="suggestion-title">${escapeHtml(item.name || item.display_name || '')}</div>
-            <div class="suggestion-subtitle">${escapeHtml(item.display_name || '')}</div>
-          </div>
+  clearTimeout(locDebounce);
+  if (q.length < 2) { hideSugg(els.locationSuggestions); return; }
+  locDebounce = setTimeout(async () => {
+    const results = await searchNominatim(q);
+    openSuggestions(els.locationSuggestions, results, (item) => `
+      <div class="suggestion" data-locname="${escHtml(item.display_name || '')}">
+        <div class="sug-meta">
+          <div class="sug-title">${escHtml(item.name || item.display_name || '')}</div>
+          <div class="sug-sub">${escHtml(item.display_name || '')}</div>
         </div>
-      `);
-      els.locationSuggestions.querySelectorAll("[data-location-name]").forEach((el) => {
-        const item = results.find((r) => (r.display_name || '') === el.dataset.locationName);
-        el.addEventListener("click", () => pickLocation(item));
+      </div>
+    `);
+    els.locationSuggestions.querySelectorAll("[data-locname]").forEach((el) => {
+      const item = results.find((r) => (r.display_name || "") === el.dataset.locname);
+      el.addEventListener("click", () => {
+        const label = item?.display_name || "";
+        els.locationInput.value  = label;
+        els.locationSearch.value = label;
+        hideSugg(els.locationSuggestions);
       });
-    } catch {
-      hideSuggestions(els.locationSuggestions);
-    }
-  }, 250);
+    });
+  }, 240);
 });
 
-els.musicSearch.addEventListener("focus", () => {
-  if (els.musicSearch.value.trim().length >= 2) els.musicSearch.dispatchEvent(new Event("input"));
-});
+// ─── IMAGE PROCESSING ─────────────────────────────────
+async function imageToJpeg(file) {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    const size = Math.min(img.width, img.height);
+    const sx   = Math.floor((img.width  - size) / 2);
+    const sy   = Math.floor((img.height - size) / 2);
+    const canvas = document.createElement("canvas");
+    canvas.width = canvas.height = 800;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, 800, 800);
+    ctx.drawImage(img, sx, sy, size, size, 0, 0, 800, 800);
+    const blob = await new Promise((res, rej) => {
+      canvas.toBlob((b) => b ? res(b) : rej(new Error("Conversion failed")), "image/jpeg", 0.92);
+    });
+    return { blob, ext: "jpg", type: "image/jpeg" };
+  } finally { URL.revokeObjectURL(url); }
+}
 
-els.locationSearch.addEventListener("focus", () => {
-  if (els.locationSearch.value.trim().length >= 2) els.locationSearch.dispatchEvent(new Event("input"));
-});
+async function prepareAsset(file) {
+  if (file.type.startsWith("image/")) return imageToJpeg(file);
+  return { blob: file, ext: (file.name.split(".").pop() || "bin").toLowerCase(), type: file.type || "application/octet-stream" };
+}
 
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".search-wrap")) {
-    hideSuggestions(els.musicSuggestions);
-    hideSuggestions(els.locationSuggestions);
+// ─── UPLOAD ───────────────────────────────────────────
+async function uploadAsset(file) {
+  showProgress(10, "Processing…");
+  const stamp   = Date.now();
+  const safe    = (file.name || `upload_${stamp}`).replace(/[^a-zA-Z0-9_.-]/g, "_");
+  const asset   = await prepareAsset(file);
+  const base    = safe.replace(/\.[^.]+$/, "");
+  const path    = `${currentUser?.id || "anonymous"}/${stamp}_${base}.${asset.ext}`;
+
+  showProgress(30, "Uploading…");
+
+  const { error } = await supabase.storage
+    .from(BUCKET_SHARED)
+    .upload(path, asset.blob, { cacheControl: "3600", upsert: false, contentType: asset.type });
+
+  if (error) throw error;
+
+  showProgress(90, "Saving…");
+  const { data } = supabase.storage.from(BUCKET_SHARED).getPublicUrl(path);
+  return data?.publicUrl || "";
+}
+
+// ─── SUBMIT ───────────────────────────────────────────
+els.submitBtn.addEventListener("click", async () => {
+  if (!selectedFile) { setStatus("Choose a media file first.", "error"); return; }
+  if (!currentUser)  { setStatus("You must be signed in.", "error"); return; }
+
+  els.submitBtn.disabled = true;
+  setStatus("Publishing…");
+
+  try {
+    const mediaUrl = await uploadAsset(selectedFile);
+
+    const { error } = await supabase.from("posts").insert({
+      user_id:      currentUser.id,
+      image_url:    mediaUrl,
+      caption:      els.captionInput.value.trim() || null,
+      tags:         els.tagsInput.value.split(",").map((t) => t.trim()).filter(Boolean),
+      location:     els.locationInput.value.trim() || null,
+      song_title:   els.musicTitle.value.trim()        || null,
+      song_author:  els.musicArtist.value.trim()       || null,
+      song_preview: els.musicPreviewInput.value.trim() || null,
+      song_cover:   els.musicCoverInput.value.trim()   || null,
+      created_at:   new Date().toISOString()
+    });
+
+    if (error) throw error;
+
+    showProgress(100, "Done!");
+    setStatus("Post published!", "ok");
+    setTimeout(() => { window.location.href = "index.html"; }, 800);
+  } catch (err) {
+    console.error(err);
+    setStatus(err?.message || "Upload failed.", "error");
+    hideProgress();
+    els.submitBtn.disabled = false;
   }
 });
 
+// ─── CLEAR ────────────────────────────────────────────
 els.clearBtn.addEventListener("click", () => {
-  selectedFile = null;
-  els.fileInput.value = "";
+  clearPreview();
+  clearMusic();
   els.captionInput.value = "";
-  els.tagsInput.value = "";
-  clearMusicSelection();
-  clearLocation();
-  resetPreview();
+  els.tagsInput.value    = "";
+  els.locationSearch.value = "";
+  els.locationInput.value  = "";
+  hideSugg(els.locationSuggestions);
+  hideProgress();
   setStatus("Ready to publish.");
 });
 
-els.form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!selectedFile) {
-    setStatus("Choose a media file first.", true);
-    return;
-  }
-  if (!currentUser) {
-    setStatus("You must be signed in to upload.", true);
-    return;
-  }
-
-  try {
-    showLoading(true);
-    setStatus("Publishing…");
-    await submitPost(selectedFile);
-    setStatus("Post published.");
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 700);
-  } catch (err) {
-    console.error(err);
-    setStatus(err?.message || "Upload failed.", true);
-  } finally {
-    showLoading(false);
-  }
-});
+// ─── CANCEL ───────────────────────────────────────────
+els.cancelBtn.addEventListener("click", () => { window.location.href = "index.html"; });
 </script>
 </body>
 </html>
