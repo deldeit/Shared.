@@ -22,7 +22,8 @@
     --danger:#ff3b30;
     --like:#ff2d55;
     --sidebar-w:330px;
-    --feed-width:420px;
+    --feed-width:430px;
+    --content-width:760px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --squircle-radius: 28px;
@@ -39,7 +40,6 @@
 
   button, input, a{font-family:'Archivo Black', sans-serif;}
 
-  /* ─── SIDEBAR OVERLAY ─────────────────────────────── */
   .sidebar-overlay{
     position:fixed;
     inset:0;
@@ -58,7 +58,6 @@
     pointer-events:auto;
   }
 
-  /* ─── HAMBURGER BUTTON ─────────────────────────────── */
   .hamburger{
     position:fixed;
     top:14px;
@@ -86,7 +85,6 @@
     transition:opacity .15s;
   }
 
-  /* ─── SIDEBAR ──────────────────────────────────────── */
   .sidebar{
     position:fixed;
     left:0;
@@ -105,9 +103,7 @@
     transition:transform .3s cubic-bezier(.4,0,.2,1);
   }
 
-  .sidebar.open{
-    transform:translateX(0);
-  }
+  .sidebar.open{transform:translateX(0);}
 
   .sidebar-top{
     display:flex;
@@ -115,7 +111,7 @@
     gap:14px;
     min-height:0;
     flex:1;
-    padding-top:56px; /* space for hamburger */
+    padding-top:56px;
   }
 
   .sidebar-bottom{
@@ -123,6 +119,53 @@
     display:flex;
     flex-direction:column;
     gap:10px;
+  }
+
+  .profile-card{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:14px;
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.14);
+    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+    box-shadow:0 14px 40px rgba(0,0,0,.38);
+  }
+
+  .profile-avatar{
+    width:54px;
+    height:54px;
+    border-radius:50%;
+    object-fit:cover;
+    border:1px solid rgba(255,255,255,.12);
+    background:#111;
+    flex:0 0 auto;
+  }
+
+  .profile-meta{min-width:0;flex:1}
+  .profile-label{
+    font-size:11px;
+    color:var(--muted-2);
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    margin-bottom:4px;
+  }
+  .profile-name{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:16px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .profile-handle{
+    margin-top:3px;
+    font-size:11px;
+    color:var(--muted-2);
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
   }
 
   .search-wrap{position:relative}
@@ -209,7 +252,7 @@
     align-items:center;
     gap:12px;
     padding:14px 15px;
-    border-radius:14px;
+    border-radius:999px;
     border:1px solid rgba(255,255,255,.15);
     background:rgba(255,255,255,.05);
     color:#fff;
@@ -219,6 +262,7 @@
     user-select:none;
     line-height:1;
     font-size:15px;
+    justify-content:center;
   }
 
   .nav-btn:hover{background:rgba(255,255,255,.1)}
@@ -233,7 +277,6 @@
     line-height:1;
   }
 
-  /* ─── MAIN CONTENT ─────────────────────────────────── */
   .main{
     width:100%;
     height:100vh;
@@ -242,12 +285,20 @@
     scroll-snap-type:y mandatory;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior:contain;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+  }
+
+  .main-inner{
+    width:min(var(--content-width), calc(100vw - 18px));
+    margin:0 auto;
+    padding-bottom:22px;
   }
 
   .header{
     text-align:center;
-    padding:18px 12px 14px;
-    padding-left:72px; /* leave room for hamburger */
+    padding:18px 12px 14px 72px;
     font-size:30px;
     letter-spacing:-.05em;
     border-bottom:1px solid rgba(255,255,255,.08);
@@ -255,6 +306,7 @@
     top:0;
     background:#000;
     z-index:5;
+    width:100%;
   }
 
   .stories-section{padding-top:8px;}
@@ -288,6 +340,9 @@
     text-align:center;
     cursor:pointer;
     flex:0 0 auto;
+    background:transparent;
+    border:0;
+    color:#fff;
   }
 
   .story img{
@@ -313,7 +368,6 @@
     padding:34px 0 22px;
   }
 
-  /* ─── SQUIRCLE POST ─────────────────────────────────── */
   .post{
     scroll-snap-align:start;
     width:min(var(--feed-width), calc(100vw - 24px));
@@ -322,7 +376,6 @@
     border-radius:var(--squircle-radius);
     overflow:hidden;
     background:#0a0a0a;
-    /* squircle shadow glow */
     box-shadow:
       0 0 0 1px rgba(255,255,255,.04),
       0 8px 32px rgba(0,0,0,.7),
@@ -338,14 +391,12 @@
       0 4px 12px rgba(0,0,0,.6);
   }
 
-  /* Media corners match post squircle */
   .media{
     position:relative;
     width:100%;
     aspect-ratio:4/3;
     background:#111;
     overflow:hidden;
-    /* top corners slightly less rounded to flow with the card */
     border-radius:0;
   }
 
@@ -539,7 +590,6 @@
 
   audio.bg-audio{display:none}
 
-  /* ─── POST SKELETON (no spinner) ──────────────────── */
   .skeleton-post{
     width:min(var(--feed-width), calc(100vw - 24px));
     margin:0 auto;
@@ -587,7 +637,6 @@
     100%{opacity:.5}
   }
 
-  /* ─── STORY VIEWER ─────────────────────────────────── */
   .story-viewer{
     position:fixed;
     inset:0;
@@ -725,7 +774,6 @@
     backdrop-filter:blur(14px);
   }
 
-  /* ─── MODAL ─────────────────────────────────────────── */
   .modal{
     position:fixed;
     inset:0;
@@ -826,32 +874,35 @@
     font-size:15px;
   }
 
-  /* ─── POST BOTTOM SPACING ───────────────────────────── */
-  .post > *:last-child{
-    margin-bottom:14px;
-  }
+  .post > *:last-child{margin-bottom:14px;}
 
-  /* ─── RESPONSIVE ─────────────────────────────────────── */
   @media (max-width: 860px){
     .header{font-size:28px}
     .post{width:calc(100vw - 18px)}
     .skeleton-post{width:calc(100vw - 18px)}
+    .main-inner{width:calc(100vw - 18px)}
   }
 </style>
 </head>
 <body>
 
-  <!-- Hamburger button (always visible) -->
   <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false">
     <span class="material-symbols-rounded" id="hamburgerIcon">menu</span>
   </button>
 
-  <!-- Sidebar overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- Sidebar (slide-in) -->
   <aside class="sidebar" id="sidebar" aria-hidden="true">
     <div class="sidebar-top">
+      <div class="profile-card" id="profileCard">
+        <img id="profileAvatar" class="profile-avatar" alt="Profile avatar" src="">
+        <div class="profile-meta">
+          <div class="profile-label">Account</div>
+          <div class="profile-name" id="profileName">Loading…</div>
+          <div class="profile-handle" id="profileHandle">@shared</div>
+        </div>
+      </div>
+
       <div class="search-wrap">
         <input id="search" class="search" placeholder="Search" autocomplete="off">
         <div id="suggestions" class="suggestions"></div>
@@ -859,14 +910,9 @@
     </div>
 
     <div class="sidebar-bottom">
-      <button class="nav-btn" type="button" onclick="goUpload('post')">
+      <button class="nav-btn" type="button" onclick="goUpload()">
         <span class="material-symbols-rounded">upload</span>
-        <span>Upload post</span>
-      </button>
-
-      <button class="nav-btn" type="button" onclick="goUpload('story')">
-        <span class="material-symbols-rounded">add_circle</span>
-        <span>Upload story</span>
+        <span>Upload</span>
       </button>
 
       <a class="nav-btn" href="settings.html">
@@ -886,21 +932,21 @@
     </div>
   </aside>
 
-  <!-- Main content -->
   <main class="main" id="mainScroll">
-    <div class="header">Shared.</div>
+    <div class="main-inner">
+      <div class="header">Shared.</div>
 
-    <section id="storiesSection" class="stories-section">
-      <div class="section-head">
-        <div class="section-title">Stories</div>
-      </div>
-      <div id="stories" class="stories"></div>
-    </section>
+      <section id="storiesSection" class="stories-section">
+        <div class="section-head">
+          <div class="section-title">Stories</div>
+        </div>
+        <div id="stories" class="stories"></div>
+      </section>
 
-    <div id="feed" class="feed"></div>
+      <div id="feed" class="feed"></div>
+    </div>
   </main>
 
-  <!-- Story viewer -->
   <div id="storyViewer" class="story-viewer" aria-hidden="true">
     <div class="story-viewer-shell">
       <div class="story-stage">
@@ -930,7 +976,6 @@
     </div>
   </div>
 
-  <!-- Likes modal -->
   <div id="likesModal" class="modal" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="likesTitle">
       <div class="modal-head">
@@ -942,23 +987,14 @@
   </div>
 
 <script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
-
-const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const API_BASE = "https://api.sharedweb.com";
-
-const BUCKET_AVATARS = "avatars";
-const BUCKET_SHARED  = "shared";
-const BUCKET_STORIES = "stories";
+const API_BASE = "https://api.sharedweb.org";
 
 const state = {
   profiles: [],
   posts: [],
   likes: [],
   currentUserId: null,
+  currentUserProfile: null,
   storyQueue: [],
   storyIndex: 0,
   storyTimer: null,
@@ -991,9 +1027,11 @@ const els = {
   sidebarOverlay: document.getElementById("sidebarOverlay"),
   hamburgerBtn:   document.getElementById("hamburgerBtn"),
   hamburgerIcon:  document.getElementById("hamburgerIcon"),
+  profileAvatar:  document.getElementById("profileAvatar"),
+  profileName:    document.getElementById("profileName"),
+  profileHandle:  document.getElementById("profileHandle"),
 };
 
-// ─── HAMBURGER MENU ──────────────────────────────────────
 let sidebarOpen = false;
 
 function openSidebar() {
@@ -1018,12 +1056,8 @@ function closeSidebar() {
 
 els.hamburgerBtn.addEventListener("click", () => sidebarOpen ? closeSidebar() : openSidebar());
 els.sidebarOverlay.addEventListener("click", closeSidebar);
+window.addEventListener("keydown", (e) => { if (e.key === "Escape" && sidebarOpen) closeSidebar(); });
 
-window.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && sidebarOpen) closeSidebar();
-});
-
-// ─── HELPERS ─────────────────────────────────────────────
 function safeArray(v) { return Array.isArray(v) ? v : []; }
 
 function escapeHtml(str) {
@@ -1077,25 +1111,10 @@ function placeholderImage() {
   `)}`;
 }
 
-function normalizeAvatar(path) {
+function normalizeUrl(path) {
   if (!path) return "";
-  if (/^https?:\/\//i.test(path)) return path;
-  const { data } = supabase.storage.from(BUCKET_AVATARS).getPublicUrl(path);
-  return data?.publicUrl || "";
-}
-
-function normalizeShared(path) {
-  if (!path) return "";
-  if (/^https?:\/\//i.test(path)) return path;
-  const { data } = supabase.storage.from(BUCKET_SHARED).getPublicUrl(path);
-  return data?.publicUrl || "";
-}
-
-function normalizeStory(path) {
-  if (!path) return "";
-  if (/^https?:\/\//i.test(path)) return path;
-  const { data } = supabase.storage.from(BUCKET_STORIES).getPublicUrl(path);
-  return data?.publicUrl || "";
+  if (/^https?:\/\//i.test(path) || path.startsWith("data:")) return path;
+  return path;
 }
 
 function getProfileById(id) {
@@ -1108,12 +1127,12 @@ function getUsernameForPost(post) {
 }
 
 function getAvatarForProfile(profile) {
-  return normalizeAvatar(profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
+  return normalizeUrl(profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
 }
 
 function getAvatarForPost(post) {
   const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
-  return normalizeAvatar(post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
+  return normalizeUrl(post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
 }
 
 function isVerified(profile) {
@@ -1139,8 +1158,8 @@ function getStoryQueue() {
       return {
         id:       profile.id,
         username: profile.username || profile.full_name || "user",
-        avatar:   normalizeAvatar(avatarPath) || defaultProfileIcon(),
-        story:    normalizeStory(storyPath),
+        avatar:   normalizeUrl(avatarPath) || defaultProfileIcon(),
+        story:    normalizeUrl(storyPath),
         profile
       };
     })
@@ -1157,13 +1176,6 @@ function postLikedByMe(postId) {
     : false;
 }
 
-async function getCurrentUserId() {
-  const { data, error } = await supabase.auth.getUser();
-  if (error) return null;
-  return data?.user?.id || null;
-}
-
-// ─── SKELETONS ────────────────────────────────────────────
 function renderSkeletons(count = 3) {
   els.feed.innerHTML = Array.from({ length: count }, () => `
     <div class="skeleton-post">
@@ -1179,99 +1191,93 @@ function renderSkeletons(count = 3) {
   `).join("");
 }
 
-// ─── FETCH FROM api.sharedweb.com ─────────────────────────
+async function apiGet(path) {
+  const res = await fetch(`${API_BASE}${path}`, { headers: { Accept: "application/json" } });
+  if (!res.ok) throw new Error(`API ${res.status} for ${path}`);
+  return res.json();
+}
+
+async function apiSend(path, method, body) {
+  const res = await fetch(`${API_BASE}${path}`, {
+    method,
+    headers: { Accept: "application/json", "Content-Type": "application/json" },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) throw new Error(`API ${res.status} for ${method} ${path}`);
+  return res.json().catch(() => null);
+}
+
 async function fetchApiPosts() {
-  try {
-    const res = await fetch(`${API_BASE}/posts`, {
-      headers: { "Accept": "application/json" }
-    });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data = await res.json();
-    // Normalise: accept { posts: [...] } or plain array
-    const posts = Array.isArray(data) ? data : (data.posts || data.data || []);
-    return safeArray(posts);
-  } catch (err) {
-    console.warn("api.sharedweb.com fetch failed, falling back to Supabase:", err);
-    return null; // signal fallback
-  }
+  const data = await apiGet(`/posts`);
+  return safeArray(Array.isArray(data) ? data : (data.posts || data.data || []));
 }
 
 async function fetchApiProfiles() {
-  try {
-    const res = await fetch(`${API_BASE}/profiles`, {
-      headers: { "Accept": "application/json" }
-    });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data = await res.json();
-    const profiles = Array.isArray(data) ? data : (data.profiles || data.data || []);
-    return safeArray(profiles);
-  } catch {
-    return null;
-  }
+  const data = await apiGet(`/profiles`);
+  return safeArray(Array.isArray(data) ? data : (data.profiles || data.data || []));
 }
 
 async function fetchApiLikes() {
+  const data = await apiGet(`/likes`);
+  return safeArray(Array.isArray(data) ? data : (data.likes || data.data || []));
+}
+
+async function fetchCurrentUser() {
   try {
-    const res = await fetch(`${API_BASE}/likes`, {
-      headers: { "Accept": "application/json" }
-    });
-    if (!res.ok) throw new Error(`API ${res.status}`);
-    const data = await res.json();
-    const likes = Array.isArray(data) ? data : (data.likes || data.data || []);
-    return safeArray(likes);
+    const data = await apiGet(`/me`);
+    return data?.user || data?.profile || data || null;
   } catch {
-    return null;
+    const storedId = localStorage.getItem("shared_current_user_id");
+    const storedUsername = localStorage.getItem("shared_current_username");
+    const storedAvatar = localStorage.getItem("shared_current_avatar");
+    if (!storedId && !storedUsername && !storedAvatar) return null;
+    return {
+      id: storedId || null,
+      username: storedUsername || "you",
+      avatar_url: storedAvatar || ""
+    };
   }
 }
 
-// ─── LOAD DATA ────────────────────────────────────────────
-async function loadData() {
-  // Show skeleton immediately — no spinner
-  renderSkeletons(4);
+function renderCurrentUser() {
+  const profile = state.currentUserProfile;
+  const username = profile?.username || profile?.full_name || "you";
+  const handle = profile?.handle || profile?.username ? `@${String(profile?.handle || profile?.username).replace(/^@/, "")}` : "@shared";
+  els.profileName.textContent = username;
+  els.profileHandle.textContent = handle;
+  els.profileAvatar.src = getAvatarForProfile(profile) || defaultProfileIcon();
+  els.profileAvatar.alt = `${username} avatar`;
+}
 
+async function loadData() {
+  renderSkeletons(4);
   try {
-    // Try api.sharedweb.com first, fall back to Supabase
-    const [apiPosts, apiProfiles, apiLikes, currentUserId] = await Promise.all([
+    const [apiPosts, apiProfiles, apiLikes, currentUser] = await Promise.all([
       fetchApiPosts(),
       fetchApiProfiles(),
       fetchApiLikes(),
-      getCurrentUserId()
+      fetchCurrentUser(),
     ]);
 
-    if (apiProfiles !== null) {
-      state.profiles = apiProfiles;
-    } else {
-      const { data } = await supabase.from("profiles").select("*").order("username", { ascending: true });
-      state.profiles = safeArray(data);
-    }
-
-    if (apiPosts !== null) {
-      state.posts = apiPosts;
-    } else {
-      const { data } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
-      state.posts = safeArray(data);
-    }
-
-    if (apiLikes !== null) {
-      state.likes = apiLikes;
-    } else {
-      const { data } = await supabase.from("likes").select("*");
-      state.likes = safeArray(data);
-    }
-
-    state.currentUserId = currentUserId;
+    state.profiles = apiProfiles;
+    state.posts = apiPosts.sort((a, b) => new Date(b.created_at || b.inserted_at || b.updated_at || 0) - new Date(a.created_at || a.inserted_at || a.updated_at || 0));
+    state.likes = apiLikes;
+    state.currentUserProfile = currentUser || state.profiles[0] || null;
+    state.currentUserId = state.currentUserProfile?.id || null;
     state.storyQueue = getStoryQueue();
 
+    renderCurrentUser();
     renderStories();
     await renderFeed(state.posts);
     updateSuggestions();
   } catch (err) {
     console.error(err);
     els.feed.innerHTML = `<div class="empty">Impossibile caricare i contenuti.</div>`;
+    state.currentUserProfile = null;
+    renderCurrentUser();
   }
 }
 
-// ─── STORIES ──────────────────────────────────────────────
 function renderStories() {
   if (!state.storyQueue.length) {
     els.storiesSection.style.display = "none";
@@ -1291,31 +1297,6 @@ function renderStories() {
   });
 }
 
-// ─── ALBUM COVER ─────────────────────────────────────────
-async function resolveAlbumCover(post) {
-  const key = songKey(post);
-  if (!key) return "";
-  if (state.coverCache.has(key)) return state.coverCache.get(key);
-
-  const title  = String(post.song_title || post.song || "").trim();
-  const artist = String(post.song_author || post.song_artist || post.song_by || "").trim();
-  const term   = [title, artist].filter(Boolean).join(" ");
-  if (!term) { state.coverCache.set(key, ""); return ""; }
-
-  try {
-    const res  = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=1`);
-    const data = await res.json();
-    const artwork = data?.results?.[0]?.artworkUrl100 || "";
-    const cover   = artwork ? artwork.replace(/100x100bb\.(jpg|png|jpeg)$/i, "600x600bb.$1") : "";
-    state.coverCache.set(key, cover);
-    return cover;
-  } catch {
-    state.coverCache.set(key, "");
-    return "";
-  }
-}
-
-// ─── FEED RENDER ─────────────────────────────────────────
 async function renderFeed(filteredPosts = state.posts) {
   if (!filteredPosts.length) {
     els.feed.innerHTML = `<div class="empty">Nessun post trovato.</div>`;
@@ -1326,12 +1307,12 @@ async function renderFeed(filteredPosts = state.posts) {
     const username   = getUsernameForPost(post);
     const profile    = getProfileById(post.user_id) || getProfileById(post.profile_id);
     const avatar     = getAvatarForPost(post);
-    const image      = normalizeShared(post.image_url || post.media_url || post.image || "");
+    const image      = normalizeUrl(post.image_url || post.media_url || post.image || "");
     const caption    = post.caption || post.text || "";
     const songTitle  = post.song_title || post.song || "";
     const songAuthor = post.song_author || post.song_artist || post.song_by || "";
     const songPreview= post.song_preview || post.audio_url || "";
-    const songCover  = normalizeShared(post.song_cover || post.album_cover || post.album_image || post.cover_url || post.artwork_url || post.album_art || "");
+    const songCover  = normalizeUrl(post.song_cover || post.album_cover || post.album_image || post.cover_url || post.artwork_url || post.album_art || "");
     const createdAt  = post.created_at || post.inserted_at || post.updated_at || "";
     const likesCount = postLikeCount(post.id);
     const liked      = postLikedByMe(post.id) || !!post.liked;
@@ -1388,28 +1369,6 @@ async function renderFeed(filteredPosts = state.posts) {
   wirePostInteractions();
   wireBackgroundAudio();
   wireDoubleTapLike();
-  await resolveMissingCovers();
-}
-
-async function resolveMissingCovers() {
-  const cards   = [...document.querySelectorAll(".song-card[data-song-key]")];
-  const targets = cards.filter((card) => card.querySelector(".note-cover"));
-
-  await Promise.all(targets.map(async (card) => {
-    const postEl = card.closest("[data-post-id]");
-    if (!postEl) return;
-    const post   = state.posts.find((p) => String(p.id) === String(postEl.dataset.postId));
-    if (!post)   return;
-    const cover  = await resolveAlbumCover(post);
-    if (!cover)  return;
-    const note   = card.querySelector(".note-cover");
-    if (!note)   return;
-    const img    = document.createElement("img");
-    img.className = "album-cover";
-    img.alt = "Album cover";
-    img.src = cover;
-    note.replaceWith(img);
-  }));
 }
 
 function wireLazyImages() {
@@ -1432,30 +1391,10 @@ function wireBackgroundAudio() {
   document.querySelectorAll("audio.bg-audio").forEach((audio) => {
     audio.volume = 0.22;
     const attemptPlay = async () => {
-      try { await audio.play(); } catch { /* blocked */ }
+      try { await audio.play(); } catch { }
     };
     attemptPlay();
     audio.addEventListener("loadedmetadata", attemptPlay, { once: true });
-  });
-}
-
-function toggleLike(postId) {
-  const btn      = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
-  const countEl  = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
-  if (!btn || !countEl) return;
-
-  const liked        = btn.classList.contains("liked");
-  const currentCount = postLikeCount(postId);
-  const nextCount    = liked ? Math.max(0, currentCount - 1) : currentCount + 1;
-
-  btn.classList.toggle("liked", !liked);
-  countEl.textContent = `${formatCount(nextCount)} likes`;
-
-  showLikePulse(postId);
-  persistLike(postId, liked).catch((err) => {
-    console.error(err);
-    btn.classList.toggle("liked", liked);
-    countEl.textContent = `${formatCount(currentCount)} likes`;
   });
 }
 
@@ -1467,22 +1406,37 @@ function showLikePulse(postId) {
   setTimeout(() => pulse.classList.remove("show"), 220);
 }
 
+function refreshLikeUi(postId) {
+  const btn = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
+  const countEl = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
+  if (!btn || !countEl) return;
+  btn.classList.toggle("liked", postLikedByMe(postId));
+  countEl.textContent = `${formatCount(postLikeCount(postId))} likes`;
+}
+
 async function persistLike(postId, wasLiked) {
   if (!state.currentUserId) return;
 
   if (wasLiked) {
-    const existing = state.likes.find((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId) && String(like.user_id) === String(state.currentUserId));
-    if (existing?.id) {
-      await supabase.from("likes").delete().eq("id", existing.id);
-    } else {
-      await supabase.from("likes").delete().eq("post_id", postId).eq("user_id", state.currentUserId);
-    }
+    await apiSend(`/likes`, "DELETE", { post_id: postId, user_id: state.currentUserId });
   } else {
-    await supabase.from("likes").insert({ post_id: postId, user_id: state.currentUserId });
+    await apiSend(`/likes`, "POST", { post_id: postId, user_id: state.currentUserId });
   }
 
-  const { data } = await supabase.from("likes").select("*");
-  state.likes = safeArray(data);
+  state.likes = await fetchApiLikes();
+  refreshLikeUi(postId);
+}
+
+function toggleLike(postId) {
+  const btn = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
+  if (!btn) return;
+
+  const wasLiked = btn.classList.contains("liked");
+  showLikePulse(postId);
+
+  persistLike(postId, wasLiked).catch((err) => {
+    console.error(err);
+  });
 }
 
 function wirePostInteractions() {
@@ -1536,7 +1490,6 @@ function wireDoubleTapLike() {
   });
 }
 
-// ─── SEARCH / SUGGESTIONS ─────────────────────────────────
 function updateSuggestions() {
   const q = state.searchQuery.trim().toLowerCase();
   if (!q) { els.suggestions.style.display = "none"; els.suggestions.innerHTML = ""; return; }
@@ -1583,7 +1536,6 @@ function goToProfile(profileId) {
   window.location.href = `profile.html?id=${encodeURIComponent(profileId)}`;
 }
 
-// ─── STORY VIEWER ─────────────────────────────────────────
 function openStory(index) {
   if (!state.storyQueue.length) return;
   state.storyIndex = ((index % state.storyQueue.length) + state.storyQueue.length) % state.storyQueue.length;
@@ -1658,7 +1610,6 @@ function prevStory() {
   startStoryTimer();
 }
 
-// ─── LIKES MODAL ─────────────────────────────────────────
 async function openLikesModal(postId) {
   const likesForPost = state.likes.filter((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId));
   const items = likesForPost.map((like) => {
@@ -1700,7 +1651,6 @@ function closeLikesModal() {
   els.likesModal.setAttribute("aria-hidden", "true");
 }
 
-// ─── EVENT WIRING ─────────────────────────────────────────
 els.closeLikesBtn.addEventListener("click", closeLikesModal);
 els.likesModal.addEventListener("click", (e) => { if (e.target === els.likesModal) closeLikesModal(); });
 
@@ -1732,14 +1682,14 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-// ─── GLOBAL HELPERS ───────────────────────────────────────
-window.goUpload = (type) => { window.location.href = `upload.html?type=${encodeURIComponent(type)}`; };
-
+window.goUpload = () => { window.location.href = `upload.html`; };
 window.logout = async () => {
-  try { await supabase.auth.signOut(); } finally { window.location.href = "index.html"; }
+  localStorage.removeItem("shared_current_user_id");
+  localStorage.removeItem("shared_current_username");
+  localStorage.removeItem("shared_current_avatar");
+  window.location.href = "index.html";
 };
 
-// ─── BOOT ─────────────────────────────────────────────────
 loadData();
 </script>
 </body>
