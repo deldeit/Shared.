@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -18,12 +18,10 @@
     --border:rgba(255,255,255,.14);
     --panel:rgba(255,255,255,.05);
     --panel-2:rgba(255,255,255,.08);
-    --panel-3:rgba(255,255,255,.12);
     --danger:#ff3b30;
     --like:#ff2d55;
     --sidebar-w:330px;
-    --feed-width:430px;
-    --content-width:760px;
+    --feed-width:420px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --squircle-radius: 28px;
@@ -49,7 +47,7 @@
     visibility:hidden;
     pointer-events:none;
     transition:opacity .28s ease, visibility .28s ease;
-    backdrop-filter:blur(2px);
+    backdrop-filter:none;
   }
 
   .sidebar-overlay.open{
@@ -67,17 +65,16 @@
     height:44px;
     border-radius:14px;
     border:1px solid rgba(255,255,255,.18);
-    background:rgba(0,0,0,.82);
+    background:rgba(0,0,0,.92);
     color:#fff;
     display:flex;
     align-items:center;
     justify-content:center;
     cursor:pointer;
-    backdrop-filter:blur(14px);
     transition:background .18s, transform .18s;
   }
 
-  .hamburger:hover{background:rgba(255,255,255,.12);}
+  .hamburger:hover{background:rgba(255,255,255,.08);}
   .hamburger:active{transform:scale(.94);}
 
   .hamburger .material-symbols-rounded{
@@ -126,10 +123,9 @@
     align-items:center;
     gap:12px;
     padding:14px;
-    border-radius:22px;
+    border-radius:18px;
     border:1px solid rgba(255,255,255,.14);
-    background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
-    box-shadow:0 14px 40px rgba(0,0,0,.38);
+    background:rgba(255,255,255,.04);
   }
 
   .profile-avatar{
@@ -194,7 +190,6 @@
     border:1px solid rgba(255,255,255,.14);
     border-radius:16px;
     overflow:hidden;
-    box-shadow:0 20px 60px rgba(0,0,0,.55);
     max-height:320px;
     overflow-y:auto;
     z-index:30;
@@ -252,7 +247,7 @@
     align-items:center;
     gap:12px;
     padding:14px 15px;
-    border-radius:999px;
+    border-radius:14px;
     border:1px solid rgba(255,255,255,.15);
     background:rgba(255,255,255,.05);
     color:#fff;
@@ -262,14 +257,14 @@
     user-select:none;
     line-height:1;
     font-size:15px;
-    justify-content:center;
+    justify-content:flex-start;
   }
 
-  .nav-btn:hover{background:rgba(255,255,255,.1)}
+  .nav-btn:hover{background:rgba(255,255,255,.09)}
   .nav-btn.logout{
-    background:rgba(255,59,48,.14);
+    background:rgba(255,59,48,.12);
     color:#ff7a73;
-    border-color:rgba(255,59,48,.3);
+    border-color:rgba(255,59,48,.24);
   }
 
   .nav-btn .material-symbols-rounded{
@@ -285,20 +280,12 @@
     scroll-snap-type:y mandatory;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior:contain;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-  }
-
-  .main-inner{
-    width:min(var(--content-width), calc(100vw - 18px));
-    margin:0 auto;
-    padding-bottom:22px;
   }
 
   .header{
     text-align:center;
-    padding:18px 12px 14px 72px;
+    padding:18px 12px 14px;
+    padding-left:72px;
     font-size:30px;
     letter-spacing:-.05em;
     border-bottom:1px solid rgba(255,255,255,.08);
@@ -306,7 +293,6 @@
     top:0;
     background:#000;
     z-index:5;
-    width:100%;
   }
 
   .stories-section{padding-top:8px;}
@@ -376,20 +362,11 @@
     border-radius:var(--squircle-radius);
     overflow:hidden;
     background:#0a0a0a;
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.04),
-      0 8px 32px rgba(0,0,0,.7),
-      0 2px 8px rgba(0,0,0,.5);
-    transition:transform .2s ease, box-shadow .2s ease;
+    box-shadow:none;
+    transition:transform .2s ease;
   }
 
-  .post:hover{
-    transform:translateY(-2px);
-    box-shadow:
-      0 0 0 1px rgba(255,255,255,.07),
-      0 16px 48px rgba(0,0,0,.75),
-      0 4px 12px rgba(0,0,0,.6);
-  }
+  .post:hover{transform:translateY(-2px);}
 
   .media{
     position:relative;
@@ -451,7 +428,7 @@
     opacity:0;
     z-index:3;
     color:var(--like);
-    filter:drop-shadow(0 6px 20px rgba(0,0,0,.6));
+    filter:none;
     transition:opacity .15s ease, transform .15s ease;
   }
 
@@ -494,7 +471,7 @@
     flex:0 0 auto;
   }
 
-  .like-btn:hover{background:rgba(255,255,255,.1)}
+  .like-btn:hover{background:rgba(255,255,255,.09)}
   .like-btn:active{transform:scale(.96)}
   .like-btn.liked{color:var(--like);background:rgba(255,45,85,.08);border-color:rgba(255,45,85,.28)}
 
@@ -771,7 +748,7 @@
     background:rgba(255,255,255,.08);
     border:1px solid rgba(255,255,255,.14);
     font-size:12px;
-    backdrop-filter:blur(14px);
+    backdrop-filter:none;
   }
 
   .modal{
@@ -794,7 +771,6 @@
     background:#0b0b0b;
     border:1px solid rgba(255,255,255,.14);
     border-radius:22px;
-    box-shadow:0 22px 70px rgba(0,0,0,.55);
     padding:14px;
   }
 
@@ -880,7 +856,6 @@
     .header{font-size:28px}
     .post{width:calc(100vw - 18px)}
     .skeleton-post{width:calc(100vw - 18px)}
-    .main-inner{width:calc(100vw - 18px)}
   }
 </style>
 </head>
@@ -933,18 +908,16 @@
   </aside>
 
   <main class="main" id="mainScroll">
-    <div class="main-inner">
-      <div class="header">Shared.</div>
+    <div class="header">Shared.</div>
 
-      <section id="storiesSection" class="stories-section">
-        <div class="section-head">
-          <div class="section-title">Stories</div>
-        </div>
-        <div id="stories" class="stories"></div>
-      </section>
+    <section id="storiesSection" class="stories-section">
+      <div class="section-head">
+        <div class="section-title">Stories</div>
+      </div>
+      <div id="stories" class="stories"></div>
+    </section>
 
-      <div id="feed" class="feed"></div>
-    </div>
+    <div id="feed" class="feed"></div>
   </main>
 
   <div id="storyViewer" class="story-viewer" aria-hidden="true">
@@ -1002,7 +975,6 @@ const state = {
   storyStartTs: 0,
   storyDurationMs: 30000,
   searchQuery: "",
-  coverCache: new Map()
 };
 
 const els = {
@@ -1207,36 +1179,46 @@ async function apiSend(path, method, body) {
   return res.json().catch(() => null);
 }
 
+async function tryPaths(paths) {
+  for (const path of paths) {
+    try {
+      return await apiGet(path);
+    } catch (err) {
+      if (!String(err?.message || err).includes("404")) throw err;
+    }
+  }
+  return null;
+}
+
 async function fetchApiPosts() {
-  const data = await apiGet(`/posts`);
-  return safeArray(Array.isArray(data) ? data : (data.posts || data.data || []));
+  const data = await tryPaths(["/posts", "/feed", "/home", "/content"]);
+  return safeArray(Array.isArray(data) ? data : (data?.posts || data?.data || []));
 }
 
 async function fetchApiProfiles() {
-  const data = await apiGet(`/profiles`);
-  return safeArray(Array.isArray(data) ? data : (data.profiles || data.data || []));
+  const data = await tryPaths(["/profiles", "/users", "/accounts", "/me/profiles"]);
+  return safeArray(Array.isArray(data) ? data : (data?.profiles || data?.users || data?.data || []));
 }
 
 async function fetchApiLikes() {
-  const data = await apiGet(`/likes`);
-  return safeArray(Array.isArray(data) ? data : (data.likes || data.data || []));
+  const data = await tryPaths(["/likes", "/reactions", "/post-likes"]);
+  return safeArray(Array.isArray(data) ? data : (data?.likes || data?.reactions || data?.data || []));
 }
 
 async function fetchCurrentUser() {
-  try {
-    const data = await apiGet(`/me`);
-    return data?.user || data?.profile || data || null;
-  } catch {
-    const storedId = localStorage.getItem("shared_current_user_id");
-    const storedUsername = localStorage.getItem("shared_current_username");
-    const storedAvatar = localStorage.getItem("shared_current_avatar");
-    if (!storedId && !storedUsername && !storedAvatar) return null;
+  const storedId = localStorage.getItem("shared_current_user_id");
+  const storedUsername = localStorage.getItem("shared_current_username");
+  const storedAvatar = localStorage.getItem("shared_current_avatar");
+  if (storedId || storedUsername || storedAvatar) {
     return {
       id: storedId || null,
       username: storedUsername || "you",
       avatar_url: storedAvatar || ""
     };
   }
+
+  const profile = state.profiles[0] || null;
+  return profile ? { ...profile } : null;
 }
 
 function renderCurrentUser() {
@@ -1252,17 +1234,16 @@ function renderCurrentUser() {
 async function loadData() {
   renderSkeletons(4);
   try {
-    const [apiPosts, apiProfiles, apiLikes, currentUser] = await Promise.all([
+    const [apiPosts, apiProfiles, apiLikes] = await Promise.all([
       fetchApiPosts(),
       fetchApiProfiles(),
       fetchApiLikes(),
-      fetchCurrentUser(),
     ]);
 
-    state.profiles = apiProfiles;
     state.posts = apiPosts.sort((a, b) => new Date(b.created_at || b.inserted_at || b.updated_at || 0) - new Date(a.created_at || a.inserted_at || a.updated_at || 0));
+    state.profiles = apiProfiles;
     state.likes = apiLikes;
-    state.currentUserProfile = currentUser || state.profiles[0] || null;
+    state.currentUserProfile = await fetchCurrentUser();
     state.currentUserId = state.currentUserProfile?.id || null;
     state.storyQueue = getStoryQueue();
 
@@ -1272,8 +1253,8 @@ async function loadData() {
     updateSuggestions();
   } catch (err) {
     console.error(err);
-    els.feed.innerHTML = `<div class="empty">Impossibile caricare i contenuti.</div>`;
-    state.currentUserProfile = null;
+    els.feed.innerHTML = `<div class="empty">Unable to load content.</div>`;
+    state.currentUserProfile = await fetchCurrentUser();
     renderCurrentUser();
   }
 }
@@ -1299,7 +1280,7 @@ function renderStories() {
 
 async function renderFeed(filteredPosts = state.posts) {
   if (!filteredPosts.length) {
-    els.feed.innerHTML = `<div class="empty">Nessun post trovato.</div>`;
+    els.feed.innerHTML = `<div class="empty">No posts found.</div>`;
     return;
   }
 
