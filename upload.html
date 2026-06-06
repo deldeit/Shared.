@@ -9,40 +9,32 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
 <style>
   :root {
-    --bg: #000;
-    --text: #fff;
-    --muted: rgba(255,255,255,.68);
-    --muted-2: rgba(255,255,255,.42);
-    --border: rgba(255,255,255,.12);
-    --panel: rgba(255,255,255,.05);
-    --panel-2: rgba(255,255,255,.08);
-    --danger: #ff3b30;
-    --accent: #fff;
-    --squircle: 24px;
-    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-top:    env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
-    --max-w: 680px;
+    --max-w: 640px;
+    --muted:   rgba(255,255,255,.60);
+    --muted-2: rgba(255,255,255,.35);
+    --border:  rgba(255,255,255,.10);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { height: 100%; }
 
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: #000;
+    color: #fff;
     font-family: 'Archivo Black', sans-serif;
     overflow: hidden;
   }
 
   button, input, textarea, select { font-family: inherit; }
 
-  /* ─── PAGE LAYOUT ─────────────────────────── */
+  /* ── LAYOUT ──────────────────────────────────────── */
   .page {
     width: 100%;
     height: 100dvh;
     display: flex;
     justify-content: center;
-    background: #000;
   }
 
   .shell {
@@ -51,23 +43,21 @@
     height: 100%;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    border-left: 1px solid rgba(255,255,255,.07);
-    border-right: 1px solid rgba(255,255,255,.07);
+    border-left: 1px solid var(--border);
+    border-right: 1px solid var(--border);
   }
 
-  /* ─── TOPBAR ──────────────────────────────── */
+  /* ── TOPBAR ──────────────────────────────────────── */
   .topbar {
     flex: 0 0 auto;
     display: grid;
     grid-template-columns: 1fr auto 1fr;
     align-items: center;
-    padding: calc(12px + var(--safe-top)) 16px 12px;
-    border-bottom: 1px solid rgba(255,255,255,.08);
-    background: rgba(0,0,0,.95);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    z-index: 10;
+    padding: calc(14px + var(--safe-top)) 20px 14px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(0,0,0,.9);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
   }
 
   .back-btn {
@@ -75,90 +65,96 @@
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    padding: 10px 14px;
+    padding: 10px 16px;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.14);
+    border: 1px solid var(--border);
     background: rgba(255,255,255,.05);
     color: #fff;
     text-decoration: none;
     font-size: 13px;
-    transition: background .18s;
-    cursor: pointer;
+    transition: background .15s;
   }
-
-  .back-btn:hover { background: rgba(255,255,255,.1); }
-  .back-btn .material-symbols-rounded { font-size: 18px; }
+  .back-btn:hover { background: rgba(255,255,255,.09); }
+  .back-btn .material-symbols-rounded { font-size: 17px; }
 
   .brand {
     justify-self: center;
-    font-size: 1.5rem;
-    letter-spacing: -.06em;
+    font-size: 1.6rem;
+    letter-spacing: -.07em;
     user-select: none;
   }
 
   .type-badge {
     justify-self: end;
-    padding: 8px 12px;
+    padding: 8px 13px;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(255,255,255,.05);
+    border: 1px solid var(--border);
+    background: rgba(255,255,255,.04);
     color: var(--muted-2);
-    font-size: 11px;
-    letter-spacing: .14em;
+    font-size: 10px;
+    letter-spacing: .18em;
     text-transform: uppercase;
   }
 
-  /* ─── SCROLLABLE CONTENT ─────────────────── */
-  .content {
+  /* ── SCROLLABLE BODY ─────────────────────────────── */
+  .body {
     flex: 1;
     min-height: 0;
     overflow-y: auto;
     overflow-x: hidden;
-    padding: 20px 16px calc(24px + var(--safe-bottom));
     -webkit-overflow-scrolling: touch;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
   }
 
-  /* ─── SECTION LABEL ──────────────────────── */
-  .section-label {
-    font-size: 11px;
-    letter-spacing: .16em;
-    text-transform: uppercase;
+  /* ── INNER WRAPPER — generous padding ────────────── */
+  .inner {
+    padding: 36px 28px calc(40px + var(--safe-bottom));
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+  }
+
+  /* ── SECTION ─────────────────────────────────────── */
+  .section {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+    letter-spacing: -.03em;
+  }
+
+  .section-sub {
+    font-size: 12px;
     color: var(--muted-2);
-    padding: 0 2px;
+    letter-spacing: .01em;
   }
 
-  /* ─── SQUIRCLE CARD ──────────────────────── */
-  .card {
-    border-radius: var(--squircle);
-    border: 1px solid rgba(255,255,255,.10);
-    background: rgba(255,255,255,.04);
-    box-shadow: 0 8px 32px rgba(0,0,0,.6), 0 0 0 1px rgba(255,255,255,.03);
-    overflow: hidden;
+  .divider {
+    border: 0;
+    border-top: 1px solid var(--border);
   }
 
-  .card-body {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-  }
-
-  /* ─── DROPZONE ────────────────────────────── */
+  /* ── DROPZONE ────────────────────────────────────── */
   .dropzone {
     position: relative;
-    min-height: 168px;
-    border-radius: 18px;
-    border: 1.5px dashed rgba(255,255,255,.2);
-    background: rgba(255,255,255,.03);
+    min-height: 200px;
+    border-radius: 22px;
+    border: 1.5px dashed rgba(255,255,255,.18);
+    background: rgba(255,255,255,.02);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    padding: 20px;
+    gap: 14px;
+    padding: 32px 24px;
     cursor: pointer;
     transition: border-color .2s, background .2s;
     overflow: hidden;
@@ -166,32 +162,29 @@
 
   .dropzone:hover,
   .dropzone.dragover {
-    border-color: rgba(255,255,255,.4);
-    background: rgba(255,255,255,.06);
+    border-color: rgba(255,255,255,.38);
+    background: rgba(255,255,255,.045);
   }
 
   .dz-icon {
-    width: 52px;
-    height: 52px;
-    border-radius: 16px;
-    background: rgba(255,255,255,.07);
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: rgba(255,255,255,.06);
     border: 1px solid rgba(255,255,255,.10);
     display: flex;
     align-items: center;
     justify-content: center;
   }
+  .dz-icon .material-symbols-rounded { font-size: 28px; }
 
-  .dz-icon .material-symbols-rounded { font-size: 26px; }
-
-  .dz-title {
-    font-size: .95rem;
-    text-align: center;
-  }
+  .dz-title { font-size: 1rem; }
 
   .dz-sub {
-    font-size: .78rem;
+    font-size: .8rem;
     color: var(--muted-2);
     text-align: center;
+    line-height: 1.5;
   }
 
   .file-input {
@@ -201,12 +194,12 @@
     cursor: pointer;
   }
 
-  /* ─── PREVIEW ─────────────────────────────── */
+  /* ── PREVIEW ─────────────────────────────────────── */
   .preview {
     display: none;
-    border-radius: 18px;
+    border-radius: 22px;
     overflow: hidden;
-    border: 1px solid rgba(255,255,255,.10);
+    border: 1px solid var(--border);
     position: relative;
   }
 
@@ -216,202 +209,49 @@
   .preview video {
     display: block;
     width: 100%;
-    max-height: 340px;
+    max-height: 380px;
     object-fit: cover;
-    background: #111;
+    background: #0d0d0d;
   }
 
   .preview-remove {
     position: absolute;
-    top: 10px;
-    right: 10px;
-    width: 34px;
-    height: 34px;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
     border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.18);
-    background: rgba(0,0,0,.72);
-    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,.2);
+    background: rgba(0,0,0,.65);
+    backdrop-filter: blur(12px);
     color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     z-index: 2;
+    transition: background .15s;
   }
-
+  .preview-remove:hover { background: rgba(0,0,0,.85); }
   .preview-remove .material-symbols-rounded { font-size: 18px; }
 
-  /* ─── FIELD ──────────────────────────────── */
-  .field {
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .field-label {
-    font-size: 11px;
-    letter-spacing: .14em;
-    text-transform: uppercase;
-    color: var(--muted-2);
-  }
-
-  .input,
-  .textarea {
-    width: 100%;
-    background: #0d0d0d;
-    border: 1px solid rgba(255,255,255,.13);
-    border-radius: 16px;
-    color: #fff;
-    outline: none;
-    padding: 13px 15px;
-    font-size: 14px;
-    transition: border-color .18s;
-  }
-
-  .input:focus,
-  .textarea:focus {
-    border-color: rgba(255,255,255,.35);
-  }
-
-  .input::placeholder,
-  .textarea::placeholder { color: rgba(255,255,255,.3); }
-
-  .textarea {
-    min-height: 100px;
-    resize: vertical;
-    line-height: 1.5;
-  }
-
-  /* ─── SEARCH + SUGGESTIONS ──────────────── */
-  .search-wrap { position: relative; }
-
-  .suggestions {
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: calc(100% + 6px);
-    z-index: 30;
-    background: #0b0b0b;
-    border: 1px solid rgba(255,255,255,.13);
-    border-radius: 18px;
-    overflow: hidden;
-    display: none;
-    box-shadow: 0 20px 60px rgba(0,0,0,.6);
-    max-height: 260px;
-    overflow-y: auto;
-  }
-
-  .suggestion {
-    display: flex;
-    align-items: center;
-    gap: 11px;
-    padding: 11px 14px;
-    cursor: pointer;
-    border-bottom: 1px solid rgba(255,255,255,.05);
-    transition: background .14s;
-  }
-
-  .suggestion:last-child { border-bottom: 0; }
-  .suggestion:hover { background: rgba(255,255,255,.05); }
-
-  .sug-thumb {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: #111;
-    border: 1px solid rgba(255,255,255,.08);
-    flex: 0 0 auto;
-  }
-
-  .sug-meta { min-width: 0; flex: 1; }
-
-  .sug-title {
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .sug-sub {
-    margin-top: 2px;
-    font-size: 11px;
-    color: var(--muted-2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* ─── MUSIC SELECTED PILL ────────────────── */
-  .music-pill {
-    display: none;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
-    border-radius: 16px;
-    background: rgba(255,255,255,.05);
-    border: 1px solid rgba(255,255,255,.10);
-  }
-
-  .music-pill.show { display: flex; }
-
-  .music-pill-cover {
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    object-fit: cover;
-    background: #111;
-    border: 1px solid rgba(255,255,255,.08);
-    flex: 0 0 auto;
-  }
-
-  .music-pill-info { min-width: 0; flex: 1; }
-
-  .music-pill-title {
-    font-size: 13px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .music-pill-artist {
-    margin-top: 2px;
-    font-size: 11px;
-    color: var(--muted-2);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .music-pill-clear {
-    width: 30px;
-    height: 30px;
-    border-radius: 999px;
-    border: 1px solid rgba(255,255,255,.12);
-    background: rgba(255,255,255,.05);
-    color: var(--muted-2);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    flex: 0 0 auto;
-  }
-
-  .music-pill-clear .material-symbols-rounded { font-size: 15px; }
-
-  /* ─── PROGRESS BAR (upload) ──────────────── */
+  /* ── PROGRESS ────────────────────────────────────── */
   .progress-wrap {
     display: none;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
   }
-
   .progress-wrap.show { display: flex; }
 
+  .progress-label {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
   .progress-track {
-    height: 4px;
+    height: 3px;
     border-radius: 999px;
-    background: rgba(255,255,255,.10);
+    background: rgba(255,255,255,.08);
     overflow: hidden;
   }
 
@@ -420,30 +260,178 @@
     border-radius: 999px;
     background: #fff;
     width: 0%;
-    transition: width .3s ease;
+    transition: width .35s ease;
   }
 
-  .progress-label {
+  /* ── FIELD ───────────────────────────────────────── */
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .field-label {
+    font-size: 11px;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+  }
+
+  .input,
+  .textarea {
+    width: 100%;
+    background: #080808;
+    border: 1px solid rgba(255,255,255,.11);
+    border-radius: 14px;
+    color: #fff;
+    outline: none;
+    padding: 15px 17px;
+    font-size: 15px;
+    transition: border-color .18s;
+    line-height: 1.4;
+  }
+
+  .input:focus,
+  .textarea:focus { border-color: rgba(255,255,255,.30); }
+
+  .input::placeholder,
+  .textarea::placeholder { color: rgba(255,255,255,.26); }
+
+  .textarea {
+    min-height: 116px;
+    resize: vertical;
+    line-height: 1.55;
+  }
+
+  /* ── SEARCH + SUGGESTIONS ────────────────────────── */
+  .search-wrap { position: relative; }
+
+  .suggestions {
+    position: absolute;
+    left: 0; right: 0;
+    top: calc(100% + 8px);
+    z-index: 30;
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 18px;
+    overflow: hidden;
+    display: none;
+    box-shadow: 0 24px 64px rgba(0,0,0,.7);
+    max-height: 270px;
+    overflow-y: auto;
+  }
+
+  .suggestion {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid rgba(255,255,255,.05);
+    transition: background .14s;
+  }
+  .suggestion:last-child { border-bottom: 0; }
+  .suggestion:hover { background: rgba(255,255,255,.04); }
+
+  .sug-thumb {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    object-fit: cover;
+    background: #111;
+    border: 1px solid rgba(255,255,255,.07);
+    flex: 0 0 auto;
+  }
+
+  .sug-meta { min-width: 0; flex: 1; }
+
+  .sug-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sug-sub {
+    margin-top: 3px;
+    font-size: 11px;
+    color: var(--muted-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* ── MUSIC PILL ──────────────────────────────────── */
+  .music-pill {
+    display: none;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    background: rgba(255,255,255,.04);
+    border: 1px solid rgba(255,255,255,.09);
+  }
+  .music-pill.show { display: flex; }
+
+  .music-pill-cover {
+    width: 46px;
+    height: 46px;
+    border-radius: 11px;
+    object-fit: cover;
+    background: #111;
+    border: 1px solid rgba(255,255,255,.07);
+    flex: 0 0 auto;
+  }
+
+  .music-pill-info { min-width: 0; flex: 1; }
+
+  .music-pill-title {
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .music-pill-artist {
+    margin-top: 3px;
     font-size: 12px;
-    color: var(--muted);
+    color: var(--muted-2);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
-  /* ─── STATUS ─────────────────────────────── */
+  .music-pill-clear {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,.10);
+    background: transparent;
+    color: var(--muted-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: 0 0 auto;
+    transition: background .15s, color .15s;
+  }
+  .music-pill-clear:hover { background: rgba(255,255,255,.06); color: #fff; }
+  .music-pill-clear .material-symbols-rounded { font-size: 16px; }
+
+  /* ── STATUS ──────────────────────────────────────── */
   .status {
-    font-size: 12px;
-    min-height: 18px;
+    font-size: 13px;
     color: var(--muted);
-    padding: 0 2px;
+    min-height: 20px;
   }
-
   .status.error { color: #ff8a85; }
   .status.ok    { color: #5edb78; }
 
-  /* ─── ACTIONS ROW ────────────────────────── */
+  /* ── ACTIONS ─────────────────────────────────────── */
   .actions {
     display: flex;
     gap: 10px;
-    flex-wrap: wrap;
+    align-items: center;
   }
 
   .btn {
@@ -451,88 +439,63 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-    padding: 14px 18px;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,.14);
-    background: rgba(255,255,255,.06);
+    gap: 9px;
+    padding: 15px 22px;
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,.13);
+    background: rgba(255,255,255,.05);
     color: #fff;
     font-family: inherit;
-    font-size: 14px;
+    font-size: 15px;
     cursor: pointer;
-    flex: 1 1 150px;
-    transition: background .18s, transform .14s, box-shadow .18s;
+    transition: background .17s, transform .13s;
+    white-space: nowrap;
   }
-
-  .btn:hover { background: rgba(255,255,255,.12); }
+  .btn:hover  { background: rgba(255,255,255,.10); }
   .btn:active { transform: scale(.97); }
-
   .btn .material-symbols-rounded { font-size: 20px; }
 
   .btn.primary {
+    flex: 1;
     background: #fff;
     color: #000;
     border-color: #fff;
-    box-shadow: 0 4px 20px rgba(255,255,255,.12);
+    box-shadow: 0 4px 24px rgba(255,255,255,.10);
   }
-
-  .btn.primary:hover { background: rgba(255,255,255,.9); }
-
+  .btn.primary:hover { background: rgba(255,255,255,.88); }
   .btn.primary:disabled {
-    background: rgba(255,255,255,.18);
-    color: rgba(0,0,0,.4);
+    background: rgba(255,255,255,.14);
+    color: rgba(0,0,0,.35);
     box-shadow: none;
     cursor: not-allowed;
   }
 
-  .btn.ghost {
+  .btn.icon-only {
+    padding: 15px;
     flex: 0 0 auto;
-    padding: 14px;
   }
 
   .btn.danger {
-    background: rgba(255,59,48,.1);
+    background: rgba(255,59,48,.08);
     color: #ff8a85;
-    border-color: rgba(255,59,48,.24);
+    border-color: rgba(255,59,48,.20);
     flex: 0 0 auto;
+    padding: 15px;
   }
+  .btn.danger:hover { background: rgba(255,59,48,.15); }
 
-  .btn.danger:hover { background: rgba(255,59,48,.18); }
-
-  /* ─── FOOTNOTE ───────────────────────────── */
+  /* ── FOOTNOTE ────────────────────────────────────── */
   .footnote {
-    font-size: 11px;
+    font-size: 12px;
     color: var(--muted-2);
-    line-height: 1.55;
-    padding: 0 2px;
+    line-height: 1.6;
   }
 
-  /* ─── DIVIDER ────────────────────────────── */
-  .divider {
-    height: 1px;
-    background: rgba(255,255,255,.06);
-    border: 0;
-  }
-
-  /* ─── PAGE FADE-IN ───────────────────────── */
-  .card {
-    animation: fadeUp .32s cubic-bezier(.4,0,.2,1) both;
-  }
-
-  .card:nth-child(2) { animation-delay: .06s; }
-  .card:nth-child(3) { animation-delay: .12s; }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ─── MOBILE ──────────────────────────────── */
-  @media (max-width: 600px) {
+  /* ── MOBILE ──────────────────────────────────────── */
+  @media (max-width: 560px) {
     .shell { border: 0; }
-    .brand { font-size: 1.2rem; }
-    .btn { flex: 1 1 100%; }
-    .btn.ghost, .btn.danger { flex: 0 0 auto; }
+    .inner { padding: 28px 20px calc(32px + var(--safe-bottom)); gap: 32px; }
+    .brand { font-size: 1.35rem; }
   }
 </style>
 </head>
@@ -540,7 +503,6 @@
 <div class="page">
   <div class="shell">
 
-    <!-- TOPBAR -->
     <header class="topbar">
       <a class="back-btn" href="javascript:history.back()" aria-label="Go back">
         <span class="material-symbols-rounded">arrow_back</span>
@@ -550,20 +512,22 @@
       <div id="typeChipEl" class="type-badge">post</div>
     </header>
 
-    <!-- CONTENT -->
-    <main class="content" id="content">
+    <div class="body">
+      <div class="inner">
 
-      <!-- MEDIA CARD -->
-      <div class="card">
-        <div class="card-body">
-          <div class="section-label">Media</div>
+        <!-- ── MEDIA ───────────────────────────────── -->
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">Media</div>
+            <div class="section-sub">image or video</div>
+          </div>
 
           <div id="dropzone" class="dropzone" role="button" tabindex="0" aria-label="Choose a file">
             <div class="dz-icon">
-              <span class="material-symbols-rounded" id="dzIcon">image</span>
+              <span class="material-symbols-rounded">image</span>
             </div>
-            <div class="dz-title" id="dzTitle">Choose an image or video</div>
-            <div class="dz-sub">Drag & drop or tap to browse</div>
+            <div class="dz-title">Choose a file</div>
+            <div class="dz-sub">Drag & drop here, or tap to browse</div>
             <input id="fileInput" class="file-input" type="file" accept="image/*,video/*" aria-label="File input" />
           </div>
 
@@ -573,49 +537,49 @@
             </button>
           </div>
 
-          <!-- Upload progress (shown only while uploading) -->
           <div id="progressWrap" class="progress-wrap">
             <div class="progress-label" id="progressLabel">Uploading…</div>
             <div class="progress-track">
               <div class="progress-fill" id="progressFill"></div>
             </div>
           </div>
-        </div>
-      </div>
+        </section>
 
-      <!-- DETAILS CARD -->
-      <div class="card">
-        <div class="card-body">
-          <div class="section-label">Details</div>
+        <hr class="divider" />
 
-          <!-- Caption -->
-          <div class="field">
-            <div class="field-label">Caption</div>
-            <textarea id="captionInput" class="textarea" placeholder="Write a caption…"></textarea>
+        <!-- ── DETAILS ─────────────────────────────── -->
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">Details</div>
           </div>
 
-          <!-- Tags -->
+          <div class="field">
+            <div class="field-label">Caption</div>
+            <textarea id="captionInput" class="textarea" placeholder="Write something about this post…"></textarea>
+          </div>
+
           <div class="field">
             <div class="field-label">Tags</div>
             <input id="tagsInput" class="input" type="text" placeholder="music, art, night" autocomplete="off" />
           </div>
 
-          <!-- Location -->
           <div class="field search-wrap">
             <div class="field-label">Location</div>
             <input id="locationSearch" class="input" type="text" placeholder="Search a place" autocomplete="off" />
             <div id="locationSuggestions" class="suggestions"></div>
           </div>
           <input id="locationInput" type="hidden" />
-        </div>
-      </div>
+        </section>
 
-      <!-- MUSIC CARD -->
-      <div class="card">
-        <div class="card-body">
-          <div class="section-label">Music</div>
+        <hr class="divider" />
 
-          <!-- Selected music pill -->
+        <!-- ── MUSIC ───────────────────────────────── -->
+        <section class="section">
+          <div class="section-head">
+            <div class="section-title">Music</div>
+            <div class="section-sub">via Deezer</div>
+          </div>
+
           <div id="musicPill" class="music-pill">
             <img id="musicPillCover" class="music-pill-cover" src="" alt="" />
             <div class="music-pill-info">
@@ -629,7 +593,7 @@
 
           <div class="field search-wrap">
             <div class="field-label">Search track</div>
-            <input id="musicSearch" class="input" type="text" placeholder="Search on Deezer…" autocomplete="off" />
+            <input id="musicSearch" class="input" type="text" placeholder="Artist, song title…" autocomplete="off" />
             <div id="musicSuggestions" class="suggestions"></div>
           </div>
 
@@ -637,12 +601,12 @@
           <input id="musicArtist" type="hidden" />
           <input id="musicPreviewInput" type="hidden" />
           <input id="musicCoverInput" type="hidden" />
-        </div>
-      </div>
+        </section>
 
-      <!-- ACTIONS CARD -->
-      <div class="card">
-        <div class="card-body">
+        <hr class="divider" />
+
+        <!-- ── PUBLISH ─────────────────────────────── -->
+        <section class="section">
           <div id="status" class="status">Ready to publish.</div>
 
           <div class="actions">
@@ -650,38 +614,35 @@
               <span class="material-symbols-rounded">cloud_upload</span>
               <span>Publish</span>
             </button>
-            <button id="clearBtn" class="btn ghost" type="button" aria-label="Clear form">
+            <button id="clearBtn" class="btn icon-only" type="button" aria-label="Clear form">
               <span class="material-symbols-rounded">restart_alt</span>
             </button>
-            <button id="cancelBtn" class="btn danger" type="button">
+            <button id="cancelBtn" class="btn danger" type="button" aria-label="Cancel">
               <span class="material-symbols-rounded">close</span>
             </button>
           </div>
 
           <div class="footnote">
-            Posts are visible to everyone. Share carefully and avoid publishing anything private or sensitive.
+            Posts are visible to everyone. Avoid sharing private or sensitive content.
           </div>
-        </div>
-      </div>
+        </section>
 
-    </main>
+      </div>
+    </div>
   </div>
 </div>
 
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-const SUPABASE_URL     = "https://cnhaonawapuahzoctqav.supabase.co";
-const SUPABASE_ANON_KEY= "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const BUCKET_SHARED = "shared";
+const SUPABASE_URL      = "https://cnhaonawapuahzoctqav.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
+const supabase     = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const BUCKET       = "shared";
 
-// ─── ELEMENT REFS ─────────────────────────────────────
 const els = {
   typeChip:          document.getElementById("typeChipEl"),
   dropzone:          document.getElementById("dropzone"),
-  dzIcon:            document.getElementById("dzIcon"),
-  dzTitle:           document.getElementById("dzTitle"),
   fileInput:         document.getElementById("fileInput"),
   preview:           document.getElementById("preview"),
   previewRemove:     document.getElementById("previewRemove"),
@@ -710,157 +671,139 @@ const els = {
   cancelBtn:         document.getElementById("cancelBtn"),
 };
 
-// ─── STATE ────────────────────────────────────────────
 let selectedFile  = null;
 let currentUser   = null;
-let musicDebounce = null;
-let locDebounce   = null;
+let musicTimer    = null;
+let locTimer      = null;
 let jsonpId       = 0;
 
-// ─── INIT ─────────────────────────────────────────────
-const params = new URLSearchParams(location.search);
-const uploadType = params.get("type") || "post";
-els.typeChip.textContent = uploadType;
+// ── INIT ────────────────────────────────────────────────
+const params     = new URLSearchParams(location.search);
+els.typeChip.textContent = params.get("type") || "post";
 
 const { data: authData } = await supabase.auth.getUser();
 currentUser = authData?.user || null;
 if (!currentUser) setStatus("You must be signed in to upload.", "error");
 
-// ─── STATUS ───────────────────────────────────────────
+// ── STATUS ──────────────────────────────────────────────
 function setStatus(msg, type = "") {
   els.status.textContent = msg || "";
   els.status.className   = `status${type ? " " + type : ""}`;
 }
 
-// ─── PROGRESS ─────────────────────────────────────────
+// ── PROGRESS ────────────────────────────────────────────
 function showProgress(pct, label = "Uploading…") {
   els.progressWrap.classList.add("show");
   els.progressFill.style.width = `${pct}%`;
   els.progressLabel.textContent = label;
 }
-
 function hideProgress() {
   els.progressWrap.classList.remove("show");
   els.progressFill.style.width = "0%";
 }
 
-// ─── PREVIEW ──────────────────────────────────────────
+// ── PREVIEW ─────────────────────────────────────────────
 function renderPreview(file) {
-  // Clear old media nodes (keep the remove button)
-  [...els.preview.children].forEach((c) => { if (c !== els.previewRemove) c.remove(); });
-
+  [...els.preview.children].forEach(c => { if (c !== els.previewRemove) c.remove(); });
   if (!file) { els.preview.classList.remove("show"); return; }
-
   const url    = URL.createObjectURL(file);
-  const isVideo= file.type.startsWith("video/");
-  const node   = document.createElement(isVideo ? "video" : "img");
+  const isVid  = file.type.startsWith("video/");
+  const node   = document.createElement(isVid ? "video" : "img");
   node.src     = url;
-  if (isVideo) { node.controls = true; node.muted = true; node.playsInline = true; node.loop = true; }
+  if (isVid) { node.controls = true; node.muted = true; node.playsInline = true; node.loop = true; }
   els.preview.insertBefore(node, els.previewRemove);
   els.preview.classList.add("show");
 }
-
 function clearPreview() {
   selectedFile = null;
   els.fileInput.value = "";
-  [...els.preview.children].forEach((c) => { if (c !== els.previewRemove) c.remove(); });
+  [...els.preview.children].forEach(c => { if (c !== els.previewRemove) c.remove(); });
   els.preview.classList.remove("show");
 }
-
 els.previewRemove.addEventListener("click", clearPreview);
 
-// ─── FILE INPUT ───────────────────────────────────────
-els.fileInput.addEventListener("change", (e) => {
-  const file = e.target.files?.[0] || null;
+// ── FILE INPUT ───────────────────────────────────────────
+function handleFile(file) {
   if (!file) return;
   selectedFile = file;
   renderPreview(file);
   setStatus(file.name);
-});
-
-els.dropzone.addEventListener("click", () => els.fileInput.click());
-els.dropzone.addEventListener("keydown", (e) => {
-  if (e.key === "Enter" || e.key === " ") { e.preventDefault(); els.fileInput.click(); }
-});
-
-els.dropzone.addEventListener("dragover",  (e) => { e.preventDefault(); els.dropzone.classList.add("dragover"); });
-els.dropzone.addEventListener("dragleave", ()  => els.dropzone.classList.remove("dragover"));
-els.dropzone.addEventListener("drop", (e) => {
+}
+els.fileInput.addEventListener("change", e => handleFile(e.target.files?.[0]));
+els.dropzone.addEventListener("click",   () => els.fileInput.click());
+els.dropzone.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); els.fileInput.click(); }});
+els.dropzone.addEventListener("dragover",  e => { e.preventDefault(); els.dropzone.classList.add("dragover"); });
+els.dropzone.addEventListener("dragleave", () => els.dropzone.classList.remove("dragover"));
+els.dropzone.addEventListener("drop", e => {
   e.preventDefault();
   els.dropzone.classList.remove("dragover");
-  const file = e.dataTransfer.files?.[0] || null;
-  if (!file) return;
-  selectedFile = file;
-  renderPreview(file);
-  setStatus(file.name);
+  handleFile(e.dataTransfer.files?.[0]);
 });
 
-// ─── SUGGESTIONS HELPERS ──────────────────────────────
-function openSuggestions(box, items, renderItem) {
+// ── SUGGESTIONS ─────────────────────────────────────────
+function showSugg(box, items, renderFn) {
   if (!items.length) { box.innerHTML = ""; box.style.display = "none"; return; }
-  box.innerHTML = items.map(renderItem).join("");
+  box.innerHTML = items.map(renderFn).join("");
   box.style.display = "block";
 }
-
 function hideSugg(box) { box.style.display = "none"; box.innerHTML = ""; }
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", e => {
   if (!e.target.closest(".search-wrap")) {
     hideSugg(els.musicSuggestions);
     hideSugg(els.locationSuggestions);
   }
 });
 
-// ─── MUSIC SEARCH (Deezer JSONP) ──────────────────────
-function jsonp(url) {
-  return new Promise((resolve, reject) => {
-    const cb = `__jsonp_${++jsonpId}`;
-    const s  = document.createElement("script");
-    const cleanup = () => { delete window[cb]; s.remove(); };
-    window[cb] = (d) => { cleanup(); resolve(d); };
-    s.onerror  = () => { cleanup(); reject(new Error("JSONP error")); };
-    s.src = `${url}${url.includes("?") ? "&" : "?"}output=jsonp&callback=${cb}`;
-    document.head.appendChild(s);
-  });
-}
-
-async function searchDeezer(q) {
-  try {
-    const d = await jsonp(`https://api.deezer.com/search?q=${encodeURIComponent(q)}`);
-    return Array.isArray(d?.data) ? d.data.slice(0, 6) : [];
-  } catch { return []; }
-}
-
-function escHtml(str) {
+// ── UTILS ────────────────────────────────────────────────
+function esc(str) {
   return String(str ?? "")
     .replaceAll("&","&amp;").replaceAll("<","&lt;")
     .replaceAll(">","&gt;").replaceAll('"',"&quot;");
 }
 
-els.musicSearch.addEventListener("input", () => {
-  const q = els.musicSearch.value.trim();
-  clearTimeout(musicDebounce);
-  if (q.length < 2) { hideSugg(els.musicSuggestions); return; }
-  musicDebounce = setTimeout(async () => {
-    const tracks = await searchDeezer(q);
-    const items  = tracks.map((t) => ({
+// ── DEEZER ──────────────────────────────────────────────
+function jsonp(url) {
+  return new Promise((resolve, reject) => {
+    const cb = `__jsonp_${++jsonpId}`;
+    const s  = document.createElement("script");
+    const cleanup = () => { delete window[cb]; s.remove(); };
+    window[cb] = d => { cleanup(); resolve(d); };
+    s.onerror  = () => { cleanup(); reject(new Error("JSONP failed")); };
+    s.src = `${url}&output=jsonp&callback=${cb}`;
+    document.head.appendChild(s);
+  });
+}
+async function deezerSearch(q) {
+  try {
+    const d = await jsonp(`https://api.deezer.com/search?q=${encodeURIComponent(q)}`);
+    return (d?.data || []).slice(0, 6).map(t => ({
       id:      String(t.id),
-      title:   t.title  || "",
+      title:   t.title || "",
       artist:  t.artist?.name || "",
       cover:   t.album?.cover_xl || t.album?.cover_big || t.album?.cover_medium || "",
       preview: t.preview || ""
     }));
-    openSuggestions(els.musicSuggestions, items, (item) => `
-      <div class="suggestion" data-mid="${escHtml(item.id)}">
-        <img class="sug-thumb" src="${escHtml(item.cover)}" alt="">
+  } catch { return []; }
+}
+
+els.musicSearch.addEventListener("input", () => {
+  const q = els.musicSearch.value.trim();
+  clearTimeout(musicTimer);
+  if (q.length < 2) { hideSugg(els.musicSuggestions); return; }
+  musicTimer = setTimeout(async () => {
+    const items = await deezerSearch(q);
+    showSugg(els.musicSuggestions, items, item => `
+      <div class="suggestion" data-mid="${esc(item.id)}">
+        <img class="sug-thumb" src="${esc(item.cover)}" alt="">
         <div class="sug-meta">
-          <div class="sug-title">${escHtml(item.title)}</div>
-          <div class="sug-sub">${escHtml(item.artist)}</div>
+          <div class="sug-title">${esc(item.title)}</div>
+          <div class="sug-sub">${esc(item.artist)}</div>
         </div>
       </div>
     `);
-    els.musicSuggestions.querySelectorAll("[data-mid]").forEach((el) => {
-      const item = items.find((r) => r.id === el.dataset.mid);
+    els.musicSuggestions.querySelectorAll("[data-mid]").forEach(el => {
+      const item = items.find(r => r.id === el.dataset.mid);
       el.addEventListener("click", () => pickMusic(item));
     });
   }, 240);
@@ -868,131 +811,113 @@ els.musicSearch.addEventListener("input", () => {
 
 function pickMusic(track) {
   if (!track) return;
-  els.musicTitle.value        = track.title   || "";
-  els.musicArtist.value       = track.artist  || "";
-  els.musicPreviewInput.value = track.preview || "";
-  els.musicCoverInput.value   = track.cover   || "";
-  // Show pill
-  els.musicPillCover.src      = track.cover   || "";
-  els.musicPillTitle.textContent  = track.title  || "";
-  els.musicPillArtist.textContent = track.artist || "";
+  els.musicTitle.value        = track.title;
+  els.musicArtist.value       = track.artist;
+  els.musicPreviewInput.value = track.preview;
+  els.musicCoverInput.value   = track.cover;
+  els.musicPillCover.src      = track.cover;
+  els.musicPillTitle.textContent  = track.title;
+  els.musicPillArtist.textContent = track.artist;
   els.musicPill.classList.add("show");
   els.musicSearch.value = "";
   hideSugg(els.musicSuggestions);
 }
-
 function clearMusic() {
   els.musicTitle.value = els.musicArtist.value = els.musicPreviewInput.value = els.musicCoverInput.value = "";
   els.musicSearch.value = "";
   els.musicPill.classList.remove("show");
-  hideSugg(els.musicSuggestions);
 }
-
 els.musicPillClear.addEventListener("click", clearMusic);
 
-// ─── LOCATION SEARCH (Nominatim) ──────────────────────
-async function searchNominatim(q) {
+// ── NOMINATIM ────────────────────────────────────────────
+async function nominatim(q) {
   try {
-    const res = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`, {
-      headers: { "Accept-Language": "it" }
-    });
-    const data = await res.json();
-    return Array.isArray(data) ? data.slice(0, 6) : [];
+    const r = await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(q)}`, { headers: { "Accept-Language": "it" }});
+    return (await r.json()).slice(0, 6);
   } catch { return []; }
 }
 
 els.locationSearch.addEventListener("input", () => {
   const q = els.locationSearch.value.trim();
-  clearTimeout(locDebounce);
+  clearTimeout(locTimer);
   if (q.length < 2) { hideSugg(els.locationSuggestions); return; }
-  locDebounce = setTimeout(async () => {
-    const results = await searchNominatim(q);
-    openSuggestions(els.locationSuggestions, results, (item) => `
-      <div class="suggestion" data-locname="${escHtml(item.display_name || '')}">
+  locTimer = setTimeout(async () => {
+    const results = await nominatim(q);
+    showSugg(els.locationSuggestions, results, item => `
+      <div class="suggestion" data-dn="${esc(item.display_name || '')}">
         <div class="sug-meta">
-          <div class="sug-title">${escHtml(item.name || item.display_name || '')}</div>
-          <div class="sug-sub">${escHtml(item.display_name || '')}</div>
+          <div class="sug-title">${esc(item.name || item.display_name || '')}</div>
+          <div class="sug-sub">${esc(item.display_name || '')}</div>
         </div>
       </div>
     `);
-    els.locationSuggestions.querySelectorAll("[data-locname]").forEach((el) => {
-      const item = results.find((r) => (r.display_name || "") === el.dataset.locname);
+    els.locationSuggestions.querySelectorAll("[data-dn]").forEach(el => {
+      const item = results.find(r => r.display_name === el.dataset.dn);
       el.addEventListener("click", () => {
-        const label = item?.display_name || "";
-        els.locationInput.value  = label;
-        els.locationSearch.value = label;
+        els.locationInput.value  = item?.display_name || "";
+        els.locationSearch.value = item?.display_name || "";
         hideSugg(els.locationSuggestions);
       });
     });
   }, 240);
 });
 
-// ─── IMAGE PROCESSING ─────────────────────────────────
+// ── IMAGE PROCESSING ─────────────────────────────────────
 async function imageToJpeg(file) {
   const url = URL.createObjectURL(file);
   try {
-    const img = new Image();
-    img.src = url;
-    await img.decode();
+    const img = new Image(); img.src = url; await img.decode();
     const size = Math.min(img.width, img.height);
     const sx   = Math.floor((img.width  - size) / 2);
     const sy   = Math.floor((img.height - size) / 2);
-    const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 800;
-    const ctx = canvas.getContext("2d");
-    ctx.fillStyle = "#000";
-    ctx.fillRect(0, 0, 800, 800);
+    const c    = document.createElement("canvas");
+    c.width = c.height = 800;
+    const ctx = c.getContext("2d");
+    ctx.fillStyle = "#000"; ctx.fillRect(0, 0, 800, 800);
     ctx.drawImage(img, sx, sy, size, size, 0, 0, 800, 800);
-    const blob = await new Promise((res, rej) => {
-      canvas.toBlob((b) => b ? res(b) : rej(new Error("Conversion failed")), "image/jpeg", 0.92);
-    });
+    const blob = await new Promise((res, rej) => c.toBlob(b => b ? res(b) : rej(new Error("Conversion failed")), "image/jpeg", 0.92));
     return { blob, ext: "jpg", type: "image/jpeg" };
   } finally { URL.revokeObjectURL(url); }
 }
-
 async function prepareAsset(file) {
   if (file.type.startsWith("image/")) return imageToJpeg(file);
   return { blob: file, ext: (file.name.split(".").pop() || "bin").toLowerCase(), type: file.type || "application/octet-stream" };
 }
 
-// ─── UPLOAD ───────────────────────────────────────────
+// ── UPLOAD ───────────────────────────────────────────────
 async function uploadAsset(file) {
   showProgress(10, "Processing…");
-  const stamp   = Date.now();
-  const safe    = (file.name || `upload_${stamp}`).replace(/[^a-zA-Z0-9_.-]/g, "_");
-  const asset   = await prepareAsset(file);
-  const base    = safe.replace(/\.[^.]+$/, "");
-  const path    = `${currentUser?.id || "anonymous"}/${stamp}_${base}.${asset.ext}`;
+  const stamp  = Date.now();
+  const safe   = (file.name || `upload_${stamp}`).replace(/[^a-zA-Z0-9_.-]/g, "_");
+  const asset  = await prepareAsset(file);
+  const base   = safe.replace(/\.[^.]+$/, "");
+  const path   = `${currentUser?.id || "anonymous"}/${stamp}_${base}.${asset.ext}`;
 
-  showProgress(30, "Uploading…");
-
+  showProgress(35, "Uploading…");
   const { error } = await supabase.storage
-    .from(BUCKET_SHARED)
+    .from(BUCKET)
     .upload(path, asset.blob, { cacheControl: "3600", upsert: false, contentType: asset.type });
-
   if (error) throw error;
 
-  showProgress(90, "Saving…");
-  const { data } = supabase.storage.from(BUCKET_SHARED).getPublicUrl(path);
+  showProgress(85, "Saving…");
+  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
   return data?.publicUrl || "";
 }
 
-// ─── SUBMIT ───────────────────────────────────────────
+// ── SUBMIT ───────────────────────────────────────────────
 els.submitBtn.addEventListener("click", async () => {
   if (!selectedFile) { setStatus("Choose a media file first.", "error"); return; }
   if (!currentUser)  { setStatus("You must be signed in.", "error"); return; }
 
   els.submitBtn.disabled = true;
   setStatus("Publishing…");
-
   try {
     const mediaUrl = await uploadAsset(selectedFile);
-
     const { error } = await supabase.from("posts").insert({
       user_id:      currentUser.id,
       image_url:    mediaUrl,
       caption:      els.captionInput.value.trim() || null,
-      tags:         els.tagsInput.value.split(",").map((t) => t.trim()).filter(Boolean),
+      tags:         els.tagsInput.value.split(",").map(t => t.trim()).filter(Boolean),
       location:     els.locationInput.value.trim() || null,
       song_title:   els.musicTitle.value.trim()        || null,
       song_author:  els.musicArtist.value.trim()       || null,
@@ -1000,9 +925,7 @@ els.submitBtn.addEventListener("click", async () => {
       song_cover:   els.musicCoverInput.value.trim()   || null,
       created_at:   new Date().toISOString()
     });
-
     if (error) throw error;
-
     showProgress(100, "Done!");
     setStatus("Post published!", "ok");
     setTimeout(() => { window.location.href = "index.html"; }, 800);
@@ -1014,10 +937,9 @@ els.submitBtn.addEventListener("click", async () => {
   }
 });
 
-// ─── CLEAR ────────────────────────────────────────────
+// ── CLEAR ────────────────────────────────────────────────
 els.clearBtn.addEventListener("click", () => {
-  clearPreview();
-  clearMusic();
+  clearPreview(); clearMusic();
   els.captionInput.value = "";
   els.tagsInput.value    = "";
   els.locationSearch.value = "";
@@ -1027,7 +949,7 @@ els.clearBtn.addEventListener("click", () => {
   setStatus("Ready to publish.");
 });
 
-// ─── CANCEL ───────────────────────────────────────────
+// ── CANCEL ───────────────────────────────────────────────
 els.cancelBtn.addEventListener("click", () => { window.location.href = "index.html"; });
 </script>
 </body>
