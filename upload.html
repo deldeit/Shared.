@@ -11,12 +11,12 @@
 <style>
 :root{
   --bg:#050505;
-  --muted:rgba(255,255,255,.6);
+  --muted:rgba(255,255,255,.5);
   --border:rgba(255,255,255,.1);
+  --border-focus:rgba(255,255,255,.35);
   --max:640px;
 }
 
-/* RESET */
 *{box-sizing:border-box;margin:0;padding:0}
 body{
   font-family:'Archivo Black',sans-serif;
@@ -25,15 +25,15 @@ body{
   overflow:hidden;
 }
 
-/* LAYOUT */
 .page{display:flex;justify-content:center;height:100dvh}
 .shell{width:100%;max-width:var(--max);display:flex;flex-direction:column;border:1px solid var(--border);border-top:0;border-bottom:0}
 
-/* TOP */
+/* TOPBAR */
 .topbar{
   display:flex;justify-content:space-between;align-items:center;
   padding:18px 20px;
   border-bottom:1px solid var(--border);
+  flex-shrink:0;
 }
 .brand{font-size:22px;letter-spacing:-.05em}
 
@@ -42,266 +42,514 @@ body{
   display:flex;
   gap:10px;
   padding:18px;
+  flex-shrink:0;
 }
-
 .type-pill{
-  flex:1;
-  padding:14px 16px;
-  border-radius:999px;
-  border:1px solid var(--border);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  cursor:pointer;
-  transition:.2s;
-  user-select:none;
-  font-size:13px;
-  opacity:.7;
+  flex:1;padding:14px 16px;border-radius:999px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;gap:8px;
+  cursor:pointer;transition:.2s;user-select:none;font-size:13px;
+  font-family:'Archivo Black',sans-serif;opacity:.7;
 }
-
 .type-pill .icon{font-size:18px}
-
-.type-pill.post.active{
-  background:#fff;
-  color:#000;
-  opacity:1;
-}
-
-.type-pill.moment.active{
-  background:#000;
-  color:#fff;
-  border-color:#fff;
-  opacity:1;
-}
+.type-pill.post.active{background:#fff;color:#000;opacity:1;}
+.type-pill.moment.active{background:#000;color:#fff;border-color:#fff;opacity:1;}
 
 /* BODY */
 .body{overflow:auto;flex:1}
-.inner{padding:20px;display:flex;flex-direction:column;gap:22px}
+.inner{padding:20px;display:flex;flex-direction:column;gap:18px}
 
-/* DROP */
+/* ── DROPZONE / PREVIEW ── */
+.media-area{position:relative;width:100%;aspect-ratio:1;border-radius:20px;overflow:hidden;cursor:pointer;}
+
 .dropzone{
+  width:100%;height:100%;
   border:1px dashed var(--border);
   border-radius:20px;
-  padding:28px;
-  text-align:center;
-  cursor:pointer;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:10px;color:var(--muted);font-size:13px;transition:.2s;
 }
+.dropzone:hover{border-color:rgba(255,255,255,.3);color:rgba(255,255,255,.8);}
+.dropzone .upload-icon{font-size:36px;opacity:.5}
 .file-input{display:none}
 
-/* PREVIEW */
-.preview img,.preview video{
-  width:100%;
-  border-radius:16px;
-  margin-top:10px;
+/* canvas preview fills the square */
+#previewCanvas{
+  position:absolute;inset:0;width:100%;height:100%;
+  border-radius:20px;object-fit:cover;display:none;
+}
+.change-btn{
+  position:absolute;bottom:12px;right:12px;
+  background:rgba(0,0,0,.7);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-family:'Archivo Black',sans-serif;font-size:11px;
+  padding:7px 12px;border-radius:999px;cursor:pointer;
+  backdrop-filter:blur(8px);
+  display:none;
 }
 
-/* INPUTS */
+/* ── INPUTS ── */
 input,textarea{
-  width:100%;
-  padding:14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:#0a0a0a;
-  color:#fff;
-  outline:none;
+  width:100%;padding:14px;border-radius:14px;
+  border:1px solid var(--border);background:#0a0a0a;
+  color:#fff;outline:none;font-family:'Archivo Black',sans-serif;
+  font-size:13px;transition:border-color .2s;
 }
+input:focus,textarea:focus{border-color:var(--border-focus);}
+textarea{min-height:90px;resize:none;}
+::placeholder{color:var(--muted);}
 
-textarea{min-height:100px}
+/* ── DROPDOWN WRAPPER ── */
+.field-wrap{position:relative;}
 
-/* BUTTONS */
-.actions{display:flex;gap:10px}
+.dropdown{
+  position:absolute;top:calc(100% + 6px);left:0;right:0;z-index:99;
+  background:#111;border:1px solid var(--border);border-radius:14px;
+  overflow:hidden;display:none;
+}
+.dropdown.open{display:block;}
+
+/* LOCATION ROW */
+.loc-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;cursor:pointer;transition:background .15s;font-size:12px;
+}
+.loc-item:hover{background:rgba(255,255,255,.06);}
+.loc-item .loc-icon{font-size:18px;color:var(--muted);flex-shrink:0;}
+.loc-main{font-size:13px;line-height:1.2;}
+.loc-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+
+/* MUSIC ROW */
+.music-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 14px;cursor:pointer;transition:background .15s;
+}
+.music-item:hover{background:rgba(255,255,255,.06);}
+.music-cover{
+  width:40px;height:40px;border-radius:6px;object-fit:cover;flex-shrink:0;
+  background:#222;
+}
+.music-cover-placeholder{
+  width:40px;height:40px;border-radius:6px;flex-shrink:0;
+  background:#222;display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:18px;
+}
+.music-info{min-width:0;}
+.music-title{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.music-artist{font-size:11px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* selected music pill */
+.music-selected{
+  display:none;
+  align-items:center;gap:12px;
+  background:#111;border:1px solid var(--border);border-radius:14px;
+  padding:10px 14px;
+}
+.music-selected.visible{display:flex;}
+.music-selected-cover{width:44px;height:44px;border-radius:8px;object-fit:cover;flex-shrink:0;}
+.music-selected-info{flex:1;min-width:0;}
+.music-selected-title{font-size:13px;}
+.music-selected-artist{font-size:11px;color:var(--muted);margin-top:3px;}
+.music-clear{background:none;border:none;color:var(--muted);cursor:pointer;font-size:20px;flex-shrink:0;font-family:'Material Symbols Rounded';}
+
+/* ── DISCLAIMER ── */
+.disclaimer{
+  display:flex;align-items:flex-start;gap:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:14px;padding:14px;
+}
+.disclaimer .disc-icon{font-size:18px;color:var(--muted);flex-shrink:0;margin-top:1px;}
+.disclaimer p{font-size:11px;color:var(--muted);line-height:1.6;}
+
+/* ── ACTIONS ── */
+.status{font-size:11px;color:var(--muted);text-align:center;}
+.actions{display:flex;gap:10px;}
 .btn{
-  padding:14px;
-  border-radius:14px;
-  border:1px solid var(--border);
-  background:transparent;
-  color:#fff;
-  cursor:pointer;
+  padding:14px;border-radius:14px;border:1px solid var(--border);
+  background:transparent;color:#fff;cursor:pointer;
+  font-family:'Archivo Black',sans-serif;font-size:13px;
 }
-.btn.primary{
-  flex:1;
-  background:#fff;
-  color:#000;
-}
+.btn.primary{flex:1;background:#fff;color:#000;border-color:#fff;}
+.btn:disabled{opacity:.4;cursor:default;}
 
-/* STATUS */
-.status{font-size:12px;color:var(--muted)}
+/* spinner */
+.spinner{
+  display:inline-block;width:14px;height:14px;
+  border:2px solid rgba(0,0,0,.2);border-top-color:#000;
+  border-radius:50%;animation:spin .6s linear infinite;vertical-align:middle;margin-right:6px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
-
 <body>
 
 <div class="page">
 <div class="shell">
 
-<div class="topbar">
-  <div></div>
-  <div class="brand">Shared.</div>
-  <div></div>
-</div>
-
-<!-- TYPE -->
-<div class="type-selector">
-  <div class="type-pill post active" id="pillPost">
-    <span class="material-symbols-rounded icon">photo_library</span>
-    Post
+  <div class="topbar">
+    <div></div>
+    <div class="brand">Shared.</div>
+    <div></div>
   </div>
 
-  <div class="type-pill moment" id="pillMoment">
-    <span class="material-symbols-rounded icon">bolt</span>
-    Moment
+  <div class="type-selector">
+    <div class="type-pill post active" id="pillPost">
+      <span class="material-symbols-rounded icon">photo_library</span>Post
+    </div>
+    <div class="type-pill moment" id="pillMoment">
+      <span class="material-symbols-rounded icon">bolt</span>Moment
+    </div>
   </div>
-</div>
 
-<div class="body">
-<div class="inner">
+  <div class="body">
+  <div class="inner">
 
-<!-- MEDIA -->
-<div class="dropzone" id="dropzone">
-  Tap to upload media
-  <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
-</div>
+    <!-- MEDIA -->
+    <div class="media-area" id="mediaArea">
+      <div class="dropzone" id="dropzone">
+        <span class="material-symbols-rounded upload-icon">add_photo_alternate</span>
+        Tap to upload media
+        <input type="file" id="fileInput" class="file-input" accept="image/*,video/*">
+      </div>
+      <canvas id="previewCanvas"></canvas>
+      <button class="change-btn" id="changeBtn">Change</button>
+    </div>
 
-<div id="preview"></div>
+    <!-- CAPTION -->
+    <textarea id="caption" placeholder="Write something..."></textarea>
 
-<!-- CAPTION -->
-<textarea id="caption" placeholder="Write something..."></textarea>
+    <!-- LOCATION -->
+    <div class="field-wrap">
+      <input id="locationInput" placeholder="Location (optional)" autocomplete="off">
+      <div class="dropdown" id="locationDropdown"></div>
+    </div>
 
-<!-- LOCATION -->
-<input id="location" placeholder="Location">
+    <!-- MUSIC -->
+    <div class="field-wrap" id="musicWrap">
+      <input id="musicInput" placeholder="Song (optional)" autocomplete="off">
+      <div class="dropdown" id="musicDropdown"></div>
+    </div>
+    <div class="music-selected" id="musicSelected">
+      <img class="music-selected-cover" id="musicSelectedCover" src="" alt="">
+      <div class="music-selected-info">
+        <div class="music-selected-title" id="musicSelectedTitle"></div>
+        <div class="music-selected-artist" id="musicSelectedArtist"></div>
+      </div>
+      <button class="music-clear material-symbols-rounded" id="musicClear">close</button>
+    </div>
 
-<!-- MUSIC -->
-<input id="music" placeholder="Song (optional)">
+    <!-- DISCLAIMER -->
+    <div class="disclaimer">
+      <span class="material-symbols-rounded disc-icon">public</span>
+      <p>I post pubblicati su Shared. sono <strong>pubblici</strong> e visibili a tutti gli utenti. Non condividere informazioni personali o sensibili.</p>
+    </div>
 
-<div class="status" id="status">Ready</div>
+    <div class="status" id="status"></div>
 
-<!-- ACTIONS -->
-<div class="actions">
-  <button class="btn primary" id="publish">Publish</button>
-</div>
+    <div class="actions">
+      <button class="btn primary" id="publish">Publish</button>
+    </div>
 
-</div>
-</div>
+  </div>
+  </div>
 
 </div>
 </div>
 
 <script>
 const API = "https://api.sharedweb.org";
-
 const token = localStorage.getItem("token");
 const userId = localStorage.getItem("user_id");
-
 if (!token) location.href = "home.html";
 
-/* STATE */
+/* ── STATE ── */
 let type = "post";
-let file = null;
+let imageBlob = null;      // final JPEG blob
+let selectedLocation = null;
+let selectedMusic = null;
 
-/* ELEMENTS */
-const pillPost = document.getElementById("pillPost");
-const pillMoment = document.getElementById("pillMoment");
-const fileInput = document.getElementById("fileInput");
-const dropzone = document.getElementById("dropzone");
-const preview = document.getElementById("preview");
-const caption = document.getElementById("caption");
-const locationEl = document.getElementById("location");
-const music = document.getElementById("music");
-const status = document.getElementById("status");
-const publish = document.getElementById("publish");
+/* ── ELS ── */
+const pillPost       = document.getElementById("pillPost");
+const pillMoment     = document.getElementById("pillMoment");
+const mediaArea      = document.getElementById("mediaArea");
+const dropzone       = document.getElementById("dropzone");
+const fileInput      = document.getElementById("fileInput");
+const previewCanvas  = document.getElementById("previewCanvas");
+const changeBtn      = document.getElementById("changeBtn");
+const caption        = document.getElementById("caption");
+const locationInput  = document.getElementById("locationInput");
+const locationDD     = document.getElementById("locationDropdown");
+const musicWrap      = document.getElementById("musicWrap");
+const musicInput     = document.getElementById("musicInput");
+const musicDD        = document.getElementById("musicDropdown");
+const musicSelected  = document.getElementById("musicSelected");
+const musicSelectedCover  = document.getElementById("musicSelectedCover");
+const musicSelectedTitle  = document.getElementById("musicSelectedTitle");
+const musicSelectedArtist = document.getElementById("musicSelectedArtist");
+const musicClear     = document.getElementById("musicClear");
+const status         = document.getElementById("status");
+const publish        = document.getElementById("publish");
 
-/* TYPE SWITCH */
+/* ── TYPE SWITCH ── */
 function setType(t){
   type = t;
-
   pillPost.classList.toggle("active", t==="post");
   pillMoment.classList.toggle("active", t==="moment");
-
-  status.textContent = t === "post"
-    ? "Creating Post"
-    : "Creating Moment";
 }
-
 pillPost.onclick = () => setType("post");
 pillMoment.onclick = () => setType("moment");
 
-/* FILE */
+/* ── MEDIA: crop to square + convert to JPEG ── */
 dropzone.onclick = () => fileInput.click();
+changeBtn.onclick = () => fileInput.click();
 
-fileInput.onchange = e=>{
-  file = e.target.files[0];
-  if(!file) return;
+fileInput.onchange = e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  fileInput.value = "";   // reset so same file can be re-selected
 
-  const url = URL.createObjectURL(file);
-
-  preview.innerHTML = file.type.startsWith("video")
-    ? `<video src="${url}" controls></video>`
-    : `<img src="${url}">`;
+  if (file.type.startsWith("video/")) {
+    // for video just store and show a thumbnail via canvas
+    processVideo(file);
+  } else {
+    processImage(file);
+  }
 };
 
-/* UPLOAD */
-async function upload(f){
-  const fd = new FormData();
-  fd.append("file", f, `${userId}_${Date.now()}.jpg`);
+function processImage(file) {
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+  img.onload = () => {
+    const size = Math.min(img.width, img.height);
+    const ox   = (img.width  - size) / 2;
+    const oy   = (img.height - size) / 2;
 
-  const res = await fetch(`${API}/upload`,{
+    const DIM = 1080;
+    previewCanvas.width  = DIM;
+    previewCanvas.height = DIM;
+    const ctx = previewCanvas.getContext("2d");
+    ctx.drawImage(img, ox, oy, size, size, 0, 0, DIM, DIM);
+    URL.revokeObjectURL(url);
+
+    previewCanvas.toBlob(blob => {
+      imageBlob = blob;
+      showPreview();
+    }, "image/jpeg", 0.92);
+  };
+  img.src = url;
+}
+
+function processVideo(file) {
+  // grab first frame as JPEG for upload preview
+  const video = document.createElement("video");
+  video.muted = true;
+  video.src = URL.createObjectURL(file);
+  video.addEventListener("loadeddata", () => {
+    video.currentTime = 0;
+  });
+  video.addEventListener("seeked", () => {
+    const size = Math.min(video.videoWidth, video.videoHeight);
+    const ox   = (video.videoWidth  - size) / 2;
+    const oy   = (video.videoHeight - size) / 2;
+
+    const DIM = 1080;
+    previewCanvas.width  = DIM;
+    previewCanvas.height = DIM;
+    const ctx = previewCanvas.getContext("2d");
+    ctx.drawImage(video, ox, oy, size, size, 0, 0, DIM, DIM);
+    URL.revokeObjectURL(video.src);
+
+    // draw play icon overlay
+    ctx.fillStyle = "rgba(0,0,0,.4)";
+    ctx.beginPath();
+    ctx.arc(DIM/2, DIM/2, 60, 0, Math.PI*2);
+    ctx.fill();
+    ctx.fillStyle = "#fff";
+    ctx.beginPath();
+    ctx.moveTo(DIM/2-20, DIM/2-30);
+    ctx.lineTo(DIM/2+35, DIM/2);
+    ctx.lineTo(DIM/2-20, DIM/2+30);
+    ctx.closePath();
+    ctx.fill();
+
+    previewCanvas.toBlob(blob => {
+      imageBlob = blob;
+      showPreview();
+    }, "image/jpeg", 0.92);
+  });
+  video.load();
+}
+
+function showPreview(){
+  dropzone.style.display  = "none";
+  previewCanvas.style.display = "block";
+  changeBtn.style.display = "block";
+}
+
+/* ── LOCATION AUTOCOMPLETE (Nominatim) ── */
+let locTimer;
+locationInput.addEventListener("input", () => {
+  clearTimeout(locTimer);
+  const q = locationInput.value.trim();
+  if (q.length < 2) { closeDD(locationDD); return; }
+  locTimer = setTimeout(() => fetchLocations(q), 400);
+});
+
+async function fetchLocations(q) {
+  try {
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=5&addressdetails=1`;
+    const res = await fetch(url, { headers:{ "Accept-Language":"it,en" } });
+    const data = await res.json();
+    renderLocations(data);
+  } catch(e) { closeDD(locationDD); }
+}
+
+function renderLocations(items) {
+  if (!items.length) { closeDD(locationDD); return; }
+  locationDD.innerHTML = items.map(item => {
+    const main = item.name || item.display_name.split(",")[0];
+    const sub  = item.display_name.split(",").slice(1,3).join(",").trim();
+    return `<div class="loc-item" data-name="${escHtml(item.display_name)}" data-main="${escHtml(main)}">
+      <span class="material-symbols-rounded loc-icon">location_on</span>
+      <div>
+        <div class="loc-main">${escHtml(main)}</div>
+        ${sub ? `<div class="loc-sub">${escHtml(sub)}</div>` : ""}
+      </div>
+    </div>`;
+  }).join("");
+
+  locationDD.querySelectorAll(".loc-item").forEach(el => {
+    el.addEventListener("click", () => {
+      const main = el.dataset.main;
+      locationInput.value = main;
+      selectedLocation    = main;
+      closeDD(locationDD);
+    });
+  });
+
+  openDD(locationDD);
+}
+
+/* ── MUSIC AUTOCOMPLETE (iTunes Search API) ── */
+let musicTimer;
+musicInput.addEventListener("input", () => {
+  if (selectedMusic) return;
+  clearTimeout(musicTimer);
+  const q = musicInput.value.trim();
+  if (q.length < 2) { closeDD(musicDD); return; }
+  musicTimer = setTimeout(() => fetchMusic(q), 400);
+});
+
+async function fetchMusic(q) {
+  try {
+    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(q)}&entity=song&limit=5`;
+    const res  = await fetch(url);
+    const data = await res.json();
+    renderMusic(data.results || []);
+  } catch(e) { closeDD(musicDD); }
+}
+
+function renderMusic(items) {
+  if (!items.length) { closeDD(musicDD); return; }
+  musicDD.innerHTML = items.map((t,i) => `
+    <div class="music-item" data-idx="${i}">
+      <img class="music-cover" src="${escHtml(t.artworkUrl60 || "")}" alt="" loading="lazy">
+      <div class="music-info">
+        <div class="music-title">${escHtml(t.trackName)}</div>
+        <div class="music-artist">${escHtml(t.artistName)}</div>
+      </div>
+    </div>
+  `).join("");
+
+  musicDD.querySelectorAll(".music-item").forEach((el, i) => {
+    el.addEventListener("click", () => {
+      const t = items[i];
+      selectMusic(t);
+      closeDD(musicDD);
+    });
+  });
+
+  openDD(musicDD);
+}
+
+function selectMusic(t) {
+  selectedMusic = t;
+  musicInput.value           = "";
+  musicWrap.style.display    = "none";
+  musicSelectedCover.src     = t.artworkUrl100 || t.artworkUrl60 || "";
+  musicSelectedTitle.textContent  = t.trackName;
+  musicSelectedArtist.textContent = t.artistName;
+  musicSelected.classList.add("visible");
+}
+
+musicClear.onclick = () => {
+  selectedMusic = null;
+  musicWrap.style.display = "";
+  musicSelected.classList.remove("visible");
+  musicInput.value = "";
+};
+
+/* ── HELPERS ── */
+function openDD(el)  { el.classList.add("open"); }
+function closeDD(el) { el.classList.remove("open"); }
+function escHtml(s)  { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+document.addEventListener("click", e => {
+  if (!locationInput.contains(e.target) && !locationDD.contains(e.target)) closeDD(locationDD);
+  if (!musicInput.contains(e.target) && !musicDD.contains(e.target)) closeDD(musicDD);
+});
+
+/* ── UPLOAD + PUBLISH ── */
+async function upload(blob) {
+  const fd = new FormData();
+  fd.append("file", blob, `${userId}_${Date.now()}.jpg`);
+  const res = await fetch(`${API}/upload`, {
     method:"POST",
     headers:{ Authorization:`Bearer ${token}` },
     body:fd
   });
-
-  if(!res.ok) throw new Error("upload failed");
+  if (!res.ok) throw new Error("upload failed");
   return await res.json();
 }
 
-/* PUBLISH */
-publish.onclick = async ()=>{
-  if(!file){
-    status.textContent = "Select media first";
+publish.onclick = async () => {
+  if (!imageBlob) {
+    status.textContent = "Seleziona prima un'immagine.";
     return;
   }
 
   publish.disabled = true;
-  status.textContent = "Uploading...";
+  publish.innerHTML = '<span class="spinner"></span>Uploading…';
+  status.textContent = "";
 
-  try{
-    const up = await upload(file);
+  try {
+    const up  = await upload(imageBlob);
     const url = up.url || up.image_url || "";
 
     const body = {
-      content: caption.value,
-      image_url: url,
-      location: locationEl.value || null,
-      song_title: music.value || null,
+      content:    caption.value,
+      image_url:  url,
+      location:   selectedLocation || locationInput.value || null,
+      song_title: selectedMusic ? `${selectedMusic.trackName} — ${selectedMusic.artistName}` : (musicInput.value || null),
       type
     };
 
-    const endpoint =
-      type === "moment"
-        ? `${API}/moments`
-        : `${API}/posts`;
-
-    const res = await fetch(endpoint,{
+    const endpoint = type === "moment" ? `${API}/moments` : `${API}/posts`;
+    const res = await fetch(endpoint, {
       method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        "Authorization":`Bearer ${token}`
-      },
+      headers:{ "Content-Type":"application/json", Authorization:`Bearer ${token}` },
       body:JSON.stringify(body)
     });
 
-    if(!res.ok) throw new Error("publish failed");
+    if (!res.ok) throw new Error("publish failed");
 
-    status.textContent = "Posted!";
-    setTimeout(()=>location.href="index.html",800);
+    publish.textContent = "Posted!";
+    setTimeout(() => location.href = "index.html", 800);
 
-  }catch(e){
+  } catch(e) {
     status.textContent = e.message;
     publish.disabled = false;
+    publish.textContent = "Publish";
   }
 };
 </script>
-
 </body>
 </html>
