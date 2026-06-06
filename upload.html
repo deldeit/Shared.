@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>Shared. - Upload</title>
+<title>Shared. — upload</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet" />
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet" />
@@ -239,7 +239,7 @@ textarea{min-height:90px;resize:none;}
     <!-- DISCLAIMER -->
     <div class="disclaimer">
       <span class="material-symbols-rounded disc-icon">public</span>
-      <p>Posts and Moments on Shared. are <strong>public</strong>, do not share sensitive informations.</p>
+      <p>Posts published on Shared. are <strong>public</strong> and visible to all users. Do not share personal or sensitive information.</p>
     </div>
 
     <div class="status" id="status"></div>
@@ -499,15 +499,34 @@ document.addEventListener("click", e => {
 
 /* ── UPLOAD + PUBLISH ── */
 async function upload(blob) {
-  const fd = new FormData();
-  fd.append("file", blob, `${userId}_${Date.now()}.jpg`);
-  const res = await fetch(`${API}/upload`, {
-    method:"POST",
-    headers:{ Authorization:`Bearer ${token}` },
-    body:fd
-  });
-  if (!res.ok) throw new Error("upload failed");
-  return await res.json();
+  const filename = `${userId}_${Date.now()}.jpg`;
+
+  // Try different auth header formats in sequence
+  const authFormats = [
+    { Authorization: `Bearer ${token}` },
+    { Authorization: `Token ${token}` },
+    { "X-Auth-Token": token },
+  ];
+
+  for (const headers of authFormats) {
+    const fd = new FormData();
+    fd.append("file", blob, filename);
+
+    const res = await fetch(`${API}/upload`, {
+      method: "POST",
+      headers,
+      body: fd,
+    });
+
+    if (res.status === 401) continue;   // try next auth format
+    if (!res.ok) throw new Error(`Upload failed (${res.status})`);
+    return await res.json();
+  }
+
+  // All formats returned 401 — clear stale session and redirect to login
+  localStorage.removeItem("token");
+  localStorage.removeItem("user_id");
+  throw new Error("Session expired. Redirecting to login…");
 }
 
 publish.onclick = async () => {
@@ -546,6 +565,9 @@ publish.onclick = async () => {
 
   } catch(e) {
     status.textContent = e.message;
+    if (e.message.includes("Session expired")) {
+      setTimeout(() => location.href = "home.html", 1500);
+    }
     publish.disabled = false;
     publish.textContent = "Publish";
   }
