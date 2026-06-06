@@ -25,6 +25,7 @@
     --feed-width:420px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --squircle-radius: 28px;
   }
 
   *{margin:0;padding:0;box-sizing:border-box}
@@ -38,13 +39,54 @@
 
   button, input, a{font-family:'Archivo Black', sans-serif;}
 
-  .app{
-    width:100%;
-    height:100vh;
-    display:flex;
-    background:#000;
+  /* ─── SIDEBAR OVERLAY ─────────────────────────────── */
+  .sidebar-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    z-index:19;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transition:opacity .28s ease, visibility .28s ease;
+    backdrop-filter:blur(2px);
   }
 
+  .sidebar-overlay.open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+  }
+
+  /* ─── HAMBURGER BUTTON ─────────────────────────────── */
+  .hamburger{
+    position:fixed;
+    top:14px;
+    left:16px;
+    z-index:22;
+    width:44px;
+    height:44px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.18);
+    background:rgba(0,0,0,.82);
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    backdrop-filter:blur(14px);
+    transition:background .18s, transform .18s;
+  }
+
+  .hamburger:hover{background:rgba(255,255,255,.12);}
+  .hamburger:active{transform:scale(.94);}
+
+  .hamburger .material-symbols-rounded{
+    font-size:24px;
+    transition:opacity .15s;
+  }
+
+  /* ─── SIDEBAR ──────────────────────────────────────── */
   .sidebar{
     position:fixed;
     left:0;
@@ -57,8 +99,14 @@
     gap:14px;
     border-right:1px solid rgba(255,255,255,.1);
     background:#000;
-    z-index:20;
+    z-index:21;
     overflow:hidden;
+    transform:translateX(-100%);
+    transition:transform .3s cubic-bezier(.4,0,.2,1);
+  }
+
+  .sidebar.open{
+    transform:translateX(0);
   }
 
   .sidebar-top{
@@ -67,6 +115,7 @@
     gap:14px;
     min-height:0;
     flex:1;
+    padding-top:56px; /* space for hamburger */
   }
 
   .sidebar-bottom{
@@ -184,9 +233,9 @@
     line-height:1;
   }
 
+  /* ─── MAIN CONTENT ─────────────────────────────────── */
   .main{
-    margin-left:var(--sidebar-w);
-    width:calc(100% - var(--sidebar-w));
+    width:100%;
     height:100vh;
     overflow-y:auto;
     overflow-x:hidden;
@@ -198,6 +247,7 @@
   .header{
     text-align:center;
     padding:18px 12px 14px;
+    padding-left:72px; /* leave room for hamburger */
     font-size:30px;
     letter-spacing:-.05em;
     border-bottom:1px solid rgba(255,255,255,.08);
@@ -259,25 +309,51 @@
   .feed{
     display:flex;
     flex-direction:column;
-    gap:12px;
+    gap:16px;
     padding:34px 0 22px;
   }
 
+  /* ─── SQUIRCLE POST ─────────────────────────────────── */
   .post{
     scroll-snap-align:start;
-    width:min(var(--feed-width), calc(100vw - var(--sidebar-w) - 24px));
+    width:min(var(--feed-width), calc(100vw - 24px));
     margin:0 auto;
-    border:1px solid rgba(255,255,255,.15);
-    border-radius:18px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:var(--squircle-radius);
     overflow:hidden;
-    background:#000;
+    background:#0a0a0a;
+    /* squircle shadow glow */
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.04),
+      0 8px 32px rgba(0,0,0,.7),
+      0 2px 8px rgba(0,0,0,.5);
+    transition:transform .2s ease, box-shadow .2s ease;
+  }
+
+  .post:hover{
+    transform:translateY(-2px);
+    box-shadow:
+      0 0 0 1px rgba(255,255,255,.07),
+      0 16px 48px rgba(0,0,0,.75),
+      0 4px 12px rgba(0,0,0,.6);
+  }
+
+  /* Media corners match post squircle */
+  .media{
+    position:relative;
+    width:100%;
+    aspect-ratio:4/3;
+    background:#111;
+    overflow:hidden;
+    /* top corners slightly less rounded to flow with the card */
+    border-radius:0;
   }
 
   .post-header{
     display:flex;
     align-items:center;
     gap:12px;
-    padding:10px 11px;
+    padding:12px 14px 10px;
   }
 
   .avatar{
@@ -307,14 +383,6 @@
     margin-top:4px;
     font-size:10px;
     color:var(--muted-2);
-  }
-
-  .media{
-    position:relative;
-    width:100%;
-    aspect-ratio:4/3;
-    background:#111;
-    overflow:hidden;
   }
 
   .media img{
@@ -351,7 +419,7 @@
     align-items:center;
     justify-content:space-between;
     gap:10px;
-    padding:10px 11px 0;
+    padding:10px 14px 0;
   }
 
   .like-row{
@@ -395,7 +463,7 @@
     display:flex;
     flex-wrap:wrap;
     gap:6px;
-    padding:10px 11px 0;
+    padding:10px 14px 0;
   }
 
   .tag-pill{
@@ -409,7 +477,7 @@
   }
 
   .caption{
-    padding:10px 11px 0;
+    padding:10px 14px 0;
     font-size:14px;
     line-height:1.42;
   }
@@ -445,9 +513,7 @@
     flex:0 0 auto;
   }
 
-  .note-cover .material-symbols-rounded{
-    font-size:24px;
-  }
+  .note-cover .material-symbols-rounded{font-size:24px;}
 
   .song-info{
     min-width:0;
@@ -473,46 +539,55 @@
 
   audio.bg-audio{display:none}
 
-  .loading{
-    position:fixed;
-    inset:0;
-    z-index:100;
-    display:grid;
-    place-items:center;
-    background:#000;
-    transition:opacity .2s ease, visibility .2s ease;
+  /* ─── POST SKELETON (no spinner) ──────────────────── */
+  .skeleton-post{
+    width:min(var(--feed-width), calc(100vw - 24px));
+    margin:0 auto;
+    border:1px solid rgba(255,255,255,.07);
+    border-radius:var(--squircle-radius);
+    overflow:hidden;
+    background:#0a0a0a;
   }
 
-  .loading.hidden{
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
+  .skel-header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:12px 14px;
   }
 
-  .loading-card{
-    display:grid;
-    gap:14px;
-    justify-items:center;
-    padding:26px 22px;
-    border-radius:24px;
-    background:rgba(255,255,255,.06);
-    border:1px solid rgba(255,255,255,.12);
-    min-width:220px;
-  }
-
-  .spinner{
+  .skel-circle{
     width:42px;
     height:42px;
     border-radius:50%;
-    border:3px solid rgba(255,255,255,.14);
-    border-top-color:#fff;
-    animation:spin .85s linear infinite;
+    background:rgba(255,255,255,.07);
+    flex:0 0 auto;
+    animation:shimmer 1.4s ease infinite;
   }
 
-  .loading-text{font-size:18px}
+  .skel-lines{flex:1;display:flex;flex-direction:column;gap:6px;}
+  .skel-line{
+    height:10px;
+    border-radius:6px;
+    background:rgba(255,255,255,.07);
+    animation:shimmer 1.4s ease infinite;
+  }
+  .skel-line.short{width:40%;}
 
-  @keyframes spin{to{transform:rotate(360deg)}}
+  .skel-image{
+    width:100%;
+    aspect-ratio:4/3;
+    background:rgba(255,255,255,.05);
+    animation:shimmer 1.4s ease infinite;
+  }
 
+  @keyframes shimmer{
+    0%{opacity:.5}
+    50%{opacity:1}
+    100%{opacity:.5}
+  }
+
+  /* ─── STORY VIEWER ─────────────────────────────────── */
   .story-viewer{
     position:fixed;
     inset:0;
@@ -650,6 +725,7 @@
     backdrop-filter:blur(14px);
   }
 
+  /* ─── MODAL ─────────────────────────────────────────── */
   .modal{
     position:fixed;
     inset:0;
@@ -750,101 +826,81 @@
     font-size:15px;
   }
 
+  /* ─── POST BOTTOM SPACING ───────────────────────────── */
+  .post > *:last-child{
+    margin-bottom:14px;
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────────────── */
   @media (max-width: 860px){
-    .app{display:block}
-    .sidebar{
-      position:sticky;
-      top:0;
-      width:100%;
-      height:auto;
-      bottom:auto;
-      border-right:0;
-      border-bottom:1px solid rgba(255,255,255,.1);
-      padding:10px;
-      gap:10px;
-    }
-    .sidebar-top{gap:10px}
-    .sidebar-bottom{
-      flex-direction:row;
-      gap:8px;
-      overflow-x:auto;
-    }
-    .nav-btn{
-      padding:12px 14px;
-      font-size:13px;
-      border-radius:12px;
-      white-space:nowrap;
-      min-width:0;
-    }
-    .main{
-      margin-left:0;
-      width:100%;
-      height:calc(100vh - 160px);
-    }
     .header{font-size:28px}
     .post{width:calc(100vw - 18px)}
+    .skeleton-post{width:calc(100vw - 18px)}
   }
 </style>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="sidebar-top">
-        <div class="search-wrap">
-          <input id="search" class="search" placeholder="Search" autocomplete="off">
-          <div id="suggestions" class="suggestions"></div>
-        </div>
+
+  <!-- Hamburger button (always visible) -->
+  <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false">
+    <span class="material-symbols-rounded" id="hamburgerIcon">menu</span>
+  </button>
+
+  <!-- Sidebar overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Sidebar (slide-in) -->
+  <aside class="sidebar" id="sidebar" aria-hidden="true">
+    <div class="sidebar-top">
+      <div class="search-wrap">
+        <input id="search" class="search" placeholder="Search" autocomplete="off">
+        <div id="suggestions" class="suggestions"></div>
       </div>
-
-      <div class="sidebar-bottom">
-        <button class="nav-btn" type="button" onclick="goUpload('post')">
-          <span class="material-symbols-rounded">upload</span>
-          <span>Upload post</span>
-        </button>
-
-        <button class="nav-btn" type="button" onclick="goUpload('story')">
-          <span class="material-symbols-rounded">add_circle</span>
-          <span>Upload story</span>
-        </button>
-
-        <a class="nav-btn" href="settings.html">
-          <span class="material-symbols-rounded">settings</span>
-          <span>Settings</span>
-        </a>
-
-        <a class="nav-btn" href="about.html">
-          <span class="material-symbols-rounded">info</span>
-          <span>About</span>
-        </a>
-
-        <button class="nav-btn logout" type="button" onclick="logout()">
-          <span class="material-symbols-rounded">logout</span>
-          <span>Logout</span>
-        </button>
-      </div>
-    </aside>
-
-    <main class="main" id="mainScroll">
-      <div class="header">Shared.</div>
-
-      <section id="storiesSection" class="stories-section">
-        <div class="section-head">
-          <div class="section-title">Stories</div>
-        </div>
-        <div id="stories" class="stories"></div>
-      </section>
-
-      <div id="feed" class="feed"></div>
-    </main>
-  </div>
-
-  <div id="loading" class="loading" role="status" aria-live="assertive">
-    <div class="loading-card">
-      <div class="spinner"></div>
-      <div class="loading-text">Loading Shared...</div>
     </div>
-  </div>
 
+    <div class="sidebar-bottom">
+      <button class="nav-btn" type="button" onclick="goUpload('post')">
+        <span class="material-symbols-rounded">upload</span>
+        <span>Upload post</span>
+      </button>
+
+      <button class="nav-btn" type="button" onclick="goUpload('story')">
+        <span class="material-symbols-rounded">add_circle</span>
+        <span>Upload story</span>
+      </button>
+
+      <a class="nav-btn" href="settings.html">
+        <span class="material-symbols-rounded">settings</span>
+        <span>Settings</span>
+      </a>
+
+      <a class="nav-btn" href="about.html">
+        <span class="material-symbols-rounded">info</span>
+        <span>About</span>
+      </a>
+
+      <button class="nav-btn logout" type="button" onclick="logout()">
+        <span class="material-symbols-rounded">logout</span>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="main" id="mainScroll">
+    <div class="header">Shared.</div>
+
+    <section id="storiesSection" class="stories-section">
+      <div class="section-head">
+        <div class="section-title">Stories</div>
+      </div>
+      <div id="stories" class="stories"></div>
+    </section>
+
+    <div id="feed" class="feed"></div>
+  </main>
+
+  <!-- Story viewer -->
   <div id="storyViewer" class="story-viewer" aria-hidden="true">
     <div class="story-viewer-shell">
       <div class="story-stage">
@@ -874,6 +930,7 @@
     </div>
   </div>
 
+  <!-- Likes modal -->
   <div id="likesModal" class="modal" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="likesTitle">
       <div class="modal-head">
@@ -891,8 +948,10 @@ const SUPABASE_URL = "https://cnhaonawapuahzoctqav.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNuaGFvbmF3YXB1YWh6b2N0cWF2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYzNDQyNTAsImV4cCI6MjA5MTkyMDI1MH0._11u3YOxSawQG6g9vHdHylcEHI8mIVJx_xAjGtArNes";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const API_BASE = "https://api.sharedweb.com";
+
 const BUCKET_AVATARS = "avatars";
-const BUCKET_SHARED = "shared";
+const BUCKET_SHARED  = "shared";
 const BUCKET_STORIES = "stories";
 
 const state = {
@@ -911,26 +970,60 @@ const state = {
 };
 
 const els = {
-  loading: document.getElementById("loading"),
-  mainScroll: document.getElementById("mainScroll"),
+  mainScroll:     document.getElementById("mainScroll"),
   storiesSection: document.getElementById("storiesSection"),
-  stories: document.getElementById("stories"),
-  feed: document.getElementById("feed"),
-  storyViewer: document.getElementById("storyViewer"),
-  storyImage: document.getElementById("storyImage"),
-  storyAvatar: document.getElementById("storyAvatar"),
-  storyName: document.getElementById("storyName"),
-  progressRow: document.getElementById("progressRow"),
-  closeStory: document.getElementById("closeStory"),
-  prevStory: document.getElementById("prevStory"),
-  nextStory: document.getElementById("nextStory"),
-  search: document.getElementById("search"),
-  suggestions: document.getElementById("suggestions"),
-  likesModal: document.getElementById("likesModal"),
-  likesList: document.getElementById("likesList"),
-  closeLikesBtn: document.getElementById("closeLikesBtn")
+  stories:        document.getElementById("stories"),
+  feed:           document.getElementById("feed"),
+  storyViewer:    document.getElementById("storyViewer"),
+  storyImage:     document.getElementById("storyImage"),
+  storyAvatar:    document.getElementById("storyAvatar"),
+  storyName:      document.getElementById("storyName"),
+  progressRow:    document.getElementById("progressRow"),
+  closeStory:     document.getElementById("closeStory"),
+  prevStory:      document.getElementById("prevStory"),
+  nextStory:      document.getElementById("nextStory"),
+  search:         document.getElementById("search"),
+  suggestions:    document.getElementById("suggestions"),
+  likesModal:     document.getElementById("likesModal"),
+  likesList:      document.getElementById("likesList"),
+  closeLikesBtn:  document.getElementById("closeLikesBtn"),
+  sidebar:        document.getElementById("sidebar"),
+  sidebarOverlay: document.getElementById("sidebarOverlay"),
+  hamburgerBtn:   document.getElementById("hamburgerBtn"),
+  hamburgerIcon:  document.getElementById("hamburgerIcon"),
 };
 
+// ─── HAMBURGER MENU ──────────────────────────────────────
+let sidebarOpen = false;
+
+function openSidebar() {
+  sidebarOpen = true;
+  els.sidebar.classList.add("open");
+  els.sidebar.setAttribute("aria-hidden", "false");
+  els.sidebarOverlay.classList.add("open");
+  els.hamburgerIcon.textContent = "close";
+  els.hamburgerBtn.setAttribute("aria-expanded", "true");
+  els.hamburgerBtn.setAttribute("aria-label", "Close menu");
+}
+
+function closeSidebar() {
+  sidebarOpen = false;
+  els.sidebar.classList.remove("open");
+  els.sidebar.setAttribute("aria-hidden", "true");
+  els.sidebarOverlay.classList.remove("open");
+  els.hamburgerIcon.textContent = "menu";
+  els.hamburgerBtn.setAttribute("aria-expanded", "false");
+  els.hamburgerBtn.setAttribute("aria-label", "Open menu");
+}
+
+els.hamburgerBtn.addEventListener("click", () => sidebarOpen ? closeSidebar() : openSidebar());
+els.sidebarOverlay.addEventListener("click", closeSidebar);
+
+window.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && sidebarOpen) closeSidebar();
+});
+
+// ─── HELPERS ─────────────────────────────────────────────
 function safeArray(v) { return Array.isArray(v) ? v : []; }
 
 function escapeHtml(str) {
@@ -945,7 +1038,7 @@ function escapeHtml(str) {
 function formatCount(n) {
   const num = Number(n || 0);
   if (num >= 1000000) return `${(num / 1000000).toFixed(num % 1000000 ? 1 : 0)}M`;
-  if (num >= 1000) return `${(num / 1000).toFixed(num % 1000 ? 1 : 0)}K`;
+  if (num >= 1000)    return `${(num / 1000).toFixed(num % 1000 ? 1 : 0)}K`;
   return String(num);
 }
 
@@ -954,12 +1047,12 @@ function timeAgo(value) {
   if (!date || Number.isNaN(date.getTime())) return "";
   const diff = Math.max(0, Date.now() - date.getTime());
   const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-  if (minutes < 1) return "just now";
+  const hours   = Math.floor(diff / 3600000);
+  const days    = Math.floor(diff / 86400000);
+  if (minutes < 1)  return "just now";
   if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24) return `${hours}h ago`;
-  if (days < 7) return `${days}d ago`;
+  if (hours < 24)   return `${hours}h ago`;
+  if (days < 7)     return `${days}d ago`;
   return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }
 
@@ -980,15 +1073,6 @@ function placeholderImage() {
       <rect x="120" y="80" width="560" height="440" rx="42" fill="#1b1b1b"/>
       <path d="M220 390l110-120 80 78 70-86 100 128" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
       <circle cx="320" cy="220" r="44" fill="#fff"/>
-    </svg>
-  `)}`;
-}
-
-function notePlaceholder() {
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-      <rect width="120" height="120" rx="18" fill="#111"/>
-      <path d="M74 22v44.4a18 18 0 1 0 8 15V42h20V22H74Z" fill="#fff"/>
     </svg>
   `)}`;
 }
@@ -1051,12 +1135,12 @@ function getStoryQueue() {
   return state.profiles
     .map((profile) => {
       const avatarPath = profile.avatar_url || profile.avatar || profile.profile_image || "";
-      const storyPath = profile.story_url || profile.story_image || profile.story || profile.latest_story || "";
+      const storyPath  = profile.story_url || profile.story_image || profile.story || profile.latest_story || "";
       return {
-        id: profile.id,
+        id:       profile.id,
         username: profile.username || profile.full_name || "user",
-        avatar: normalizeAvatar(avatarPath) || defaultProfileIcon(),
-        story: normalizeStory(storyPath),
+        avatar:   normalizeAvatar(avatarPath) || defaultProfileIcon(),
+        story:    normalizeStory(storyPath),
         profile
       };
     })
@@ -1079,32 +1163,115 @@ async function getCurrentUserId() {
   return data?.user?.id || null;
 }
 
-async function loadData() {
+// ─── SKELETONS ────────────────────────────────────────────
+function renderSkeletons(count = 3) {
+  els.feed.innerHTML = Array.from({ length: count }, () => `
+    <div class="skeleton-post">
+      <div class="skel-header">
+        <div class="skel-circle"></div>
+        <div class="skel-lines">
+          <div class="skel-line"></div>
+          <div class="skel-line short"></div>
+        </div>
+      </div>
+      <div class="skel-image"></div>
+    </div>
+  `).join("");
+}
+
+// ─── FETCH FROM api.sharedweb.com ─────────────────────────
+async function fetchApiPosts() {
   try {
-    const [{ data: profilesData }, { data: postsData }, { data: likesData }, currentUserId] = await Promise.all([
-      supabase.from("profiles").select("*").order("username", { ascending: true }),
-      supabase.from("posts").select("*").order("created_at", { ascending: false }),
-      supabase.from("likes").select("*"),
+    const res = await fetch(`${API_BASE}/posts`, {
+      headers: { "Accept": "application/json" }
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    // Normalise: accept { posts: [...] } or plain array
+    const posts = Array.isArray(data) ? data : (data.posts || data.data || []);
+    return safeArray(posts);
+  } catch (err) {
+    console.warn("api.sharedweb.com fetch failed, falling back to Supabase:", err);
+    return null; // signal fallback
+  }
+}
+
+async function fetchApiProfiles() {
+  try {
+    const res = await fetch(`${API_BASE}/profiles`, {
+      headers: { "Accept": "application/json" }
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    const profiles = Array.isArray(data) ? data : (data.profiles || data.data || []);
+    return safeArray(profiles);
+  } catch {
+    return null;
+  }
+}
+
+async function fetchApiLikes() {
+  try {
+    const res = await fetch(`${API_BASE}/likes`, {
+      headers: { "Accept": "application/json" }
+    });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    const likes = Array.isArray(data) ? data : (data.likes || data.data || []);
+    return safeArray(likes);
+  } catch {
+    return null;
+  }
+}
+
+// ─── LOAD DATA ────────────────────────────────────────────
+async function loadData() {
+  // Show skeleton immediately — no spinner
+  renderSkeletons(4);
+
+  try {
+    // Try api.sharedweb.com first, fall back to Supabase
+    const [apiPosts, apiProfiles, apiLikes, currentUserId] = await Promise.all([
+      fetchApiPosts(),
+      fetchApiProfiles(),
+      fetchApiLikes(),
       getCurrentUserId()
     ]);
 
-    state.profiles = safeArray(profilesData);
-    state.posts = safeArray(postsData);
-    state.likes = safeArray(likesData);
+    if (apiProfiles !== null) {
+      state.profiles = apiProfiles;
+    } else {
+      const { data } = await supabase.from("profiles").select("*").order("username", { ascending: true });
+      state.profiles = safeArray(data);
+    }
+
+    if (apiPosts !== null) {
+      state.posts = apiPosts;
+    } else {
+      const { data } = await supabase.from("posts").select("*").order("created_at", { ascending: false });
+      state.posts = safeArray(data);
+    }
+
+    if (apiLikes !== null) {
+      state.likes = apiLikes;
+    } else {
+      const { data } = await supabase.from("likes").select("*");
+      state.likes = safeArray(data);
+    }
+
     state.currentUserId = currentUserId;
     state.storyQueue = getStoryQueue();
 
     renderStories();
-    await renderFeed(resolveCurrentFeed());
+    await renderFeed(state.posts);
     updateSuggestions();
   } catch (err) {
     console.error(err);
     els.feed.innerHTML = `<div class="empty">Impossibile caricare i contenuti.</div>`;
-  } finally {
-    els.loading.classList.add("hidden");
   }
 }
 
+// ─── STORIES ──────────────────────────────────────────────
 function renderStories() {
   if (!state.storyQueue.length) {
     els.storiesSection.style.display = "none";
@@ -1124,25 +1291,22 @@ function renderStories() {
   });
 }
 
+// ─── ALBUM COVER ─────────────────────────────────────────
 async function resolveAlbumCover(post) {
   const key = songKey(post);
   if (!key) return "";
   if (state.coverCache.has(key)) return state.coverCache.get(key);
 
-  const title = String(post.song_title || post.song || "").trim();
+  const title  = String(post.song_title || post.song || "").trim();
   const artist = String(post.song_author || post.song_artist || post.song_by || "").trim();
-  const term = [title, artist].filter(Boolean).join(" ");
-  if (!term) {
-    state.coverCache.set(key, "");
-    return "";
-  }
+  const term   = [title, artist].filter(Boolean).join(" ");
+  if (!term) { state.coverCache.set(key, ""); return ""; }
 
   try {
-    const url = `https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=1`;
-    const res = await fetch(url);
+    const res  = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(term)}&media=music&entity=song&limit=1`);
     const data = await res.json();
     const artwork = data?.results?.[0]?.artworkUrl100 || "";
-    const cover = artwork ? artwork.replace(/100x100bb\.(jpg|png|jpeg)$/i, "600x600bb.$1") : "";
+    const cover   = artwork ? artwork.replace(/100x100bb\.(jpg|png|jpeg)$/i, "600x600bb.$1") : "";
     state.coverCache.set(key, cover);
     return cover;
   } catch {
@@ -1151,6 +1315,7 @@ async function resolveAlbumCover(post) {
   }
 }
 
+// ─── FEED RENDER ─────────────────────────────────────────
 async function renderFeed(filteredPosts = state.posts) {
   if (!filteredPosts.length) {
     els.feed.innerHTML = `<div class="empty">Nessun post trovato.</div>`;
@@ -1158,19 +1323,19 @@ async function renderFeed(filteredPosts = state.posts) {
   }
 
   els.feed.innerHTML = filteredPosts.map((post) => {
-    const username = getUsernameForPost(post);
-    const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
-    const avatar = getAvatarForPost(post);
-    const image = normalizeShared(post.image_url || post.media_url || post.image || "");
-    const caption = post.caption || post.text || "";
-    const songTitle = post.song_title || post.song || "";
+    const username   = getUsernameForPost(post);
+    const profile    = getProfileById(post.user_id) || getProfileById(post.profile_id);
+    const avatar     = getAvatarForPost(post);
+    const image      = normalizeShared(post.image_url || post.media_url || post.image || "");
+    const caption    = post.caption || post.text || "";
+    const songTitle  = post.song_title || post.song || "";
     const songAuthor = post.song_author || post.song_artist || post.song_by || "";
-    const songPreview = post.song_preview || post.audio_url || "";
-    const songCover = normalizeShared(post.song_cover || post.album_cover || post.album_image || post.cover_url || post.artwork_url || post.album_art || "");
-    const createdAt = post.created_at || post.inserted_at || post.updated_at || "";
+    const songPreview= post.song_preview || post.audio_url || "";
+    const songCover  = normalizeShared(post.song_cover || post.album_cover || post.album_image || post.cover_url || post.artwork_url || post.album_art || "");
+    const createdAt  = post.created_at || post.inserted_at || post.updated_at || "";
     const likesCount = postLikeCount(post.id);
-    const liked = postLikedByMe(post.id) || !!post.liked;
-    const tags = tagsForPost(post);
+    const liked      = postLikedByMe(post.id) || !!post.liked;
+    const tags       = tagsForPost(post);
 
     return `
       <article class="post" data-post-id="${escapeHtml(post.id)}">
@@ -1209,7 +1374,7 @@ async function renderFeed(filteredPosts = state.posts) {
           <div class="song-card" data-song-key="${escapeHtml(songKey(post))}">
             ${songCover ? `<img class="album-cover" src="${songCover}" alt="Album cover">` : `<div class="note-cover" aria-label="No cover"><span class="material-symbols-rounded">music_note</span></div>`}
             <div class="song-info">
-              ${songTitle ? `<div class="song-title">${escapeHtml(songTitle)}</div>` : ""}
+              ${songTitle  ? `<div class="song-title">${escapeHtml(songTitle)}</div>`   : ""}
               ${songAuthor ? `<div class="song-author">${escapeHtml(songAuthor)}</div>` : ""}
             </div>
             ${songPreview ? `<audio class="bg-audio" autoplay loop preload="auto" playsinline src="${escapeHtml(songPreview)}"></audio>` : ""}
@@ -1227,22 +1392,19 @@ async function renderFeed(filteredPosts = state.posts) {
 }
 
 async function resolveMissingCovers() {
-  const cards = [...document.querySelectorAll(".song-card[data-song-key]")];
+  const cards   = [...document.querySelectorAll(".song-card[data-song-key]")];
   const targets = cards.filter((card) => card.querySelector(".note-cover"));
 
   await Promise.all(targets.map(async (card) => {
     const postEl = card.closest("[data-post-id]");
     if (!postEl) return;
-    const postId = postEl.dataset.postId;
-    const post = state.posts.find((p) => String(p.id) === String(postId));
-    if (!post) return;
-
-    const cover = await resolveAlbumCover(post);
-    if (!cover) return;
-
-    const note = card.querySelector(".note-cover");
-    if (!note) return;
-    const img = document.createElement("img");
+    const post   = state.posts.find((p) => String(p.id) === String(postEl.dataset.postId));
+    if (!post)   return;
+    const cover  = await resolveAlbumCover(post);
+    if (!cover)  return;
+    const note   = card.querySelector(".note-cover");
+    if (!note)   return;
+    const img    = document.createElement("img");
     img.className = "album-cover";
     img.alt = "Album cover";
     img.src = cover;
@@ -1270,11 +1432,7 @@ function wireBackgroundAudio() {
   document.querySelectorAll("audio.bg-audio").forEach((audio) => {
     audio.volume = 0.22;
     const attemptPlay = async () => {
-      try {
-        await audio.play();
-      } catch {
-        // autoplay may be blocked until user interaction
-      }
+      try { await audio.play(); } catch { /* blocked */ }
     };
     attemptPlay();
     audio.addEventListener("loadedmetadata", attemptPlay, { once: true });
@@ -1282,20 +1440,20 @@ function wireBackgroundAudio() {
 }
 
 function toggleLike(postId) {
-  const btn = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
-  const countEl = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
+  const btn      = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
+  const countEl  = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
   if (!btn || !countEl) return;
 
-  const liked = btn.classList.contains("liked");
+  const liked        = btn.classList.contains("liked");
   const currentCount = postLikeCount(postId);
-  const nextCount = liked ? Math.max(0, currentCount - 1) : currentCount + 1;
+  const nextCount    = liked ? Math.max(0, currentCount - 1) : currentCount + 1;
 
   btn.classList.toggle("liked", !liked);
   countEl.textContent = `${formatCount(nextCount)} likes`;
 
   showLikePulse(postId);
-  persistLike(postId, liked).catch((error) => {
-    console.error(error);
+  persistLike(postId, liked).catch((err) => {
+    console.error(err);
     btn.classList.toggle("liked", liked);
     countEl.textContent = `${formatCount(currentCount)} likes`;
   });
@@ -1329,10 +1487,7 @@ async function persistLike(postId, wasLiked) {
 
 function wirePostInteractions() {
   document.querySelectorAll("[data-profile-id]").forEach((nameEl) => {
-    nameEl.addEventListener("click", () => {
-      const profileId = nameEl.dataset.profileId;
-      goToProfile(profileId);
-    });
+    nameEl.addEventListener("click", () => goToProfile(nameEl.dataset.profileId));
   });
 
   document.querySelectorAll("[data-like-btn]").forEach((btn) => {
@@ -1349,74 +1504,59 @@ function wireDoubleTapLike() {
 
   document.querySelectorAll("[data-like-zone]").forEach((zone) => {
     zone.addEventListener("click", () => {
-      const id = zone.dataset.likeZone;
+      const id  = zone.dataset.likeZone;
       const now = Date.now();
-      const prev = lastTap.get(id) || 0;
+      const prev= lastTap.get(id) || 0;
       if (now - prev < 300) {
         toggleLike(id);
         lastTap.delete(id);
         return;
       }
       lastTap.set(id, now);
-      setTimeout(() => {
-        if (lastTap.get(id) === now) lastTap.delete(id);
-      }, 320);
+      setTimeout(() => { if (lastTap.get(id) === now) lastTap.delete(id); }, 320);
     });
 
-    zone.addEventListener("dblclick", () => {
-      toggleLike(zone.dataset.likeZone);
-    });
+    zone.addEventListener("dblclick", () => toggleLike(zone.dataset.likeZone));
   });
 
   let touchStartTs = 0;
   let lastTouchPost = null;
   document.querySelectorAll("[data-like-zone]").forEach((zone) => {
     zone.addEventListener("touchend", () => {
-      const id = zone.dataset.likeZone;
+      const id  = zone.dataset.likeZone;
       const now = Date.now();
       if (lastTouchPost === id && now - touchStartTs < 320) {
         toggleLike(id);
         lastTouchPost = null;
         return;
       }
-      touchStartTs = now;
+      touchStartTs  = now;
       lastTouchPost = id;
     }, { passive: true });
   });
 }
 
-function resolveCurrentFeed() {
-  return state.posts;
-}
-
+// ─── SEARCH / SUGGESTIONS ─────────────────────────────────
 function updateSuggestions() {
   const q = state.searchQuery.trim().toLowerCase();
-  if (!q) {
-    els.suggestions.style.display = "none";
-    els.suggestions.innerHTML = "";
-    return;
-  }
+  if (!q) { els.suggestions.style.display = "none"; els.suggestions.innerHTML = ""; return; }
 
   const userMatches = state.profiles
-    .filter((profile) => {
-      const username = String(profile.username || profile.full_name || "").toLowerCase();
-      const bio = String(profile.bio || "").toLowerCase();
+    .filter((p) => {
+      const username = String(p.username || p.full_name || "").toLowerCase();
+      const bio      = String(p.bio || "").toLowerCase();
       return username.includes(q) || bio.includes(q);
     })
     .slice(0, 8)
-    .map((profile) => ({
-      id: profile.id,
-      title: profile.username || profile.full_name || "user",
-      subtitle: profile.bio || "Open profile",
-      avatar: getAvatarForProfile(profile),
-      verified: isVerified(profile)
+    .map((p) => ({
+      id:       p.id,
+      title:    p.username || p.full_name || "user",
+      subtitle: p.bio || "Open profile",
+      avatar:   getAvatarForProfile(p),
+      verified: isVerified(p)
     }));
 
-  if (!userMatches.length) {
-    els.suggestions.style.display = "none";
-    els.suggestions.innerHTML = "";
-    return;
-  }
+  if (!userMatches.length) { els.suggestions.style.display = "none"; els.suggestions.innerHTML = ""; return; }
 
   els.suggestions.innerHTML = userMatches.map((item) => `
     <div class="suggestion" data-suggestion-id="${escapeHtml(item.id)}">
@@ -1434,9 +1574,7 @@ function updateSuggestions() {
   els.suggestions.style.display = "block";
 
   els.suggestions.querySelectorAll("[data-suggestion-id]").forEach((node) => {
-    node.addEventListener("click", () => {
-      goToProfile(node.dataset.suggestionId);
-    });
+    node.addEventListener("click", () => goToProfile(node.dataset.suggestionId));
   });
 }
 
@@ -1445,6 +1583,7 @@ function goToProfile(profileId) {
   window.location.href = `profile.html?id=${encodeURIComponent(profileId)}`;
 }
 
+// ─── STORY VIEWER ─────────────────────────────────────────
 function openStory(index) {
   if (!state.storyQueue.length) return;
   state.storyIndex = ((index % state.storyQueue.length) + state.storyQueue.length) % state.storyQueue.length;
@@ -1465,7 +1604,7 @@ function closeStory() {
 function renderStory() {
   const story = state.storyQueue[state.storyIndex];
   if (!story) return;
-  els.storyImage.src = story.story || story.avatar || defaultProfileIcon();
+  els.storyImage.src  = story.story || story.avatar || defaultProfileIcon();
   els.storyAvatar.src = story.avatar || defaultProfileIcon();
   els.storyName.textContent = story.username;
   renderProgressBars();
@@ -1481,14 +1620,11 @@ function renderProgressBars() {
 function updateProgress() {
   const bars = [...els.progressRow.querySelectorAll(".progress > span")];
   bars.forEach((bar, i) => {
-    if (i < state.storyIndex) {
-      bar.style.width = "100%";
-    } else if (i > state.storyIndex) {
-      bar.style.width = "0%";
-    } else {
+    if (i < state.storyIndex)      { bar.style.width = "100%"; }
+    else if (i > state.storyIndex) { bar.style.width = "0%"; }
+    else {
       const elapsed = performance.now() - state.storyStartTs;
-      const pct = Math.min(100, (elapsed / state.storyDurationMs) * 100);
-      bar.style.width = `${pct}%`;
+      bar.style.width = `${Math.min(100, (elapsed / state.storyDurationMs) * 100)}%`;
     }
   });
   state.storyRaf = requestAnimationFrame(updateProgress);
@@ -1497,15 +1633,15 @@ function updateProgress() {
 function startStoryTimer() {
   stopStoryTimer();
   state.storyStartTs = performance.now();
-  state.storyTimer = setTimeout(() => nextStory(), state.storyDurationMs);
-  state.storyRaf = requestAnimationFrame(updateProgress);
+  state.storyTimer   = setTimeout(() => nextStory(), state.storyDurationMs);
+  state.storyRaf     = requestAnimationFrame(updateProgress);
 }
 
 function stopStoryTimer() {
   if (state.storyTimer) clearTimeout(state.storyTimer);
-  if (state.storyRaf) cancelAnimationFrame(state.storyRaf);
+  if (state.storyRaf)   cancelAnimationFrame(state.storyRaf);
   state.storyTimer = null;
-  state.storyRaf = null;
+  state.storyRaf   = null;
 }
 
 function nextStory() {
@@ -1522,14 +1658,15 @@ function prevStory() {
   startStoryTimer();
 }
 
+// ─── LIKES MODAL ─────────────────────────────────────────
 async function openLikesModal(postId) {
   const likesForPost = state.likes.filter((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId));
   const items = likesForPost.map((like) => {
     const profile = getProfileById(like.user_id);
     return {
-      id: profile?.id || like.user_id,
-      name: profile?.username || profile?.full_name || "user",
-      avatar: getAvatarForProfile(profile),
+      id:       profile?.id || like.user_id,
+      name:     profile?.username || profile?.full_name || "user",
+      avatar:   getAvatarForProfile(profile),
       subtitle: profile?.bio || "Open profile",
       verified: isVerified(profile)
     };
@@ -1563,39 +1700,28 @@ function closeLikesModal() {
   els.likesModal.setAttribute("aria-hidden", "true");
 }
 
+// ─── EVENT WIRING ─────────────────────────────────────────
 els.closeLikesBtn.addEventListener("click", closeLikesModal);
-els.likesModal.addEventListener("click", (e) => {
-  if (e.target === els.likesModal) closeLikesModal();
-});
+els.likesModal.addEventListener("click", (e) => { if (e.target === els.likesModal) closeLikesModal(); });
 
 els.closeStory.addEventListener("click", closeStory);
-els.storyViewer.addEventListener("click", (event) => {
-  if (event.target === els.storyViewer) closeStory();
-});
-els.prevStory.addEventListener("click", (event) => { event.stopPropagation(); prevStory(); });
-els.nextStory.addEventListener("click", (event) => { event.stopPropagation(); nextStory(); });
+els.storyViewer.addEventListener("click", (e) => { if (e.target === els.storyViewer) closeStory(); });
+els.prevStory.addEventListener("click", (e) => { e.stopPropagation(); prevStory(); });
+els.nextStory.addEventListener("click", (e) => { e.stopPropagation(); nextStory(); });
 
-els.search.addEventListener("input", () => {
-  state.searchQuery = els.search.value;
-  updateSuggestions();
-});
-
+els.search.addEventListener("input", () => { state.searchQuery = els.search.value; updateSuggestions(); });
 els.search.addEventListener("focus", updateSuggestions);
 document.addEventListener("click", (e) => {
-  if (!e.target.closest(".search-wrap")) {
-    els.suggestions.style.display = "none";
-  }
+  if (!e.target.closest(".search-wrap")) els.suggestions.style.display = "none";
 });
 
 window.addEventListener("keydown", (event) => {
   if (els.storyViewer.classList.contains("open")) {
-    if (event.key === "Escape") closeStory();
-    if (event.key === "ArrowLeft") prevStory();
+    if (event.key === "Escape")     closeStory();
+    if (event.key === "ArrowLeft")  prevStory();
     if (event.key === "ArrowRight") nextStory();
   }
-  if (els.likesModal.classList.contains("open") && event.key === "Escape") {
-    closeLikesModal();
-  }
+  if (els.likesModal.classList.contains("open") && event.key === "Escape") closeLikesModal();
 });
 
 document.addEventListener("visibilitychange", () => {
@@ -1606,35 +1732,14 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 
-window.goUpload = (type) => {
-  window.location.href = `upload.html?type=${encodeURIComponent(type)}`;
-};
+// ─── GLOBAL HELPERS ───────────────────────────────────────
+window.goUpload = (type) => { window.location.href = `upload.html?type=${encodeURIComponent(type)}`; };
 
 window.logout = async () => {
-  try {
-    await supabase.auth.signOut();
-  } finally {
-    window.location.href = "index.html";
-  }
+  try { await supabase.auth.signOut(); } finally { window.location.href = "index.html"; }
 };
 
-window.goProfile = (id) => {
-  if (!id) return;
-  window.location.href = `profile.html?id=${encodeURIComponent(id)}`;
-};
-
-window.like = async (id) => {
-  if (!id || !state.currentUserId) return;
-  await supabase.from("likes").insert({ post_id: id, user_id: state.currentUserId });
-  const { data } = await supabase.from("likes").select("*");
-  state.likes = safeArray(data);
-  renderFeed(resolveCurrentFeed());
-};
-
-window.showLikes = async (id) => {
-  await openLikesModal(id);
-};
-
+// ─── BOOT ─────────────────────────────────────────────────
 loadData();
 </script>
 </body>
