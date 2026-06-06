@@ -500,33 +500,46 @@ document.addEventListener("click", e => {
 /* ── UPLOAD + PUBLISH ── */
 async function upload(blob) {
   const filename = `${userId}_${Date.now()}.jpg`;
+  const authHeader = { Authorization: `Bearer ${token}` };
 
-  // Try different auth header formats in sequence
-  const authFormats = [
-    { Authorization: `Bearer ${token}` },
-    { Authorization: `Token ${token}` },
-    { "X-Auth-Token": token },
-  ];
+  // 422 = server received the request but rejected the payload.
+  // Probe common field names so we find the one the server expects.
+  const fieldNames = ["file", "image", "photo", "media", "upload"];
+  let lastErrBody = null;
 
-  for (const headers of authFormats) {
+  for (const field of fieldNames) {
     const fd = new FormData();
-    fd.append("file", blob, filename);
+    fd.append(field, blob, filename);
 
     const res = await fetch(`${API}/upload`, {
       method: "POST",
-      headers,
+      headers: authHeader,
       body: fd,
     });
 
-    if (res.status === 401) continue;   // try next auth format
+    if (res.status === 401) {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user_id");
+      throw new Error("Session expired. Redirecting to login...");
+    }
+
+    if (res.status === 422) {
+      try {
+        lastErrBody = await res.json();
+        console.warn(`[upload] field="${field}" -> 422:`, JSON.stringify(lastErrBody));
+      } catch(_) {}
+      continue; // try next field name
+    }
+
     if (!res.ok) throw new Error(`Upload failed (${res.status})`);
     return await res.json();
   }
 
-  // All formats returned 401 — clear stale session and redirect to login
-  localStorage.removeItem("token");
-  localStorage.removeItem("user_id");
-  throw new Error("Session expired. Redirecting to login…");
+  // All field names rejected -- show the server's own message if available
+  const detail = lastErrBody
+    ? JSON.stringify(lastErrBody)
+    : "open DevTools > Console for details";
+  throw new Error(`Server rejected the upload (422): ${detail}`);
 }
 
 publish.onclick = async () => {
