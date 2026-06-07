@@ -9,257 +9,415 @@
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 <style>
 :root{
-  --bg:#000;--text:#fff;--muted:rgba(255,255,255,.68);--muted-2:rgba(255,255,255,.48);
-  --border:rgba(255,255,255,.14);--panel:rgba(255,255,255,.05);--panel-2:rgba(255,255,255,.08);
-  --danger:#ff3b30;--like:#ff2d55;--sidebar-w:330px;--feed-width:440px;
+  --bg:#000;--text:#fff;--muted:rgba(255,255,255,.68);--muted-2:rgba(255,255,255,.42);
+  --border:rgba(255,255,255,.13);--panel:rgba(255,255,255,.05);
+  --danger:#ff3b30;--like:#ff2d55;
+  --sidebar-w:330px;--feed-width:440px;
   --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-  --squircle-radius:28px;
+  --radius:28px;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%}
 body{background:#000;color:#fff;font-family:'Archivo Black',sans-serif;overflow:hidden;}
 button,input,a{font-family:'Archivo Black',sans-serif;}
 
-/* Sidebar */
-.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:19;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s,visibility .28s;}
+/* ═══ SIDEBAR ══════════════════════════════════════════════ */
+.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:19;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s,visibility .28s;}
 .sidebar-overlay.open{opacity:1;visibility:visible;pointer-events:auto;}
 .hamburger{position:fixed;top:14px;left:16px;z-index:22;width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.92);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s,transform .18s;}
 .hamburger:hover{background:rgba(255,255,255,.08);}
 .hamburger:active{transform:scale(.94);}
 .hamburger .material-symbols-rounded{font-size:24px;}
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);padding:18px 16px;display:flex;flex-direction:column;gap:14px;border-right:1px solid rgba(255,255,255,.1);background:#000;z-index:21;overflow:hidden;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);}
+
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);display:flex;flex-direction:column;gap:0;border-right:1px solid rgba(255,255,255,.09);background:#050505;z-index:21;overflow:hidden;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
 .sidebar.open{transform:translateX(0);}
-.sidebar-top{display:flex;flex-direction:column;gap:14px;min-height:0;flex:1;padding-top:56px;}
-.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:10px;}
-.profile-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);}
-.profile-avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.12);background:#111;flex:0 0 auto;}
-.profile-meta{min-width:0;flex:1}
-.profile-label{font-size:11px;color:var(--muted-2);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;}
-.profile-name{display:flex;align-items:center;gap:6px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.profile-handle{margin-top:3px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* Profile hero in sidebar */
+.sidebar-hero{
+  position:relative;flex:0 0 auto;
+  height:200px;overflow:hidden;
+}
+.sidebar-hero-bg{
+  position:absolute;inset:0;
+  background:linear-gradient(160deg,#1a1a2e 0%,#0a0a0a 100%);
+  filter:blur(0);
+}
+.sidebar-hero-blur{
+  position:absolute;inset:0;
+  background:inherit;
+  backdrop-filter:blur(40px);
+}
+.sidebar-hero-content{
+  position:relative;z-index:2;
+  display:flex;flex-direction:column;align-items:flex-start;
+  padding:calc(16px + var(--safe-top)) 20px 18px;
+  height:100%;justify-content:flex-end;
+}
+.sidebar-profile-avatar{
+  width:64px;height:64px;border-radius:50%;
+  object-fit:cover;border:2.5px solid rgba(255,255,255,.3);
+  background:#111;margin-bottom:12px;
+  box-shadow:0 4px 20px rgba(0,0,0,.6);
+}
+.sidebar-profile-name{font-size:20px;letter-spacing:-.02em;line-height:1.1;}
+.sidebar-profile-handle{margin-top:4px;font-size:12px;color:var(--muted-2);}
+.sidebar-profile-stats{display:flex;gap:18px;margin-top:10px;}
+.sidebar-stat{display:flex;flex-direction:column;align-items:flex-start;}
+.sidebar-stat-n{font-size:15px;}
+.sidebar-stat-l{font-size:10px;color:var(--muted-2);letter-spacing:.06em;text-transform:uppercase;}
+
+/* Sidebar body */
+.sidebar-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 0;display:flex;flex-direction:column;gap:10px;}
+.sidebar-body::-webkit-scrollbar{display:none}
+
 .search-wrap{position:relative}
-.search{width:100%;display:block;padding:14px 16px;border-radius:18px;border:1px solid rgba(255,255,255,.18);background:#111;color:#fff;outline:none;font-size:15px;}
-.search::placeholder{color:rgba(255,255,255,.4)}
-.suggestions{position:absolute;left:0;right:0;top:calc(100% + 8px);display:none;background:#0b0b0b;border:1px solid rgba(255,255,255,.14);border-radius:16px;overflow:hidden;max-height:320px;overflow-y:auto;z-index:30;}
-.suggestion{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.06);}
+.search{width:100%;display:block;padding:13px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;outline:none;font-size:14px;}
+.search::placeholder{color:rgba(255,255,255,.35)}
+.suggestions{position:absolute;left:0;right:0;top:calc(100% + 8px);display:none;background:#0e0e0e;border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;max-height:280px;overflow-y:auto;z-index:30;}
+.suggestion{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);}
 .suggestion:last-child{border-bottom:0}
-.suggestion:hover{background:rgba(255,255,255,.06)}
+.suggestion:hover{background:rgba(255,255,255,.05)}
 .suggestion-avatar{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.1);flex:0 0 auto;object-fit:cover;background:#111;}
 .suggestion-meta{min-width:0;flex:1}
-.suggestion-title{display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.suggestion-title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .suggestion-subtitle{margin-top:3px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.nav-btn{display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:14px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;transition:.2s;text-decoration:none;user-select:none;line-height:1;font-size:15px;justify-content:flex-start;}
+
+.sidebar-footer{padding:14px;display:flex;flex-direction:column;gap:8px;}
+.nav-btn{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;transition:.18s;text-decoration:none;user-select:none;line-height:1;font-size:14px;}
 .nav-btn:hover{background:rgba(255,255,255,.09)}
-.nav-btn.logout{background:rgba(255,59,48,.12);color:#ff7a73;border-color:rgba(255,59,48,.24);}
-.nav-btn .material-symbols-rounded{font-size:22px;line-height:1;}
+.nav-btn.logout{background:rgba(255,59,48,.1);color:#ff7a73;border-color:rgba(255,59,48,.22);}
+.nav-btn .material-symbols-rounded{font-size:20px;line-height:1;}
 
-/* Main */
+/* ═══ MAIN ══════════════════════════════════════════════════ */
 .main{width:100%;height:100vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
+.header{text-align:center;padding:18px 72px 14px;font-size:30px;letter-spacing:-.05em;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;background:#000;z-index:5;}
 
-/* Header */
-.header{text-align:center;padding:18px 72px 14px;font-size:30px;letter-spacing:-.05em;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;background:#000;z-index:5;}
-
-/* Stories / Moments shared strip */
-.stories-section{padding-top:8px;}
-.section-head{display:flex;align-items:center;justify-content:space-between;padding:0 12px 10px;}
-.section-title{font-size:12px;color:var(--muted-2);letter-spacing:.14em;text-transform:uppercase;}
-
-/* Stories row */
-.stories{display:flex;gap:14px;overflow-x:auto;padding:8px 12px 6px;scrollbar-width:none;}
+/* ═══ STORIES ═══════════════════════════════════════════════ */
+.stories-section{padding-top:10px;}
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:0 14px 10px;}
+.section-title{font-size:11px;color:var(--muted-2);letter-spacing:.14em;text-transform:uppercase;}
+.stories{display:flex;gap:14px;overflow-x:auto;padding:4px 14px 10px;scrollbar-width:none;}
 .stories::-webkit-scrollbar{display:none}
-.story{min-width:70px;text-align:center;cursor:pointer;flex:0 0 auto;background:transparent;border:0;color:#fff;}
-.story img{width:60px;height:60px;border-radius:50%;border:2px solid #fff;display:block;margin:0 auto 8px;object-fit:cover;background:#111;}
-.story div{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:70px;}
+.story{min-width:64px;text-align:center;cursor:pointer;flex:0 0 auto;background:transparent;border:0;color:#fff;}
+.story img{width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.8);display:block;margin:0 auto 7px;object-fit:cover;background:#111;}
+.story div{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;color:var(--muted);}
 
-/* Moments horizontal strip */
-.moments-section{padding:12px 0 4px;}
-.moments-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 12px 10px;scrollbar-width:none;}
+/* ═══ MOMENTS ═══════════════════════════════════════════════ */
+.moments-section{padding:6px 0 0;}
+.moments-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 14px 14px;scrollbar-width:none;}
 .moments-strip::-webkit-scrollbar{display:none}
+
 .moment-card{
-  flex:0 0 auto;width:130px;border-radius:18px;overflow:hidden;cursor:pointer;
-  position:relative;border:1px solid rgba(255,255,255,.1);
-  background:#0a0a0a;transition:transform .18s;
+  flex:0 0 auto;width:120px;border-radius:20px;overflow:hidden;cursor:pointer;
+  position:relative;border:1px solid rgba(255,255,255,.09);background:#0a0a0a;
+  transition:transform .2s,box-shadow .2s;
 }
-.moment-card:hover{transform:scale(1.03);}
-.moment-card:active{transform:scale(.97);}
-.moment-thumb{width:130px;height:180px;object-fit:cover;display:block;background:#111;}
-.moment-grad{position:absolute;inset:0;background:linear-gradient(0deg,rgba(0,0,0,.75) 0%,transparent 50%);}
-.moment-meta{position:absolute;bottom:0;left:0;right:0;padding:10px 10px 12px;}
-.moment-avatar{width:26px;height:26px;border-radius:50%;border:1.5px solid #fff;object-fit:cover;background:#111;display:block;margin-bottom:5px;}
-.moment-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;}
-.moment-caption{font-size:9px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px;}
-
-/* Feed section label */
-.feed-label{
-  display:flex;align-items:center;gap:8px;
-  padding:6px 12px 0;font-size:11px;color:var(--muted-2);letter-spacing:.12em;text-transform:uppercase;
+.moment-card:hover{transform:scale(1.04);box-shadow:0 12px 32px rgba(0,0,0,.6);}
+.moment-card:active{transform:scale(.96);}
+.moment-thumb{width:120px;height:190px;object-fit:cover;display:block;background:#111;}
+/* gradient overlay */
+.moment-grad{
+  position:absolute;inset:0;
+  background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.3) 45%, transparent 70%);
 }
-.feed-label .material-symbols-rounded{font-size:14px;}
+/* top ring */
+.moment-card-avatar-wrap{
+  position:absolute;top:10px;left:50%;transform:translateX(-50%);
+  width:38px;height:38px;
+  border-radius:50%;padding:2px;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,.4));
+}
+.moment-card-avatar{
+  width:100%;height:100%;border-radius:50%;object-fit:cover;background:#111;
+  border:2px solid #000;display:block;
+}
+.moment-meta{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:0 9px 12px;
+}
+.moment-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;text-align:center;}
+.moment-caption-pill{
+  margin-top:4px;
+  font-size:9px;color:rgba(255,255,255,.7);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  text-align:center;
+  background:rgba(255,255,255,.1);
+  border-radius:999px;padding:2px 7px;
+  backdrop-filter:blur(8px);
+}
 
-/* Feed */
-.feed{display:flex;flex-direction:column;gap:20px;padding:12px 0 80px;}
+/* ═══ MOMENT VIEWER ════════════════════════════════════════ */
+.moment-viewer{
+  position:fixed;inset:0;z-index:200;
+  display:flex;align-items:stretch;
+  background:#000;opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .22s,visibility .22s;
+}
+.moment-viewer.open{opacity:1;visibility:visible;pointer-events:auto;}
 
-/* Post */
+.moment-viewer-shell{
+  position:relative;width:100%;max-width:480px;margin:0 auto;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.moment-bg-blur{
+  position:absolute;inset:0;
+  background-size:cover;background-position:center;
+  filter:blur(40px) brightness(.35) saturate(1.4);
+  transform:scale(1.1);
+  z-index:0;
+}
+.moment-stage{
+  position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;
+}
+.moment-stage img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  max-height:100vh;
+}
+.moment-shade{
+  position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 22%,transparent 62%,rgba(0,0,0,.88) 100%);
+  pointer-events:none;
+}
+/* Progress */
+.moment-top{
+  position:absolute;top:0;left:0;right:0;z-index:3;
+  padding:calc(14px + var(--safe-top)) 14px 10px;
+}
+.moment-prog-row{display:flex;gap:4px;margin-bottom:12px;}
+.moment-prog{flex:1;height:2.5px;background:rgba(255,255,255,.2);border-radius:999px;overflow:hidden;}
+.moment-prog > span{display:block;width:0%;height:100%;background:#fff;border-radius:inherit;transition:none;}
+
+.moment-header{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.moment-user{display:flex;align-items:center;gap:10px;min-width:0;}
+.moment-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.5);background:#111;flex:0 0 auto;}
+.moment-username{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.moment-time{font-size:10px;color:rgba(255,255,255,.55);margin-top:2px;}
+
+/* Caption box inside viewer */
+.moment-caption-viewer{
+  position:absolute;bottom:0;left:0;right:0;z-index:3;
+  padding:0 16px calc(28px + var(--safe-bottom));
+}
+.moment-caption-text{
+  font-size:15px;line-height:1.5;
+  color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.9);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  cursor:pointer;transition:all .2s;
+}
+.moment-caption-text.expanded{-webkit-line-clamp:unset;}
+.moment-expand-hint{
+  font-size:11px;color:rgba(255,255,255,.5);margin-top:4px;cursor:pointer;
+}
+
+/* Tap zones */
+.moment-tap-zone{position:absolute;inset:0;z-index:2;display:grid;grid-template-columns:1fr 1fr;}
+.mv-close{
+  width:40px;height:40px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);
+  color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
+  backdrop-filter:blur(10px);flex:0 0 auto;
+}
+
+/* ═══ FEED ══════════════════════════════════════════════════ */
+.feed-label{display:flex;align-items:center;gap:7px;padding:8px 14px 4px;font-size:10px;color:var(--muted-2);letter-spacing:.12em;text-transform:uppercase;}
+.feed-label .material-symbols-rounded{font-size:13px;}
+.feed{display:flex;flex-direction:column;gap:18px;padding:10px 0 100px;}
+
+/* ═══ POST ══════════════════════════════════════════════════ */
 .post{
-  width:min(var(--feed-width),calc(100vw - 24px));margin:0 auto;
-  border:1px solid rgba(255,255,255,.12);border-radius:var(--squircle-radius);
-  overflow:hidden;background:#0a0a0a;
-  transition:transform .2s ease,box-shadow .2s ease;
-  animation:fadeUp .35s ease both;
+  width:min(var(--feed-width),calc(100vw - 20px));margin:0 auto;
+  border:1px solid rgba(255,255,255,.11);border-radius:var(--radius);
+  overflow:hidden;background:#080808;
+  animation:fadeUp .32s ease both;
 }
-@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
-.post:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5);}
-
-/* Post header */
-.post-header{display:flex;align-items:center;gap:12px;padding:12px 14px 10px;}
-.avatar{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.12);flex:0 0 auto;object-fit:cover;background:#111;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.post-header{display:flex;align-items:center;gap:11px;padding:12px 13px 10px;}
+.avatar{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.12);flex:0 0 auto;object-fit:cover;background:#111;}
 .user-meta{flex:1;min-width:0;}
-.username{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:15px;line-height:1.1;white-space:nowrap;overflow:hidden;}
-.verified{font-size:15px;color:#fff;flex:0 0 auto;font-variation-settings:'FILL' 1;}
-.post-time{margin-top:4px;font-size:10px;color:var(--muted-2);}
-.following-badge{
-  margin-left:auto;padding:4px 9px;border-radius:999px;
-  font-size:10px;border:1px solid rgba(255,255,255,.16);
-  background:rgba(255,255,255,.05);color:var(--muted-2);white-space:nowrap;flex:0 0 auto;
+.username{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:14px;line-height:1.1;white-space:nowrap;overflow:hidden;}
+.verified{font-size:14px;color:#fff;flex:0 0 auto;font-variation-settings:'FILL' 1;}
+.post-time{margin-top:3px;font-size:10px;color:var(--muted-2);}
+.following-badge{padding:3px 8px;border-radius:999px;font-size:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--muted-2);white-space:nowrap;flex:0 0 auto;margin-left:auto;}
+
+/* Delete button */
+.delete-btn{
+  width:32px;height:32px;border-radius:999px;
+  border:1px solid rgba(255,59,48,.28);background:rgba(255,59,48,.06);
+  color:#ff7a73;display:inline-flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:.18s;flex:0 0 auto;margin-left:6px;
 }
+.delete-btn:hover{background:rgba(255,59,48,.16);}
+.delete-btn:active{transform:scale(.92);}
+.delete-btn .material-symbols-rounded{font-size:16px;}
 
 /* Media */
 .media{position:relative;width:100%;aspect-ratio:4/3;background:#111;overflow:hidden;}
 .media img{width:100%;height:100%;display:block;object-fit:cover;}
-.like-pop{position:absolute;inset:auto auto 50% 50%;transform:translate(-50%,50%) scale(.8);pointer-events:none;opacity:0;z-index:3;color:var(--like);transition:opacity .15s,transform .15s;}
+.like-pop{position:absolute;inset:auto auto 50% 50%;transform:translate(-50%,50%) scale(.7);pointer-events:none;opacity:0;z-index:3;color:var(--like);transition:opacity .14s,transform .14s;}
 .like-pop.show{opacity:1;transform:translate(-50%,50%) scale(1);}
 .like-pop .material-symbols-rounded{font-size:72px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;}
 
 /* Actions */
-.actions{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px 0;}
-.like-row{display:flex;align-items:center;gap:10px;}
-.like-btn{width:40px;height:40px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.18s;flex:0 0 auto;}
+.actions{display:flex;align-items:center;gap:10px;padding:10px 13px 0;}
+.like-row{display:flex;align-items:center;gap:8px;flex:1;}
+.like-btn{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.04);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.18s;flex:0 0 auto;}
 .like-btn:hover{background:rgba(255,255,255,.09)}
-.like-btn:active{transform:scale(.96)}
+.like-btn:active{transform:scale(.95)}
 .like-btn.liked{color:var(--like);background:rgba(255,45,85,.08);border-color:rgba(255,45,85,.28)}
-.like-btn .material-symbols-rounded{font-size:20px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 24;}
+.like-btn .material-symbols-rounded{font-size:19px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 24;}
 .count{font-size:12px;color:var(--muted);cursor:pointer;user-select:none;}
 
 /* Location */
-.location-row{display:flex;align-items:center;gap:5px;padding:8px 14px 0;font-size:11px;color:var(--muted-2);}
+.location-row{display:flex;align-items:center;gap:5px;padding:8px 13px 0;font-size:11px;color:var(--muted-2);}
 .location-row .material-symbols-rounded{font-size:13px;flex:0 0 auto;}
-
 /* Tags */
-.tag-row{display:flex;flex-wrap:wrap;gap:6px;padding:8px 14px 0;}
-.tag-pill{padding:5px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;font-size:11px;}
-
-/* Caption — always visible */
+.tag-row{display:flex;flex-wrap:wrap;gap:5px;padding:7px 13px 0;}
+.tag-pill{padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.04);color:rgba(255,255,255,.75);font-size:10px;}
+/* Caption */
 .caption{
-  padding:10px 14px 0;font-size:14px;line-height:1.5;color:var(--muted);
-  display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;
+  padding:9px 13px 0;font-size:13.5px;line-height:1.5;color:var(--muted);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
 }
-.caption .author-handle{color:#fff;margin-right:6px;}
 .caption.expanded{display:block;-webkit-line-clamp:unset;}
-.caption-toggle{padding:2px 14px 0;font-size:12px;color:var(--muted-2);cursor:pointer;display:none;}
-.caption-toggle.visible{display:block;}
+.caption .author-handle{color:#fff;margin-right:6px;}
+.caption-more{padding:3px 13px 0;font-size:11px;color:var(--muted-2);cursor:pointer;display:none;}
+.caption-more.visible{display:block;}
 
-/* Song card */
+/* ═══ SONG CARD ═════════════════════════════════════════════ */
 .song-card{
-  display:flex;align-items:center;gap:12px;padding:11px;margin:10px 10px 0;
-  border-radius:16px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
-  cursor:pointer;transition:background .18s;
+  display:flex;align-items:center;gap:11px;
+  padding:10px;margin:10px 10px 0;
+  border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  cursor:pointer;transition:background .18s;position:relative;overflow:hidden;
 }
-.song-card:hover{background:rgba(255,255,255,.09);}
-.song-card.playing{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
-.music-bars{display:none;align-items:flex-end;gap:2px;width:18px;height:18px;flex:0 0 auto;}
+.song-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(255,255,255,.03),transparent);
+  pointer-events:none;
+}
+.song-card:hover{background:rgba(255,255,255,.08);}
+.song-card.playing{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.07);}
+.song-card.loading-itunes{opacity:.7;}
+.music-bars{display:none;align-items:flex-end;gap:2px;width:16px;height:16px;flex:0 0 auto;}
 .song-card.playing .music-bars{display:flex;}
-.music-bars span{display:block;width:3px;border-radius:2px;background:#fff;animation:bar .7s ease infinite alternate;}
+.music-bars span{display:block;width:2.5px;border-radius:2px;background:#fff;animation:bar .65s ease infinite alternate;}
 .music-bars span:nth-child(1){height:6px;animation-delay:0s;}
-.music-bars span:nth-child(2){height:12px;animation-delay:.18s;}
-.music-bars span:nth-child(3){height:8px;animation-delay:.32s;}
+.music-bars span:nth-child(2){height:12px;animation-delay:.16s;}
+.music-bars span:nth-child(3){height:8px;animation-delay:.3s;}
 @keyframes bar{to{height:3px;}}
-.album-cover{width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.12);flex:0 0 auto;object-fit:cover;background:#111;}
-.note-cover{width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;background:#111;flex:0 0 auto;}
-.note-cover .material-symbols-rounded{font-size:24px;}
+.album-cover{width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.1);flex:0 0 auto;object-fit:cover;background:#1a1a1a;}
+.note-cover{width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;background:#1a1a1a;flex:0 0 auto;}
+.note-cover .material-symbols-rounded{font-size:22px;color:var(--muted-2);}
 .song-info{min-width:0;flex:1;}
-.song-title{font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.song-author{margin-top:4px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.song-title{font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.song-author{margin-top:3px;font-size:10px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.song-source-badge{font-size:8px;color:rgba(255,255,255,.3);margin-top:2px;letter-spacing:.04em;}
+.play-btn-inline{
+  width:32px;height:32px;border-radius:50%;border:1px solid rgba(255,255,255,.14);
+  background:rgba(255,255,255,.06);color:#fff;display:flex;align-items:center;justify-content:center;
+  flex:0 0 auto;
+}
+.play-btn-inline .material-symbols-rounded{font-size:16px;font-variation-settings:'FILL' 1;}
 
-/* Audio bar */
+/* ═══ AUDIO BAR ═════════════════════════════════════════════ */
 #audioBar{
   position:fixed;bottom:0;left:0;right:0;z-index:50;display:none;
-  align-items:center;gap:12px;
-  padding:10px 16px calc(10px + var(--safe-bottom));
-  background:rgba(10,10,10,.96);border-top:1px solid rgba(255,255,255,.1);
-  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  padding:10px 14px calc(12px + var(--safe-bottom));
+  background:rgba(8,8,8,.97);border-top:1px solid rgba(255,255,255,.09);
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  gap:12px;align-items:center;
 }
 #audioBar.visible{display:flex;}
-#audioBarCover{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#111;border:1px solid rgba(255,255,255,.12);flex:0 0 auto;}
-#audioBarInfo{flex:1;min-width:0;}
-#audioBarTitle{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#audioBarArtist{font-size:10px;color:var(--muted-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-#audioBarToggle{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
-#audioBarToggle .material-symbols-rounded{font-size:20px;}
-#audioBarClose{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:var(--muted-2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;}
+.audio-bar-cover-wrap{position:relative;flex:0 0 auto;}
+#audioBarCover{
+  width:48px;height:48px;border-radius:12px;object-fit:cover;
+  background:#1a1a1a;border:1px solid rgba(255,255,255,.1);
+  display:block;
+}
+.audio-playing-ring{
+  position:absolute;inset:-3px;border-radius:15px;
+  border:2px solid rgba(255,255,255,.25);
+  animation:ringPulse 2s ease infinite;pointer-events:none;
+}
+@keyframes ringPulse{0%,100%{opacity:.4;transform:scale(1);}50%{opacity:.9;transform:scale(1.04);}}
+.audio-bar-info{flex:1;min-width:0;}
+#audioBarTitle{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em;}
+#audioBarArtist{font-size:11px;color:var(--muted-2);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.audio-bar-progress{margin-top:6px;height:2px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden;}
+.audio-bar-progress-fill{height:100%;background:#fff;border-radius:inherit;width:0%;transition:width .5s linear;}
+.audio-bar-controls{display:flex;align-items:center;gap:8px;flex:0 0 auto;}
+#audioBarToggle{
+  width:40px;height:40px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.1);
+  color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+#audioBarToggle .material-symbols-rounded{font-size:20px;font-variation-settings:'FILL' 1;}
+#audioBarClose{
+  width:32px;height:32px;border-radius:999px;
+  border:1px solid rgba(255,255,255,.1);background:transparent;
+  color:var(--muted-2);display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
 #audioBarClose .material-symbols-rounded{font-size:16px;}
 
-/* Skeleton */
-.skeleton-post{width:min(var(--feed-width),calc(100vw - 24px));margin:0 auto;border:1px solid rgba(255,255,255,.07);border-radius:var(--squircle-radius);overflow:hidden;background:#0a0a0a;}
+/* ═══ SKELETONS ═════════════════════════════════════════════ */
+.skeleton-post{width:min(var(--feed-width),calc(100vw - 20px));margin:0 auto;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;background:#080808;}
 .skel-header{display:flex;align-items:center;gap:12px;padding:12px 14px;}
-.skel-circle{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.07);flex:0 0 auto;animation:shimmer 1.4s ease infinite;}
+.skel-circle{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.06);flex:0 0 auto;animation:shimmer 1.4s ease infinite;}
 .skel-lines{flex:1;display:flex;flex-direction:column;gap:6px;}
-.skel-line{height:10px;border-radius:6px;background:rgba(255,255,255,.07);animation:shimmer 1.4s ease infinite;}
+.skel-line{height:9px;border-radius:6px;background:rgba(255,255,255,.06);animation:shimmer 1.4s ease infinite;}
 .skel-line.short{width:40%;}
-.skel-image{width:100%;aspect-ratio:4/3;background:rgba(255,255,255,.05);animation:shimmer 1.4s ease infinite;}
-.skel-caption{height:12px;margin:12px 14px;border-radius:6px;background:rgba(255,255,255,.05);animation:shimmer 1.4s ease infinite;}
-@keyframes shimmer{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
+.skel-image{width:100%;aspect-ratio:4/3;background:rgba(255,255,255,.04);animation:shimmer 1.4s ease infinite;}
+.skel-caption{height:10px;margin:12px 14px 8px;border-radius:6px;background:rgba(255,255,255,.04);animation:shimmer 1.4s ease infinite;}
+@keyframes shimmer{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
 
-/* Moment viewer overlay */
-.moment-viewer{position:fixed;inset:0;z-index:110;display:grid;place-items:center;background:#000;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .2s,visibility .2s;}
-.moment-viewer.open{opacity:1;visibility:visible;pointer-events:auto;}
-.moment-stage{width:100%;height:100%;position:relative;max-width:420px;margin:0 auto;}
-.moment-stage img{width:100%;height:100%;object-fit:cover;display:block;}
-.moment-stage video{width:100%;height:100%;object-fit:cover;display:block;}
-.moment-gradient{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.62),transparent 18%,transparent 72%,rgba(0,0,0,.8));pointer-events:none;}
-.moment-top{position:absolute;top:0;left:0;right:0;z-index:2;padding:calc(14px + var(--safe-top)) 12px 12px;display:grid;gap:10px;background:linear-gradient(180deg,rgba(0,0,0,.56),transparent);}
-.moment-progress-row{display:flex;gap:4px;}
-.moment-prog{flex:1;height:3px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden;}
-.moment-prog > span{display:block;width:0%;height:100%;background:#fff;border-radius:inherit;}
-.moment-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;}
-.moment-meta-left{display:flex;align-items:center;gap:10px;min-width:0;}
-.moment-meta-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.16);background:#111;}
-.moment-meta-name{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.moment-bottom{position:absolute;bottom:0;left:0;right:0;z-index:2;padding:0 16px calc(24px + var(--safe-bottom));}
-.moment-caption-display{font-size:15px;line-height:1.5;color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.8);max-height:100px;overflow:hidden;}
-.close-btn{width:42px;height:42px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
-.moment-tap-zone{position:absolute;inset:0;z-index:1;display:grid;grid-template-columns:1fr 1fr;}
-
-/* Load more */
+/* ═══ LOAD MORE ════════════════════════════════════════════ */
 #loadMore{
   display:flex;align-items:center;justify-content:center;
-  width:min(var(--feed-width),calc(100vw - 24px));margin:0 auto 80px;
-  padding:16px;border-radius:16px;border:1px solid rgba(255,255,255,.12);
-  background:rgba(255,255,255,.04);color:var(--muted);font-size:14px;cursor:pointer;
-  transition:.2s;font-family:'Archivo Black',sans-serif;gap:8px;
+  width:min(var(--feed-width),calc(100vw - 20px));margin:0 auto 100px;
+  padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.11);
+  background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;cursor:pointer;
+  transition:.2s;font-family:'Archivo Black',sans-serif;gap:7px;
 }
-#loadMore:hover{background:rgba(255,255,255,.08);}
+#loadMore:hover{background:rgba(255,255,255,.07);}
 #loadMore.hidden{display:none;}
 
-/* Modal */
+/* ═══ DELETE CONFIRM ════════════════════════════════════════ */
+.del-confirm{
+  position:fixed;inset:0;z-index:300;display:none;align-items:flex-end;justify-content:center;
+  background:rgba(0,0,0,.7);padding:16px;
+}
+.del-confirm.open{display:flex;}
+.del-sheet{
+  width:min(92vw,440px);background:#111;border:1px solid rgba(255,255,255,.12);
+  border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;
+  animation:slideUp .22s ease;
+}
+@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
+.del-title{font-size:17px;}
+.del-body{font-size:13px;color:var(--muted);line-height:1.5;}
+.del-actions{display:flex;gap:10px;margin-top:4px;}
+.del-cancel{flex:1;padding:13px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-size:14px;font-family:'Archivo Black',sans-serif;}
+.del-ok{flex:1;padding:13px;border-radius:14px;border:1px solid rgba(255,59,48,.3);background:rgba(255,59,48,.14);color:#ff7a73;cursor:pointer;font-size:14px;font-family:'Archivo Black',sans-serif;}
+
+/* ═══ MODAL ════════════════════════════════════════════════ */
 .modal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88);padding:16px;}
 .modal.open{display:flex}
-.modal-box{width:min(92vw,520px);max-height:min(80vh,760px);overflow:auto;background:#0b0b0b;border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:14px;}
+.modal-box{width:min(92vw,520px);max-height:min(80vh,760px);overflow:auto;background:#0c0c0c;border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:14px;}
 .modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
 .modal-title{font-size:18px}
-.modal-close{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-family:'Archivo Black',sans-serif;}
+.modal-close{width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;font-family:'Archivo Black',sans-serif;}
 .list-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 8px;border-radius:14px;cursor:pointer;transition:background .14s;}
 .list-item:hover{background:rgba(255,255,255,.05)}
-.list-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#111;border:1px solid rgba(255,255,255,.10);flex:0 0 auto;}
+.list-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#111;border:1px solid rgba(255,255,255,.09);flex:0 0 auto;}
 .list-main{min-width:0;flex:1}
-.list-name{display:flex;align-items:center;gap:6px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.list-sub{margin-top:2px;color:var(--muted-2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.empty{margin:16px 14px 0;padding:22px;border-radius:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--muted);text-align:center;font-size:15px;}
-.post > *:last-child{margin-bottom:14px;}
+.list-name{display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.list-sub{margin-top:2px;color:var(--muted-2);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.empty{margin:16px 0 0;padding:22px;border-radius:22px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);color:var(--muted);text-align:center;font-size:14px;}
+.post > *:last-child{margin-bottom:13px;}
 
 @media(max-width:860px){
-  .header{font-size:28px}
-  .post{width:calc(100vw - 18px)}
-  .skeleton-post{width:calc(100vw - 18px)}
+  .header{font-size:26px}
+  .post,.skeleton-post,#loadMore{width:calc(100vw - 16px)}
 }
 </style>
 </head>
@@ -268,30 +426,37 @@ button,input,a{font-family:'Archivo Black',sans-serif;}
 <button class="hamburger" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false">
   <span class="material-symbols-rounded" id="hamburgerIcon">menu</span>
 </button>
-
 <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <aside class="sidebar" id="sidebar" aria-hidden="true">
-  <div class="sidebar-top">
-    <div class="profile-card">
-      <img id="profileAvatar" class="profile-avatar" alt="Profile avatar" src="">
-      <div class="profile-meta">
-        <div class="profile-label">Account</div>
-        <div class="profile-name" id="profileName">Loading…</div>
-        <div class="profile-handle" id="profileHandle">@shared</div>
+  <!-- Profile hero -->
+  <div class="sidebar-hero" id="sidebarHero">
+    <div class="sidebar-hero-bg" id="sidebarHeroBg"></div>
+    <div class="sidebar-hero-content">
+      <img id="profileAvatar" class="sidebar-profile-avatar" alt="Avatar" src="">
+      <div id="profileName" class="sidebar-profile-name">Loading…</div>
+      <div id="profileHandle" class="sidebar-profile-handle">@shared</div>
+      <div class="sidebar-profile-stats">
+        <div class="sidebar-stat"><div class="sidebar-stat-n" id="statPosts">—</div><div class="sidebar-stat-l">Post</div></div>
+        <div class="sidebar-stat"><div class="sidebar-stat-n" id="statFollowers">—</div><div class="sidebar-stat-l">Follower</div></div>
+        <div class="sidebar-stat"><div class="sidebar-stat-n" id="statFollowing">—</div><div class="sidebar-stat-l">Following</div></div>
       </div>
     </div>
+  </div>
+
+  <div class="sidebar-body">
     <div class="search-wrap">
       <input id="search" class="search" placeholder="Search" autocomplete="off">
       <div id="suggestions" class="suggestions"></div>
     </div>
   </div>
-  <div class="sidebar-bottom">
+
+  <div class="sidebar-footer">
     <button class="nav-btn" type="button" onclick="goUpload()">
       <span class="material-symbols-rounded">upload</span><span>Upload</span>
     </button>
     <a class="nav-btn" href="settings.html">
-      <span class="material-symbols-rounded">settings</span><span>Settings</span>
+      <span class="material-symbols-rounded">settings</span><span>Impostazioni</span>
     </a>
     <a class="nav-btn" href="about.html">
       <span class="material-symbols-rounded">info</span><span>About</span>
@@ -305,77 +470,87 @@ button,input,a{font-family:'Archivo Black',sans-serif;}
 <main class="main" id="mainScroll">
   <div class="header">Shared.</div>
 
-  <!-- Stories -->
   <section id="storiesSection" class="stories-section" style="display:none">
     <div class="section-head"><div class="section-title">Stories</div></div>
     <div id="stories" class="stories"></div>
   </section>
 
-  <!-- Moments -->
   <section id="momentsSection" class="moments-section" style="display:none">
-    <div class="section-head">
-      <div class="section-title">Moments</div>
-    </div>
+    <div class="section-head"><div class="section-title">Moments</div></div>
     <div id="momentsStrip" class="moments-strip"></div>
   </section>
 
-  <!-- Feed -->
-  <div id="feedFollowing" class="feed-label" style="display:none">
-    <span class="material-symbols-rounded">group</span>
-    <span>From people you follow</span>
+  <div id="feedFollowingLabel" class="feed-label" style="display:none">
+    <span class="material-symbols-rounded">group</span><span>Da chi segui</span>
   </div>
   <div id="feedDiscoverLabel" class="feed-label" style="display:none">
-    <span class="material-symbols-rounded">explore</span>
-    <span>Discover</span>
+    <span class="material-symbols-rounded">explore</span><span>Scopri</span>
   </div>
   <div id="feed" class="feed"></div>
-  <button id="loadMore" type="button">
-    <span class="material-symbols-rounded">add</span>
-    Carica altri
-  </button>
+  <button id="loadMore" type="button"><span class="material-symbols-rounded">add</span>Carica altri</button>
 </main>
 
-<!-- Global audio -->
+<!-- Audio -->
 <audio id="globalAudio" loop preload="auto"></audio>
 
-<!-- Audio bar -->
 <div id="audioBar">
-  <img id="audioBarCover" alt="Album cover" src="">
-  <div id="audioBarInfo">
-    <div id="audioBarTitle"></div>
-    <div id="audioBarArtist"></div>
+  <div class="audio-bar-cover-wrap">
+    <img id="audioBarCover" alt="Cover" src="">
+    <div class="audio-playing-ring" id="audioRing"></div>
   </div>
-  <button id="audioBarToggle" type="button" aria-label="Play/Pause">
-    <span class="material-symbols-rounded" id="audioBarIcon">pause</span>
-  </button>
-  <button id="audioBarClose" type="button" aria-label="Stop">
-    <span class="material-symbols-rounded">close</span>
-  </button>
+  <div class="audio-bar-info">
+    <div id="audioBarTitle">—</div>
+    <div id="audioBarArtist"></div>
+    <div class="audio-bar-progress"><div class="audio-bar-progress-fill" id="audioProgress"></div></div>
+  </div>
+  <div class="audio-bar-controls">
+    <button id="audioBarToggle" type="button"><span class="material-symbols-rounded" id="audioBarIcon">pause</span></button>
+    <button id="audioBarClose" type="button"><span class="material-symbols-rounded">close</span></button>
+  </div>
 </div>
 
 <!-- Moment viewer -->
 <div id="momentViewer" class="moment-viewer" aria-hidden="true">
-  <div class="moment-stage" id="momentStage">
-    <img id="momentImg" alt="Moment">
-    <div class="moment-gradient"></div>
+  <div class="moment-viewer-shell">
+    <div class="moment-bg-blur" id="momentBgBlur"></div>
+    <div class="moment-stage">
+      <img id="momentImg" alt="Moment">
+      <div class="moment-shade"></div>
+      <div class="moment-tap-zone" aria-hidden="true">
+        <div id="prevMoment"></div>
+        <div id="nextMoment"></div>
+      </div>
+    </div>
     <div class="moment-top">
-      <div class="moment-progress-row" id="momentProgRow"></div>
-      <div class="moment-meta">
-        <div class="moment-meta-left">
-          <img id="momentAvatar" class="moment-meta-avatar" alt="">
-          <div id="momentName" class="moment-meta-name"></div>
+      <div class="moment-prog-row" id="momentProgRow"></div>
+      <div class="moment-header">
+        <div class="moment-user">
+          <img id="momentAv" class="moment-av" alt="">
+          <div>
+            <div id="momentUsername" class="moment-username"></div>
+            <div id="momentTimeEl" class="moment-time"></div>
+          </div>
         </div>
-        <button id="closeMoment" class="close-btn" type="button">
+        <button id="closeMoment" class="mv-close" type="button">
           <span class="material-symbols-rounded">close</span>
         </button>
       </div>
     </div>
-    <div class="moment-tap-zone" aria-hidden="true">
-      <div id="prevMoment"></div>
-      <div id="nextMoment"></div>
+    <div class="moment-caption-viewer">
+      <div id="momentCaptionText" class="moment-caption-text"></div>
+      <div id="momentExpandHint" class="moment-expand-hint" style="display:none">Leggi tutto ↑</div>
     </div>
-    <div class="moment-bottom">
-      <div id="momentCaptionDisplay" class="moment-caption-display"></div>
+  </div>
+</div>
+
+<!-- Delete confirm -->
+<div id="delConfirm" class="del-confirm">
+  <div class="del-sheet">
+    <div class="del-title">Elimina post</div>
+    <div class="del-body">Sei sicuro? Questa azione è irreversibile e rimuoverà il post dal feed.</div>
+    <div class="del-actions">
+      <button class="del-cancel" id="delCancel">Annulla</button>
+      <button class="del-ok" id="delOk">Elimina</button>
     </div>
   </div>
 </div>
@@ -392,352 +567,389 @@ button,input,a{font-family:'Archivo Black',sans-serif;}
 </div>
 
 <script type="module">
-const API_BASE = "https://api.sharedweb.org";
-const BATCH = 12; // post per caricamento
+/* ═══════════════════════════════════════════════════════════
+   CONFIG & STATE
+═══════════════════════════════════════════════════════════ */
+const API_BASE   = "https://api.sharedweb.org";
+const ITUNES_API = "https://itunes.apple.com/search";
+const BATCH      = 12;
 
 const state = {
-  profiles: [],
-  posts: [],        // tutti i post caricati (sorted)
-  moments: [],      // moments / video brevi
-  likes: [],
-  follows: [],      // [{follower_id, following_id}]
-  currentUserId: null,
-  currentUserProfile: null,
-  storyQueue: [],
-
-  // paginazione
-  followingPosts: [],
-  discoverPosts: [],
-  renderedCount: 0,
-  allLoaded: false,
-
+  profiles:[], posts:[], moments:[], likes:[], follows:[],
+  currentUserId:null, currentUserProfile:null,
+  storyQueue:[], followingPosts:[], discoverPosts:[], renderedCount:0, allLoaded:false,
   // moment viewer
-  momentQueue: [],
-  momentIndex: 0,
-  momentTimer: null,
-  momentRaf: null,
-  momentStartTs: 0,
-  momentDurationMs: 8000,
-
+  mvQueue:[], mvIndex:0, mvTimer:null, mvRaf:null, mvStartTs:0, mvDuration:8000,
   // audio
-  audioPostId: null,
-  audioPlaying: false,
-
-  // like deltas ottimistici
-  likeDeltas: {},
-  searchQuery: "",
+  audioPostId:null, audioPlaying:false, audioProgressRaf:null,
+  // like deltas
+  likeDeltas:{},
+  // delete
+  pendingDeleteId:null,
+  searchQuery:"",
 };
 
-/* ─── Elementi ─────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   ELEMENTS
+═══════════════════════════════════════════════════════════ */
 const el = id => document.getElementById(id);
-const els = {
-  mainScroll:      el("mainScroll"),
-  storiesSection:  el("storiesSection"),
-  stories:         el("stories"),
-  momentsSection:  el("momentsSection"),
-  momentsStrip:    el("momentsStrip"),
-  feed:            el("feed"),
-  feedFollowing:   el("feedFollowing"),
-  feedDiscoverLabel: el("feedDiscoverLabel"),
-  loadMore:        el("loadMore"),
-  search:          el("search"),
-  suggestions:     el("suggestions"),
-  likesModal:      el("likesModal"),
-  likesList:       el("likesList"),
-  closeLikesBtn:   el("closeLikesBtn"),
-  sidebar:         el("sidebar"),
-  sidebarOverlay:  el("sidebarOverlay"),
-  hamburgerBtn:    el("hamburgerBtn"),
-  hamburgerIcon:   el("hamburgerIcon"),
-  profileAvatar:   el("profileAvatar"),
-  profileName:     el("profileName"),
-  profileHandle:   el("profileHandle"),
-  audioBar:        el("audioBar"),
-  audioBarCover:   el("audioBarCover"),
-  audioBarTitle:   el("audioBarTitle"),
-  audioBarArtist:  el("audioBarArtist"),
-  audioBarToggle:  el("audioBarToggle"),
-  audioBarIcon:    el("audioBarIcon"),
-  audioBarClose:   el("audioBarClose"),
-  globalAudio:     el("globalAudio"),
-  momentViewer:    el("momentViewer"),
-  momentStage:     el("momentStage"),
-  momentImg:       el("momentImg"),
-  momentAvatar:    el("momentAvatar"),
-  momentName:      el("momentName"),
-  momentProgRow:   el("momentProgRow"),
-  closeMoment:     el("closeMoment"),
-  prevMoment:      el("prevMoment"),
-  nextMoment:      el("nextMoment"),
-  momentCaptionDisplay: el("momentCaptionDisplay"),
+const E = {
+  main:el("mainScroll"), storiesSection:el("storiesSection"), stories:el("stories"),
+  momentsSection:el("momentsSection"), momentsStrip:el("momentsStrip"),
+  feed:el("feed"), feedFollowingLabel:el("feedFollowingLabel"), feedDiscoverLabel:el("feedDiscoverLabel"),
+  loadMore:el("loadMore"), search:el("search"), suggestions:el("suggestions"),
+  likesModal:el("likesModal"), likesList:el("likesList"), closeLikesBtn:el("closeLikesBtn"),
+  sidebar:el("sidebar"), sidebarOverlay:el("sidebarOverlay"),
+  hamburgerBtn:el("hamburgerBtn"), hamburgerIcon:el("hamburgerIcon"),
+  profileAvatar:el("profileAvatar"), profileName:el("profileName"), profileHandle:el("profileHandle"),
+  sidebarHeroBg:el("sidebarHeroBg"),
+  statPosts:el("statPosts"), statFollowers:el("statFollowers"), statFollowing:el("statFollowing"),
+  audioBar:el("audioBar"), audioBarCover:el("audioBarCover"),
+  audioBarTitle:el("audioBarTitle"), audioBarArtist:el("audioBarArtist"),
+  audioBarToggle:el("audioBarToggle"), audioBarIcon:el("audioBarIcon"),
+  audioBarClose:el("audioBarClose"), audioProgress:el("audioProgress"),
+  audioRing:el("audioRing"), globalAudio:el("globalAudio"),
+  momentViewer:el("momentViewer"), momentBgBlur:el("momentBgBlur"),
+  momentImg:el("momentImg"), momentAv:el("momentAv"),
+  momentUsername:el("momentUsername"), momentTimeEl:el("momentTimeEl"),
+  momentProgRow:el("momentProgRow"), closeMoment:el("closeMoment"),
+  prevMoment:el("prevMoment"), nextMoment:el("nextMoment"),
+  momentCaptionText:el("momentCaptionText"), momentExpandHint:el("momentExpandHint"),
+  delConfirm:el("delConfirm"), delCancel:el("delCancel"), delOk:el("delOk"),
 };
 
-/* ─── Sidebar ──────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   SIDEBAR
+═══════════════════════════════════════════════════════════ */
 let sidebarOpen = false;
-const openSidebar  = () => { sidebarOpen=true;  els.sidebar.classList.add("open");    els.sidebarOverlay.classList.add("open");    els.hamburgerIcon.textContent="close"; els.hamburgerBtn.setAttribute("aria-expanded","true");  };
-const closeSidebar = () => { sidebarOpen=false; els.sidebar.classList.remove("open"); els.sidebarOverlay.classList.remove("open"); els.hamburgerIcon.textContent="menu";  els.hamburgerBtn.setAttribute("aria-expanded","false"); };
-els.hamburgerBtn.addEventListener("click",()=>sidebarOpen?closeSidebar():openSidebar());
-els.sidebarOverlay.addEventListener("click",closeSidebar);
-window.addEventListener("keydown",e=>{if(e.key==="Escape"&&sidebarOpen)closeSidebar();});
+const openSidebar  = () => { sidebarOpen=true;  E.sidebar.classList.add("open");    E.sidebarOverlay.classList.add("open");    E.hamburgerIcon.textContent="close"; };
+const closeSidebar = () => { sidebarOpen=false; E.sidebar.classList.remove("open"); E.sidebarOverlay.classList.remove("open"); E.hamburgerIcon.textContent="menu"; };
+E.hamburgerBtn.addEventListener("click", () => sidebarOpen ? closeSidebar() : openSidebar());
+E.sidebarOverlay.addEventListener("click", closeSidebar);
+window.addEventListener("keydown", e => { if(e.key==="Escape" && sidebarOpen) closeSidebar(); });
 
-/* ─── Utils ────────────────────────────────────── */
-const safeArr   = v => Array.isArray(v) ? v : [];
-const esc       = s => String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-const fmtN      = n => { const x=Number(n||0); return x>=1e6?`${(x/1e6).toFixed(1)}M`:x>=1000?`${(x/1000).toFixed(1)}K`:String(x); };
-const normUrl   = p => (!p||/^https?:\/\//i.test(p)||p.startsWith("data:"))?p:p;
-const profileById = id => state.profiles.find(p=>String(p.id)===String(id))||null;
-
-const defAvatar = () => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="60" fill="#111"/><circle cx="60" cy="48" r="18" fill="#fff"/><path d="M24 102c7-20 24-30 36-30s29 10 36 30" fill="#fff"/></svg>`)}`;
-const defImg    = () => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="#111"/><circle cx="320" cy="260" r="44" fill="#222"/></svg>`)}`;
+/* ═══════════════════════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════════════════════ */
+const safeArr = v => Array.isArray(v) ? v : [];
+const esc = s => String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
+const fmtN = n => { const x=Number(n||0); return x>=1e6?`${(x/1e6).toFixed(1)}M`:x>=1000?`${(x/1000).toFixed(1)}K`:String(x); };
+const norm  = p => (!p||/^https?:\/\//i.test(p)||p.startsWith("data:")) ? p : p;
 
 function timeAgo(v){
   const d=v?new Date(v):null; if(!d||isNaN(d))return"";
-  const diff=Math.max(0,Date.now()-d.getTime()), m=Math.floor(diff/6e4), h=Math.floor(diff/36e5), dy=Math.floor(diff/864e5);
-  return m<1?"just now":m<60?`${m}m`:h<24?`${h}h`:dy<7?`${dy}d`:d.toLocaleDateString([],{month:"short",day:"numeric"});
+  const s=Math.max(0,Date.now()-d.getTime()), m=Math.floor(s/6e4), h=Math.floor(s/36e5), dy=Math.floor(s/864e5);
+  return m<1?"ora":m<60?`${m}m`:h<24?`${h}h`:dy<7?`${dy}g`:d.toLocaleDateString([],{month:"short",day:"numeric"});
 }
 
+const defAvatar = () => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="60" fill="#111"/><circle cx="60" cy="48" r="18" fill="#fff"/><path d="M24 102c7-20 24-30 36-30s29 10 36 30" fill="#fff"/></svg>')}`;
+const defImg    = () => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="#0f0f0f"/></svg>')}`;
+
+const profileById = id => state.profiles.find(p => String(p.id)===String(id)) || null;
+const avatarForProfile = p => norm(p?.avatar_url||p?.avatar||p?.profile_image||"") || defAvatar();
 function avatarForPost(post){
   const p = profileById(post.user_id)||profileById(post.profile_id);
-  return normUrl(post.avatar_url||p?.avatar_url||p?.avatar||p?.profile_image||"")||defAvatar();
-}
-function avatarForProfile(p){
-  return normUrl(p?.avatar_url||p?.avatar||p?.profile_image||"")||defAvatar();
+  return norm(post.avatar_url||p?.avatar_url||p?.avatar||p?.profile_image||"") || defAvatar();
 }
 function usernameForPost(post){
-  const p=profileById(post.user_id)||profileById(post.profile_id);
+  const p = profileById(post.user_id)||profileById(post.profile_id);
   return post.username||p?.username||p?.full_name||"user";
 }
-function isVerified(p){return p?.verified===true||p?.verified==='true'||p?.verified===1;}
-function tagsFor(post){
+const isVerified = p => p?.verified===true||p?.verified==='true'||p?.verified===1;
+const tagsFor = post => {
   const r=post.tags; if(!r)return[];
-  return (Array.isArray(r)?r:String(r).split(",")).map(t=>String(t).trim()).filter(Boolean).slice(0,8);
-}
-function locationFor(post){ return post.location||post.place||post.city||post.location_name||""; }
+  return (Array.isArray(r)?r:String(r).split(",")).map(t=>String(t).trim()).filter(Boolean).slice(0,6);
+};
+const locationFor = post => post.location||post.place||post.city||post.location_name||"";
 
-/* ─── Like helpers ─────────────────────────────── */
-function likeCount(postId){
-  const s = state.likes.filter(l=>String(l.post_id??l.postId??l.postid)===String(postId)).length;
-  return Math.max(0, s + (state.likeDeltas[postId]??0));
-}
-function likedByMe(postId){
-  return state.currentUserId
-    ? state.likes.some(l=>String(l.post_id??l.postId??l.postid)===String(postId)&&String(l.user_id)===String(state.currentUserId))
-    : false;
+/* ═══════════════════════════════════════════════════════════
+   ITUNES ENRICHMENT (free, no key)
+═══════════════════════════════════════════════════════════ */
+const itunesCache = new Map();
+
+async function fetchItunesMeta(title, artist){
+  const key = `${title}|${artist}`.toLowerCase().trim();
+  if(itunesCache.has(key)) return itunesCache.get(key);
+  try{
+    const term = encodeURIComponent([title, artist].filter(Boolean).join(" "));
+    const r = await fetch(`${ITUNES_API}?term=${term}&media=music&entity=song&limit=1`);
+    if(!r.ok) throw new Error("itunes fail");
+    const data = await r.json();
+    const track = data?.results?.[0];
+    const meta = track ? {
+      cover:   track.artworkUrl100?.replace("100x100bb","300x300bb") || track.artworkUrl100 || "",
+      preview: track.previewUrl || "",
+      title:   track.trackName || title,
+      artist:  track.artistName || artist,
+    } : null;
+    itunesCache.set(key, meta);
+    return meta;
+  }catch{
+    itunesCache.set(key, null);
+    return null;
+  }
 }
 
-/* ─── Follow helpers ───────────────────────────── */
-function iFollow(userId){
-  return state.currentUserId && state.follows.some(f=>
+/* ═══════════════════════════════════════════════════════════
+   LIKE HELPERS
+═══════════════════════════════════════════════════════════ */
+const likeCount  = id => Math.max(0, state.likes.filter(l=>String(l.post_id??l.postId??l.postid)===String(id)).length + (state.likeDeltas[id]??0));
+const likedByMe  = id => !!state.currentUserId && state.likes.some(l=>String(l.post_id??l.postId??l.postid)===String(id)&&String(l.user_id)===String(state.currentUserId));
+
+/* ═══════════════════════════════════════════════════════════
+   FOLLOW HELPERS
+═══════════════════════════════════════════════════════════ */
+function iFollow(uid){
+  return !!state.currentUserId && state.follows.some(f=>
     String(f.follower_id??f.follower??f.from_user_id??f.from)===String(state.currentUserId) &&
-    String(f.following_id??f.following??f.to_user_id??f.to)===String(userId)
-  );
+    String(f.following_id??f.following??f.to_user_id??f.to)===String(uid));
 }
-function followsMe(userId){
-  return state.currentUserId && state.follows.some(f=>
-    String(f.follower_id??f.follower??f.from_user_id??f.from)===String(userId) &&
-    String(f.following_id??f.following??f.to_user_id??f.to)===String(state.currentUserId)
-  );
+function followsMe(uid){
+  return !!state.currentUserId && state.follows.some(f=>
+    String(f.follower_id??f.follower??f.from_user_id??f.from)===String(uid) &&
+    String(f.following_id??f.following??f.to_user_id??f.to)===String(state.currentUserId));
 }
-function isMutual(userId){ return iFollow(userId)&&followsMe(userId); }
+const isMutual = uid => iFollow(uid) && followsMe(uid);
 
-/* ─── API ──────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   API
+═══════════════════════════════════════════════════════════ */
 async function apiFetch(path){
-  const r=await fetch(`${API_BASE}${path}`,{headers:{Accept:"application/json"}});
+  const r = await fetch(`${API_BASE}${path}`, {headers:{Accept:"application/json"}});
   if(!r.ok) throw new Error(`${r.status} ${path}`);
   return r.json();
 }
 async function apiSend(path,method,body){
-  const r=await fetch(`${API_BASE}${path}`,{method,headers:{Accept:"application/json","Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});
+  const r = await fetch(`${API_BASE}${path}`, {method, headers:{Accept:"application/json","Content-Type":"application/json"}, body:body?JSON.stringify(body):undefined});
   if(!r.ok) throw new Error(`${r.status} ${method} ${path}`);
   return r.json().catch(()=>null);
 }
 async function tryPaths(paths){
-  for(const p of paths){ try{ return await apiFetch(p); }catch(e){ if(!String(e).includes("404"))throw e; } }
+  for(const p of paths){ try{ return await apiFetch(p); } catch(e){ if(!String(e).includes("404"))throw e; } }
   return null;
 }
 
-async function fetchPosts(){ 
-  const d=await tryPaths(["/posts","/feed","/home","/content"]); 
-  return safeArr(Array.isArray(d)?d:(d?.posts||d?.data||d?.results||[])); 
-}
-async function fetchProfiles(){ 
-  const d=await tryPaths(["/profiles","/users","/accounts"]); 
-  return safeArr(Array.isArray(d)?d:(d?.profiles||d?.users||d?.data||[])); 
-}
-async function fetchLikes(){ 
-  const d=await tryPaths(["/likes","/reactions","/post-likes"]); 
-  return safeArr(Array.isArray(d)?d:(d?.likes||d?.reactions||d?.data||[])); 
-}
-async function fetchFollows(){
-  const d=await tryPaths([
-    "/follows","/follow","/followers","/following",
-    state.currentUserId?`/users/${state.currentUserId}/follows`:null,
-    state.currentUserId?`/profiles/${state.currentUserId}/follows`:null,
-  ].filter(Boolean));
-  return safeArr(Array.isArray(d)?d:(d?.follows||d?.data||[]));
-}
-async function fetchMoments(){
-  const d=await tryPaths(["/moments","/reels","/stories","/shorts","/videos"]);
-  return safeArr(Array.isArray(d)?d:(d?.moments||d?.reels||d?.stories||d?.data||[]));
-}
+const fetchPosts    = () => tryPaths(["/posts","/feed","/home","/content"]).then(d=>safeArr(Array.isArray(d)?d:(d?.posts||d?.data||d?.results||[])));
+const fetchProfiles = () => tryPaths(["/profiles","/users","/accounts"]).then(d=>safeArr(Array.isArray(d)?d:(d?.profiles||d?.users||d?.data||[])));
+const fetchLikes    = () => tryPaths(["/likes","/reactions"]).then(d=>safeArr(Array.isArray(d)?d:(d?.likes||d?.data||[])));
+const fetchFollows  = () => tryPaths(["/follows","/follow","/followers","/following", state.currentUserId?`/users/${state.currentUserId}/follows`:null].filter(Boolean)).then(d=>safeArr(Array.isArray(d)?d:(d?.follows||d?.data||[])));
+const fetchMoments  = () => tryPaths(["/moments","/reels","/shorts","/stories","/videos"]).then(d=>safeArr(Array.isArray(d)?d:(d?.moments||d?.reels||d?.data||[])));
 
-/* ─── Current user ─────────────────────────────── */
 async function fetchCurrentUser(){
   const id=localStorage.getItem("shared_current_user_id");
   const un=localStorage.getItem("shared_current_username");
   const av=localStorage.getItem("shared_current_avatar");
-  if(id||un) return{id:id||null,username:un||"you",avatar_url:av||""};
+  if(id||un) return {id:id||null, username:un||"you", avatar_url:av||""};
   return state.profiles[0]||null;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   RENDER SIDEBAR / CURRENT USER
+═══════════════════════════════════════════════════════════ */
 function renderCurrentUser(){
-  const p=state.currentUserProfile;
-  const username=p?.username||p?.full_name||"you";
-  const handle=p?.handle||p?.username?`@${String(p?.handle||p?.username).replace(/^@/,"")}` :"@shared";
-  els.profileName.textContent=username;
-  els.profileHandle.textContent=handle;
-  els.profileAvatar.src=avatarForProfile(p)||defAvatar();
+  const p = state.currentUserProfile;
+  const username = p?.username||p?.full_name||"you";
+  const handle   = p?.handle||p?.username ? `@${String(p?.handle||p?.username).replace(/^@/,"")}` : "@shared";
+  const avatar   = avatarForProfile(p);
+  E.profileName.textContent   = username;
+  E.profileHandle.textContent = handle;
+  E.profileAvatar.src         = avatar;
+  // set hero bg gradient from avatar colour (use the image as CSS background for blur)
+  if(avatar && !avatar.startsWith("data:")){
+    E.sidebarHeroBg.style.backgroundImage = `url(${avatar})`;
+    E.sidebarHeroBg.style.filter = "blur(60px) brightness(.45) saturate(1.6)";
+  }
+  // stats
+  const myId = state.currentUserId;
+  const myPosts = state.posts.filter(post=>String(post.user_id||post.profile_id)===String(myId)).length;
+  const followers = state.follows.filter(f=>String(f.following_id??f.following??f.to_user_id??f.to)===String(myId)).length;
+  const following = state.follows.filter(f=>String(f.follower_id??f.follower??f.from_user_id??f.from)===String(myId)).length;
+  E.statPosts.textContent     = fmtN(myPosts||p?.posts_count||"—");
+  E.statFollowers.textContent = fmtN(followers||p?.followers_count||"—");
+  E.statFollowing.textContent = fmtN(following||p?.following_count||"—");
 }
 
-/* ─── Skeleton ─────────────────────────────────── */
-function renderSkeletons(n=3){
-  els.feed.innerHTML=Array.from({length:n},()=>`
+/* ═══════════════════════════════════════════════════════════
+   SKELETONS
+═══════════════════════════════════════════════════════════ */
+function renderSkeletons(n=4){
+  E.feed.innerHTML = Array.from({length:n},()=>`
     <div class="skeleton-post">
       <div class="skel-header"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
-      <div class="skel-image"></div>
-      <div class="skel-caption"></div>
+      <div class="skel-image"></div><div class="skel-caption"></div>
     </div>`).join("");
 }
 
-/* ─── Stories from profiles ────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   STORIES
+═══════════════════════════════════════════════════════════ */
 function buildStoryQueue(){
-  return state.profiles.map(p=>{
-    const av=normUrl(p.avatar_url||p.avatar||p.profile_image||"")||defAvatar();
-    const st=normUrl(p.story_url||p.story_image||p.story||p.latest_story||"");
-    return{id:p.id,username:p.username||p.full_name||"user",avatar:av,story:st,profile:p};
-  }).filter(x=>x.story||x.avatar);
+  return state.profiles.map(p=>({
+    id:p.id, username:p.username||p.full_name||"user",
+    avatar: avatarForProfile(p),
+    story:  norm(p.story_url||p.story_image||p.story||p.latest_story||""),
+    caption:p.story_caption||"",
+    created_at:p.story_updated_at||p.updated_at||"",
+    profile:p
+  })).filter(x=>x.story);
 }
 function renderStories(){
-  if(!state.storyQueue.length){els.storiesSection.style.display="none";return;}
-  els.storiesSection.style.display="block";
-  els.stories.innerHTML=state.storyQueue.map((s,i)=>`
+  if(!state.storyQueue.length){ E.storiesSection.style.display="none"; return; }
+  E.storiesSection.style.display="block";
+  E.stories.innerHTML = state.storyQueue.map((s,i)=>`
     <button class="story" data-story-index="${i}" type="button">
       <img loading="lazy" src="${s.avatar}" alt="${esc(s.username)}">
       <div>${esc(s.username)}</div>
     </button>`).join("");
-  els.stories.querySelectorAll("[data-story-index]").forEach(b=>{
-    b.addEventListener("click",()=>openMomentViewer(state.storyQueue,Number(b.dataset.storyIndex),"story"));
+  E.stories.querySelectorAll("[data-story-index]").forEach(b=>{
+    b.addEventListener("click",()=>openMomentViewer(state.storyQueue, Number(b.dataset.storyIndex)));
   });
 }
 
-/* ─── Moments ──────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   MOMENTS
+═══════════════════════════════════════════════════════════ */
 function renderMoments(){
-  if(!state.moments.length){els.momentsSection.style.display="none";return;}
-  els.momentsSection.style.display="block";
-  els.momentsStrip.innerHTML=state.moments.map((m,i)=>{
-    const profile=profileById(m.user_id||m.profile_id);
-    const av=normUrl(m.avatar_url||profile?.avatar_url||profile?.avatar||"")||defAvatar();
-    const thumb=normUrl(m.thumbnail||m.thumb||m.cover||m.image_url||m.image||m.video_url||"");
-    const username=m.username||profile?.username||profile?.full_name||"user";
-    const caption=m.caption||m.text||"";
+  if(!state.moments.length){ E.momentsSection.style.display="none"; return; }
+  E.momentsSection.style.display="block";
+  E.momentsStrip.innerHTML = state.moments.map((m,i)=>{
+    const p = profileById(m.user_id||m.profile_id);
+    const av = norm(m.avatar_url||p?.avatar_url||p?.avatar||"") || defAvatar();
+    const thumb = norm(m.thumbnail||m.thumb||m.cover||m.image_url||m.image||m.video_url||"");
+    const uname = m.username||p?.username||p?.full_name||"user";
+    const cap   = m.caption||m.text||"";
     return `
       <div class="moment-card" data-moment-index="${i}">
-        <img class="moment-thumb" src="${thumb||defImg()}" alt="${esc(username)}" loading="lazy">
+        <img class="moment-thumb" src="${thumb||defImg()}" alt="${esc(uname)}" loading="lazy">
         <div class="moment-grad"></div>
+        <div class="moment-card-avatar-wrap"><img class="moment-card-avatar" src="${av}" alt=""></div>
         <div class="moment-meta">
-          <img class="moment-avatar" src="${av}" alt="">
-          <div class="moment-name">${esc(username)}</div>
-          ${caption?`<div class="moment-caption">${esc(caption)}</div>`:""}
+          <div class="moment-name">${esc(uname)}</div>
+          ${cap?`<div class="moment-caption-pill">${esc(cap)}</div>`:""}
         </div>
       </div>`;
   }).join("");
-  els.momentsStrip.querySelectorAll("[data-moment-index]").forEach(c=>{
-    c.addEventListener("click",()=>openMomentViewer(state.moments,Number(c.dataset.momentIndex),"moment"));
+  E.momentsStrip.querySelectorAll("[data-moment-index]").forEach(c=>{
+    c.addEventListener("click",()=>openMomentViewer(state.moments, Number(c.dataset.momentIndex)));
   });
 }
 
-/* ─── Moment viewer ────────────────────────────── */
-let _mvQueue=[], _mvIndex=0, _mvType="moment";
-function openMomentViewer(queue,index,type){
-  _mvQueue=queue; _mvIndex=index; _mvType=type;
-  els.momentViewer.classList.add("open");
-  els.momentViewer.setAttribute("aria-hidden","false");
+/* ═══════════════════════════════════════════════════════════
+   MOMENT VIEWER
+═══════════════════════════════════════════════════════════ */
+function openMomentViewer(queue, index){
+  state.mvQueue=[...queue]; state.mvIndex=index;
+  E.momentViewer.classList.add("open");
+  E.momentViewer.setAttribute("aria-hidden","false");
   document.body.style.overflow="hidden";
   renderMomentSlide();
   startMomentTimer();
 }
 function closeMomentViewer(){
   stopMomentTimer();
-  els.momentViewer.classList.remove("open");
-  els.momentViewer.setAttribute("aria-hidden","true");
+  E.momentViewer.classList.remove("open");
+  E.momentViewer.setAttribute("aria-hidden","true");
   document.body.style.overflow="hidden";
 }
 function renderMomentSlide(){
-  const item=_mvQueue[_mvIndex]; if(!item) return;
-  const profile=profileById(item.user_id||item.profile_id||item.id);
-  const av = _mvType==="story"
-    ? (item.avatar||defAvatar())
-    : normUrl(item.avatar_url||profile?.avatar_url||profile?.avatar||"")||defAvatar();
-  const img = _mvType==="story"
-    ? (item.story||item.avatar||defAvatar())
-    : normUrl(item.thumbnail||item.thumb||item.cover||item.image_url||item.image||"");
-  const username = _mvType==="story"
-    ? item.username
-    : (item.username||profile?.username||profile?.full_name||"user");
-  const caption = item.caption||item.text||"";
+  const item = state.mvQueue[state.mvIndex]; if(!item) return;
+  const p = profileById(item.user_id||item.profile_id||item.id);
+  const av   = norm(item.avatar||item.avatar_url||p?.avatar_url||p?.avatar||"") || defAvatar();
+  const img  = norm(item.story||item.thumbnail||item.thumb||item.image_url||item.image||item.cover||"");
+  const name = item.username||p?.username||p?.full_name||"user";
+  const cap  = item.caption||item.text||"";
+  const time = item.created_at||item.inserted_at||"";
 
-  els.momentImg.src=img||defImg();
-  els.momentAvatar.src=av;
-  els.momentName.textContent=username;
-  els.momentCaptionDisplay.textContent=caption;
+  E.momentImg.src         = img || defImg();
+  E.momentAv.src          = av;
+  E.momentUsername.textContent = name;
+  E.momentTimeEl.textContent   = time ? timeAgo(time) : "";
+  E.momentBgBlur.style.backgroundImage = `url(${img||av})`;
+
+  // caption
+  E.momentCaptionText.textContent = cap;
+  E.momentCaptionText.classList.remove("expanded");
+  if(cap){
+    // show expand hint only when text overflows
+    requestAnimationFrame(()=>{
+      const overflows = E.momentCaptionText.scrollHeight > E.momentCaptionText.clientHeight + 2;
+      E.momentExpandHint.style.display = overflows ? "block" : "none";
+      E.momentExpandHint.textContent = "Leggi tutto ↑";
+    });
+  } else {
+    E.momentExpandHint.style.display="none";
+  }
+
   // progress bars
-  const total=_mvQueue.length;
-  els.momentProgRow.innerHTML=Array.from({length:total},(_,i)=>
-    `<div class="moment-prog"><span style="width:${i<_mvIndex?100:0}%"></span></div>`
+  const total = state.mvQueue.length;
+  E.momentProgRow.innerHTML = Array.from({length:total},(_,i)=>
+    `<div class="moment-prog"><span style="width:${i<state.mvIndex?100:0}%"></span></div>`
   ).join("");
 }
 function updateMomentProgress(){
-  const bars=[...els.momentProgRow.querySelectorAll(".moment-prog > span")];
+  const bars = [...E.momentProgRow.querySelectorAll(".moment-prog > span")];
   bars.forEach((b,i)=>{
-    if(i<_mvIndex)b.style.width="100%";
-    else if(i>_mvIndex)b.style.width="0%";
-    else{ const e=performance.now()-state.momentStartTs; b.style.width=`${Math.min(100,(e/state.momentDurationMs)*100)}%`; }
+    if(i<state.mvIndex) b.style.width="100%";
+    else if(i>state.mvIndex) b.style.width="0%";
+    else { const e=performance.now()-state.mvStartTs; b.style.width=`${Math.min(100,(e/state.mvDuration)*100)}%`; }
   });
-  state.momentRaf=requestAnimationFrame(updateMomentProgress);
+  state.mvRaf = requestAnimationFrame(updateMomentProgress);
 }
 function startMomentTimer(){
   stopMomentTimer();
-  state.momentStartTs=performance.now();
-  state.momentTimer=setTimeout(()=>advanceMoment(1),state.momentDurationMs);
-  state.momentRaf=requestAnimationFrame(updateMomentProgress);
+  state.mvStartTs = performance.now();
+  state.mvTimer   = setTimeout(()=>advanceMoment(1), state.mvDuration);
+  state.mvRaf     = requestAnimationFrame(updateMomentProgress);
 }
-function stopMomentTimer(){ clearTimeout(state.momentTimer); cancelAnimationFrame(state.momentRaf); }
+function stopMomentTimer(){ clearTimeout(state.mvTimer); cancelAnimationFrame(state.mvRaf); }
 function advanceMoment(dir){
-  _mvIndex=(_mvIndex+dir+_mvQueue.length)%_mvQueue.length;
+  state.mvIndex = (state.mvIndex+dir+state.mvQueue.length)%state.mvQueue.length;
   renderMomentSlide(); startMomentTimer();
 }
-els.closeMoment.addEventListener("click",closeMomentViewer);
-els.prevMoment.addEventListener("click",e=>{e.stopPropagation();advanceMoment(-1);});
-els.nextMoment.addEventListener("click",e=>{e.stopPropagation();advanceMoment(1);});
-els.momentViewer.addEventListener("click",e=>{if(e.target===els.momentViewer)closeMomentViewer();});
 
-/* ─── Post HTML ────────────────────────────────── */
+E.closeMoment.addEventListener("click", closeMomentViewer);
+E.prevMoment.addEventListener("click",  e=>{e.stopPropagation();advanceMoment(-1);});
+E.nextMoment.addEventListener("click",  e=>{e.stopPropagation();advanceMoment(1);});
+E.momentViewer.addEventListener("click",e=>{if(e.target===E.momentViewer)closeMomentViewer();});
+E.momentCaptionText.addEventListener("click",()=>{
+  const exp = E.momentCaptionText.classList.toggle("expanded");
+  E.momentExpandHint.textContent = exp ? "Mostra meno ↓" : "Leggi tutto ↑";
+});
+window.addEventListener("keydown",e=>{
+  if(!E.momentViewer.classList.contains("open")) return;
+  if(e.key==="Escape") closeMomentViewer();
+  if(e.key==="ArrowLeft")  advanceMoment(-1);
+  if(e.key==="ArrowRight") advanceMoment(1);
+});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden) stopMomentTimer();
+  else if(E.momentViewer.classList.contains("open")) startMomentTimer();
+});
+
+/* ═══════════════════════════════════════════════════════════
+   BUILD POST HTML
+═══════════════════════════════════════════════════════════ */
+function isMyPost(post){
+  return state.currentUserId && String(post.user_id||post.profile_id)===String(state.currentUserId);
+}
 function buildPostHtml(post, badge=""){
-  const username = usernameForPost(post);
-  const profile  = profileById(post.user_id)||profileById(post.profile_id);
-  const avatar   = avatarForPost(post);
-  const image    = normUrl(post.image_url||post.media_url||post.image||"");
-  const caption  = post.caption||post.text||"";
+  const username   = usernameForPost(post);
+  const profile    = profileById(post.user_id)||profileById(post.profile_id);
+  const avatar     = avatarForPost(post);
+  const image      = norm(post.image_url||post.media_url||post.image||"");
+  const caption    = post.caption||post.text||"";
   const songTitle  = post.song_title||post.song||"";
   const songAuthor = post.song_author||post.song_artist||post.song_by||"";
   const songPreview= post.song_preview||post.audio_url||post.preview_url||"";
-  const songCover  = normUrl(post.song_cover||post.album_cover||post.album_image||post.cover_url||post.artwork_url||post.album_art||"");
+  const songCover  = norm(post.song_cover||post.album_cover||post.cover_url||post.artwork_url||"");
   const createdAt  = post.created_at||post.inserted_at||post.updated_at||"";
   const likes      = likeCount(post.id);
   const liked      = likedByMe(post.id)||!!post.liked;
   const tags       = tagsFor(post);
   const location   = locationFor(post);
-  const isPlaying  = state.audioPostId===String(post.id)&&state.audioPlaying;
+  const mine       = isMyPost(post);
+  const isPlaying  = state.audioPostId===String(post.id) && state.audioPlaying;
+  const hasSong    = !!(songTitle||songPreview);
 
   return `
 <article class="post" data-post-id="${esc(post.id)}">
@@ -746,11 +958,12 @@ function buildPostHtml(post, badge=""){
     <div class="user-meta">
       <div class="username" data-profile-id="${esc(post.user_id||post.profile_id||"")}">
         <span>${esc(username)}</span>
-        ${profile&&isVerified(profile)?`<span class="material-symbols-rounded verified">verified</span>`:""}
+        ${profile&&isVerified(profile)?`<span class="material-symbols-rounded verified" style="font-size:14px;font-variation-settings:'FILL' 1">verified</span>`:""}
       </div>
       <div class="post-time">${esc(timeAgo(createdAt))}</div>
     </div>
     ${badge?`<div class="following-badge">${badge}</div>`:""}
+    ${mine?`<button class="delete-btn" data-delete-id="${esc(post.id)}" type="button" title="Elimina post"><span class="material-symbols-rounded">delete</span></button>`:""}
   </div>
 
   <div class="media" data-like-zone="${esc(post.id)}">
@@ -760,7 +973,7 @@ function buildPostHtml(post, badge=""){
 
   <div class="actions">
     <div class="like-row">
-      <button class="like-btn${liked?" liked":""}" data-like-btn="${esc(post.id)}" type="button" aria-label="Like">
+      <button class="like-btn${liked?" liked":""}" data-like-btn="${esc(post.id)}" type="button">
         <span class="material-symbols-rounded">favorite</span>
       </button>
       <div class="count" data-like-count="${esc(post.id)}">${fmtN(likes)} likes</div>
@@ -772,335 +985,399 @@ function buildPostHtml(post, badge=""){
 
   ${caption?`
     <div class="caption" id="cap-${esc(post.id)}"><span class="author-handle">${esc(username)}</span>${esc(caption)}</div>
-    <div class="caption-toggle" id="captog-${esc(post.id)}" data-cap-id="${esc(post.id)}">Leggi tutto</div>
+    <div class="caption-more" id="capmore-${esc(post.id)}" data-cap="${esc(post.id)}">Leggi tutto</div>
   `:""}
 
-  ${(songTitle||songPreview)?`
-    <div class="song-card${isPlaying?" playing":""}" data-song-play="${esc(post.id)}"
-         data-audio="${esc(songPreview)}" data-song-title="${esc(songTitle)}"
-         data-song-artist="${esc(songAuthor)}" data-song-cover="${esc(songCover)}">
+  ${hasSong?`
+    <div class="song-card${isPlaying?" playing":""}" id="sc-${esc(post.id)}"
+         data-song-play="${esc(post.id)}"
+         data-audio="${esc(songPreview)}"
+         data-song-title="${esc(songTitle)}"
+         data-song-artist="${esc(songAuthor)}"
+         data-song-cover="${esc(songCover)}">
       ${songCover
-        ?`<img class="album-cover" src="${songCover}" alt="Album cover">`
-        :`<div class="note-cover"><span class="material-symbols-rounded">music_note</span></div>`}
+        ?`<img class="album-cover" id="scov-${esc(post.id)}" src="${songCover}" alt="Cover">`
+        :`<div class="note-cover" id="scov-${esc(post.id)}"><span class="material-symbols-rounded">music_note</span></div>`}
       <div class="song-info">
-        ${songTitle ?`<div class="song-title">${esc(songTitle)}</div>`:""}
-        ${songAuthor?`<div class="song-author">${esc(songAuthor)}</div>`:""}
+        <div class="song-title" id="stit-${esc(post.id)}">${esc(songTitle)||"Caricamento…"}</div>
+        <div class="song-author" id="sart-${esc(post.id)}">${esc(songAuthor)}</div>
+        <div class="song-source-badge" id="ssrc-${esc(post.id)}"></div>
       </div>
+      <div class="play-btn-inline"><span class="material-symbols-rounded">${isPlaying?"pause":"play_arrow"}</span></div>
       <div class="music-bars"><span></span><span></span><span></span></div>
     </div>
   `:""}
 </article>`;
 }
 
-/* ─── Feed rendering ───────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   ITUNES ENRICHMENT ON VISIBLE SONG CARDS
+═══════════════════════════════════════════════════════════ */
+function enrichVisibleSongCards(){
+  document.querySelectorAll("[data-song-play]").forEach(async card=>{
+    if(card.dataset.itunesEnriched) return;
+    card.dataset.itunesEnriched="1";
+    const postId  = card.dataset.songPlay;
+    const title   = card.dataset.songTitle?.trim();
+    const artist  = card.dataset.songArtist?.trim();
+    if(!title && !artist) return;
+
+    // Only fetch iTunes if we're missing cover or preview
+    const missingCover   = !card.dataset.songCover;
+    const missingPreview = !card.dataset.audio;
+    if(!missingCover && !missingPreview) return;
+
+    const meta = await fetchItunesMeta(title, artist);
+    if(!meta) return;
+
+    // Update cover in DOM
+    if(missingCover && meta.cover){
+      card.dataset.songCover = meta.cover;
+      const covEl = document.getElementById(`scov-${postId}`);
+      if(covEl && covEl.tagName==="DIV"){
+        const img = document.createElement("img");
+        img.className="album-cover"; img.id=`scov-${postId}`;
+        img.src=meta.cover; img.alt="Cover";
+        covEl.replaceWith(img);
+      } else if(covEl && covEl.tagName==="IMG"){
+        covEl.src = meta.cover;
+      }
+    }
+    // Update preview
+    if(missingPreview && meta.preview){
+      card.dataset.audio = meta.preview;
+    }
+    // Update title/artist if improved
+    if(meta.title){ card.dataset.songTitle=meta.title; const t=document.getElementById(`stit-${postId}`); if(t) t.textContent=meta.title; }
+    if(meta.artist){ card.dataset.songArtist=meta.artist; const a=document.getElementById(`sart-${postId}`); if(a) a.textContent=meta.artist; }
+    const src = document.getElementById(`ssrc-${postId}`);
+    if(src) src.textContent = "via iTunes";
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FEED SORT & RENDER
+═══════════════════════════════════════════════════════════ */
 function sortPosts(){
   const all = [...state.posts].sort((a,b)=>new Date(b.created_at||b.inserted_at||0)-new Date(a.created_at||a.inserted_at||0));
-  // Split: mutual first, then following, then rest
   const mutual=[], following=[], discover=[];
   all.forEach(p=>{
-    const uid=p.user_id||p.profile_id;
-    if(isMutual(uid)) mutual.push({post:p,badge:"Mutuo"});
-    else if(iFollow(uid)) following.push({post:p,badge:"Segui"});
-    else discover.push({post:p,badge:""});
+    const uid = p.user_id||p.profile_id;
+    if(isMutual(uid))        mutual.push({post:p,badge:"Mutuo"});
+    else if(iFollow(uid))    following.push({post:p,badge:"Segui"});
+    else                     discover.push({post:p,badge:""});
   });
-  // shuffle discover
-  for(let i=discover.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[discover[i],discover[j]]=[discover[j],discover[i]];}
-  state.followingPosts=[...mutual,...following];
-  state.discoverPosts=discover;
+  for(let i=discover.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [discover[i],discover[j]]=[discover[j],discover[i]]; }
+  state.followingPosts = [...mutual,...following];
+  state.discoverPosts  = discover;
 }
 
-function getNextBatch(){
-  const result=[];
-  const fi=state.renderedCount; // index into followingPosts for this batch
-  // We interleave: first take from following, then fill up with discover
-  const followChunk=state.followingPosts.slice(fi);
-  result.push(...followChunk);
-  // then discover - track separately
-  const di=Math.max(0, state.renderedCount - state.followingPosts.length);
-  const discoverChunk=state.discoverPosts.slice(di, di + BATCH);
-  result.push(...discoverChunk);
-  return result.slice(0, BATCH);
-}
+function renderFeed(append=false){
+  if(!append){ E.feed.innerHTML=""; state.renderedCount=0; sortPosts(); }
 
-async function renderFeed(append=false){
-  if(!append){
-    els.feed.innerHTML="";
-    state.renderedCount=0;
-    sortPosts();
-  }
-
-  const combined=[...state.followingPosts,...state.discoverPosts];
-  const batch=combined.slice(state.renderedCount, state.renderedCount+BATCH);
+  const combined = [...state.followingPosts, ...state.discoverPosts];
+  const batch    = combined.slice(state.renderedCount, state.renderedCount+BATCH);
 
   if(!batch.length && !append){
-    els.feed.innerHTML=`<div class="empty">Nessun post trovato.</div>`;
-    els.loadMore.classList.add("hidden");
-    return;
+    E.feed.innerHTML=`<div class="empty">Nessun post trovato.</div>`;
+    E.loadMore.classList.add("hidden"); return;
   }
 
-  // Show labels
   if(!append){
-    els.feedFollowing.style.display   = state.followingPosts.length?"flex":"none";
-    els.feedDiscoverLabel.style.display= state.discoverPosts.length?"flex":"none";
+    E.feedFollowingLabel.style.display = state.followingPosts.length?"flex":"none";
+    E.feedDiscoverLabel.style.display  = state.discoverPosts.length?"flex":"none";
   }
 
-  const frag=document.createElement("div");
-  frag.innerHTML=batch.map(item=>buildPostHtml(item.post||item, item.badge||"")).join("");
-
-  const articles=[...frag.children];
-  articles.forEach(c=>{
-    c.style.animationDelay=`${articles.indexOf(c)*40}ms`;
-    els.feed.appendChild(c);
+  batch.forEach((item,idx)=>{
+    const html = buildPostHtml(item.post||item, item.badge||"");
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = html.trim();
+    const article = wrapper.firstChild;
+    article.style.animationDelay=`${idx*35}ms`;
+    E.feed.appendChild(article);
   });
 
-  state.renderedCount+=batch.length;
-  if(state.renderedCount>=combined.length){ state.allLoaded=true; els.loadMore.classList.add("hidden"); }
+  state.renderedCount += batch.length;
+  if(state.renderedCount >= combined.length){ state.allLoaded=true; E.loadMore.classList.add("hidden"); }
 
   wireLazy();
   wireInteractions();
   wireSongCards();
   wireDoubleTap();
   wireCaptionToggles();
+  enrichVisibleSongCards();
 }
 
-/* ─── Lazy images ──────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   LAZY IMAGES
+═══════════════════════════════════════════════════════════ */
 function wireLazy(){
-  const imgs=[...document.querySelectorAll("img.lazy-media[data-src]")];
-  const io=new IntersectionObserver((entries,obs)=>{
+  const io = new IntersectionObserver((entries,obs)=>{
     entries.forEach(e=>{
-      if(!e.isIntersecting)return;
+      if(!e.isIntersecting) return;
       const img=e.target; img.src=img.dataset.src||""; img.removeAttribute("data-src"); obs.unobserve(img);
     });
-  },{root:els.mainScroll,threshold:0.1,rootMargin:"200px 0px"});
-  imgs.forEach(i=>io.observe(i));
+  },{root:E.main,threshold:0.1,rootMargin:"200px 0px"});
+  document.querySelectorAll("img.lazy-media[data-src]").forEach(i=>io.observe(i));
 }
 
-/* ─── Caption expand ───────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   CAPTION TOGGLE
+═══════════════════════════════════════════════════════════ */
 function wireCaptionToggles(){
   document.querySelectorAll(".caption").forEach(cap=>{
-    // show toggle only if text overflows
     requestAnimationFrame(()=>{
-      if(cap.scrollHeight > cap.clientHeight + 2){
-        const togId="captog-"+cap.id.replace("cap-","");
-        const tog=document.getElementById(togId);
-        if(tog) tog.classList.add("visible");
+      if(cap.scrollHeight > cap.clientHeight+2){
+        const m=document.getElementById("capmore-"+cap.id.replace("cap-",""));
+        if(m) m.classList.add("visible");
       }
     });
   });
-  document.querySelectorAll(".caption-toggle").forEach(tog=>{
-    tog.addEventListener("click",()=>{
-      const cap=document.getElementById("cap-"+tog.dataset.capId);
-      if(!cap)return;
-      const expanded=cap.classList.toggle("expanded");
-      tog.textContent=expanded?"Mostra meno":"Leggi tutto";
+  document.querySelectorAll(".caption-more").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const cap=document.getElementById("cap-"+btn.dataset.cap); if(!cap) return;
+      const exp=cap.classList.toggle("expanded");
+      btn.textContent=exp?"Mostra meno":"Leggi tutto";
     });
   });
 }
 
-/* ─── Like ─────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   LIKE
+═══════════════════════════════════════════════════════════ */
 function showPulse(postId){
-  const zone=document.querySelector(`[data-like-zone="${CSS.escape(postId)}"]`);
-  const pulse=zone?.querySelector(".like-pop"); if(!pulse)return;
-  pulse.classList.add("show"); setTimeout(()=>pulse.classList.remove("show"),220);
+  const z=document.querySelector(`[data-like-zone="${CSS.escape(postId)}"]`);
+  const p=z?.querySelector(".like-pop"); if(!p) return;
+  p.classList.add("show"); setTimeout(()=>p.classList.remove("show"),200);
 }
 function refreshLikeUi(postId){
   const btn=document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
   const cnt=document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
-  if(!btn||!cnt)return;
-  btn.classList.toggle("liked", likedByMe(postId)||(state.likeDeltas[postId]??0)>0);
-  cnt.textContent=`${fmtN(likeCount(postId))} likes`;
+  if(btn) btn.classList.toggle("liked", likedByMe(postId)||(state.likeDeltas[postId]??0)>0);
+  if(cnt) cnt.textContent=`${fmtN(likeCount(postId))} likes`;
 }
 async function persistLike(postId, wasLiked){
-  if(!state.currentUserId)return;
+  if(!state.currentUserId) return;
   state.likeDeltas[postId]=(state.likeDeltas[postId]??0)+(wasLiked?-1:1);
   refreshLikeUi(postId);
   try{
     if(wasLiked) await apiSend("/likes","DELETE",{post_id:postId,user_id:state.currentUserId});
-    else         await apiSend("/likes","POST",  {post_id:postId,user_id:state.currentUserId});
-    state.likes=await fetchLikes();
+    else         await apiSend("/likes","POST",{post_id:postId,user_id:state.currentUserId});
+    state.likes = await fetchLikes();
     state.likeDeltas[postId]=0;
-  }catch(e){
-    state.likeDeltas[postId]=(state.likeDeltas[postId]??0)+(wasLiked?1:-1);
-    console.error(e);
-  }
+  }catch(e){ state.likeDeltas[postId]=(state.likeDeltas[postId]??0)+(wasLiked?1:-1); console.error(e); }
   refreshLikeUi(postId);
 }
 function toggleLike(postId){
-  const btn=document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`); if(!btn)return;
+  const btn=document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`); if(!btn) return;
   showPulse(postId);
   persistLike(postId, btn.classList.contains("liked")).catch(console.error);
 }
 
-/* ─── Wire interactions ────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   DELETE
+═══════════════════════════════════════════════════════════ */
+function promptDelete(postId){
+  state.pendingDeleteId = postId;
+  E.delConfirm.classList.add("open");
+}
+function closeDeleteConfirm(){ E.delConfirm.classList.remove("open"); state.pendingDeleteId=null; }
+E.delCancel.addEventListener("click", closeDeleteConfirm);
+E.delConfirm.addEventListener("click", e=>{ if(e.target===E.delConfirm) closeDeleteConfirm(); });
+E.delOk.addEventListener("click", async()=>{
+  const id = state.pendingDeleteId; if(!id) return;
+  closeDeleteConfirm();
+  // Optimistically remove from DOM
+  const art = document.querySelector(`[data-post-id="${CSS.escape(id)}"]`);
+  if(art){ art.style.transition="opacity .2s,transform .2s"; art.style.opacity="0"; art.style.transform="scale(.96)"; setTimeout(()=>art.remove(),220); }
+  // Remove from state
+  state.posts = state.posts.filter(p=>String(p.id)!==String(id));
+  state.followingPosts = state.followingPosts.filter(x=>String((x.post||x).id)!==String(id))
+  state.discoverPosts  = state.discoverPosts.filter(x=>String((x.post||x).id)!==String(id));
+  try{
+    await apiSend(`/posts/${id}`,"DELETE",null);
+  }catch(e){ console.error("Delete failed",e); }
+});
+
+/* ═══════════════════════════════════════════════════════════
+   INTERACTIONS WIRING
+═══════════════════════════════════════════════════════════ */
 function wireInteractions(){
   document.querySelectorAll("[data-profile-id]").forEach(n=>{
     n.addEventListener("click",()=>{ if(n.dataset.profileId) window.location.href=`profile.html?id=${encodeURIComponent(n.dataset.profileId)}`; });
   });
-  document.querySelectorAll("[data-like-btn]").forEach(b=>{b.addEventListener("click",()=>toggleLike(b.dataset.likeBtn));});
-  document.querySelectorAll("[data-like-count]").forEach(c=>{c.addEventListener("click",()=>openLikesModal(c.dataset.likeCount));});
+  document.querySelectorAll("[data-like-btn]").forEach(b=>b.addEventListener("click",()=>toggleLike(b.dataset.likeBtn)));
+  document.querySelectorAll("[data-like-count]").forEach(c=>c.addEventListener("click",()=>openLikesModal(c.dataset.likeCount)));
+  document.querySelectorAll("[data-delete-id]").forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); promptDelete(b.dataset.deleteId); }));
 }
-
 function wireDoubleTap(){
-  const lastTap=new Map();
   document.querySelectorAll("[data-like-zone]").forEach(zone=>{
     zone.addEventListener("dblclick",()=>toggleLike(zone.dataset.likeZone));
     let ts=0,last=null;
     zone.addEventListener("touchend",()=>{
-      const id=zone.dataset.likeZone, now=Date.now();
+      const id=zone.dataset.likeZone,now=Date.now();
       if(last===id&&now-ts<320){toggleLike(id);last=null;return;}
-      ts=now; last=id;
+      ts=now;last=id;
     },{passive:true});
   });
 }
 
-/* ─── Audio ─────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   AUDIO
+═══════════════════════════════════════════════════════════ */
 function wireSongCards(){
   document.querySelectorAll("[data-song-play]").forEach(card=>{
     card.addEventListener("click",()=>{
       const id=card.dataset.songPlay, src=card.dataset.audio;
-      if(!src)return;
+      if(!src){ return; }
       if(state.audioPostId===id){ state.audioPlaying?pauseAudio():resumeAudio(); return; }
-      startAudio(id,src,card.dataset.songTitle,card.dataset.songArtist,card.dataset.songCover);
+      startAudio(id, src, card.dataset.songTitle, card.dataset.songArtist, card.dataset.songCover);
     });
   });
 }
-
-function startAudio(postId,src,title,artist,cover){
+function updatePlayBtn(postId, playing){
+  const btn = document.querySelector(`[data-song-play="${CSS.escape(postId)}"] .play-btn-inline .material-symbols-rounded`);
+  if(btn) btn.textContent = playing?"pause":"play_arrow";
+}
+function startAudio(postId, src, title, artist, cover){
   if(state.audioPostId){
     document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`)?.classList.remove("playing");
+    updatePlayBtn(state.audioPostId, false);
   }
   state.audioPostId=postId; state.audioPlaying=true;
-  els.globalAudio.src=src; els.globalAudio.volume=0.22;
-  els.globalAudio.play().catch(()=>{});
-  els.audioBarCover.src=cover||defAvatar();
-  els.audioBarTitle.textContent=title||"Now playing";
-  els.audioBarArtist.textContent=artist||"";
-  els.audioBarIcon.textContent="pause";
-  els.audioBar.classList.add("visible");
+  E.globalAudio.src=src; E.globalAudio.volume=0.22;
+  E.globalAudio.play().catch(()=>{});
+  const displayCover = cover || defAvatar();
+  E.audioBarCover.src    = displayCover;
+  E.audioBarTitle.textContent  = title||"Now playing";
+  E.audioBarArtist.textContent = artist||"";
+  E.audioBarIcon.textContent   = "pause";
+  E.audioBar.classList.add("visible");
   document.querySelector(`[data-song-play="${CSS.escape(postId)}"]`)?.classList.add("playing");
+  updatePlayBtn(postId, true);
+  startProgressRaf();
 }
 function pauseAudio(){
-  state.audioPlaying=false; els.globalAudio.pause();
-  els.audioBarIcon.textContent="play_arrow";
+  state.audioPlaying=false; E.globalAudio.pause();
+  E.audioBarIcon.textContent="play_arrow";
+  E.audioRing.style.animationPlayState="paused";
   document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`)?.classList.remove("playing");
+  updatePlayBtn(state.audioPostId, false);
+  stopProgressRaf();
 }
 function resumeAudio(){
-  state.audioPlaying=true; els.globalAudio.play().catch(()=>{});
-  els.audioBarIcon.textContent="pause";
+  state.audioPlaying=true; E.globalAudio.play().catch(()=>{});
+  E.audioBarIcon.textContent="pause";
+  E.audioRing.style.animationPlayState="running";
   document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`)?.classList.add("playing");
+  updatePlayBtn(state.audioPostId, true);
+  startProgressRaf();
 }
 function stopAudio(){
-  pauseAudio(); state.audioPostId=null; els.audioBar.classList.remove("visible"); els.globalAudio.src="";
+  pauseAudio(); state.audioPostId=null; E.audioBar.classList.remove("visible"); E.globalAudio.src=""; E.audioProgress.style.width="0%";
 }
-els.audioBarToggle.addEventListener("click",()=>state.audioPlaying?pauseAudio():resumeAudio());
-els.audioBarClose.addEventListener("click",stopAudio);
+function startProgressRaf(){
+  stopProgressRaf();
+  const tick=()=>{
+    const dur=E.globalAudio.duration||0, cur=E.globalAudio.currentTime||0;
+    if(dur>0) E.audioProgress.style.width=`${(cur/dur)*100}%`;
+    state.audioProgressRaf=requestAnimationFrame(tick);
+  };
+  state.audioProgressRaf=requestAnimationFrame(tick);
+}
+function stopProgressRaf(){ cancelAnimationFrame(state.audioProgressRaf); }
 
-/* ─── Load more ────────────────────────────────── */
-els.loadMore.addEventListener("click",async()=>{
-  if(state.allLoaded)return;
-  els.loadMore.innerHTML="<span>Caricamento…</span>";
-  await renderFeed(true);
-  els.loadMore.innerHTML=`<span class="material-symbols-rounded">add</span>Carica altri`;
+E.audioBarToggle.addEventListener("click",()=>state.audioPlaying?pauseAudio():resumeAudio());
+E.audioBarClose.addEventListener("click", stopAudio);
+
+/* Load more */
+E.loadMore.addEventListener("click",()=>{
+  if(state.allLoaded) return;
+  E.loadMore.innerHTML="<span>Caricamento…</span>";
+  renderFeed(true);
+  E.loadMore.innerHTML=`<span class="material-symbols-rounded">add</span>Carica altri`;
 });
 
-/* ─── Likes modal ──────────────────────────────── */
+/* Likes modal */
 function openLikesModal(postId){
   const items=state.likes.filter(l=>String(l.post_id??l.postId??l.postid)===String(postId)).map(l=>{
     const p=profileById(l.user_id);
     return{id:p?.id||l.user_id,name:p?.username||p?.full_name||"user",avatar:avatarForProfile(p),sub:p?.bio||"",verified:isVerified(p)};
   });
-  els.likesList.innerHTML=items.length?items.map(x=>`
+  E.likesList.innerHTML=items.length?items.map(x=>`
     <div class="list-item" data-open-profile="${esc(x.id)}">
       <img class="list-avatar" src="${x.avatar}" alt="">
       <div class="list-main">
-        <div class="list-name"><span>${esc(x.name)}</span>${x.verified?`<span class="material-symbols-rounded verified" style="font-size:14px;font-variation-settings:'FILL' 1">verified</span>`:""}</div>
+        <div class="list-name"><span>${esc(x.name)}</span>${x.verified?`<span class="material-symbols-rounded verified" style="font-size:13px;font-variation-settings:'FILL' 1">verified</span>`:""}</div>
         <div class="list-sub">${esc(x.sub)}</div>
       </div>
-    </div>`).join(""):`<div class="empty" style="margin:0">Nessun like ancora.</div>`;
-  els.likesModal.classList.add("open");
-  els.likesList.querySelectorAll("[data-open-profile]").forEach(item=>{
-    item.addEventListener("click",()=>{ if(item.dataset.openProfile) window.location.href=`profile.html?id=${encodeURIComponent(item.dataset.openProfile)}`; });
+    </div>`).join(""):`<div class="empty">Nessun like ancora.</div>`;
+  E.likesModal.classList.add("open");
+  E.likesList.querySelectorAll("[data-open-profile]").forEach(i=>{
+    i.addEventListener("click",()=>{ if(i.dataset.openProfile) window.location.href=`profile.html?id=${encodeURIComponent(i.dataset.openProfile)}`; });
   });
 }
-function closeLikesModal(){ els.likesModal.classList.remove("open"); }
-els.closeLikesBtn.addEventListener("click",closeLikesModal);
-els.likesModal.addEventListener("click",e=>{if(e.target===els.likesModal)closeLikesModal();});
+const closeLikesModal=()=>E.likesModal.classList.remove("open");
+E.closeLikesBtn.addEventListener("click",closeLikesModal);
+E.likesModal.addEventListener("click",e=>{if(e.target===E.likesModal)closeLikesModal();});
+window.addEventListener("keydown",e=>{if(E.likesModal.classList.contains("open")&&e.key==="Escape")closeLikesModal();});
 
-/* ─── Search ───────────────────────────────────── */
+/* Search */
 function updateSuggestions(){
   const q=state.searchQuery.trim().toLowerCase();
-  if(!q){els.suggestions.style.display="none";els.suggestions.innerHTML="";return;}
-  const matches=state.profiles.filter(p=>{
-    const u=String(p.username||p.full_name||"").toLowerCase();
-    return u.includes(q)||String(p.bio||"").toLowerCase().includes(q);
-  }).slice(0,8);
-  if(!matches.length){els.suggestions.style.display="none";return;}
-  els.suggestions.innerHTML=matches.map(p=>`
+  if(!q){E.suggestions.style.display="none";E.suggestions.innerHTML="";return;}
+  const matches=state.profiles.filter(p=>
+    (p.username||p.full_name||"").toLowerCase().includes(q)||
+    (p.bio||"").toLowerCase().includes(q)
+  ).slice(0,8);
+  if(!matches.length){E.suggestions.style.display="none";return;}
+  E.suggestions.innerHTML=matches.map(p=>`
     <div class="suggestion" data-sid="${esc(p.id)}">
       <img class="suggestion-avatar" src="${avatarForProfile(p)}" alt="">
       <div class="suggestion-meta">
-        <div class="suggestion-title"><span>${esc(p.username||p.full_name||"user")}</span>${isVerified(p)?`<span>✓</span>`:""}</div>
+        <div class="suggestion-title">${esc(p.username||p.full_name||"user")}</div>
         <div class="suggestion-subtitle">${esc(p.bio||"Apri profilo")}</div>
       </div>
     </div>`).join("");
-  els.suggestions.style.display="block";
-  els.suggestions.querySelectorAll("[data-sid]").forEach(n=>{
+  E.suggestions.style.display="block";
+  E.suggestions.querySelectorAll("[data-sid]").forEach(n=>{
     n.addEventListener("click",()=>window.location.href=`profile.html?id=${encodeURIComponent(n.dataset.sid)}`);
   });
 }
-els.search.addEventListener("input",()=>{state.searchQuery=els.search.value;updateSuggestions();});
-els.search.addEventListener("focus",updateSuggestions);
-document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))els.suggestions.style.display="none";});
+E.search.addEventListener("input",()=>{state.searchQuery=E.search.value;updateSuggestions();});
+E.search.addEventListener("focus",updateSuggestions);
+document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))E.suggestions.style.display="none";});
 
-/* ─── Keyboard ─────────────────────────────────── */
-window.addEventListener("keydown",e=>{
-  if(els.momentViewer.classList.contains("open")){
-    if(e.key==="Escape")closeMomentViewer();
-    if(e.key==="ArrowLeft")advanceMoment(-1);
-    if(e.key==="ArrowRight")advanceMoment(1);
-  }
-  if(els.likesModal.classList.contains("open")&&e.key==="Escape")closeLikesModal();
-});
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden) stopMomentTimer();
-  else if(els.momentViewer.classList.contains("open")) startMomentTimer();
-});
-
-/* ─── Bootstrap ────────────────────────────────── */
+/* Bootstrap */
 async function loadData(){
   renderSkeletons(4);
   try{
     const [rawPosts,rawProfiles,rawLikes,rawMoments]=await Promise.all([
       fetchPosts(), fetchProfiles(), fetchLikes(), fetchMoments()
     ]);
-    state.profiles=rawProfiles;
-    state.currentUserProfile=await fetchCurrentUser();
-    state.currentUserId=state.currentUserProfile?.id||null;
-
-    // fetch follows after we know current user
-    state.follows=await fetchFollows().catch(()=>[]);
-
-    state.posts=rawPosts;
-    state.likes=rawLikes;
-    state.moments=rawMoments;
-    state.storyQueue=buildStoryQueue();
-
+    state.profiles = rawProfiles;
+    state.currentUserProfile = await fetchCurrentUser();
+    state.currentUserId      = state.currentUserProfile?.id||null;
+    state.follows = await fetchFollows().catch(()=>[]);
+    state.posts   = rawPosts;
+    state.likes   = rawLikes;
+    state.moments = rawMoments;
+    state.storyQueue = buildStoryQueue();
     renderCurrentUser();
     renderStories();
     renderMoments();
-    await renderFeed(false);
-
+    renderFeed(false);
     updateSuggestions();
   }catch(err){
     console.error(err);
-    els.feed.innerHTML=`<div class="empty">Impossibile caricare i contenuti.</div>`;
+    E.feed.innerHTML=`<div class="empty">Impossibile caricare i contenuti.</div>`;
     state.currentUserProfile=await fetchCurrentUser().catch(()=>null);
     renderCurrentUser();
   }
 }
 
-window.goUpload=()=>window.location.href="upload.html";
-window.logout=()=>{
+window.goUpload = ()=>window.location.href="upload.html";
+window.logout   = ()=>{
   ["shared_current_user_id","shared_current_username","shared_current_avatar"].forEach(k=>localStorage.removeItem(k));
   window.location.href="index.html";
 };
