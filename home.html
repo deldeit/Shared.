@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#000000">
 
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
 
 <style>
   :root{
@@ -21,7 +21,7 @@
     --danger:#ff3b30;
     --like:#ff2d55;
     --sidebar-w:330px;
-    --feed-width:420px;
+    --feed-width:440px;
     --safe-top: env(safe-area-inset-top, 0px);
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --squircle-radius: 28px;
@@ -38,819 +38,344 @@
 
   button, input, a{font-family:'Archivo Black', sans-serif;}
 
+  /* ── Sidebar overlay ── */
   .sidebar-overlay{
-    position:fixed;
-    inset:0;
+    position:fixed;inset:0;
     background:rgba(0,0,0,.55);
-    z-index:19;
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
+    z-index:19;opacity:0;visibility:hidden;pointer-events:none;
     transition:opacity .28s ease, visibility .28s ease;
-    backdrop-filter:none;
   }
+  .sidebar-overlay.open{opacity:1;visibility:visible;pointer-events:auto;}
 
-  .sidebar-overlay.open{
-    opacity:1;
-    visibility:visible;
-    pointer-events:auto;
-  }
-
+  /* ── Hamburger ── */
   .hamburger{
-    position:fixed;
-    top:14px;
-    left:16px;
-    z-index:22;
-    width:44px;
-    height:44px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.18);
-    background:rgba(0,0,0,.92);
-    color:#fff;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
+    position:fixed;top:14px;left:16px;z-index:22;
+    width:44px;height:44px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.92);color:#fff;
+    display:flex;align-items:center;justify-content:center;cursor:pointer;
     transition:background .18s, transform .18s;
   }
-
   .hamburger:hover{background:rgba(255,255,255,.08);}
   .hamburger:active{transform:scale(.94);}
+  .hamburger .material-symbols-rounded{font-size:24px;transition:opacity .15s;}
 
-  .hamburger .material-symbols-rounded{
-    font-size:24px;
-    transition:opacity .15s;
-  }
-
+  /* ── Sidebar ── */
   .sidebar{
-    position:fixed;
-    left:0;
-    top:0;
-    bottom:0;
-    width:var(--sidebar-w);
-    padding:18px 16px;
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-    border-right:1px solid rgba(255,255,255,.1);
-    background:#000;
-    z-index:21;
-    overflow:hidden;
-    transform:translateX(-100%);
-    transition:transform .3s cubic-bezier(.4,0,.2,1);
+    position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);
+    padding:18px 16px;display:flex;flex-direction:column;gap:14px;
+    border-right:1px solid rgba(255,255,255,.1);background:#000;
+    z-index:21;overflow:hidden;
+    transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
   }
-
   .sidebar.open{transform:translateX(0);}
 
-  .sidebar-top{
-    display:flex;
-    flex-direction:column;
-    gap:14px;
-    min-height:0;
-    flex:1;
-    padding-top:56px;
-  }
-
-  .sidebar-bottom{
-    margin-top:auto;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-  }
+  .sidebar-top{display:flex;flex-direction:column;gap:14px;min-height:0;flex:1;padding-top:56px;}
+  .sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:10px;}
 
   .profile-card{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:14px;
-    border-radius:18px;
-    border:1px solid rgba(255,255,255,.14);
-    background:rgba(255,255,255,.04);
+    display:flex;align-items:center;gap:12px;padding:14px;
+    border-radius:18px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);
   }
-
   .profile-avatar{
-    width:54px;
-    height:54px;
-    border-radius:50%;
-    object-fit:cover;
-    border:1px solid rgba(255,255,255,.12);
-    background:#111;
-    flex:0 0 auto;
+    width:54px;height:54px;border-radius:50%;object-fit:cover;
+    border:1px solid rgba(255,255,255,.12);background:#111;flex:0 0 auto;
   }
-
   .profile-meta{min-width:0;flex:1}
-  .profile-label{
-    font-size:11px;
-    color:var(--muted-2);
-    letter-spacing:.14em;
-    text-transform:uppercase;
-    margin-bottom:4px;
-  }
-  .profile-name{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:16px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .profile-handle{
-    margin-top:3px;
-    font-size:11px;
-    color:var(--muted-2);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
+  .profile-label{font-size:11px;color:var(--muted-2);letter-spacing:.14em;text-transform:uppercase;margin-bottom:4px;}
+  .profile-name{display:flex;align-items:center;gap:6px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .profile-handle{margin-top:3px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   .search-wrap{position:relative}
-
   .search{
-    width:100%;
-    display:block;
-    padding:14px 16px;
-    border-radius:18px;
-    border:1px solid rgba(255,255,255,.18);
-    background:#111;
-    color:#fff;
-    outline:none;
-    font-size:15px;
+    width:100%;display:block;padding:14px 16px;border-radius:18px;
+    border:1px solid rgba(255,255,255,.18);background:#111;color:#fff;outline:none;font-size:15px;
   }
-
   .search::placeholder{color:rgba(255,255,255,.4)}
-
   .suggestions{
-    position:absolute;
-    left:0;
-    right:0;
-    top:calc(100% + 8px);
-    display:none;
-    background:#0b0b0b;
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:16px;
-    overflow:hidden;
-    max-height:320px;
-    overflow-y:auto;
-    z-index:30;
+    position:absolute;left:0;right:0;top:calc(100% + 8px);display:none;
+    background:#0b0b0b;border:1px solid rgba(255,255,255,.14);border-radius:16px;
+    overflow:hidden;max-height:320px;overflow-y:auto;z-index:30;
   }
-
   .suggestion{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:12px 14px;
-    cursor:pointer;
+    display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;
     border-bottom:1px solid rgba(255,255,255,.06);
   }
-
   .suggestion:last-child{border-bottom:0}
   .suggestion:hover{background:rgba(255,255,255,.06)}
-
-  .suggestion-avatar,
-  .avatar,
-  .story img,
-  .album-cover{
-    object-fit:cover;
-    background:#111;
-  }
-
-  .suggestion-avatar{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,.1);
-    flex:0 0 auto;
-  }
-
+  .suggestion-avatar{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.1);flex:0 0 auto;object-fit:cover;background:#111;}
   .suggestion-meta{min-width:0;flex:1}
-  .suggestion-title{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:14px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-  .suggestion-subtitle{
-    margin-top:3px;
-    font-size:11px;
-    color:var(--muted-2);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
+  .suggestion-title{display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .suggestion-subtitle{margin-top:3px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   .nav-btn{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:14px 15px;
-    border-radius:14px;
-    border:1px solid rgba(255,255,255,.15);
-    background:rgba(255,255,255,.05);
-    color:#fff;
-    cursor:pointer;
-    transition:.2s;
-    text-decoration:none;
-    user-select:none;
-    line-height:1;
-    font-size:15px;
-    justify-content:flex-start;
+    display:flex;align-items:center;gap:12px;padding:14px 15px;border-radius:14px;
+    border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.05);color:#fff;
+    cursor:pointer;transition:.2s;text-decoration:none;user-select:none;
+    line-height:1;font-size:15px;justify-content:flex-start;
   }
-
   .nav-btn:hover{background:rgba(255,255,255,.09)}
-  .nav-btn.logout{
-    background:rgba(255,59,48,.12);
-    color:#ff7a73;
-    border-color:rgba(255,59,48,.24);
-  }
+  .nav-btn.logout{background:rgba(255,59,48,.12);color:#ff7a73;border-color:rgba(255,59,48,.24);}
+  .nav-btn .material-symbols-rounded{font-size:22px;line-height:1;}
 
-  .nav-btn .material-symbols-rounded{
-    font-size:22px;
-    line-height:1;
-  }
-
+  /* ── Main scroll ── */
   .main{
-    width:100%;
-    height:100vh;
-    overflow-y:auto;
-    overflow-x:hidden;
-    scroll-snap-type:y mandatory;
+    width:100%;height:100vh;
+    overflow-y:auto;overflow-x:hidden;
     -webkit-overflow-scrolling:touch;
     overscroll-behavior:contain;
+    scroll-behavior:smooth;
   }
 
+  /* ── Header ── */
   .header{
     text-align:center;
-    padding:18px 12px 14px;
-    padding-left:72px;
-    font-size:30px;
-    letter-spacing:-.05em;
+    padding:18px 72px 14px;
+    font-size:30px;letter-spacing:-.05em;
     border-bottom:1px solid rgba(255,255,255,.08);
-    position:sticky;
-    top:0;
-    background:#000;
-    z-index:5;
+    position:sticky;top:0;background:#000;z-index:5;
   }
 
+  /* ── Stories ── */
   .stories-section{padding-top:8px;}
-
-  .section-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:0 12px 10px;
-  }
-
-  .section-title{
-    font-size:12px;
-    color:var(--muted-2);
-    letter-spacing:.14em;
-    text-transform:uppercase;
-  }
-
-  .stories{
-    display:flex;
-    gap:14px;
-    overflow-x:auto;
-    padding:8px 12px 6px;
-    scrollbar-width:none;
-  }
-
+  .section-head{display:flex;align-items:center;justify-content:space-between;padding:0 12px 10px;}
+  .section-title{font-size:12px;color:var(--muted-2);letter-spacing:.14em;text-transform:uppercase;}
+  .stories{display:flex;gap:14px;overflow-x:auto;padding:8px 12px 6px;scrollbar-width:none;}
   .stories::-webkit-scrollbar{display:none}
-
   .story{
-    min-width:70px;
-    text-align:center;
-    cursor:pointer;
-    flex:0 0 auto;
-    background:transparent;
-    border:0;
-    color:#fff;
+    min-width:70px;text-align:center;cursor:pointer;flex:0 0 auto;
+    background:transparent;border:0;color:#fff;
   }
-
   .story img{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    border:2px solid #fff;
-    display:block;
-    margin:0 auto 8px;
+    width:60px;height:60px;border-radius:50%;border:2px solid #fff;
+    display:block;margin:0 auto 8px;object-fit:cover;background:#111;
   }
+  .story div{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  .story div{
-    font-size:11px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
+  /* ── Feed ── */
+  .feed{display:flex;flex-direction:column;gap:20px;padding:34px 0 80px;}
 
-  .feed{
-    display:flex;
-    flex-direction:column;
-    gap:16px;
-    padding:34px 0 22px;
-  }
-
+  /* ── Post card ── */
   .post{
-    scroll-snap-align:start;
     width:min(var(--feed-width), calc(100vw - 24px));
     margin:0 auto;
     border:1px solid rgba(255,255,255,.12);
     border-radius:var(--squircle-radius);
-    overflow:hidden;
-    background:#0a0a0a;
-    box-shadow:none;
-    transition:transform .2s ease;
+    overflow:hidden;background:#0a0a0a;
+    transition:transform .2s ease, box-shadow .2s ease;
+    animation: fadeUp .35s ease both;
   }
-
-  .post:hover{transform:translateY(-2px);}
-
-  .media{
-    position:relative;
-    width:100%;
-    aspect-ratio:4/3;
-    background:#111;
-    overflow:hidden;
-    border-radius:0;
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(18px); }
+    to   { opacity:1; transform:translateY(0); }
   }
+  .post:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,.5);}
 
-  .post-header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:12px 14px 10px;
-  }
+  /* ── Post header ── */
+  .post-header{display:flex;align-items:center;gap:12px;padding:12px 14px 10px;}
+  .avatar{width:42px;height:42px;border-radius:50%;border:1px solid rgba(255,255,255,.12);flex:0 0 auto;object-fit:cover;background:#111;}
+  .user-meta{flex:1;min-width:0;}
+  .username{display:flex;align-items:center;gap:6px;cursor:pointer;font-size:15px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .verified{font-size:16px;color:#fff;flex:0 0 auto;}
+  .post-time{margin-top:4px;font-size:10px;color:var(--muted-2);}
 
-  .avatar{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    border:1px solid rgba(255,255,255,.12);
-    flex:0 0 auto;
-  }
+  /* ── Media ── */
+  .media{position:relative;width:100%;aspect-ratio:4/3;background:#111;overflow:hidden;}
+  .media img{width:100%;height:100%;display:block;object-fit:cover;}
 
-  .username{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    cursor:pointer;
-    font-size:15px;
-    line-height:1.1;
-  }
-
-  .verified{
-    font-size:16px;
-    color:#fff;
-    flex:0 0 auto;
-  }
-
-  .post-time{
-    margin-top:4px;
-    font-size:10px;
-    color:var(--muted-2);
-  }
-
-  .media img{
-    width:100%;
-    height:100%;
-    display:block;
-    object-fit:cover;
-  }
-
+  /* ── Like pop ── */
   .like-pop{
-    position:absolute;
-    inset:auto auto 50% 50%;
+    position:absolute;inset:auto auto 50% 50%;
     transform:translate(-50%, 50%) scale(.8);
-    pointer-events:none;
-    opacity:0;
-    z-index:3;
-    color:var(--like);
-    filter:none;
+    pointer-events:none;opacity:0;z-index:3;color:var(--like);
     transition:opacity .15s ease, transform .15s ease;
   }
-
-  .like-pop.show{
-    opacity:1;
-    transform:translate(-50%, 50%) scale(1);
-  }
-
+  .like-pop.show{opacity:1;transform:translate(-50%, 50%) scale(1);}
   .like-pop .material-symbols-rounded{
     font-size:72px;
     font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;
   }
 
+  /* ── Actions row ── */
   .actions{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:10px;
-    padding:10px 14px 0;
+    display:flex;align-items:center;justify-content:space-between;
+    gap:10px;padding:10px 14px 0;
   }
-
-  .like-row{
-    display:flex;
-    align-items:center;
-    gap:10px;
-  }
-
+  .like-row{display:flex;align-items:center;gap:10px;}
   .like-btn{
-    width:40px;
-    height:40px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.14);
-    background:rgba(255,255,255,.05);
-    color:#fff;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    transition:.18s;
-    flex:0 0 auto;
+    width:40px;height:40px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;
+    display:inline-flex;align-items:center;justify-content:center;
+    cursor:pointer;transition:.18s;flex:0 0 auto;
   }
-
   .like-btn:hover{background:rgba(255,255,255,.09)}
   .like-btn:active{transform:scale(.96)}
   .like-btn.liked{color:var(--like);background:rgba(255,45,85,.08);border-color:rgba(255,45,85,.28)}
-
   .like-btn .material-symbols-rounded{
     font-size:20px;
     font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 24;
   }
+  .count{font-size:12px;color:var(--muted);cursor:pointer;user-select:none;}
 
-  .count{
-    font-size:12px;
-    color:var(--muted);
-    cursor:pointer;
-    user-select:none;
-  }
-
-  .tag-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:6px;
+  /* ── Location ── */
+  .location-row{
+    display:flex;align-items:center;gap:6px;
     padding:10px 14px 0;
+    font-size:12px;color:var(--muted-2);
   }
+  .location-row .material-symbols-rounded{font-size:14px;flex:0 0 auto;}
 
+  /* ── Tags ── */
+  .tag-row{display:flex;flex-wrap:wrap;gap:6px;padding:10px 14px 0;}
   .tag-pill{
-    padding:6px 10px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.12);
-    background:rgba(255,255,255,.05);
-    color:#fff;
-    font-size:11px;
-    letter-spacing:.02em;
+    padding:6px 10px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+    color:#fff;font-size:11px;letter-spacing:.02em;
   }
 
-  .caption{
-    padding:10px 14px 0;
-    font-size:14px;
-    line-height:1.42;
-  }
+  /* ── Caption ── */
+  .caption{padding:10px 14px 0;font-size:14px;line-height:1.5;color:var(--muted);}
+  .caption .author-handle{color:#fff;margin-right:6px;}
 
+  /* ── Song card ── */
   .song-card{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:11px;
-    margin:11px;
-    border-radius:16px;
-    background:rgba(255,255,255,.05);
-    border:1px solid rgba(255,255,255,.08);
+    display:flex;align-items:center;gap:12px;padding:11px;
+    margin:11px;border-radius:16px;
+    background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);
+    cursor:pointer;transition:background .18s;
+    position:relative;overflow:hidden;
   }
+  .song-card:hover{background:rgba(255,255,255,.09);}
+  .song-card.playing{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.08);}
+
+  /* animated bars when playing */
+  .song-card.playing .music-bars{display:flex;}
+  .music-bars{
+    display:none;align-items:flex-end;gap:2px;
+    width:18px;height:18px;flex:0 0 auto;
+  }
+  .music-bars span{
+    display:block;width:3px;border-radius:2px;background:#fff;
+    animation:bar 0.7s ease infinite alternate;
+  }
+  .music-bars span:nth-child(1){height:6px;animation-delay:0s;}
+  .music-bars span:nth-child(2){height:12px;animation-delay:.18s;}
+  .music-bars span:nth-child(3){height:8px;animation-delay:.32s;}
+  @keyframes bar{to{height:3px;}}
 
   .album-cover{
-    width:46px;
-    height:46px;
-    border-radius:10px;
-    border:1px solid rgba(255,255,255,.12);
-    flex:0 0 auto;
+    width:46px;height:46px;border-radius:10px;
+    border:1px solid rgba(255,255,255,.12);flex:0 0 auto;
+    object-fit:cover;background:#111;
   }
-
   .note-cover{
-    width:46px;
-    height:46px;
-    border-radius:10px;
+    width:46px;height:46px;border-radius:10px;
     border:1px solid rgba(255,255,255,.12);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:#111;
-    flex:0 0 auto;
+    display:flex;align-items:center;justify-content:center;
+    background:#111;flex:0 0 auto;
   }
-
   .note-cover .material-symbols-rounded{font-size:24px;}
+  .song-info{min-width:0;flex:1;}
+  .song-title{font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .song-author{margin-top:4px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  .song-info{
-    min-width:0;
-    flex:1;
+  /* ── Global audio player bar ── */
+  #audioBar{
+    position:fixed;bottom:0;left:0;right:0;z-index:50;
+    display:none;
+    align-items:center;gap:12px;
+    padding:10px 16px calc(10px + var(--safe-bottom));
+    background:rgba(0,0,0,.92);
+    border-top:1px solid rgba(255,255,255,.1);
+    backdrop-filter:blur(20px);
   }
-
-  .song-title{
-    font-size:14px;
-    line-height:1.2;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+  #audioBar.visible{display:flex;}
+  #audioBarCover{width:38px;height:38px;border-radius:8px;object-fit:cover;background:#111;border:1px solid rgba(255,255,255,.12);flex:0 0 auto;}
+  #audioBarInfo{flex:1;min-width:0;}
+  #audioBarTitle{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #audioBarArtist{font-size:10px;color:var(--muted-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  #audioBarToggle{
+    width:38px;height:38px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);
+    color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;
   }
-
-  .song-author{
-    margin-top:4px;
-    font-size:11px;
-    color:var(--muted-2);
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+  #audioBarToggle .material-symbols-rounded{font-size:20px;}
+  #audioBarClose{
+    width:34px;height:34px;border-radius:999px;
+    border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);
+    color:var(--muted-2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:0 0 auto;
   }
+  #audioBarClose .material-symbols-rounded{font-size:16px;}
 
-  audio.bg-audio{display:none}
-
+  /* ── Skeleton ── */
   .skeleton-post{
-    width:min(var(--feed-width), calc(100vw - 24px));
-    margin:0 auto;
-    border:1px solid rgba(255,255,255,.07);
-    border-radius:var(--squircle-radius);
-    overflow:hidden;
-    background:#0a0a0a;
+    width:min(var(--feed-width), calc(100vw - 24px));margin:0 auto;
+    border:1px solid rgba(255,255,255,.07);border-radius:var(--squircle-radius);
+    overflow:hidden;background:#0a0a0a;
   }
-
-  .skel-header{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:12px 14px;
-  }
-
-  .skel-circle{
-    width:42px;
-    height:42px;
-    border-radius:50%;
-    background:rgba(255,255,255,.07);
-    flex:0 0 auto;
-    animation:shimmer 1.4s ease infinite;
-  }
-
+  .skel-header{display:flex;align-items:center;gap:12px;padding:12px 14px;}
+  .skel-circle{width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.07);flex:0 0 auto;animation:shimmer 1.4s ease infinite;}
   .skel-lines{flex:1;display:flex;flex-direction:column;gap:6px;}
-  .skel-line{
-    height:10px;
-    border-radius:6px;
-    background:rgba(255,255,255,.07);
-    animation:shimmer 1.4s ease infinite;
-  }
+  .skel-line{height:10px;border-radius:6px;background:rgba(255,255,255,.07);animation:shimmer 1.4s ease infinite;}
   .skel-line.short{width:40%;}
+  .skel-image{width:100%;aspect-ratio:4/3;background:rgba(255,255,255,.05);animation:shimmer 1.4s ease infinite;}
+  @keyframes shimmer{0%{opacity:.5}50%{opacity:1}100%{opacity:.5}}
 
-  .skel-image{
-    width:100%;
-    aspect-ratio:4/3;
-    background:rgba(255,255,255,.05);
-    animation:shimmer 1.4s ease infinite;
-  }
-
-  @keyframes shimmer{
-    0%{opacity:.5}
-    50%{opacity:1}
-    100%{opacity:.5}
-  }
-
+  /* ── Story viewer ── */
   .story-viewer{
-    position:fixed;
-    inset:0;
-    z-index:110;
-    display:grid;
-    place-items:center;
-    background:#000;
-    opacity:0;
-    visibility:hidden;
-    pointer-events:none;
+    position:fixed;inset:0;z-index:110;display:grid;place-items:center;
+    background:#000;opacity:0;visibility:hidden;pointer-events:none;
     transition:opacity .2s ease, visibility .2s ease;
   }
-
-  .story-viewer.open{
-    opacity:1;
-    visibility:visible;
-    pointer-events:auto;
-  }
-
-  .story-viewer-shell,
-  .story-stage{width:100%;height:100%;max-width:100vw;position:relative}
-
+  .story-viewer.open{opacity:1;visibility:visible;pointer-events:auto;}
+  .story-viewer-shell,.story-stage{width:100%;height:100%;max-width:100vw;position:relative}
   .story-stage{background:#000}
-
-  .story-stage img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    display:block;
-  }
-
-  .story-gradient{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(180deg, rgba(0,0,0,.62), transparent 18%, transparent 78%, rgba(0,0,0,.72));
-    pointer-events:none;
-  }
-
+  .story-stage img{width:100%;height:100%;object-fit:cover;display:block;}
+  .story-gradient{position:absolute;inset:0;background:linear-gradient(180deg, rgba(0,0,0,.62), transparent 18%, transparent 78%, rgba(0,0,0,.72));pointer-events:none;}
   .story-top{
-    position:absolute;
-    top:0;
-    left:0;
-    right:0;
-    z-index:2;
-    padding:calc(14px + var(--safe-top)) 12px 12px;
-    display:grid;
-    gap:10px;
+    position:absolute;top:0;left:0;right:0;z-index:2;
+    padding:calc(14px + var(--safe-top)) 12px 12px;display:grid;gap:10px;
     background:linear-gradient(180deg, rgba(0,0,0,.56), transparent);
   }
+  .progress-row{display:grid;grid-template-columns:repeat(12, 1fr);gap:4px;}
+  .progress{height:3px;background:rgba(255,255,255,.18);border-radius:999px;overflow:hidden;}
+  .progress > span{display:block;width:0%;height:100%;background:#fff;border-radius:inherit;}
+  .story-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;color:#fff;}
+  .story-meta-left{display:flex;align-items:center;gap:10px;min-width:0;}
+  .story-meta-avatar{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.16);background:#111;}
+  .story-meta-name{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .close-btn{width:42px;height:42px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;}
+  .story-tap-zone{position:absolute;inset:0;z-index:1;display:grid;grid-template-columns:1fr 1fr;}
+  .story-hint{position:absolute;left:50%;bottom:calc(18px + var(--safe-bottom));transform:translateX(-50%);z-index:2;padding:10px 14px;border-radius:999px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);font-size:12px;}
 
-  .progress-row{
-    display:grid;
-    grid-template-columns:repeat(12, 1fr);
-    gap:4px;
-  }
-
-  .progress{
-    height:3px;
-    background:rgba(255,255,255,.18);
-    border-radius:999px;
-    overflow:hidden;
-  }
-
-  .progress > span{
-    display:block;
-    width:0%;
-    height:100%;
-    background:#fff;
-    border-radius:inherit;
-  }
-
-  .story-meta{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    color:#fff;
-  }
-
-  .story-meta-left{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    min-width:0;
-  }
-
-  .story-meta-avatar{
-    width:36px;
-    height:36px;
-    border-radius:50%;
-    object-fit:cover;
-    border:1px solid rgba(255,255,255,.16);
-    background:#111;
-  }
-
-  .story-meta-name{
-    font-size:16px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .close-btn{
-    width:42px;
-    height:42px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.16);
-    background:rgba(255,255,255,.06);
-    color:#fff;
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-  }
-
-  .story-tap-zone{
-    position:absolute;
-    inset:0;
-    z-index:1;
-    display:grid;
-    grid-template-columns:1fr 1fr;
-  }
-
-  .story-hint{
-    position:absolute;
-    left:50%;
-    bottom:calc(18px + var(--safe-bottom));
-    transform:translateX(-50%);
-    z-index:2;
-    padding:10px 14px;
-    border-radius:999px;
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.14);
-    font-size:12px;
-    backdrop-filter:none;
-  }
-
-  .modal{
-    position:fixed;
-    inset:0;
-    z-index:120;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    background:rgba(0,0,0,.88);
-    padding:16px;
-  }
-
+  /* ── Modal ── */
+  .modal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88);padding:16px;}
   .modal.open{display:flex}
-
-  .modal-box{
-    width:min(92vw, 520px);
-    max-height:min(80vh, 760px);
-    overflow:auto;
-    background:#0b0b0b;
-    border:1px solid rgba(255,255,255,.14);
-    border-radius:22px;
-    padding:14px;
-  }
-
-  .modal-head{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    gap:12px;
-    margin-bottom:12px;
-  }
-
+  .modal-box{width:min(92vw, 520px);max-height:min(80vh, 760px);overflow:auto;background:#0b0b0b;border:1px solid rgba(255,255,255,.14);border-radius:22px;padding:14px;}
+  .modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
   .modal-title{font-size:18px}
-
-  .modal-close{
-    width:38px;
-    height:38px;
-    border-radius:999px;
-    border:1px solid rgba(255,255,255,.14);
-    background:rgba(255,255,255,.05);
-    color:#fff;
-    cursor:pointer;
-    font-family:'Archivo Black', sans-serif;
-  }
-
-  .list-item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    width:100%;
-    padding:10px 8px;
-    border-radius:14px;
-    cursor:pointer;
-    transition:background .14s ease;
-  }
-
+  .modal-close{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-family:'Archivo Black', sans-serif;}
+  .list-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 8px;border-radius:14px;cursor:pointer;transition:background .14s ease;}
   .list-item:hover{background:rgba(255,255,255,.05)}
-
-  .list-avatar{
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    object-fit:cover;
-    background:#111;
-    border:1px solid rgba(255,255,255,.10);
-    flex:0 0 auto;
-  }
-
+  .list-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#111;border:1px solid rgba(255,255,255,.10);flex:0 0 auto;}
   .list-main{min-width:0;flex:1}
+  .list-name{display:flex;align-items:center;gap:6px;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .list-sub{margin-top:2px;color:var(--muted-2);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
-  .list-name{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:15px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .list-sub{
-    margin-top:2px;
-    color:var(--muted-2);
-    font-size:12px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-  }
-
-  .empty{
-    margin:16px 14px 0;
-    padding:22px;
-    border-radius:22px;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.08);
-    color:var(--muted);
-    text-align:center;
-    font-size:15px;
-  }
+  .empty{margin:16px 14px 0;padding:22px;border-radius:22px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:var(--muted);text-align:center;font-size:15px;}
 
   .post > *:last-child{margin-bottom:14px;}
+
+  /* ── Load more ── */
+  #loadMore{
+    display:flex;align-items:center;justify-content:center;
+    width:min(var(--feed-width), calc(100vw - 24px));margin:0 auto 80px;
+    padding:16px;border-radius:16px;
+    border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);
+    color:var(--muted);font-size:14px;cursor:pointer;transition:.2s;
+    font-family:'Archivo Black',sans-serif;gap:8px;
+  }
+  #loadMore:hover{background:rgba(255,255,255,.08);}
+  #loadMore.hidden{display:none;}
 
   @media (max-width: 860px){
     .header{font-size:28px}
@@ -889,17 +414,14 @@
         <span class="material-symbols-rounded">upload</span>
         <span>Upload</span>
       </button>
-
       <a class="nav-btn" href="settings.html">
         <span class="material-symbols-rounded">settings</span>
         <span>Settings</span>
       </a>
-
       <a class="nav-btn" href="about.html">
         <span class="material-symbols-rounded">info</span>
         <span>About</span>
       </a>
-
       <button class="nav-btn logout" type="button" onclick="logout()">
         <span class="material-symbols-rounded">logout</span>
         <span>Logout</span>
@@ -918,14 +440,36 @@
     </section>
 
     <div id="feed" class="feed"></div>
+    <button id="loadMore" type="button">
+      <span class="material-symbols-rounded">add</span>
+      Load more
+    </button>
   </main>
 
+  <!-- Global audio bar -->
+  <div id="audioBar">
+    <img id="audioBarCover" alt="Album cover" src="">
+    <div id="audioBarInfo">
+      <div id="audioBarTitle"></div>
+      <div id="audioBarArtist"></div>
+    </div>
+    <button id="audioBarToggle" type="button" aria-label="Play/Pause">
+      <span class="material-symbols-rounded" id="audioBarIcon">pause</span>
+    </button>
+    <button id="audioBarClose" type="button" aria-label="Stop audio">
+      <span class="material-symbols-rounded">close</span>
+    </button>
+  </div>
+
+  <!-- Hidden audio element -->
+  <audio id="globalAudio" loop preload="auto"></audio>
+
+  <!-- Story viewer -->
   <div id="storyViewer" class="story-viewer" aria-hidden="true">
     <div class="story-viewer-shell">
       <div class="story-stage">
         <img id="storyImage" alt="Story">
         <div class="story-gradient"></div>
-
         <div class="story-top">
           <div class="progress-row" id="progressRow"></div>
           <div class="story-meta">
@@ -938,17 +482,16 @@
             </button>
           </div>
         </div>
-
         <div class="story-tap-zone" aria-hidden="true">
           <div id="prevStory"></div>
           <div id="nextStory"></div>
         </div>
-
         <div class="story-hint">Tap to navigate</div>
       </div>
     </div>
   </div>
 
+  <!-- Likes modal -->
   <div id="likesModal" class="modal" aria-hidden="true">
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="likesTitle">
       <div class="modal-head">
@@ -961,6 +504,7 @@
 
 <script type="module">
 const API_BASE = "https://api.sharedweb.org";
+const PAGE_SIZE = 10;
 
 const state = {
   profiles: [],
@@ -975,6 +519,13 @@ const state = {
   storyStartTs: 0,
   storyDurationMs: 30000,
   searchQuery: "",
+  page: 0,
+  allLoaded: false,
+  // Audio
+  audioPostId: null,
+  audioPlaying: false,
+  // Optimistic like counters: { postId: delta }
+  likeDeltas: {},
 };
 
 const els = {
@@ -1002,674 +553,504 @@ const els = {
   profileAvatar:  document.getElementById("profileAvatar"),
   profileName:    document.getElementById("profileName"),
   profileHandle:  document.getElementById("profileHandle"),
+  loadMore:       document.getElementById("loadMore"),
+  // Audio bar
+  audioBar:       document.getElementById("audioBar"),
+  audioBarCover:  document.getElementById("audioBarCover"),
+  audioBarTitle:  document.getElementById("audioBarTitle"),
+  audioBarArtist: document.getElementById("audioBarArtist"),
+  audioBarToggle: document.getElementById("audioBarToggle"),
+  audioBarIcon:   document.getElementById("audioBarIcon"),
+  audioBarClose:  document.getElementById("audioBarClose"),
+  globalAudio:    document.getElementById("globalAudio"),
 };
 
+// ── Sidebar ──────────────────────────────────────────────────────────
 let sidebarOpen = false;
+function openSidebar(){sidebarOpen=true;els.sidebar.classList.add("open");els.sidebar.setAttribute("aria-hidden","false");els.sidebarOverlay.classList.add("open");els.hamburgerIcon.textContent="close";els.hamburgerBtn.setAttribute("aria-expanded","true");els.hamburgerBtn.setAttribute("aria-label","Close menu");}
+function closeSidebar(){sidebarOpen=false;els.sidebar.classList.remove("open");els.sidebar.setAttribute("aria-hidden","true");els.sidebarOverlay.classList.remove("open");els.hamburgerIcon.textContent="menu";els.hamburgerBtn.setAttribute("aria-expanded","false");els.hamburgerBtn.setAttribute("aria-label","Open menu");}
+els.hamburgerBtn.addEventListener("click",()=>sidebarOpen?closeSidebar():openSidebar());
+els.sidebarOverlay.addEventListener("click",closeSidebar);
+window.addEventListener("keydown",(e)=>{if(e.key==="Escape"&&sidebarOpen)closeSidebar();});
 
-function openSidebar() {
-  sidebarOpen = true;
-  els.sidebar.classList.add("open");
-  els.sidebar.setAttribute("aria-hidden", "false");
-  els.sidebarOverlay.classList.add("open");
-  els.hamburgerIcon.textContent = "close";
-  els.hamburgerBtn.setAttribute("aria-expanded", "true");
-  els.hamburgerBtn.setAttribute("aria-label", "Close menu");
+// ── Utils ─────────────────────────────────────────────────────────────
+function safeArray(v){return Array.isArray(v)?v:[]; }
+function escapeHtml(str){return String(str??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");}
+function formatCount(n){const num=Number(n||0);if(num>=1000000)return`${(num/1000000).toFixed(num%1000000?1:0)}M`;if(num>=1000)return`${(num/1000).toFixed(num%1000?1:0)}K`;return String(num);}
+function timeAgo(value){const date=value?new Date(value):null;if(!date||Number.isNaN(date.getTime()))return"";const diff=Math.max(0,Date.now()-date.getTime());const minutes=Math.floor(diff/60000);const hours=Math.floor(diff/3600000);const days=Math.floor(diff/86400000);if(minutes<1)return"just now";if(minutes<60)return`${minutes}m ago`;if(hours<24)return`${hours}h ago`;if(days<7)return`${days}d ago`;return date.toLocaleDateString([],{month:"short",day:"numeric"});}
+function defaultProfileIcon(){return`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="60" fill="#111"/><circle cx="60" cy="48" r="18" fill="#fff"/><path d="M24 102c7-20 24-30 36-30s29 10 36 30" fill="#fff"/></svg>`)}`;}
+function placeholderImage(){return`data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="#111"/><rect x="120" y="80" width="560" height="440" rx="42" fill="#1b1b1b"/><path d="M220 390l110-120 80 78 70-86 100 128" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="320" cy="220" r="44" fill="#fff"/></svg>`)}`;}
+function normalizeUrl(path){if(!path)return"";if(/^https?:\/\//i.test(path)||path.startsWith("data:"))return path;return path;}
+function getProfileById(id){return state.profiles.find((p)=>String(p.id)===String(id))||null;}
+function getUsernameForPost(post){const profile=getProfileById(post.user_id)||getProfileById(post.profile_id);return post.username||profile?.username||profile?.full_name||"user";}
+function getAvatarForProfile(profile){return normalizeUrl(profile?.avatar_url||profile?.avatar||profile?.profile_image||"")||defaultProfileIcon();}
+function getAvatarForPost(post){const profile=getProfileById(post.user_id)||getProfileById(post.profile_id);return normalizeUrl(post.avatar_url||profile?.avatar_url||profile?.avatar||profile?.profile_image||"")||defaultProfileIcon();}
+function isVerified(profile){return profile?.verified===true||profile?.verified==='true'||profile?.verified===1;}
+function tagsForPost(post){const raw=post.tags;if(!raw)return[];if(Array.isArray(raw))return raw.map((t)=>String(t).trim()).filter(Boolean).slice(0,8);return String(raw).split(',').map((t)=>t.trim()).filter(Boolean).slice(0,8);}
+function getLocationForPost(post){return post.location||post.place||post.city||post.location_name||"";}
+
+function postLikeCount(postId){
+  const fromServer = state.likes.filter((like)=>String(like.post_id??like.postId??like.postid)===String(postId)).length;
+  const delta = state.likeDeltas[postId] ?? 0;
+  return Math.max(0, fromServer + delta);
 }
-
-function closeSidebar() {
-  sidebarOpen = false;
-  els.sidebar.classList.remove("open");
-  els.sidebar.setAttribute("aria-hidden", "true");
-  els.sidebarOverlay.classList.remove("open");
-  els.hamburgerIcon.textContent = "menu";
-  els.hamburgerBtn.setAttribute("aria-expanded", "false");
-  els.hamburgerBtn.setAttribute("aria-label", "Open menu");
-}
-
-els.hamburgerBtn.addEventListener("click", () => sidebarOpen ? closeSidebar() : openSidebar());
-els.sidebarOverlay.addEventListener("click", closeSidebar);
-window.addEventListener("keydown", (e) => { if (e.key === "Escape" && sidebarOpen) closeSidebar(); });
-
-function safeArray(v) { return Array.isArray(v) ? v : []; }
-
-function escapeHtml(str) {
-  return String(str ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function formatCount(n) {
-  const num = Number(n || 0);
-  if (num >= 1000000) return `${(num / 1000000).toFixed(num % 1000000 ? 1 : 0)}M`;
-  if (num >= 1000)    return `${(num / 1000).toFixed(num % 1000 ? 1 : 0)}K`;
-  return String(num);
-}
-
-function timeAgo(value) {
-  const date = value ? new Date(value) : null;
-  if (!date || Number.isNaN(date.getTime())) return "";
-  const diff = Math.max(0, Date.now() - date.getTime());
-  const minutes = Math.floor(diff / 60000);
-  const hours   = Math.floor(diff / 3600000);
-  const days    = Math.floor(diff / 86400000);
-  if (minutes < 1)  return "just now";
-  if (minutes < 60) return `${minutes}m ago`;
-  if (hours < 24)   return `${hours}h ago`;
-  if (days < 7)     return `${days}d ago`;
-  return date.toLocaleDateString([], { month: "short", day: "numeric" });
-}
-
-function defaultProfileIcon() {
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
-      <rect width="120" height="120" rx="60" fill="#111"/>
-      <circle cx="60" cy="48" r="18" fill="#fff"/>
-      <path d="M24 102c7-20 24-30 36-30s29 10 36 30" fill="#fff"/>
-    </svg>
-  `)}`;
-}
-
-function placeholderImage() {
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(`
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
-      <rect width="800" height="600" fill="#111"/>
-      <rect x="120" y="80" width="560" height="440" rx="42" fill="#1b1b1b"/>
-      <path d="M220 390l110-120 80 78 70-86 100 128" stroke="#fff" stroke-width="20" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-      <circle cx="320" cy="220" r="44" fill="#fff"/>
-    </svg>
-  `)}`;
-}
-
-function normalizeUrl(path) {
-  if (!path) return "";
-  if (/^https?:\/\//i.test(path) || path.startsWith("data:")) return path;
-  return path;
-}
-
-function getProfileById(id) {
-  return state.profiles.find((p) => String(p.id) === String(id)) || null;
-}
-
-function getUsernameForPost(post) {
-  const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
-  return post.username || profile?.username || profile?.full_name || "user";
-}
-
-function getAvatarForProfile(profile) {
-  return normalizeUrl(profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
-}
-
-function getAvatarForPost(post) {
-  const profile = getProfileById(post.user_id) || getProfileById(post.profile_id);
-  return normalizeUrl(post.avatar_url || profile?.avatar_url || profile?.avatar || profile?.profile_image || "") || defaultProfileIcon();
-}
-
-function isVerified(profile) {
-  return profile?.verified === true || profile?.verified === 'true' || profile?.verified === 1;
-}
-
-function tagsForPost(post) {
-  const raw = post.tags;
-  if (!raw) return [];
-  if (Array.isArray(raw)) return raw.map((t) => String(t).trim()).filter(Boolean).slice(0, 8);
-  return String(raw).split(',').map((t) => t.trim()).filter(Boolean).slice(0, 8);
-}
-
-function songKey(post) {
-  return [post.song_title || post.song || "", post.song_author || post.song_artist || post.song_by || ""].join("|").trim().toLowerCase();
-}
-
-function getStoryQueue() {
-  return state.profiles
-    .map((profile) => {
-      const avatarPath = profile.avatar_url || profile.avatar || profile.profile_image || "";
-      const storyPath  = profile.story_url || profile.story_image || profile.story || profile.latest_story || "";
-      return {
-        id:       profile.id,
-        username: profile.username || profile.full_name || "user",
-        avatar:   normalizeUrl(avatarPath) || defaultProfileIcon(),
-        story:    normalizeUrl(storyPath),
-        profile
-      };
-    })
-    .filter((item) => item.story || item.avatar || item.username);
-}
-
-function postLikeCount(postId) {
-  return state.likes.filter((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId)).length;
-}
-
-function postLikedByMe(postId) {
+function postLikedByMe(postId){
   return state.currentUserId
-    ? state.likes.some((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId) && String(like.user_id) === String(state.currentUserId))
+    ? state.likes.some((like)=>String(like.post_id??like.postId??like.postid)===String(postId)&&String(like.user_id)===String(state.currentUserId))
     : false;
 }
 
-function renderSkeletons(count = 3) {
-  els.feed.innerHTML = Array.from({ length: count }, () => `
+// ── API ───────────────────────────────────────────────────────────────
+async function apiGet(path){const res=await fetch(`${API_BASE}${path}`,{headers:{Accept:"application/json"}});if(!res.ok)throw new Error(`API ${res.status} for ${path}`);return res.json();}
+async function apiSend(path,method,body){const res=await fetch(`${API_BASE}${path}`,{method,headers:{Accept:"application/json","Content-Type":"application/json"},body:body?JSON.stringify(body):undefined});if(!res.ok)throw new Error(`API ${res.status} for ${method} ${path}`);return res.json().catch(()=>null);}
+async function tryPaths(paths){for(const path of paths){try{return await apiGet(path);}catch(err){if(!String(err?.message||err).includes("404"))throw err;}}return null;}
+
+async function fetchApiPosts(page=0){
+  const offset=page*PAGE_SIZE;
+  const data=await tryPaths([
+    `/posts?limit=${PAGE_SIZE}&offset=${offset}`,
+    `/feed?limit=${PAGE_SIZE}&offset=${offset}`,
+    `/posts?page=${page+1}&page_size=${PAGE_SIZE}`,
+    `/posts`,
+  ]);
+  return safeArray(Array.isArray(data)?data:(data?.posts||data?.data||data?.results||[]));
+}
+async function fetchApiProfiles(){const data=await tryPaths(["/profiles","/users","/accounts","/me/profiles"]);return safeArray(Array.isArray(data)?data:(data?.profiles||data?.users||data?.data||[]));}
+async function fetchApiLikes(){const data=await tryPaths(["/likes","/reactions","/post-likes"]);return safeArray(Array.isArray(data)?data:(data?.likes||data?.reactions||data?.data||[]));}
+
+async function fetchCurrentUser(){
+  const storedId=localStorage.getItem("shared_current_user_id");
+  const storedUsername=localStorage.getItem("shared_current_username");
+  const storedAvatar=localStorage.getItem("shared_current_avatar");
+  if(storedId||storedUsername||storedAvatar)return{id:storedId||null,username:storedUsername||"you",avatar_url:storedAvatar||""};
+  const profile=state.profiles[0]||null;
+  return profile?{...profile}:null;
+}
+
+// ── Render utils ──────────────────────────────────────────────────────
+function renderSkeletons(count=3){
+  els.feed.innerHTML=Array.from({length:count},()=>`
     <div class="skeleton-post">
-      <div class="skel-header">
-        <div class="skel-circle"></div>
-        <div class="skel-lines">
-          <div class="skel-line"></div>
-          <div class="skel-line short"></div>
-        </div>
-      </div>
+      <div class="skel-header"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
       <div class="skel-image"></div>
     </div>
   `).join("");
 }
 
-async function apiGet(path) {
-  const res = await fetch(`${API_BASE}${path}`, { headers: { Accept: "application/json" } });
-  if (!res.ok) throw new Error(`API ${res.status} for ${path}`);
-  return res.json();
+function renderCurrentUser(){
+  const profile=state.currentUserProfile;
+  const username=profile?.username||profile?.full_name||"you";
+  const handle=profile?.handle||profile?.username?`@${String(profile?.handle||profile?.username).replace(/^@/,"")}`:"@shared";
+  els.profileName.textContent=username;
+  els.profileHandle.textContent=handle;
+  els.profileAvatar.src=getAvatarForProfile(profile)||defaultProfileIcon();
+  els.profileAvatar.alt=`${username} avatar`;
 }
 
-async function apiSend(path, method, body) {
-  const res = await fetch(`${API_BASE}${path}`, {
-    method,
-    headers: { Accept: "application/json", "Content-Type": "application/json" },
-    body: body ? JSON.stringify(body) : undefined,
+// ── Post HTML ─────────────────────────────────────────────────────────
+function buildPostHtml(post){
+  const username   = getUsernameForPost(post);
+  const profile    = getProfileById(post.user_id)||getProfileById(post.profile_id);
+  const avatar     = getAvatarForPost(post);
+  const image      = normalizeUrl(post.image_url||post.media_url||post.image||"");
+  const caption    = post.caption||post.text||"";
+  const songTitle  = post.song_title||post.song||"";
+  const songAuthor = post.song_author||post.song_artist||post.song_by||"";
+  const songPreview= post.song_preview||post.audio_url||post.preview_url||"";
+  const songCover  = normalizeUrl(post.song_cover||post.album_cover||post.album_image||post.cover_url||post.artwork_url||post.album_art||"");
+  const createdAt  = post.created_at||post.inserted_at||post.updated_at||"";
+  const likesCount = postLikeCount(post.id);
+  const liked      = postLikedByMe(post.id)||!!post.liked;
+  const tags       = tagsForPost(post);
+  const location   = getLocationForPost(post);
+  const isPlaying  = state.audioPostId===String(post.id)&&state.audioPlaying;
+
+  return `
+    <article class="post" data-post-id="${escapeHtml(post.id)}">
+      <div class="post-header">
+        <img class="avatar" loading="lazy" src="${avatar}" alt="${escapeHtml(username)} avatar">
+        <div class="user-meta">
+          <div class="username" data-profile-id="${escapeHtml(post.user_id||post.profile_id||post.id)}">
+            <span>${escapeHtml(username)}</span>
+            ${profile&&isVerified(profile)?`<span class="verified material-symbols-rounded" style="font-size:15px;font-variation-settings:'FILL' 1">verified</span>`:""}
+          </div>
+          <div class="post-time">${escapeHtml(timeAgo(createdAt))}</div>
+        </div>
+      </div>
+
+      <div class="media" data-like-zone="${escapeHtml(post.id)}">
+        <img class="lazy-media" loading="lazy" data-src="${escapeHtml(image)}" alt="Post by ${escapeHtml(username)}" src="${placeholderImage()}">
+        <div class="like-pop" aria-hidden="true"><span class="material-symbols-rounded">favorite</span></div>
+      </div>
+
+      <div class="actions">
+        <div class="like-row">
+          <button class="like-btn ${liked?"liked":""}" data-like-btn="${escapeHtml(post.id)}" type="button" aria-label="Like post">
+            <span class="material-symbols-rounded">favorite</span>
+          </button>
+          <div class="count" data-like-count="${escapeHtml(post.id)}">${formatCount(likesCount)} likes</div>
+        </div>
+      </div>
+
+      ${location?`
+        <div class="location-row">
+          <span class="material-symbols-rounded">location_on</span>
+          <span>${escapeHtml(location)}</span>
+        </div>
+      `:""}
+
+      ${tags.length?`<div class="tag-row">${tags.map((tag)=>`<span class="tag-pill">${escapeHtml(tag)}</span>`).join("")}</div>`:""}
+
+      ${caption?`<div class="caption"><span class="author-handle">${escapeHtml(username)}</span>${escapeHtml(caption)}</div>`:""}
+
+      ${(songTitle||songPreview)?`
+        <div class="song-card ${isPlaying?"playing":""}" data-song-play="${escapeHtml(post.id)}"
+             data-audio="${escapeHtml(songPreview)}"
+             data-song-title="${escapeHtml(songTitle)}"
+             data-song-artist="${escapeHtml(songAuthor)}"
+             data-song-cover="${escapeHtml(songCover)}">
+          ${songCover
+            ?`<img class="album-cover" src="${songCover}" alt="Album cover">`
+            :`<div class="note-cover" aria-label="No cover"><span class="material-symbols-rounded">music_note</span></div>`
+          }
+          <div class="song-info">
+            ${songTitle ?`<div class="song-title">${escapeHtml(songTitle)}</div>`:""}
+            ${songAuthor?`<div class="song-author">${escapeHtml(songAuthor)}</div>`:""}
+          </div>
+          <div class="music-bars"><span></span><span></span><span></span></div>
+        </div>
+      `:""}
+    </article>
+  `;
+}
+
+// ── Stories ───────────────────────────────────────────────────────────
+function getStoryQueue(){
+  return state.profiles.map((profile)=>{
+    const avatarPath=profile.avatar_url||profile.avatar||profile.profile_image||"";
+    const storyPath=profile.story_url||profile.story_image||profile.story||profile.latest_story||"";
+    return{id:profile.id,username:profile.username||profile.full_name||"user",avatar:normalizeUrl(avatarPath)||defaultProfileIcon(),story:normalizeUrl(storyPath),profile};
+  }).filter((item)=>item.story||item.avatar||item.username);
+}
+
+function renderStories(){
+  if(!state.storyQueue.length){els.storiesSection.style.display="none";return;}
+  els.storiesSection.style.display="block";
+  els.stories.innerHTML=state.storyQueue.map((story,index)=>`
+    <button class="story" data-story-index="${index}" type="button" aria-label="Open story from ${escapeHtml(story.username)}">
+      <img loading="lazy" src="${story.avatar||defaultProfileIcon()}" alt="${escapeHtml(story.username)} avatar">
+      <div>${escapeHtml(story.username)}</div>
+    </button>
+  `).join("");
+  els.stories.querySelectorAll("[data-story-index]").forEach((btn)=>{btn.addEventListener("click",()=>openStory(Number(btn.dataset.storyIndex)));});
+}
+
+// ── Feed rendering ────────────────────────────────────────────────────
+async function renderFeed(posts, append=false){
+  if(!append) els.feed.innerHTML="";
+  if(!posts.length&&!append){els.feed.innerHTML=`<div class="empty">No posts found.</div>`;return;}
+  if(!posts.length){state.allLoaded=true;els.loadMore.classList.add("hidden");return;}
+
+  const html = posts.map(buildPostHtml).join("");
+  if(append){
+    const frag=document.createElement("div");
+    frag.innerHTML=html;
+    [...frag.children].forEach(c=>els.feed.appendChild(c));
+  } else {
+    els.feed.innerHTML=html;
+  }
+
+  wireLazyImages();
+  wirePostInteractions();
+  wireSongCards();
+  wireDoubleTapLike();
+}
+
+function wireLazyImages(){
+  const images=[...document.querySelectorAll("img.lazy-media[data-src]")];
+  const io=new IntersectionObserver((entries,observer)=>{
+    entries.forEach((entry)=>{
+      if(!entry.isIntersecting)return;
+      const img=entry.target;
+      const src=img.dataset.src;
+      if(src)img.src=src;
+      img.removeAttribute("data-src");
+      observer.unobserve(img);
+    });
+  },{root:els.mainScroll,threshold:0.15,rootMargin:"160px 0px"});
+  images.forEach((img)=>io.observe(img));
+}
+
+function showLikePulse(postId){
+  const media=document.querySelector(`[data-like-zone="${CSS.escape(postId)}"]`);
+  const pulse=media?.querySelector(".like-pop");
+  if(!pulse)return;
+  pulse.classList.add("show");
+  setTimeout(()=>pulse.classList.remove("show"),220);
+}
+
+function refreshLikeUi(postId){
+  const btn=document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
+  const countEl=document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
+  if(!btn||!countEl)return;
+  btn.classList.toggle("liked",postLikedByMe(postId)||((state.likeDeltas[postId]??0)>0&&!postLikedByMe(postId)));
+  countEl.textContent=`${formatCount(postLikeCount(postId))} likes`;
+}
+
+async function persistLike(postId, wasLiked){
+  if(!state.currentUserId)return;
+  // Optimistic update
+  state.likeDeltas[postId]=(state.likeDeltas[postId]??0)+(wasLiked?-1:1);
+  refreshLikeUi(postId);
+  try{
+    if(wasLiked){await apiSend(`/likes`,"DELETE",{post_id:postId,user_id:state.currentUserId});}
+    else{await apiSend(`/likes`,"POST",{post_id:postId,user_id:state.currentUserId});}
+    state.likes=await fetchApiLikes();
+    state.likeDeltas[postId]=0;
+  }catch(err){
+    console.error(err);
+    state.likeDeltas[postId]=(state.likeDeltas[postId]??0)+(wasLiked?1:-1);
+  }
+  refreshLikeUi(postId);
+}
+
+function toggleLike(postId){
+  const btn=document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
+  if(!btn)return;
+  const wasLiked=btn.classList.contains("liked");
+  showLikePulse(postId);
+  persistLike(postId,wasLiked).catch(console.error);
+}
+
+function wirePostInteractions(){
+  document.querySelectorAll("[data-profile-id]").forEach((nameEl)=>{
+    nameEl.addEventListener("click",()=>goToProfile(nameEl.dataset.profileId));
   });
-  if (!res.ok) throw new Error(`API ${res.status} for ${method} ${path}`);
-  return res.json().catch(() => null);
+  document.querySelectorAll("[data-like-btn]").forEach((btn)=>{
+    btn.addEventListener("click",()=>toggleLike(btn.dataset.likeBtn));
+  });
+  document.querySelectorAll("[data-like-count]").forEach((countEl)=>{
+    countEl.addEventListener("click",()=>openLikesModal(countEl.dataset.likeCount));
+  });
 }
 
-async function tryPaths(paths) {
-  for (const path of paths) {
-    try {
-      return await apiGet(path);
-    } catch (err) {
-      if (!String(err?.message || err).includes("404")) throw err;
-    }
+function wireDoubleTapLike(){
+  const lastTap=new Map();
+  document.querySelectorAll("[data-like-zone]").forEach((zone)=>{
+    zone.addEventListener("click",()=>{
+      const id=zone.dataset.likeZone;const now=Date.now();const prev=lastTap.get(id)||0;
+      if(now-prev<300){toggleLike(id);lastTap.delete(id);return;}
+      lastTap.set(id,now);setTimeout(()=>{if(lastTap.get(id)===now)lastTap.delete(id);},320);
+    });
+    zone.addEventListener("dblclick",()=>toggleLike(zone.dataset.likeZone));
+  });
+  let touchStartTs=0;let lastTouchPost=null;
+  document.querySelectorAll("[data-like-zone]").forEach((zone)=>{
+    zone.addEventListener("touchend",()=>{
+      const id=zone.dataset.likeZone;const now=Date.now();
+      if(lastTouchPost===id&&now-touchStartTs<320){toggleLike(id);lastTouchPost=null;return;}
+      touchStartTs=now;lastTouchPost=id;
+    },{passive:true});
+  });
+}
+
+// ── Global audio player ───────────────────────────────────────────────
+function wireSongCards(){
+  document.querySelectorAll("[data-song-play]").forEach((card)=>{
+    card.addEventListener("click",()=>{
+      const postId=card.dataset.songPlay;
+      const src=card.dataset.audio;
+      const title=card.dataset.songTitle;
+      const artist=card.dataset.songArtist;
+      const cover=card.dataset.songCover;
+      if(!src)return;
+      if(state.audioPostId===postId){
+        // toggle play/pause
+        if(state.audioPlaying){pauseGlobalAudio();}
+        else{playGlobalAudio();}
+        return;
+      }
+      startGlobalAudio(postId,src,title,artist,cover);
+    });
+  });
+}
+
+function startGlobalAudio(postId,src,title,artist,cover){
+  // Remove playing class from old card
+  if(state.audioPostId){
+    const old=document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`);
+    if(old)old.classList.remove("playing");
   }
-  return null;
+  state.audioPostId=postId;
+  state.audioPlaying=true;
+  els.globalAudio.src=src;
+  els.globalAudio.volume=0.22;
+  els.globalAudio.play().catch(()=>{});
+  // Update bar
+  els.audioBarCover.src=cover||defaultProfileIcon();
+  els.audioBarTitle.textContent=title||"Now playing";
+  els.audioBarArtist.textContent=artist||"";
+  els.audioBarIcon.textContent="pause";
+  els.audioBar.classList.add("visible");
+  // Mark card playing
+  const card=document.querySelector(`[data-song-play="${CSS.escape(postId)}"]`);
+  if(card)card.classList.add("playing");
 }
 
-async function fetchApiPosts() {
-  const data = await tryPaths(["/posts", "/feed", "/home", "/content"]);
-  return safeArray(Array.isArray(data) ? data : (data?.posts || data?.data || []));
+function pauseGlobalAudio(){
+  state.audioPlaying=false;
+  els.globalAudio.pause();
+  els.audioBarIcon.textContent="play_arrow";
+  const card=document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`);
+  if(card)card.classList.remove("playing");
 }
 
-async function fetchApiProfiles() {
-  const data = await tryPaths(["/profiles", "/users", "/accounts", "/me/profiles"]);
-  return safeArray(Array.isArray(data) ? data : (data?.profiles || data?.users || data?.data || []));
+function playGlobalAudio(){
+  state.audioPlaying=true;
+  els.globalAudio.play().catch(()=>{});
+  els.audioBarIcon.textContent="pause";
+  const card=document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`);
+  if(card)card.classList.add("playing");
 }
 
-async function fetchApiLikes() {
-  const data = await tryPaths(["/likes", "/reactions", "/post-likes"]);
-  return safeArray(Array.isArray(data) ? data : (data?.likes || data?.reactions || data?.data || []));
+function stopGlobalAudio(){
+  pauseGlobalAudio();
+  state.audioPostId=null;
+  els.audioBar.classList.remove("visible");
+  els.globalAudio.src="";
 }
 
-async function fetchCurrentUser() {
-  const storedId = localStorage.getItem("shared_current_user_id");
-  const storedUsername = localStorage.getItem("shared_current_username");
-  const storedAvatar = localStorage.getItem("shared_current_avatar");
-  if (storedId || storedUsername || storedAvatar) {
-    return {
-      id: storedId || null,
-      username: storedUsername || "you",
-      avatar_url: storedAvatar || ""
-    };
+els.audioBarToggle.addEventListener("click",()=>{
+  if(state.audioPlaying)pauseGlobalAudio();else playGlobalAudio();
+});
+els.audioBarClose.addEventListener("click",stopGlobalAudio);
+
+// ── Load more ─────────────────────────────────────────────────────────
+els.loadMore.addEventListener("click",async()=>{
+  if(state.allLoaded)return;
+  state.page++;
+  els.loadMore.textContent="Loading…";
+  try{
+    const morePosts=await fetchApiPosts(state.page);
+    const newPosts=morePosts.sort((a,b)=>new Date(b.created_at||b.inserted_at||b.updated_at||0)-new Date(a.created_at||a.inserted_at||a.updated_at||0));
+    state.posts.push(...newPosts);
+    if(newPosts.length<PAGE_SIZE){state.allLoaded=true;els.loadMore.classList.add("hidden");}
+    await renderFeed(newPosts,true);
+  }catch(err){
+    console.error(err);
   }
+  els.loadMore.innerHTML=`<span class="material-symbols-rounded">add</span>Load more`;
+});
 
-  const profile = state.profiles[0] || null;
-  return profile ? { ...profile } : null;
-}
-
-function renderCurrentUser() {
-  const profile = state.currentUserProfile;
-  const username = profile?.username || profile?.full_name || "you";
-  const handle = profile?.handle || profile?.username ? `@${String(profile?.handle || profile?.username).replace(/^@/, "")}` : "@shared";
-  els.profileName.textContent = username;
-  els.profileHandle.textContent = handle;
-  els.profileAvatar.src = getAvatarForProfile(profile) || defaultProfileIcon();
-  els.profileAvatar.alt = `${username} avatar`;
-}
-
-async function loadData() {
+// ── Main load ─────────────────────────────────────────────────────────
+async function loadData(){
   renderSkeletons(4);
-  try {
-    const [apiPosts, apiProfiles, apiLikes] = await Promise.all([
-      fetchApiPosts(),
+  try{
+    const [apiPosts,apiProfiles,apiLikes]=await Promise.all([
+      fetchApiPosts(0),
       fetchApiProfiles(),
       fetchApiLikes(),
     ]);
-
-    state.posts = apiPosts.sort((a, b) => new Date(b.created_at || b.inserted_at || b.updated_at || 0) - new Date(a.created_at || a.inserted_at || a.updated_at || 0));
-    state.profiles = apiProfiles;
-    state.likes = apiLikes;
-    state.currentUserProfile = await fetchCurrentUser();
-    state.currentUserId = state.currentUserProfile?.id || null;
-    state.storyQueue = getStoryQueue();
+    state.posts=apiPosts.sort((a,b)=>new Date(b.created_at||b.inserted_at||b.updated_at||0)-new Date(a.created_at||a.inserted_at||a.updated_at||0));
+    state.profiles=apiProfiles;
+    state.likes=apiLikes;
+    state.currentUserProfile=await fetchCurrentUser();
+    state.currentUserId=state.currentUserProfile?.id||null;
+    state.storyQueue=getStoryQueue();
 
     renderCurrentUser();
     renderStories();
     await renderFeed(state.posts);
-    updateSuggestions();
-  } catch (err) {
+    if(state.posts.length<PAGE_SIZE){state.allLoaded=true;els.loadMore.classList.add("hidden");}
+  }catch(err){
     console.error(err);
-    els.feed.innerHTML = `<div class="empty">Unable to load content.</div>`;
-    state.currentUserProfile = await fetchCurrentUser();
+    els.feed.innerHTML=`<div class="empty">Unable to load content.</div>`;
+    state.currentUserProfile=await fetchCurrentUser();
     renderCurrentUser();
   }
 }
 
-function renderStories() {
-  if (!state.storyQueue.length) {
-    els.storiesSection.style.display = "none";
-    return;
-  }
-
-  els.storiesSection.style.display = "block";
-  els.stories.innerHTML = state.storyQueue.map((story, index) => `
-    <button class="story" data-story-index="${index}" type="button" aria-label="Open story from ${escapeHtml(story.username)}">
-      <img loading="lazy" src="${story.avatar || defaultProfileIcon()}" alt="${escapeHtml(story.username)} avatar">
-      <div>${escapeHtml(story.username)}</div>
-    </button>
-  `).join("");
-
-  els.stories.querySelectorAll("[data-story-index]").forEach((btn) => {
-    btn.addEventListener("click", () => openStory(Number(btn.dataset.storyIndex)));
-  });
-}
-
-async function renderFeed(filteredPosts = state.posts) {
-  if (!filteredPosts.length) {
-    els.feed.innerHTML = `<div class="empty">No posts found.</div>`;
-    return;
-  }
-
-  els.feed.innerHTML = filteredPosts.map((post) => {
-    const username   = getUsernameForPost(post);
-    const profile    = getProfileById(post.user_id) || getProfileById(post.profile_id);
-    const avatar     = getAvatarForPost(post);
-    const image      = normalizeUrl(post.image_url || post.media_url || post.image || "");
-    const caption    = post.caption || post.text || "";
-    const songTitle  = post.song_title || post.song || "";
-    const songAuthor = post.song_author || post.song_artist || post.song_by || "";
-    const songPreview= post.song_preview || post.audio_url || "";
-    const songCover  = normalizeUrl(post.song_cover || post.album_cover || post.album_image || post.cover_url || post.artwork_url || post.album_art || "");
-    const createdAt  = post.created_at || post.inserted_at || post.updated_at || "";
-    const likesCount = postLikeCount(post.id);
-    const liked      = postLikedByMe(post.id) || !!post.liked;
-    const tags       = tagsForPost(post);
-
-    return `
-      <article class="post" data-post-id="${escapeHtml(post.id)}">
-        <div class="post-header">
-          <img class="avatar" loading="lazy" src="${avatar}" alt="${escapeHtml(username)} avatar">
-          <div class="user-meta">
-            <div class="username" data-profile-id="${escapeHtml(post.user_id || post.profile_id || post.id)}">
-              <span>${escapeHtml(username)}</span>
-              ${profile && isVerified(profile) ? `<span class="verified">✓</span>` : ""}
-            </div>
-            <div class="post-time">${escapeHtml(timeAgo(createdAt))}</div>
-          </div>
-        </div>
-
-        <div class="media" data-like-zone="${escapeHtml(post.id)}">
-          <img class="lazy-media" loading="lazy" data-src="${escapeHtml(image)}" alt="Post by ${escapeHtml(username)}" src="${placeholderImage()}">
-          <div class="like-pop" aria-hidden="true">
-            <span class="material-symbols-rounded">favorite</span>
-          </div>
-        </div>
-
-        <div class="actions">
-          <div class="like-row">
-            <button class="like-btn ${liked ? "liked" : ""}" data-like-btn="${escapeHtml(post.id)}" type="button" aria-label="Like post">
-              <span class="material-symbols-rounded">favorite</span>
-            </button>
-            <div class="count" data-like-count="${escapeHtml(post.id)}">${formatCount(likesCount)} likes</div>
-          </div>
-        </div>
-
-        ${tags.length ? `<div class="tag-row">${tags.map((tag) => `<span class="tag-pill">${escapeHtml(tag)}</span>`).join("")}</div>` : ""}
-
-        ${caption ? `<div class="caption">${escapeHtml(caption)}</div>` : ""}
-
-        ${(songTitle || songPreview) ? `
-          <div class="song-card" data-song-key="${escapeHtml(songKey(post))}">
-            ${songCover ? `<img class="album-cover" src="${songCover}" alt="Album cover">` : `<div class="note-cover" aria-label="No cover"><span class="material-symbols-rounded">music_note</span></div>`}
-            <div class="song-info">
-              ${songTitle  ? `<div class="song-title">${escapeHtml(songTitle)}</div>`   : ""}
-              ${songAuthor ? `<div class="song-author">${escapeHtml(songAuthor)}</div>` : ""}
-            </div>
-            ${songPreview ? `<audio class="bg-audio" autoplay loop preload="auto" playsinline src="${escapeHtml(songPreview)}"></audio>` : ""}
-          </div>
-        ` : ""}
-      </article>
-    `;
-  }).join("");
-
-  wireLazyImages();
-  wirePostInteractions();
-  wireBackgroundAudio();
-  wireDoubleTapLike();
-}
-
-function wireLazyImages() {
-  const images = [...document.querySelectorAll("img.lazy-media")];
-  const io = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      const img = entry.target;
-      const src = img.dataset.src;
-      if (src) img.src = src;
-      img.removeAttribute("data-src");
-      observer.unobserve(img);
-    });
-  }, { root: els.mainScroll, threshold: 0.15, rootMargin: "160px 0px" });
-
-  images.forEach((img) => io.observe(img));
-}
-
-function wireBackgroundAudio() {
-  document.querySelectorAll("audio.bg-audio").forEach((audio) => {
-    audio.volume = 0.22;
-    const attemptPlay = async () => {
-      try { await audio.play(); } catch { }
-    };
-    attemptPlay();
-    audio.addEventListener("loadedmetadata", attemptPlay, { once: true });
-  });
-}
-
-function showLikePulse(postId) {
-  const media = document.querySelector(`[data-like-zone="${CSS.escape(postId)}"]`);
-  const pulse = media?.querySelector(".like-pop");
-  if (!pulse) return;
-  pulse.classList.add("show");
-  setTimeout(() => pulse.classList.remove("show"), 220);
-}
-
-function refreshLikeUi(postId) {
-  const btn = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
-  const countEl = document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
-  if (!btn || !countEl) return;
-  btn.classList.toggle("liked", postLikedByMe(postId));
-  countEl.textContent = `${formatCount(postLikeCount(postId))} likes`;
-}
-
-async function persistLike(postId, wasLiked) {
-  if (!state.currentUserId) return;
-
-  if (wasLiked) {
-    await apiSend(`/likes`, "DELETE", { post_id: postId, user_id: state.currentUserId });
-  } else {
-    await apiSend(`/likes`, "POST", { post_id: postId, user_id: state.currentUserId });
-  }
-
-  state.likes = await fetchApiLikes();
-  refreshLikeUi(postId);
-}
-
-function toggleLike(postId) {
-  const btn = document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
-  if (!btn) return;
-
-  const wasLiked = btn.classList.contains("liked");
-  showLikePulse(postId);
-
-  persistLike(postId, wasLiked).catch((err) => {
-    console.error(err);
-  });
-}
-
-function wirePostInteractions() {
-  document.querySelectorAll("[data-profile-id]").forEach((nameEl) => {
-    nameEl.addEventListener("click", () => goToProfile(nameEl.dataset.profileId));
-  });
-
-  document.querySelectorAll("[data-like-btn]").forEach((btn) => {
-    btn.addEventListener("click", () => toggleLike(btn.dataset.likeBtn));
-  });
-
-  document.querySelectorAll("[data-like-count]").forEach((countEl) => {
-    countEl.addEventListener("click", () => openLikesModal(countEl.dataset.likeCount));
-  });
-}
-
-function wireDoubleTapLike() {
-  const lastTap = new Map();
-
-  document.querySelectorAll("[data-like-zone]").forEach((zone) => {
-    zone.addEventListener("click", () => {
-      const id  = zone.dataset.likeZone;
-      const now = Date.now();
-      const prev= lastTap.get(id) || 0;
-      if (now - prev < 300) {
-        toggleLike(id);
-        lastTap.delete(id);
-        return;
-      }
-      lastTap.set(id, now);
-      setTimeout(() => { if (lastTap.get(id) === now) lastTap.delete(id); }, 320);
-    });
-
-    zone.addEventListener("dblclick", () => toggleLike(zone.dataset.likeZone));
-  });
-
-  let touchStartTs = 0;
-  let lastTouchPost = null;
-  document.querySelectorAll("[data-like-zone]").forEach((zone) => {
-    zone.addEventListener("touchend", () => {
-      const id  = zone.dataset.likeZone;
-      const now = Date.now();
-      if (lastTouchPost === id && now - touchStartTs < 320) {
-        toggleLike(id);
-        lastTouchPost = null;
-        return;
-      }
-      touchStartTs  = now;
-      lastTouchPost = id;
-    }, { passive: true });
-  });
-}
-
-function updateSuggestions() {
-  const q = state.searchQuery.trim().toLowerCase();
-  if (!q) { els.suggestions.style.display = "none"; els.suggestions.innerHTML = ""; return; }
-
-  const userMatches = state.profiles
-    .filter((p) => {
-      const username = String(p.username || p.full_name || "").toLowerCase();
-      const bio      = String(p.bio || "").toLowerCase();
-      return username.includes(q) || bio.includes(q);
-    })
-    .slice(0, 8)
-    .map((p) => ({
-      id:       p.id,
-      title:    p.username || p.full_name || "user",
-      subtitle: p.bio || "Open profile",
-      avatar:   getAvatarForProfile(p),
-      verified: isVerified(p)
-    }));
-
-  if (!userMatches.length) { els.suggestions.style.display = "none"; els.suggestions.innerHTML = ""; return; }
-
-  els.suggestions.innerHTML = userMatches.map((item) => `
+// ── Search ────────────────────────────────────────────────────────────
+function updateSuggestions(){
+  const q=state.searchQuery.trim().toLowerCase();
+  if(!q){els.suggestions.style.display="none";els.suggestions.innerHTML="";return;}
+  const userMatches=state.profiles.filter((p)=>{
+    const username=String(p.username||p.full_name||"").toLowerCase();
+    const bio=String(p.bio||"").toLowerCase();
+    return username.includes(q)||bio.includes(q);
+  }).slice(0,8).map((p)=>({id:p.id,title:p.username||p.full_name||"user",subtitle:p.bio||"Open profile",avatar:getAvatarForProfile(p),verified:isVerified(p)}));
+  if(!userMatches.length){els.suggestions.style.display="none";els.suggestions.innerHTML="";return;}
+  els.suggestions.innerHTML=userMatches.map((item)=>`
     <div class="suggestion" data-suggestion-id="${escapeHtml(item.id)}">
       <img class="suggestion-avatar" src="${item.avatar}" alt="">
       <div class="suggestion-meta">
-        <div class="suggestion-title">
-          <span>${escapeHtml(item.title)}</span>
-          ${item.verified ? `<span class="verified">✓</span>` : ""}
-        </div>
+        <div class="suggestion-title"><span>${escapeHtml(item.title)}</span>${item.verified?`<span class="verified">✓</span>`:""}</div>
         <div class="suggestion-subtitle">${escapeHtml(item.subtitle)}</div>
       </div>
     </div>
   `).join("");
-
-  els.suggestions.style.display = "block";
-
-  els.suggestions.querySelectorAll("[data-suggestion-id]").forEach((node) => {
-    node.addEventListener("click", () => goToProfile(node.dataset.suggestionId));
+  els.suggestions.style.display="block";
+  els.suggestions.querySelectorAll("[data-suggestion-id]").forEach((node)=>{
+    node.addEventListener("click",()=>goToProfile(node.dataset.suggestionId));
   });
 }
 
-function goToProfile(profileId) {
-  if (!profileId) return;
-  window.location.href = `profile.html?id=${encodeURIComponent(profileId)}`;
-}
+function goToProfile(profileId){if(!profileId)return;window.location.href=`profile.html?id=${encodeURIComponent(profileId)}`;}
 
-function openStory(index) {
-  if (!state.storyQueue.length) return;
-  state.storyIndex = ((index % state.storyQueue.length) + state.storyQueue.length) % state.storyQueue.length;
-  els.storyViewer.classList.add("open");
-  els.storyViewer.setAttribute("aria-hidden", "false");
-  document.body.style.overflow = "hidden";
-  renderStory();
-  startStoryTimer();
-}
+els.search.addEventListener("input",()=>{state.searchQuery=els.search.value;updateSuggestions();});
+els.search.addEventListener("focus",updateSuggestions);
+document.addEventListener("click",(e)=>{if(!e.target.closest(".search-wrap"))els.suggestions.style.display="none";});
 
-function closeStory() {
-  stopStoryTimer();
-  els.storyViewer.classList.remove("open");
-  els.storyViewer.setAttribute("aria-hidden", "true");
-  document.body.style.overflow = "hidden";
-}
+// ── Stories ───────────────────────────────────────────────────────────
+function openStory(index){if(!state.storyQueue.length)return;state.storyIndex=((index%state.storyQueue.length)+state.storyQueue.length)%state.storyQueue.length;els.storyViewer.classList.add("open");els.storyViewer.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";renderStory();startStoryTimer();}
+function closeStory(){stopStoryTimer();els.storyViewer.classList.remove("open");els.storyViewer.setAttribute("aria-hidden","true");document.body.style.overflow="hidden";}
+function renderStory(){const story=state.storyQueue[state.storyIndex];if(!story)return;els.storyImage.src=story.story||story.avatar||defaultProfileIcon();els.storyAvatar.src=story.avatar||defaultProfileIcon();els.storyName.textContent=story.username;renderProgressBars();}
+function renderProgressBars(){const total=Math.max(1,state.storyQueue.length);els.progressRow.innerHTML=Array.from({length:total},(_,i)=>`<div class="progress"><span style="width:${i<state.storyIndex?100:0}%"></span></div>`).join("");}
+function updateProgress(){const bars=[...els.progressRow.querySelectorAll(".progress > span")];bars.forEach((bar,i)=>{if(i<state.storyIndex){bar.style.width="100%";}else if(i>state.storyIndex){bar.style.width="0%";}else{const elapsed=performance.now()-state.storyStartTs;bar.style.width=`${Math.min(100,(elapsed/state.storyDurationMs)*100)}%`;}});state.storyRaf=requestAnimationFrame(updateProgress);}
+function startStoryTimer(){stopStoryTimer();state.storyStartTs=performance.now();state.storyTimer=setTimeout(()=>nextStory(),state.storyDurationMs);state.storyRaf=requestAnimationFrame(updateProgress);}
+function stopStoryTimer(){if(state.storyTimer)clearTimeout(state.storyTimer);if(state.storyRaf)cancelAnimationFrame(state.storyRaf);state.storyTimer=null;state.storyRaf=null;}
+function nextStory(){if(!state.storyQueue.length)return;state.storyIndex=(state.storyIndex+1)%state.storyQueue.length;renderStory();startStoryTimer();}
+function prevStory(){if(!state.storyQueue.length)return;state.storyIndex=(state.storyIndex-1+state.storyQueue.length)%state.storyQueue.length;renderStory();startStoryTimer();}
 
-function renderStory() {
-  const story = state.storyQueue[state.storyIndex];
-  if (!story) return;
-  els.storyImage.src  = story.story || story.avatar || defaultProfileIcon();
-  els.storyAvatar.src = story.avatar || defaultProfileIcon();
-  els.storyName.textContent = story.username;
-  renderProgressBars();
-}
+els.closeStory.addEventListener("click",closeStory);
+els.storyViewer.addEventListener("click",(e)=>{if(e.target===els.storyViewer)closeStory();});
+els.prevStory.addEventListener("click",(e)=>{e.stopPropagation();prevStory();});
+els.nextStory.addEventListener("click",(e)=>{e.stopPropagation();nextStory();});
 
-function renderProgressBars() {
-  const total = Math.max(1, state.storyQueue.length);
-  els.progressRow.innerHTML = Array.from({ length: total }, (_, i) => `
-    <div class="progress"><span style="width:${i < state.storyIndex ? 100 : 0}%"></span></div>
-  `).join("");
-}
-
-function updateProgress() {
-  const bars = [...els.progressRow.querySelectorAll(".progress > span")];
-  bars.forEach((bar, i) => {
-    if (i < state.storyIndex)      { bar.style.width = "100%"; }
-    else if (i > state.storyIndex) { bar.style.width = "0%"; }
-    else {
-      const elapsed = performance.now() - state.storyStartTs;
-      bar.style.width = `${Math.min(100, (elapsed / state.storyDurationMs) * 100)}%`;
-    }
-  });
-  state.storyRaf = requestAnimationFrame(updateProgress);
-}
-
-function startStoryTimer() {
-  stopStoryTimer();
-  state.storyStartTs = performance.now();
-  state.storyTimer   = setTimeout(() => nextStory(), state.storyDurationMs);
-  state.storyRaf     = requestAnimationFrame(updateProgress);
-}
-
-function stopStoryTimer() {
-  if (state.storyTimer) clearTimeout(state.storyTimer);
-  if (state.storyRaf)   cancelAnimationFrame(state.storyRaf);
-  state.storyTimer = null;
-  state.storyRaf   = null;
-}
-
-function nextStory() {
-  if (!state.storyQueue.length) return;
-  state.storyIndex = (state.storyIndex + 1) % state.storyQueue.length;
-  renderStory();
-  startStoryTimer();
-}
-
-function prevStory() {
-  if (!state.storyQueue.length) return;
-  state.storyIndex = (state.storyIndex - 1 + state.storyQueue.length) % state.storyQueue.length;
-  renderStory();
-  startStoryTimer();
-}
-
-async function openLikesModal(postId) {
-  const likesForPost = state.likes.filter((like) => String(like.post_id ?? like.postId ?? like.postid) === String(postId));
-  const items = likesForPost.map((like) => {
-    const profile = getProfileById(like.user_id);
-    return {
-      id:       profile?.id || like.user_id,
-      name:     profile?.username || profile?.full_name || "user",
-      avatar:   getAvatarForProfile(profile),
-      subtitle: profile?.bio || "Open profile",
-      verified: isVerified(profile)
-    };
-  });
-
-  els.likesList.innerHTML = items.length
-    ? items.map((item) => `
-        <div class="list-item" data-open-profile="${escapeHtml(item.id)}">
-          <img class="list-avatar" src="${item.avatar}" alt="">
-          <div class="list-main">
-            <div class="list-name">
-              <span>${escapeHtml(item.name)}</span>
-              ${item.verified ? `<span class="verified">✓</span>` : ""}
-            </div>
-            <div class="list-sub">${escapeHtml(item.subtitle)}</div>
-          </div>
-        </div>
-      `).join("")
-    : `<div class="empty" style="margin:0;">No likes yet.</div>`;
-
+// ── Likes modal ───────────────────────────────────────────────────────
+async function openLikesModal(postId){
+  const likesForPost=state.likes.filter((like)=>String(like.post_id??like.postId??like.postid)===String(postId));
+  const items=likesForPost.map((like)=>{const profile=getProfileById(like.user_id);return{id:profile?.id||like.user_id,name:profile?.username||profile?.full_name||"user",avatar:getAvatarForProfile(profile),subtitle:profile?.bio||"Open profile",verified:isVerified(profile)};});
+  els.likesList.innerHTML=items.length?items.map((item)=>`
+    <div class="list-item" data-open-profile="${escapeHtml(item.id)}">
+      <img class="list-avatar" src="${item.avatar}" alt="">
+      <div class="list-main">
+        <div class="list-name"><span>${escapeHtml(item.name)}</span>${item.verified?`<span class="verified">✓</span>`:""}</div>
+        <div class="list-sub">${escapeHtml(item.subtitle)}</div>
+      </div>
+    </div>
+  `).join(""):`<div class="empty" style="margin:0;">No likes yet.</div>`;
   els.likesModal.classList.add("open");
-  els.likesModal.setAttribute("aria-hidden", "false");
-
-  els.likesList.querySelectorAll("[data-open-profile]").forEach((item) => {
-    item.addEventListener("click", () => goToProfile(item.dataset.openProfile));
-  });
+  els.likesModal.setAttribute("aria-hidden","false");
+  els.likesList.querySelectorAll("[data-open-profile]").forEach((item)=>{item.addEventListener("click",()=>goToProfile(item.dataset.openProfile));});
 }
+function closeLikesModal(){els.likesModal.classList.remove("open");els.likesModal.setAttribute("aria-hidden","true");}
+els.closeLikesBtn.addEventListener("click",closeLikesModal);
+els.likesModal.addEventListener("click",(e)=>{if(e.target===els.likesModal)closeLikesModal();});
 
-function closeLikesModal() {
-  els.likesModal.classList.remove("open");
-  els.likesModal.setAttribute("aria-hidden", "true");
-}
-
-els.closeLikesBtn.addEventListener("click", closeLikesModal);
-els.likesModal.addEventListener("click", (e) => { if (e.target === els.likesModal) closeLikesModal(); });
-
-els.closeStory.addEventListener("click", closeStory);
-els.storyViewer.addEventListener("click", (e) => { if (e.target === els.storyViewer) closeStory(); });
-els.prevStory.addEventListener("click", (e) => { e.stopPropagation(); prevStory(); });
-els.nextStory.addEventListener("click", (e) => { e.stopPropagation(); nextStory(); });
-
-els.search.addEventListener("input", () => { state.searchQuery = els.search.value; updateSuggestions(); });
-els.search.addEventListener("focus", updateSuggestions);
-document.addEventListener("click", (e) => {
-  if (!e.target.closest(".search-wrap")) els.suggestions.style.display = "none";
+// ── Keyboard ──────────────────────────────────────────────────────────
+window.addEventListener("keydown",(event)=>{
+  if(els.storyViewer.classList.contains("open")){if(event.key==="Escape")closeStory();if(event.key==="ArrowLeft")prevStory();if(event.key==="ArrowRight")nextStory();}
+  if(els.likesModal.classList.contains("open")&&event.key==="Escape")closeLikesModal();
+});
+document.addEventListener("visibilitychange",()=>{
+  if(document.hidden){stopStoryTimer();}
+  else if(els.storyViewer.classList.contains("open")){startStoryTimer();}
 });
 
-window.addEventListener("keydown", (event) => {
-  if (els.storyViewer.classList.contains("open")) {
-    if (event.key === "Escape")     closeStory();
-    if (event.key === "ArrowLeft")  prevStory();
-    if (event.key === "ArrowRight") nextStory();
-  }
-  if (els.likesModal.classList.contains("open") && event.key === "Escape") closeLikesModal();
-});
-
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden) {
-    stopStoryTimer();
-  } else if (els.storyViewer.classList.contains("open")) {
-    startStoryTimer();
-  }
-});
-
-window.goUpload = () => { window.location.href = `upload.html`; };
-window.logout = async () => {
-  localStorage.removeItem("shared_current_user_id");
-  localStorage.removeItem("shared_current_username");
-  localStorage.removeItem("shared_current_avatar");
-  window.location.href = "index.html";
-};
+// ── Globals ───────────────────────────────────────────────────────────
+window.goUpload=()=>{window.location.href=`upload.html`;};
+window.logout=async()=>{localStorage.removeItem("shared_current_user_id");localStorage.removeItem("shared_current_username");localStorage.removeItem("shared_current_avatar");window.location.href="index.html";};
 
 loadData();
 </script>
