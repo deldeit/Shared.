@@ -30,9 +30,13 @@
   .sidebar.open { transform:translateX(0); }
   .sidebar-close { position:absolute; top:10px; right:10px; background:none; border:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; }
   .sidebar-close:active { background:var(--border); }
-  .sidebar-profile { display:flex; align-items:center; gap:11px; background:none; border:1.5px solid var(--border); border-radius:var(--pill); padding:10px 14px; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.88rem; text-decoration:none; margin-bottom:18px; }
+
+  /* sidebar profile — skeleton while loading */
+  .sidebar-profile { display:flex; align-items:center; gap:11px; border:1.5px solid var(--border); border-radius:var(--pill); padding:10px 14px; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.88rem; text-decoration:none; margin-bottom:18px; min-height:56px; }
   .sidebar-profile:active { background:var(--border); }
-  .sidebar-profile img { width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .sidebar-profile-avatar { width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--skel); }
+  .sidebar-profile-name { flex:1; }
+  .sidebar-profile-name.loading { height:12px; border-radius:6px; background:var(--skel); width:60%; }
 
   .search-wrap { position:relative; margin-bottom:18px; }
   .sidebar-search { display:flex; align-items:center; gap:8px; background:var(--black); border:1.5px solid var(--border); border-radius:var(--pill); padding:9px 14px; transition:border-color .15s; }
@@ -44,7 +48,7 @@
   .search-dropdown.open { display:block; }
   .search-result { display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; }
   .search-result:active { background:var(--border); }
-  .search-result img { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .search-result img { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--skel); }
   .search-result-name { font-size:.82rem; }
   .search-result-handle { font-size:.7rem; color:var(--muted); margin-top:1px; }
   .search-empty { padding:14px; font-size:.78rem; color:var(--muted); text-align:center; }
@@ -130,18 +134,18 @@
   .post { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--squircle); overflow:hidden; opacity:0; transform:translateY(6px); transition:opacity .3s ease,transform .3s ease; }
   .post.visible { opacity:1; transform:translateY(0); }
   .post-header { display:flex; align-items:center; gap:10px; padding:13px 14px 10px; }
-  .post-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; background:var(--muted); flex-shrink:0; display:block; }
+  .post-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; background:var(--skel); flex-shrink:0; display:block; }
   .post-meta { flex:1; min-width:0; }
   .post-username { font-size:.83rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--white); text-decoration:none; display:block; }
   .post-username:hover { text-decoration:underline; }
   .post-date { font-size:.7rem; color:var(--muted); margin-top:1px; }
-  .post-image { width:100%; aspect-ratio:1/1; object-fit:cover; background:#1a1a1a; display:block; }
+  .post-image { width:100%; aspect-ratio:1/1; object-fit:cover; background:var(--skel); display:block; }
   .post-body { padding:12px 14px 14px; }
   .post-location { display:flex; align-items:center; gap:3px; font-size:.7rem; color:var(--muted); margin-bottom:7px; }
   .post-location .material-icons { font-size:12px; }
   .post-caption { font-size:.8rem; line-height:1.55; margin-bottom:12px; color:#ccc; }
   .post-song { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px 10px; margin-bottom:12px; }
-  .song-cover { width:38px; height:38px; border-radius:7px; background:#222; object-fit:cover; flex-shrink:0; }
+  .song-cover { width:38px; height:38px; border-radius:7px; background:var(--skel); object-fit:cover; flex-shrink:0; }
   .song-info { flex:1; min-width:0; }
   .song-title { font-size:.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
   .song-artist { font-size:.68rem; color:var(--muted); margin-top:2px; }
@@ -151,7 +155,6 @@
   .action-btn:active { opacity:.75; }
   .action-btn.liked { background:#222; color:var(--white); }
   .action-btn .material-icons { font-size:15px; }
-  /* likes count clickable */
   .like-count-link { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
 
   /* MODAL */
@@ -165,16 +168,22 @@
   .modal-title { font-size:.88rem; flex:1; }
   .modal-body { overflow-y:auto; padding:6px 0 8px; -webkit-overflow-scrolling:touch; flex:1; }
   .modal-row { display:flex; align-items:flex-start; gap:11px; padding:10px 18px; }
-  .modal-avatar { width:34px; height:34px; border-radius:50%; background:var(--muted); object-fit:cover; flex-shrink:0; cursor:pointer; }
+  .modal-avatar { width:34px; height:34px; border-radius:50%; background:var(--skel); object-fit:cover; flex-shrink:0; }
   .modal-user { font-size:.8rem; }
   .modal-time { font-size:.68rem; color:var(--muted); }
   .modal-comment-text { font-size:.78rem; color:#ccc; margin-top:2px; line-height:1.4; }
   .modal-empty { padding:20px 18px; font-size:.78rem; color:var(--muted); display:flex; align-items:center; gap:8px; }
   .modal-empty .material-icons { font-size:16px; }
 
+  /* LIKES LIST ROW */
+  .likes-user-row { display:flex; align-items:center; gap:11px; padding:10px 18px; }
+  .likes-user-row img { width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--skel); }
+  .likes-user-name { font-size:.82rem; }
+  .likes-user-handle { font-size:.7rem; color:var(--muted); margin-top:1px; }
+
   /* COMMENT INPUT */
   .comment-input-bar { display:flex; align-items:center; gap:10px; padding:10px 14px 14px; border-top:1px solid var(--border); flex-shrink:0; }
-  .comment-input-bar img { width:30px; height:30px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .comment-bar-avatar { width:30px; height:30px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--skel); }
   .comment-input-wrap { flex:1; display:flex; align-items:center; gap:8px; background:var(--black); border:1.5px solid var(--border); border-radius:var(--pill); padding:8px 12px; transition:border-color .15s; }
   .comment-input-wrap:focus-within { border-color:#444; }
   .comment-input-wrap input { flex:1; background:none; border:none; outline:none; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.8rem; min-width:0; }
@@ -187,15 +196,14 @@
   .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1a1a1a; border:1px solid var(--border); border-radius:var(--pill); padding:10px 20px; font-size:.78rem; color:var(--white); opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; z-index:999; white-space:nowrap; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* Error banner */
-  .api-error-banner { background:#1a0808; border:1px solid #3a1212; border-radius:14px; padding:12px 16px; font-size:.75rem; color:#ff6b6b; display:flex; align-items:center; gap:8px; }
-  .api-error-banner .material-icons { font-size:16px; flex-shrink:0; }
+  /* ERROR BANNER */
+  .error-banner { background:#1a0808; border:1px solid #3a1212; border-radius:14px; padding:14px 16px; font-size:.78rem; color:#ff6b6b; display:flex; align-items:center; gap:10px; }
+  .error-banner .material-icons { font-size:18px; flex-shrink:0; }
+  .error-banner strong { display:block; margin-bottom:2px; }
 
-  /* Likes modal user row */
-  .likes-user-row { display:flex; align-items:center; gap:11px; padding:10px 18px; }
-  .likes-user-row img { width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--muted); }
-  .likes-user-name { font-size:.82rem; }
-  .likes-user-handle { font-size:.7rem; color:var(--muted); margin-top:1px; }
+  /* EMPTY FEED */
+  .feed-empty { padding:40px 16px; text-align:center; color:var(--muted); font-size:.82rem; display:flex; flex-direction:column; align-items:center; gap:10px; }
+  .feed-empty .material-icons { font-size:36px; }
 
   @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .comment-input-bar { padding-bottom:calc(14px + env(safe-area-inset-bottom)); }
@@ -219,10 +227,11 @@
   <button class="sidebar-close" onclick="toggleSidebar()">
     <span class="material-icons">close</span>
   </button>
-  <a class="sidebar-profile" href="user.html">
-    <img src="" id="meAvatar" alt="avatar">
-    <span id="meUsername">@marco.visconti</span>
-  </a>
+  <!-- populated by JS after resolveMe() -->
+  <div class="sidebar-profile" id="sidebarProfile">
+    <div class="sidebar-profile-avatar skel" id="sidebarAvatar"></div>
+    <div class="sidebar-profile-name loading skel" id="sidebarName"></div>
+  </div>
   <div class="search-wrap">
     <div class="sidebar-search" id="searchBox">
       <span class="material-icons">search</span>
@@ -233,9 +242,9 @@
   </div>
   <div class="sidebar-spacer"></div>
   <div class="sidebar-nav">
-    <a class="sidebar-btn" href="about.html"><span class="material-icons">info</span> About</a>
-    <a class="sidebar-btn" href="settings.html"><span class="material-icons">settings</span> Settings</a>
-    <button class="sidebar-btn logout"><span class="material-icons">logout</span> Logout</button>
+    <button class="sidebar-btn logout" onclick="handleLogout()">
+      <span class="material-icons">logout</span> Logout
+    </button>
   </div>
 </aside>
 
@@ -263,7 +272,7 @@
     </div>
     <div class="modal-body" id="modalCommentsBody"></div>
     <div class="comment-input-bar">
-      <img id="commentBarAvatar" src="" alt="me">
+      <div class="comment-bar-avatar skel" id="commentBarAvatar"></div>
       <div class="comment-input-wrap">
         <input type="text" id="commentInput" placeholder="Add a comment…"
                oninput="onCommentInput()" onkeydown="if(event.key==='Enter')submitComment()">
@@ -282,41 +291,72 @@
    CONFIG
 ══════════════════════════════════════════════════════ */
 const API_BASE = 'https://api.sharedweb.org';
-const ME_ID    = 'me';
-// Will be populated from /users/me or fallback
-let ME = {
-  id: ME_ID,
-  username: 'marco.visconti',
-  name: 'Marco Visconti',
-  avatar_url: 'https://i.pravatar.cc/80?img=11',
-};
+
+// Current user — populated entirely from the API. No hardcoded values.
+let ME = null;
 
 /* ══════════════════════════════════════════════════════
-   API HELPER — always uses CORS mode + JSON headers
+   API HELPER
 ══════════════════════════════════════════════════════ */
 async function apiFetch(path, opts = {}) {
-  const url = API_BASE + path;
-  const defaults = {
+  const isFormData = opts.body instanceof FormData;
+  const headers = {
+    'Accept': 'application/json',
+    ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
+    ...opts.headers,
+  };
+  const res = await fetch(API_BASE + path, {
     mode: 'cors',
     credentials: 'omit',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-      ...opts.headers,
-    },
-  };
-  // For FormData (multipart) don't set Content-Type; let browser do it
-  if (opts.body instanceof FormData) {
-    delete defaults.headers['Content-Type'];
-  }
-  const res = await fetch(url, { ...defaults, ...opts, headers: { ...defaults.headers, ...opts.headers } });
+    ...opts,
+    headers,
+  });
   if (!res.ok) {
-    let detail = res.statusText;
-    try { const j = await res.json(); detail = j.detail || detail; } catch(_) {}
-    throw new Error(detail);
+    let msg = res.statusText;
+    try { const j = await res.json(); msg = j.detail || msg; } catch(_) {}
+    throw new Error(msg);
   }
   if (res.status === 204) return null;
   return res.json();
+}
+
+/* ══════════════════════════════════════════════════════
+   AVATAR RESOLUTION — no external placeholder services
+══════════════════════════════════════════════════════ */
+// Generates a simple SVG-based initials avatar as a data URL
+function initialsAvatar(name, username) {
+  const label = name
+    ? name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase()
+    : (username || '?')[0].toUpperCase();
+  // deterministic hue from username
+  let h = 0;
+  const s = username || name || '';
+  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) & 0xffff;
+  const hue = h % 360;
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80">
+    <rect width="80" height="80" fill="hsl(${hue},40%,20%)"/>
+    <text x="50%" y="54%" dominant-baseline="middle" text-anchor="middle"
+      fill="hsl(${hue},60%,80%)" font-family="sans-serif" font-size="28" font-weight="bold">${label}</text>
+  </svg>`;
+  return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+}
+
+function resolvedAvatar(user) {
+  if (!user) return initialsAvatar('', 'unknown');
+  if (user.avatar_url) {
+    return user.avatar_url.startsWith('http')
+      ? user.avatar_url
+      : API_BASE + user.avatar_url;
+  }
+  return initialsAvatar(user.name, user.username);
+}
+
+// Attach onerror fallback to an <img> element
+function withFallback(img, user) {
+  img.onerror = () => {
+    img.src = initialsAvatar(user.name, user.username);
+    img.onerror = null;
+  };
 }
 
 /* ══════════════════════════════════════════════════════
@@ -332,45 +372,53 @@ function showToast(msg) {
 }
 
 /* ══════════════════════════════════════════════════════
-   AVATAR HELPERS — never show broken images
-══════════════════════════════════════════════════════ */
-// Returns a deterministic fallback avatar from pravatar based on username hash
-function fallbackAvatar(username) {
-  let hash = 0;
-  for (let i = 0; i < username.length; i++) hash = (hash * 31 + username.charCodeAt(i)) & 0xffff;
-  return `https://i.pravatar.cc/80?img=${(hash % 70) + 1}`;
-}
-
-function resolvedAvatar(user) {
-  if (user.avatar_url && user.avatar_url.startsWith('http')) return user.avatar_url;
-  if (user.avatar_url) return API_BASE + user.avatar_url;
-  return fallbackAvatar(user.username || user.id || 'user');
-}
-
-// Make any <img> fall back to deterministic avatar on error
-function safeImg(el, username) {
-  el.onerror = () => { el.src = fallbackAvatar(username); el.onerror = null; };
-}
-
-/* ══════════════════════════════════════════════════════
-   RESOLVE CURRENT USER
+   RESOLVE CURRENT USER — from API only
+   Uses first user from /users if no session concept exists
 ══════════════════════════════════════════════════════ */
 async function resolveMe() {
+  // Try to get the "me" user. The API uses user_id='me' as convention.
+  // Attempt to load it; fall back to first user in the list.
+  let user = null;
   try {
-    const user = await apiFetch(`/users/${ME.username}`);
-    ME = { ...user };
-  } catch(_) { /* keep defaults */ }
+    user = await apiFetch('/users/me');
+  } catch(_) {}
+
+  if (!user) {
+    try {
+      const list = await apiFetch('/users?q=');
+      if (list && list.length) user = list[0];
+    } catch(_) {}
+  }
+
+  if (!user) {
+    // API completely unreachable — show error state in sidebar
+    document.getElementById('sidebarName').textContent = 'Not connected';
+    document.getElementById('sidebarName').classList.remove('loading', 'skel');
+    return;
+  }
+
+  ME = user;
+
+  // Sidebar profile
   const av = resolvedAvatar(ME);
-  ME.avatar_url = av;
-  const meAvEl = document.getElementById('meAvatar');
-  meAvEl.src = av;
-  safeImg(meAvEl, ME.username);
-  document.getElementById('meUsername').textContent = `@${ME.username}`;
-  document.getElementById('commentBarAvatar').src = av;
+  const avatarEl = document.getElementById('sidebarAvatar');
+  avatarEl.classList.remove('skel');
+  avatarEl.outerHTML = `<img class="sidebar-profile-avatar" id="sidebarAvatar" src="${av}" alt="${ME.name}">`;
+  withFallback(document.getElementById('sidebarAvatar'), ME);
+
+  const nameEl = document.getElementById('sidebarName');
+  nameEl.classList.remove('loading', 'skel');
+  nameEl.textContent = `@${ME.username}`;
+
+  // Comment bar avatar
+  const cba = document.getElementById('commentBarAvatar');
+  cba.classList.remove('skel');
+  cba.outerHTML = `<img class="comment-bar-avatar" id="commentBarAvatar" src="${av}" alt="${ME.username}">`;
+  withFallback(document.getElementById('commentBarAvatar'), ME);
 }
 
 /* ══════════════════════════════════════════════════════
-   SIDEBAR SEARCH  →  GET /users?q=…
+   SIDEBAR SEARCH  →  GET /users?q=
 ══════════════════════════════════════════════════════ */
 let searchTimer = null, searchBlurTimer = null;
 
@@ -386,8 +434,8 @@ function handleSearch(q) {
       } else {
         dd.innerHTML = users.map(u => {
           const av = resolvedAvatar(u);
-          return `<div class="search-result" onmousedown="location.href='user.html'">
-            <img src="${av}" alt="${u.name}" onerror="this.src='${fallbackAvatar(u.username)}'">
+          return `<div class="search-result" onmousedown="location.href='user.html?u=${encodeURIComponent(u.username)}'">
+            <img src="${av}" alt="${u.name}" onerror="this.src='${initialsAvatar(u.name, u.username)}'">
             <div>
               <div class="search-result-name">${u.name}</div>
               <div class="search-result-handle">@${u.username}</div>
@@ -396,11 +444,28 @@ function handleSearch(q) {
         }).join('');
       }
       dd.classList.add('open');
-    } catch(e) { console.warn('search error', e); }
+    } catch(e) {
+      dd.innerHTML = `<div class="search-empty">Search unavailable</div>`;
+      dd.classList.add('open');
+    }
   }, 250);
 }
 function onSearchFocus() { clearTimeout(searchBlurTimer); document.getElementById('searchBox').classList.add('focused'); }
-function onSearchBlur()  { searchBlurTimer = setTimeout(() => { document.getElementById('searchDropdown').classList.remove('open'); document.getElementById('searchBox').classList.remove('focused'); }, 180); }
+function onSearchBlur()  {
+  searchBlurTimer = setTimeout(() => {
+    document.getElementById('searchDropdown').classList.remove('open');
+    document.getElementById('searchBox').classList.remove('focused');
+  }, 180);
+}
+
+/* ══════════════════════════════════════════════════════
+   LOGOUT
+══════════════════════════════════════════════════════ */
+function handleLogout() {
+  ME = null;
+  toggleSidebar();
+  showToast('Logged out.');
+}
 
 /* ══════════════════════════════════════════════════════
    UPLOAD CARD
@@ -417,19 +482,19 @@ const CITIES = [
   'Lisbon, Portugal','Dublin, Ireland','Stockholm, Sweden','Zurich, Switzerland',
 ];
 const SONGS = [
-  { title:'Nuvole Bianche',    artist:'Ludovico Einaudi', cover:'https://picsum.photos/seed/alb1/80/80' },
-  { title:'Blinding Lights',   artist:'The Weeknd',       cover:'https://picsum.photos/seed/alb2/80/80' },
-  { title:'Con te partirò',    artist:'Andrea Bocelli',   cover:'https://picsum.photos/seed/alb3/80/80' },
-  { title:'Levitating',        artist:'Dua Lipa',         cover:'https://picsum.photos/seed/alb5/80/80' },
-  { title:'Shape of You',      artist:'Ed Sheeran',       cover:'https://picsum.photos/seed/alb6/80/80' },
-  { title:'Bohemian Rhapsody', artist:'Queen',            cover:'https://picsum.photos/seed/alb7/80/80' },
-  { title:'Superstition',      artist:'Stevie Wonder',    cover:'https://picsum.photos/seed/alb9/80/80' },
-  { title:'Volare',            artist:'Domenico Modugno', cover:'https://picsum.photos/seed/alb10/80/80' },
-  { title:'Bad Guy',           artist:'Billie Eilish',    cover:'https://picsum.photos/seed/alb13/80/80' },
-  { title:'Flowers',           artist:'Miley Cyrus',      cover:'https://picsum.photos/seed/alb14/80/80' },
-  { title:'Anti-Hero',         artist:'Taylor Swift',     cover:'https://picsum.photos/seed/alb15/80/80' },
-  { title:'As It Was',         artist:'Harry Styles',     cover:'https://picsum.photos/seed/alb16/80/80' },
-  { title:'Espresso',          artist:'Sabrina Carpenter',cover:'https://picsum.photos/seed/alb19/80/80' },
+  { title:'Nuvole Bianche',    artist:'Ludovico Einaudi' },
+  { title:'Blinding Lights',   artist:'The Weeknd'       },
+  { title:'Con te partirò',    artist:'Andrea Bocelli'   },
+  { title:'Levitating',        artist:'Dua Lipa'         },
+  { title:'Shape of You',      artist:'Ed Sheeran'       },
+  { title:'Bohemian Rhapsody', artist:'Queen'            },
+  { title:'Superstition',      artist:'Stevie Wonder'    },
+  { title:'Volare',            artist:'Domenico Modugno' },
+  { title:'Bad Guy',           artist:'Billie Eilish'    },
+  { title:'Flowers',           artist:'Miley Cyrus'      },
+  { title:'Anti-Hero',         artist:'Taylor Swift'     },
+  { title:'As It Was',         artist:'Harry Styles'     },
+  { title:'Espresso',          artist:'Sabrina Carpenter'},
 ];
 
 function buildUploadCard() {
@@ -475,7 +540,6 @@ function buildUploadCard() {
       </div>
       <div class="ac-dropdown" id="songDropdown"></div>
       <div class="song-pill" id="songPill">
-        <img id="songPillCover" src="" alt="cover">
         <div class="song-pill-info">
           <div class="song-pill-title" id="songPillTitle"></div>
           <div class="song-pill-artist" id="songPillArtist"></div>
@@ -493,8 +557,13 @@ function buildUploadCard() {
 let uploadFile = null;
 function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
 function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
-function onDrop(e) { e.preventDefault(); document.getElementById('dropZone').classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadImageFile(f); }
-function onFileChange(e) { const f=e.target.files[0]; if(f) loadImageFile(f); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('dropZone').classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith('image/')) loadImageFile(f);
+}
+function onFileChange(e) { const f = e.target.files[0]; if (f) loadImageFile(f); }
 function loadImageFile(file) {
   uploadFile = file;
   const r = new FileReader();
@@ -518,80 +587,87 @@ function clearImage(e) {
   document.getElementById('fileInput').value = '';
 }
 
-/* Location AC */
-let locBlurTimer=null;
+/* Location autocomplete */
+let locBlurTimer = null;
 function handleLocation(q) {
-  const dd=document.getElementById('locDropdown'), v=q.trim().toLowerCase();
-  if(!v){dd.classList.remove('open');return;}
-  const res=CITIES.filter(c=>c.toLowerCase().includes(v)).slice(0,7);
-  if(!res.length){dd.classList.remove('open');return;}
-  dd.innerHTML=res.map(c=>`<div class="ac-item" onmousedown="selectCity('${c.replace(/'/g,"\\'")}')"><span class="material-icons">location_on</span><div>${c}</div></div>`).join('');
+  const dd = document.getElementById('locDropdown'), v = q.trim().toLowerCase();
+  if (!v) { dd.classList.remove('open'); return; }
+  const res = CITIES.filter(c => c.toLowerCase().includes(v)).slice(0, 7);
+  if (!res.length) { dd.classList.remove('open'); return; }
+  dd.innerHTML = res.map(c =>
+    `<div class="ac-item" onmousedown="selectCity('${c.replace(/'/g,"\\'")}')">
+      <span class="material-icons">location_on</span><div>${c}</div>
+    </div>`).join('');
   dd.classList.add('open');
 }
-function onLocFocus(){clearTimeout(locBlurTimer);const v=document.getElementById('locationInput').value.trim();if(v)handleLocation(v);}
-function onLocBlur(){locBlurTimer=setTimeout(()=>document.getElementById('locDropdown').classList.remove('open'),180);}
-function selectCity(c){document.getElementById('locationInput').value=c;document.getElementById('locDropdown').classList.remove('open');}
+function onLocFocus() { clearTimeout(locBlurTimer); const v = document.getElementById('locationInput').value.trim(); if (v) handleLocation(v); }
+function onLocBlur()  { locBlurTimer = setTimeout(() => document.getElementById('locDropdown').classList.remove('open'), 180); }
+function selectCity(c) { document.getElementById('locationInput').value = c; document.getElementById('locDropdown').classList.remove('open'); }
 
-/* Song AC */
-let songBlurTimer=null, selectedSong=null;
-function handleSong(q){
-  const dd=document.getElementById('songDropdown'),v=q.trim().toLowerCase();
-  if(!v){dd.classList.remove('open');return;}
-  const res=SONGS.filter(s=>s.title.toLowerCase().includes(v)||s.artist.toLowerCase().includes(v)).slice(0,6);
-  if(!res.length){dd.classList.remove('open');return;}
-  dd.innerHTML=res.map(s=>`<div class="ac-item" onmousedown="selectSong(${SONGS.indexOf(s)})"><img src="${s.cover}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0"><div><div>${s.title}</div><div class="ac-item-sub">${s.artist}</div></div></div>`).join('');
+/* Song autocomplete */
+let songBlurTimer = null, selectedSong = null;
+function handleSong(q) {
+  const dd = document.getElementById('songDropdown'), v = q.trim().toLowerCase();
+  if (!v) { dd.classList.remove('open'); return; }
+  const res = SONGS.filter(s => s.title.toLowerCase().includes(v) || s.artist.toLowerCase().includes(v)).slice(0, 6);
+  if (!res.length) { dd.classList.remove('open'); return; }
+  dd.innerHTML = res.map((s, i) =>
+    `<div class="ac-item" onmousedown="selectSong(${SONGS.indexOf(s)})">
+      <span class="material-icons">music_note</span>
+      <div><div>${s.title}</div><div class="ac-item-sub">${s.artist}</div></div>
+    </div>`).join('');
   dd.classList.add('open');
 }
-function onSongFocus(){clearTimeout(songBlurTimer);const v=document.getElementById('songInput').value.trim();if(v&&!selectedSong)handleSong(v);}
-function onSongBlur(){songBlurTimer=setTimeout(()=>document.getElementById('songDropdown').classList.remove('open'),180);}
-function selectSong(i){
-  selectedSong=SONGS[i];
-  document.getElementById('songInput').value='';
+function onSongFocus() { clearTimeout(songBlurTimer); const v = document.getElementById('songInput').value.trim(); if (v && !selectedSong) handleSong(v); }
+function onSongBlur()  { songBlurTimer = setTimeout(() => document.getElementById('songDropdown').classList.remove('open'), 180); }
+function selectSong(i) {
+  selectedSong = SONGS[i];
+  document.getElementById('songInput').value = '';
   document.getElementById('songDropdown').classList.remove('open');
-  document.getElementById('songInputWrap').style.display='none';
-  document.getElementById('songPillCover').src=selectedSong.cover;
-  document.getElementById('songPillTitle').textContent=selectedSong.title;
-  document.getElementById('songPillArtist').textContent=selectedSong.artist;
+  document.getElementById('songInputWrap').style.display = 'none';
+  document.getElementById('songPillTitle').textContent = selectedSong.title;
+  document.getElementById('songPillArtist').textContent = selectedSong.artist;
   document.getElementById('songPill').classList.add('visible');
 }
-function clearSong(){
-  selectedSong=null;
-  document.getElementById('songInputWrap').style.display='';
+function clearSong() {
+  selectedSong = null;
+  document.getElementById('songInputWrap').style.display = '';
   document.getElementById('songPill').classList.remove('visible');
-  document.getElementById('songInput').value='';
+  document.getElementById('songInput').value = '';
 }
 
-/* Submit → POST /posts (multipart/form-data, CORS) */
+/* Submit → POST /posts */
 async function handleSubmit() {
-  if(!uploadFile){ showToast('Select a photo first.'); return; }
+  if (!ME) { showToast('Not logged in.'); return; }
+  if (!uploadFile) { showToast('Select a photo first.'); return; }
+
   const btn = document.getElementById('uploadSubmit');
   btn.disabled = true;
   btn.innerHTML = '<span class="material-icons" style="animation:spin 1s linear infinite;display:inline-block">refresh</span> Publishing…';
 
   const fd = new FormData();
-  fd.append('user_id',    ME.id);
-  fd.append('caption',    document.getElementById('captionInput').value.trim());
-  fd.append('location',   document.getElementById('locationInput').value.trim());
+  fd.append('user_id',     ME.id);
+  fd.append('caption',     document.getElementById('captionInput').value.trim());
+  fd.append('location',    document.getElementById('locationInput').value.trim());
   fd.append('song_title',  selectedSong?.title  || '');
   fd.append('song_artist', selectedSong?.artist || '');
-  fd.append('song_cover',  selectedSong?.cover  || '');
+  fd.append('song_cover',  '');
   fd.append('image', uploadFile, uploadFile.name);
 
   try {
-    const post = await apiFetch('/posts', {
-      method: 'POST',
-      body: fd,
-      headers: { 'Accept': 'application/json' }, // no Content-Type for multipart
-    });
+    const post = await apiFetch('/posts', { method: 'POST', body: fd });
     clearImage();
-    document.getElementById('captionInput').value='';
-    document.getElementById('locationInput').value='';
+    document.getElementById('captionInput').value = '';
+    document.getElementById('locationInput').value = '';
     clearSong();
     const feed = document.getElementById('feed');
     const uploadCard = feed.firstElementChild;
     const el = buildPostEl(post);
     el.classList.add('visible');
     feed.insertBefore(el, uploadCard.nextSibling);
+    // Remove empty-feed message if present
+    const empty = feed.querySelector('.feed-empty');
+    if (empty) empty.remove();
     showToast('Post published.');
   } catch(e) {
     showToast('Failed to publish: ' + e.message);
@@ -602,10 +678,10 @@ async function handleSubmit() {
 }
 
 /* ══════════════════════════════════════════════════════
-   POST ELEMENT BUILDER
+   POST ELEMENT
 ══════════════════════════════════════════════════════ */
 function resolvedImageUrl(url) {
-  if (!url) return 'https://picsum.photos/seed/placeholder/600/600';
+  if (!url) return null;
   return url.startsWith('http') ? url : API_BASE + url;
 }
 
@@ -616,37 +692,47 @@ function buildPostEl(p) {
 
   const imageUrl  = resolvedImageUrl(p.image_url);
   const avatarUrl = resolvedAvatar(p.user);
-  const coverUrl  = p.song_cover
-    ? (p.song_cover.startsWith('http') ? p.song_cover : API_BASE + p.song_cover)
-    : '';
+  const coverUrl  = p.song_cover ? resolvedImageUrl(p.song_cover) : null;
+
+  // Image tag — if no URL at all, show nothing (shouldn't happen per API spec)
+  const imgTag = imageUrl
+    ? `<img class="post-image" src="${imageUrl}" alt="post" loading="lazy"
+         onerror="this.style.background='#1a1a1a';this.removeAttribute('src')">`
+    : `<div class="post-image" style="background:#0a0a0a;display:flex;align-items:center;justify-content:center">
+         <span class="material-icons" style="color:#333;font-size:36px">broken_image</span>
+       </div>`;
+
+  // Song block — no cover image if none, just music icon
+  const songBlock = p.song_title ? `
+    <div class="post-song">
+      ${coverUrl
+        ? `<img class="song-cover" src="${coverUrl}" alt="album" onerror="this.style.display='none'">`
+        : `<span class="material-icons" style="color:var(--muted);font-size:24px;flex-shrink:0">album</span>`}
+      <div class="song-info">
+        <div class="song-title">${p.song_title}</div>
+        ${p.song_artist ? `<div class="song-artist">${p.song_artist}</div>` : ''}
+      </div>
+      <div class="song-icon"><span class="material-icons">music_note</span></div>
+    </div>` : '';
 
   el.innerHTML = `
     <div class="post-header">
-      <a href="user.html"><img class="post-avatar" src="${avatarUrl}" alt="${p.user.username}"
-         onerror="this.src='${fallbackAvatar(p.user.username)}'"></a>
+      <img class="post-avatar" id="av-${p.id}" src="${avatarUrl}" alt="${p.user.username}">
       <div class="post-meta">
-        <a class="post-username" href="user.html">@${p.user.username}</a>
+        <span class="post-username">@${p.user.username}</span>
         <div class="post-date">${p.time_human}</div>
       </div>
     </div>
-    <img class="post-image" src="${imageUrl}" alt="post" loading="lazy"
-         onerror="this.src='https://picsum.photos/seed/${p.id}/600/600'">
+    ${imgTag}
     <div class="post-body">
       ${p.location ? `<div class="post-location"><span class="material-icons">location_on</span>${p.location}</div>` : ''}
       ${p.caption  ? `<div class="post-caption">${p.caption}</div>` : ''}
-      ${p.song_title ? `
-      <div class="post-song">
-        ${coverUrl ? `<img class="song-cover" src="${coverUrl}" alt="album" onerror="this.style.display='none'">` : ''}
-        <div class="song-info">
-          <div class="song-title">${p.song_title}</div>
-          <div class="song-artist">${p.song_artist || ''}</div>
-        </div>
-        <div class="song-icon"><span class="material-icons">music_note</span></div>
-      </div>` : ''}
+      ${songBlock}
       <div class="post-actions">
         <button class="action-btn ${p.liked_by_me ? 'liked' : ''}" id="like-btn-${p.id}" onclick="toggleLike('${p.id}')">
           <span class="material-icons">bolt</span>
-          <span class="like-count-link" id="like-count-${p.id}" onclick="event.stopPropagation();openLikes('${p.id}',${p.like_count})">${p.like_count}</span>
+          <span class="like-count-link" id="like-count-${p.id}"
+                onclick="event.stopPropagation();openLikes('${p.id}',${p.like_count})">${p.like_count}</span>
         </button>
         <button class="action-btn" onclick="openComments('${p.id}')">
           <span class="material-icons">chat_bubble_outline</span>
@@ -654,38 +740,75 @@ function buildPostEl(p) {
         </button>
       </div>
     </div>`;
+
+  // Attach avatar fallback after element exists
+  setTimeout(() => {
+    const avEl = document.getElementById(`av-${p.id}`);
+    if (avEl) withFallback(avEl, p.user);
+  }, 0);
+
   return el;
 }
 
 /* ══════════════════════════════════════════════════════
    FEED  →  GET /feed
 ══════════════════════════════════════════════════════ */
-function buildSkeleton(){
-  const el=document.createElement('div');el.className='skel-card';
-  el.innerHTML=`<div class="skel-header"><div class="skel skel-avatar"></div><div class="skel-meta"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel skel-image"></div><div class="skel-body"><div class="skel skel-line s"></div><div class="skel skel-line l"></div><div class="skel skel-line f"></div><div class="skel skel-line m"></div><div class="skel-song"><div class="skel skel-song-cover"></div><div class="skel-song-info"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel-actions"><div class="skel skel-btn w1"></div><div class="skel skel-btn w2"></div></div></div>`;
+function buildSkeleton() {
+  const el = document.createElement('div');
+  el.className = 'skel-card';
+  el.innerHTML = `
+    <div class="skel-header">
+      <div class="skel skel-avatar"></div>
+      <div class="skel-meta"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div>
+    </div>
+    <div class="skel skel-image"></div>
+    <div class="skel-body">
+      <div class="skel skel-line s"></div>
+      <div class="skel skel-line l"></div>
+      <div class="skel skel-line f"></div>
+      <div class="skel skel-line m"></div>
+      <div class="skel-song">
+        <div class="skel skel-song-cover"></div>
+        <div class="skel-song-info"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div>
+      </div>
+      <div class="skel-actions"><div class="skel skel-btn w1"></div><div class="skel skel-btn w2"></div></div>
+    </div>`;
   return el;
 }
 
 async function buildFeed() {
   const feed = document.getElementById('feed');
   feed.appendChild(buildUploadCard());
-  const skels = Array.from({length:4}, () => { const s=buildSkeleton(); feed.appendChild(s); return s; });
+  const skels = Array.from({length: 4}, () => { const s = buildSkeleton(); feed.appendChild(s); return s; });
 
   let posts = [];
-  let apiOk = false;
+  let error = null;
   try {
-    posts = await apiFetch(`/feed?viewer=${encodeURIComponent(ME.id)}&limit=20`);
-    apiOk = true;
+    const viewerId = ME ? encodeURIComponent(ME.id) : 'me';
+    posts = await apiFetch(`/feed?viewer=${viewerId}&limit=20`);
   } catch(e) {
-    const errEl = document.createElement('div');
-    errEl.className = 'api-error-banner';
-    errEl.innerHTML = `<span class="material-icons">wifi_off</span>
-      Can't reach <strong>api.sharedweb.org</strong> — showing demo posts.`;
-    skels[0].before(errEl);
-    posts = DEMO_POSTS;
+    error = e.message;
   }
 
   skels.forEach(s => s.remove());
+
+  if (error) {
+    const banner = document.createElement('div');
+    banner.className = 'error-banner';
+    banner.innerHTML = `<span class="material-icons">wifi_off</span>
+      <div><strong>Can't reach the server</strong>${error}</div>`;
+    feed.appendChild(banner);
+    return;
+  }
+
+  if (!posts.length) {
+    const empty = document.createElement('div');
+    empty.className = 'feed-empty';
+    empty.innerHTML = `<span class="material-icons">photo_camera</span>No posts yet. Be the first to share something.`;
+    feed.appendChild(empty);
+    return;
+  }
+
   posts.forEach((p, i) => {
     const el = buildPostEl(p);
     feed.appendChild(el);
@@ -693,33 +816,27 @@ async function buildFeed() {
   });
 }
 
-/* Demo fallback */
-const DEMO_POSTS = [
-  { id:'p1', user:{id:'u1',username:'sara.bianchi',name:'Sara Bianchi',avatar_url:'https://i.pravatar.cc/80?img=5',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post1/600/600', caption:"Afternoon light on the Lungarno. Some hours can't be explained, only lived.", location:'Florence, Tuscany', song_title:'Nuvole Bianche', song_artist:'Ludovico Einaudi', song_cover:'https://picsum.photos/seed/alb1/80/80', time_human:'2h ago', like_count:4, comment_count:2, liked_by_me:false },
-  { id:'p2', user:{id:'u2',username:'luca.ferretti',name:'Luca Ferretti',avatar_url:'https://i.pravatar.cc/80?img=12',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post2/600/600', caption:'Breakfast alone in a city of 3 million people.', location:'Milan, Lombardy', song_title:'Blinding Lights', song_artist:'The Weeknd', song_cover:'https://picsum.photos/seed/alb2/80/80', time_human:'4h ago', like_count:2, comment_count:1, liked_by_me:false },
-  { id:'p3', user:{id:'u3',username:'gioia.romano',name:'Gioia Romano',avatar_url:'https://i.pravatar.cc/80?img=44',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post3/600/600', caption:'Spanish Steps at 7 in the morning. Zero tourists, just silence.', location:'Rome, Lazio', song_title:'Con te partirò', song_artist:'Andrea Bocelli', song_cover:'https://picsum.photos/seed/alb3/80/80', time_human:'6h ago', like_count:3, comment_count:2, liked_by_me:false },
-  { id:'p4', user:{id:'u4',username:'edo.mazza',name:'Edoardo Mazza',avatar_url:'https://i.pravatar.cc/80?img=33',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post4/600/600', caption:"Spaccanapoli on a Saturday. The city that never stops.", location:'Naples, Campania', song_title:'Volare', song_artist:'Domenico Modugno', song_cover:'https://picsum.photos/seed/alb4/80/80', time_human:'8h ago', like_count:2, comment_count:0, liked_by_me:false },
-];
-
 /* ══════════════════════════════════════════════════════
-   LIKES  →  POST /posts/:id/likes  |  DELETE /posts/:id/likes
+   LIKES  →  POST/DELETE /posts/:id/likes
 ══════════════════════════════════════════════════════ */
 async function toggleLike(postId) {
+  if (!ME) { showToast('Log in to like posts.'); return; }
   const btn   = document.getElementById(`like-btn-${postId}`);
   const count = document.getElementById(`like-count-${postId}`);
   const liked = btn.classList.contains('liked');
-  // Optimistic update
-  const prev = parseInt(count.textContent) || 0;
-  const next  = liked ? Math.max(0, prev - 1) : prev + 1;
+  const prev  = parseInt(count.textContent) || 0;
+
+  // Optimistic
   btn.classList.toggle('liked', !liked);
-  count.textContent = next;
+  count.textContent = liked ? Math.max(0, prev - 1) : prev + 1;
+
   try {
     const res = liked
-      ? await apiFetch(`/posts/${postId}/likes?user_id=${encodeURIComponent(ME.id)}`, { method:'DELETE' })
-      : await apiFetch(`/posts/${postId}/likes?user_id=${encodeURIComponent(ME.id)}`, { method:'POST' });
+      ? await apiFetch(`/posts/${postId}/likes?user_id=${encodeURIComponent(ME.id)}`, { method: 'DELETE' })
+      : await apiFetch(`/posts/${postId}/likes?user_id=${encodeURIComponent(ME.id)}`, { method: 'POST' });
     if (res && typeof res.like_count === 'number') count.textContent = res.like_count;
   } catch(e) {
-    // Revert on error
+    // Revert
     btn.classList.toggle('liked', liked);
     count.textContent = prev;
     showToast(e.message);
@@ -730,7 +847,7 @@ async function toggleLike(postId) {
    LIKES MODAL  →  GET /posts/:id/likes
 ══════════════════════════════════════════════════════ */
 async function openLikes(postId, knownCount) {
-  const body = document.getElementById('modalLikesBody');
+  const body  = document.getElementById('modalLikesBody');
   const title = document.getElementById('likesTitle');
   title.textContent = knownCount > 0 ? `Likes (${knownCount})` : 'Likes';
   body.innerHTML = `<div class="modal-empty"><span class="material-icons">hourglass_empty</span>Loading…</div>`;
@@ -740,15 +857,13 @@ async function openLikes(postId, knownCount) {
     const likes = await apiFetch(`/posts/${postId}/likes`);
     title.textContent = `Likes (${likes.length})`;
     if (!likes.length) {
-      body.innerHTML = `<div class="modal-empty"><span class="material-icons">bolt</span>No likes yet — be the first!</div>`;
+      body.innerHTML = `<div class="modal-empty"><span class="material-icons">bolt</span>No likes yet.</div>`;
       return;
     }
     body.innerHTML = likes.map(u => {
-      const av = u.avatar_url
-        ? (u.avatar_url.startsWith('http') ? u.avatar_url : API_BASE + u.avatar_url)
-        : fallbackAvatar(u.username);
+      const av = resolvedAvatar(u);
       return `<div class="likes-user-row">
-        <img src="${av}" alt="${u.name}" onerror="this.src='${fallbackAvatar(u.username)}'">
+        <img src="${av}" alt="${u.name}" onerror="this.src='${initialsAvatar(u.name, u.username)}'">
         <div>
           <div class="likes-user-name">${u.name}</div>
           <div class="likes-user-handle">@${u.username}</div>
@@ -788,17 +903,17 @@ async function openComments(postId) {
 function renderComments(comments) {
   const body = document.getElementById('modalCommentsBody');
   if (!comments.length) {
-    body.innerHTML = `<div class="modal-empty"><span class="material-icons">chat_bubble_outline</span>No comments yet. Be the first!</div>`;
+    body.innerHTML = `<div class="modal-empty"><span class="material-icons">chat_bubble_outline</span>No comments yet.</div>`;
     return;
   }
   body.innerHTML = comments.map(c => {
     const av = resolvedAvatar(c.user);
     return `<div class="modal-row">
-      <a href="user.html"><img class="modal-avatar" src="${av}" alt="${c.user.username}"
-         onerror="this.src='${fallbackAvatar(c.user.username)}'"></a>
+      <img class="modal-avatar" src="${av}" alt="${c.user.username}"
+           onerror="this.src='${initialsAvatar(c.user.name, c.user.username)}'">
       <div>
         <div class="modal-user">
-          <a href="user.html" style="color:var(--white);text-decoration:none">@${c.user.username}</a>
+          <span>@${c.user.username}</span>
           <span class="modal-time"> · ${c.time_human}</span>
         </div>
         <div class="modal-comment-text">${c.text}</div>
@@ -813,6 +928,7 @@ function onCommentInput() {
 }
 
 async function submitComment() {
+  if (!ME) { showToast('Log in to comment.'); return; }
   const input = document.getElementById('commentInput');
   const text  = input.value.trim();
   if (!text || !activePostId) return;
@@ -825,16 +941,15 @@ async function submitComment() {
       body: JSON.stringify({ user_id: ME.id, text }),
     });
     const body = document.getElementById('modalCommentsBody');
-    const empty = body.querySelector('.modal-empty');
-    if (empty) body.innerHTML = '';
-    const av = ME.avatar_url;
+    if (body.querySelector('.modal-empty')) body.innerHTML = '';
+    const av = resolvedAvatar(ME);
     body.insertAdjacentHTML('beforeend', `
       <div class="modal-row">
-        <a href="user.html"><img class="modal-avatar" src="${av}" alt="${ME.username}"
-           onerror="this.src='${fallbackAvatar(ME.username)}'"></a>
+        <img class="modal-avatar" src="${av}" alt="${ME.username}"
+             onerror="this.src='${initialsAvatar(ME.name, ME.username)}'">
         <div>
           <div class="modal-user">
-            <a href="user.html" style="color:var(--white);text-decoration:none">@${ME.username}</a>
+            <span>@${ME.username}</span>
             <span class="modal-time"> · just now</span>
           </div>
           <div class="modal-comment-text">${c.text}</div>
@@ -848,13 +963,13 @@ async function submitComment() {
     titleEl.textContent = `Comments (${cur + 1})`;
   } catch(e) {
     showToast('Failed to post comment: ' + e.message);
-    input.value = text; // restore
+    input.value = text;
     document.getElementById('commentSendBtn').classList.add('active');
   }
 }
 
 /* ══════════════════════════════════════════════════════
-   MODAL / SIDEBAR HELPERS
+   MODALS & SIDEBAR
 ══════════════════════════════════════════════════════ */
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
@@ -862,10 +977,12 @@ function closeModal(id) {
 }
 
 function toggleSidebar() {
-  const s=document.getElementById('sidebar'), o=document.getElementById('sidebarOverlay');
-  s.classList.toggle('open'); o.classList.toggle('open');
-  if(!s.classList.contains('open')){
-    document.getElementById('searchInput').value='';
+  const s = document.getElementById('sidebar');
+  const o = document.getElementById('sidebarOverlay');
+  s.classList.toggle('open');
+  o.classList.toggle('open');
+  if (!s.classList.contains('open')) {
+    document.getElementById('searchInput').value = '';
     document.getElementById('searchDropdown').classList.remove('open');
   }
 }
@@ -873,7 +990,7 @@ function toggleSidebar() {
 /* ── INIT ── */
 (async () => {
   await resolveMe();
-  buildFeed();
+  await buildFeed();
 })();
 </script>
 </body>
