@@ -151,6 +151,8 @@
   .action-btn:active { opacity:.75; }
   .action-btn.liked { background:#222; color:var(--white); }
   .action-btn .material-icons { font-size:15px; }
+  /* likes count clickable */
+  .like-count-link { cursor:pointer; text-decoration:underline; text-underline-offset:2px; }
 
   /* MODAL */
   .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:300; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
@@ -185,14 +187,22 @@
   .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1a1a1a; border:1px solid var(--border); border-radius:var(--pill); padding:10px 20px; font-size:.78rem; color:var(--white); opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; z-index:999; white-space:nowrap; }
   .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-  /* API error banner */
-  .api-error { display:none; background:#1a0808; border:1px solid #3a1212; border-radius:14px; padding:12px 16px; margin-bottom:4px; font-size:.75rem; color:#ff6b6b; display:flex; align-items:center; gap:8px; }
-  .api-error .material-icons { font-size:16px; flex-shrink:0; }
+  /* Error banner */
+  .api-error-banner { background:#1a0808; border:1px solid #3a1212; border-radius:14px; padding:12px 16px; font-size:.75rem; color:#ff6b6b; display:flex; align-items:center; gap:8px; }
+  .api-error-banner .material-icons { font-size:16px; flex-shrink:0; }
+
+  /* Likes modal user row */
+  .likes-user-row { display:flex; align-items:center; gap:11px; padding:10px 18px; }
+  .likes-user-row img { width:36px; height:36px; border-radius:50%; object-fit:cover; flex-shrink:0; background:var(--muted); }
+  .likes-user-name { font-size:.82rem; }
+  .likes-user-handle { font-size:.7rem; color:var(--muted); margin-top:1px; }
 
   @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .comment-input-bar { padding-bottom:calc(14px + env(safe-area-inset-bottom)); }
     .feed { padding-bottom:calc(48px + env(safe-area-inset-bottom)); }
   }
+
+  @keyframes spin { to { transform:rotate(360deg) } }
 </style>
 </head>
 <body>
@@ -210,8 +220,8 @@
     <span class="material-icons">close</span>
   </button>
   <a class="sidebar-profile" href="user.html">
-    <img src="https://i.pravatar.cc/80?img=11" alt="avatar">
-    <span>@marco.visconti</span>
+    <img src="" id="meAvatar" alt="avatar">
+    <span id="meUsername">@marco.visconti</span>
   </a>
   <div class="search-wrap">
     <div class="sidebar-search" id="searchBox">
@@ -229,9 +239,7 @@
   </div>
 </aside>
 
-<main class="feed" id="feed">
-  <!-- Upload card injected by JS -->
-</main>
+<main class="feed" id="feed"></main>
 
 <!-- MODAL LIKES -->
 <div class="modal-overlay" id="modalLikes" onclick="closeModal('modalLikes')">
@@ -239,7 +247,7 @@
     <div class="modal-handle"></div>
     <div class="modal-header">
       <span class="material-icons">bolt</span>
-      <span class="modal-title">Likes</span>
+      <span class="modal-title" id="likesTitle">Likes</span>
     </div>
     <div class="modal-body" id="modalLikesBody"></div>
   </div>
@@ -255,7 +263,7 @@
     </div>
     <div class="modal-body" id="modalCommentsBody"></div>
     <div class="comment-input-bar">
-      <img src="https://i.pravatar.cc/80?img=11" alt="me">
+      <img id="commentBarAvatar" src="" alt="me">
       <div class="comment-input-wrap">
         <input type="text" id="commentInput" placeholder="Add a comment…"
                oninput="onCommentInput()" onkeydown="if(event.key==='Enter')submitComment()">
@@ -273,21 +281,39 @@
 /* ══════════════════════════════════════════════════════
    CONFIG
 ══════════════════════════════════════════════════════ */
-const API   = 'https://api.sharedweb.org';
-const ME_ID = 'me';   // current logged-in user id (matches seed)
-const ME_AVATAR = 'https://i.pravatar.cc/80?img=11';
+const API_BASE = 'https://api.sharedweb.org';
+const ME_ID    = 'me';
+// Will be populated from /users/me or fallback
+let ME = {
+  id: ME_ID,
+  username: 'marco.visconti',
+  name: 'Marco Visconti',
+  avatar_url: 'https://i.pravatar.cc/80?img=11',
+};
 
 /* ══════════════════════════════════════════════════════
-   API HELPERS
+   API HELPER — always uses CORS mode + JSON headers
 ══════════════════════════════════════════════════════ */
 async function apiFetch(path, opts = {}) {
-  const res = await fetch(API + path, {
-    headers: { 'Content-Type': 'application/json', ...opts.headers },
-    ...opts,
-  });
+  const url = API_BASE + path;
+  const defaults = {
+    mode: 'cors',
+    credentials: 'omit',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      ...opts.headers,
+    },
+  };
+  // For FormData (multipart) don't set Content-Type; let browser do it
+  if (opts.body instanceof FormData) {
+    delete defaults.headers['Content-Type'];
+  }
+  const res = await fetch(url, { ...defaults, ...opts, headers: { ...defaults.headers, ...opts.headers } });
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail || 'API error');
+    let detail = res.statusText;
+    try { const j = await res.json(); detail = j.detail || detail; } catch(_) {}
+    throw new Error(detail);
   }
   if (res.status === 204) return null;
   return res.json();
@@ -306,7 +332,45 @@ function showToast(msg) {
 }
 
 /* ══════════════════════════════════════════════════════
-   SIDEBAR SEARCH  (live → GET /users?q=…)
+   AVATAR HELPERS — never show broken images
+══════════════════════════════════════════════════════ */
+// Returns a deterministic fallback avatar from pravatar based on username hash
+function fallbackAvatar(username) {
+  let hash = 0;
+  for (let i = 0; i < username.length; i++) hash = (hash * 31 + username.charCodeAt(i)) & 0xffff;
+  return `https://i.pravatar.cc/80?img=${(hash % 70) + 1}`;
+}
+
+function resolvedAvatar(user) {
+  if (user.avatar_url && user.avatar_url.startsWith('http')) return user.avatar_url;
+  if (user.avatar_url) return API_BASE + user.avatar_url;
+  return fallbackAvatar(user.username || user.id || 'user');
+}
+
+// Make any <img> fall back to deterministic avatar on error
+function safeImg(el, username) {
+  el.onerror = () => { el.src = fallbackAvatar(username); el.onerror = null; };
+}
+
+/* ══════════════════════════════════════════════════════
+   RESOLVE CURRENT USER
+══════════════════════════════════════════════════════ */
+async function resolveMe() {
+  try {
+    const user = await apiFetch(`/users/${ME.username}`);
+    ME = { ...user };
+  } catch(_) { /* keep defaults */ }
+  const av = resolvedAvatar(ME);
+  ME.avatar_url = av;
+  const meAvEl = document.getElementById('meAvatar');
+  meAvEl.src = av;
+  safeImg(meAvEl, ME.username);
+  document.getElementById('meUsername').textContent = `@${ME.username}`;
+  document.getElementById('commentBarAvatar').src = av;
+}
+
+/* ══════════════════════════════════════════════════════
+   SIDEBAR SEARCH  →  GET /users?q=…
 ══════════════════════════════════════════════════════ */
 let searchTimer = null, searchBlurTimer = null;
 
@@ -320,14 +384,16 @@ function handleSearch(q) {
       if (!users.length) {
         dd.innerHTML = `<div class="search-empty">No users found</div>`;
       } else {
-        dd.innerHTML = users.map(u => `
-          <div class="search-result" onmousedown="location.href='user.html'">
-            <img src="${u.avatar_url || ME_AVATAR}" alt="${u.name}">
+        dd.innerHTML = users.map(u => {
+          const av = resolvedAvatar(u);
+          return `<div class="search-result" onmousedown="location.href='user.html'">
+            <img src="${av}" alt="${u.name}" onerror="this.src='${fallbackAvatar(u.username)}'">
             <div>
               <div class="search-result-name">${u.name}</div>
               <div class="search-result-handle">@${u.username}</div>
             </div>
-          </div>`).join('');
+          </div>`;
+        }).join('');
       }
       dd.classList.add('open');
     } catch(e) { console.warn('search error', e); }
@@ -495,15 +561,15 @@ function clearSong(){
   document.getElementById('songInput').value='';
 }
 
-/* Submit → POST /posts */
+/* Submit → POST /posts (multipart/form-data, CORS) */
 async function handleSubmit() {
   if(!uploadFile){ showToast('Select a photo first.'); return; }
   const btn = document.getElementById('uploadSubmit');
   btn.disabled = true;
-  btn.innerHTML = '<span class="material-icons" style="animation:spin 1s linear infinite">refresh</span> Publishing…';
+  btn.innerHTML = '<span class="material-icons" style="animation:spin 1s linear infinite;display:inline-block">refresh</span> Publishing…';
 
   const fd = new FormData();
-  fd.append('user_id',    ME_ID);
+  fd.append('user_id',    ME.id);
   fd.append('caption',    document.getElementById('captionInput').value.trim());
   fd.append('location',   document.getElementById('locationInput').value.trim());
   fd.append('song_title',  selectedSong?.title  || '');
@@ -512,15 +578,15 @@ async function handleSubmit() {
   fd.append('image', uploadFile, uploadFile.name);
 
   try {
-    const post = await fetch(API + '/posts', { method:'POST', body:fd }).then(r => {
-      if(!r.ok) throw new Error('Upload failed');
-      return r.json();
+    const post = await apiFetch('/posts', {
+      method: 'POST',
+      body: fd,
+      headers: { 'Accept': 'application/json' }, // no Content-Type for multipart
     });
     clearImage();
     document.getElementById('captionInput').value='';
     document.getElementById('locationInput').value='';
     clearSong();
-    // Prepend new post to feed
     const feed = document.getElementById('feed');
     const uploadCard = feed.firstElementChild;
     const el = buildPostEl(post);
@@ -536,48 +602,51 @@ async function handleSubmit() {
 }
 
 /* ══════════════════════════════════════════════════════
-   FEED  →  GET /feed
+   POST ELEMENT BUILDER
 ══════════════════════════════════════════════════════ */
-function buildSkeleton(){
-  const el=document.createElement('div');el.className='skel-card';
-  el.innerHTML=`<div class="skel-header"><div class="skel skel-avatar"></div><div class="skel-meta"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel skel-image"></div><div class="skel-body"><div class="skel skel-line s"></div><div class="skel skel-line l"></div><div class="skel skel-line f"></div><div class="skel skel-line m"></div><div class="skel-song"><div class="skel skel-song-cover"></div><div class="skel-song-info"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel-actions"><div class="skel skel-btn w1"></div><div class="skel skel-btn w2"></div></div></div>`;
-  return el;
+function resolvedImageUrl(url) {
+  if (!url) return 'https://picsum.photos/seed/placeholder/600/600';
+  return url.startsWith('http') ? url : API_BASE + url;
 }
 
 function buildPostEl(p) {
   const el = document.createElement('article');
   el.className = 'post';
   el.dataset.postId = p.id;
-  const imageUrl = p.image_url.startsWith('http') ? p.image_url : API + p.image_url;
-  const coverUrl = p.song_cover
-    ? (p.song_cover.startsWith('http') ? p.song_cover : API + p.song_cover) : '';
-  const avatarUrl = p.user.avatar_url || ME_AVATAR;
+
+  const imageUrl  = resolvedImageUrl(p.image_url);
+  const avatarUrl = resolvedAvatar(p.user);
+  const coverUrl  = p.song_cover
+    ? (p.song_cover.startsWith('http') ? p.song_cover : API_BASE + p.song_cover)
+    : '';
 
   el.innerHTML = `
     <div class="post-header">
-      <a href="user.html"><img class="post-avatar" src="${avatarUrl}" alt="${p.user.username}"></a>
+      <a href="user.html"><img class="post-avatar" src="${avatarUrl}" alt="${p.user.username}"
+         onerror="this.src='${fallbackAvatar(p.user.username)}'"></a>
       <div class="post-meta">
         <a class="post-username" href="user.html">@${p.user.username}</a>
         <div class="post-date">${p.time_human}</div>
       </div>
     </div>
-    <img class="post-image" src="${imageUrl}" alt="post" loading="lazy">
+    <img class="post-image" src="${imageUrl}" alt="post" loading="lazy"
+         onerror="this.src='https://picsum.photos/seed/${p.id}/600/600'">
     <div class="post-body">
       ${p.location ? `<div class="post-location"><span class="material-icons">location_on</span>${p.location}</div>` : ''}
       ${p.caption  ? `<div class="post-caption">${p.caption}</div>` : ''}
       ${p.song_title ? `
       <div class="post-song">
-        ${coverUrl ? `<img class="song-cover" src="${coverUrl}" alt="album">` : ''}
+        ${coverUrl ? `<img class="song-cover" src="${coverUrl}" alt="album" onerror="this.style.display='none'">` : ''}
         <div class="song-info">
           <div class="song-title">${p.song_title}</div>
-          <div class="song-artist">${p.song_artist}</div>
+          <div class="song-artist">${p.song_artist || ''}</div>
         </div>
         <div class="song-icon"><span class="material-icons">music_note</span></div>
       </div>` : ''}
       <div class="post-actions">
         <button class="action-btn ${p.liked_by_me ? 'liked' : ''}" id="like-btn-${p.id}" onclick="toggleLike('${p.id}')">
           <span class="material-icons">bolt</span>
-          <span id="like-count-${p.id}">${p.like_count}</span>
+          <span class="like-count-link" id="like-count-${p.id}" onclick="event.stopPropagation();openLikes('${p.id}',${p.like_count})">${p.like_count}</span>
         </button>
         <button class="action-btn" onclick="openComments('${p.id}')">
           <span class="material-icons">chat_bubble_outline</span>
@@ -588,26 +657,31 @@ function buildPostEl(p) {
   return el;
 }
 
+/* ══════════════════════════════════════════════════════
+   FEED  →  GET /feed
+══════════════════════════════════════════════════════ */
+function buildSkeleton(){
+  const el=document.createElement('div');el.className='skel-card';
+  el.innerHTML=`<div class="skel-header"><div class="skel skel-avatar"></div><div class="skel-meta"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel skel-image"></div><div class="skel-body"><div class="skel skel-line s"></div><div class="skel skel-line l"></div><div class="skel skel-line f"></div><div class="skel skel-line m"></div><div class="skel-song"><div class="skel skel-song-cover"></div><div class="skel-song-info"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel-actions"><div class="skel skel-btn w1"></div><div class="skel skel-btn w2"></div></div></div>`;
+  return el;
+}
+
 async function buildFeed() {
   const feed = document.getElementById('feed');
-
-  // Upload card first
   feed.appendChild(buildUploadCard());
-
-  // Skeletons
   const skels = Array.from({length:4}, () => { const s=buildSkeleton(); feed.appendChild(s); return s; });
 
   let posts = [];
+  let apiOk = false;
   try {
-    posts = await apiFetch(`/feed?viewer=${ME_ID}`);
+    posts = await apiFetch(`/feed?viewer=${encodeURIComponent(ME.id)}&limit=20`);
+    apiOk = true;
   } catch(e) {
-    // Show inline error after upload card
     const errEl = document.createElement('div');
-    errEl.className = 'api-error';
+    errEl.className = 'api-error-banner';
     errEl.innerHTML = `<span class="material-icons">wifi_off</span>
-      Could not reach <strong>api.sharedweb.org</strong> — showing cached demo feed.`;
-    feed.insertBefore(errEl, skels[0]);
-    // Fallback: use demo data
+      Can't reach <strong>api.sharedweb.org</strong> — showing demo posts.`;
+    skels[0].before(errEl);
     posts = DEMO_POSTS;
   }
 
@@ -619,7 +693,7 @@ async function buildFeed() {
   });
 }
 
-/* Inline demo fallback (mirrors seed data structure) */
+/* Demo fallback */
 const DEMO_POSTS = [
   { id:'p1', user:{id:'u1',username:'sara.bianchi',name:'Sara Bianchi',avatar_url:'https://i.pravatar.cc/80?img=5',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post1/600/600', caption:"Afternoon light on the Lungarno. Some hours can't be explained, only lived.", location:'Florence, Tuscany', song_title:'Nuvole Bianche', song_artist:'Ludovico Einaudi', song_cover:'https://picsum.photos/seed/alb1/80/80', time_human:'2h ago', like_count:4, comment_count:2, liked_by_me:false },
   { id:'p2', user:{id:'u2',username:'luca.ferretti',name:'Luca Ferretti',avatar_url:'https://i.pravatar.cc/80?img=12',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post2/600/600', caption:'Breakfast alone in a city of 3 million people.', location:'Milan, Lombardy', song_title:'Blinding Lights', song_artist:'The Weeknd', song_cover:'https://picsum.photos/seed/alb2/80/80', time_human:'4h ago', like_count:2, comment_count:1, liked_by_me:false },
@@ -628,24 +702,61 @@ const DEMO_POSTS = [
 ];
 
 /* ══════════════════════════════════════════════════════
-   LIKES  →  POST/DELETE /posts/:id/likes
+   LIKES  →  POST /posts/:id/likes  |  DELETE /posts/:id/likes
 ══════════════════════════════════════════════════════ */
 async function toggleLike(postId) {
   const btn   = document.getElementById(`like-btn-${postId}`);
   const count = document.getElementById(`like-count-${postId}`);
   const liked = btn.classList.contains('liked');
+  // Optimistic update
+  const prev = parseInt(count.textContent) || 0;
+  const next  = liked ? Math.max(0, prev - 1) : prev + 1;
+  btn.classList.toggle('liked', !liked);
+  count.textContent = next;
   try {
-    let res;
-    if (liked) {
-      res = await apiFetch(`/posts/${postId}/likes?user_id=${ME_ID}`, { method:'DELETE' });
-      btn.classList.remove('liked');
-    } else {
-      res = await apiFetch(`/posts/${postId}/likes?user_id=${ME_ID}`, { method:'POST' });
-      btn.classList.add('liked');
-    }
-    if (res) count.textContent = res.like_count;
+    const res = liked
+      ? await apiFetch(`/posts/${postId}/likes?user_id=${encodeURIComponent(ME.id)}`, { method:'DELETE' })
+      : await apiFetch(`/posts/${postId}/likes?user_id=${encodeURIComponent(ME.id)}`, { method:'POST' });
+    if (res && typeof res.like_count === 'number') count.textContent = res.like_count;
   } catch(e) {
+    // Revert on error
+    btn.classList.toggle('liked', liked);
+    count.textContent = prev;
     showToast(e.message);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   LIKES MODAL  →  GET /posts/:id/likes
+══════════════════════════════════════════════════════ */
+async function openLikes(postId, knownCount) {
+  const body = document.getElementById('modalLikesBody');
+  const title = document.getElementById('likesTitle');
+  title.textContent = knownCount > 0 ? `Likes (${knownCount})` : 'Likes';
+  body.innerHTML = `<div class="modal-empty"><span class="material-icons">hourglass_empty</span>Loading…</div>`;
+  document.getElementById('modalLikes').classList.add('open');
+
+  try {
+    const likes = await apiFetch(`/posts/${postId}/likes`);
+    title.textContent = `Likes (${likes.length})`;
+    if (!likes.length) {
+      body.innerHTML = `<div class="modal-empty"><span class="material-icons">bolt</span>No likes yet — be the first!</div>`;
+      return;
+    }
+    body.innerHTML = likes.map(u => {
+      const av = u.avatar_url
+        ? (u.avatar_url.startsWith('http') ? u.avatar_url : API_BASE + u.avatar_url)
+        : fallbackAvatar(u.username);
+      return `<div class="likes-user-row">
+        <img src="${av}" alt="${u.name}" onerror="this.src='${fallbackAvatar(u.username)}'">
+        <div>
+          <div class="likes-user-name">${u.name}</div>
+          <div class="likes-user-handle">@${u.username}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    body.innerHTML = `<div class="modal-empty"><span class="material-icons">wifi_off</span>Couldn't load likes.</div>`;
   }
 }
 
@@ -669,7 +780,7 @@ async function openComments(postId) {
     document.getElementById('commentsTitle').textContent = `Comments (${comments.length})`;
   } catch(e) {
     document.getElementById('modalCommentsBody').innerHTML =
-      `<div class="modal-empty"><span class="material-icons">wifi_off</span>Could not load comments.</div>`;
+      `<div class="modal-empty"><span class="material-icons">wifi_off</span>Couldn't load comments.</div>`;
   }
   setTimeout(() => document.getElementById('commentInput').focus(), 300);
 }
@@ -680,17 +791,20 @@ function renderComments(comments) {
     body.innerHTML = `<div class="modal-empty"><span class="material-icons">chat_bubble_outline</span>No comments yet. Be the first!</div>`;
     return;
   }
-  body.innerHTML = comments.map(c => `
-    <div class="modal-row">
-      <a href="user.html"><img class="modal-avatar" src="${c.user.avatar_url || ME_AVATAR}"></a>
+  body.innerHTML = comments.map(c => {
+    const av = resolvedAvatar(c.user);
+    return `<div class="modal-row">
+      <a href="user.html"><img class="modal-avatar" src="${av}" alt="${c.user.username}"
+         onerror="this.src='${fallbackAvatar(c.user.username)}'"></a>
       <div>
         <div class="modal-user">
           <a href="user.html" style="color:var(--white);text-decoration:none">@${c.user.username}</a>
-          <span class="modal-time">${c.time_human}</span>
+          <span class="modal-time"> · ${c.time_human}</span>
         </div>
         <div class="modal-comment-text">${c.text}</div>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 
 function onCommentInput() {
@@ -702,32 +816,31 @@ async function submitComment() {
   const input = document.getElementById('commentInput');
   const text  = input.value.trim();
   if (!text || !activePostId) return;
-
   input.value = '';
   document.getElementById('commentSendBtn').classList.remove('active');
 
   try {
     const c = await apiFetch(`/posts/${activePostId}/comments`, {
       method: 'POST',
-      body: JSON.stringify({ user_id: ME_ID, text }),
+      body: JSON.stringify({ user_id: ME.id, text }),
     });
-    // Append to list
     const body = document.getElementById('modalCommentsBody');
     const empty = body.querySelector('.modal-empty');
     if (empty) body.innerHTML = '';
+    const av = ME.avatar_url;
     body.insertAdjacentHTML('beforeend', `
       <div class="modal-row">
-        <a href="user.html"><img class="modal-avatar" src="${ME_AVATAR}"></a>
+        <a href="user.html"><img class="modal-avatar" src="${av}" alt="${ME.username}"
+           onerror="this.src='${fallbackAvatar(ME.username)}'"></a>
         <div>
           <div class="modal-user">
-            <a href="user.html" style="color:var(--white);text-decoration:none">@marco.visconti</a>
-            <span class="modal-time">just now</span>
+            <a href="user.html" style="color:var(--white);text-decoration:none">@${ME.username}</a>
+            <span class="modal-time"> · just now</span>
           </div>
           <div class="modal-comment-text">${c.text}</div>
         </div>
       </div>`);
     body.scrollTop = body.scrollHeight;
-    // Update count on post card
     const cc = document.getElementById(`ccount-${activePostId}`);
     if (cc) cc.textContent = parseInt(cc.textContent || 0) + 1;
     const titleEl = document.getElementById('commentsTitle');
@@ -735,35 +848,19 @@ async function submitComment() {
     titleEl.textContent = `Comments (${cur + 1})`;
   } catch(e) {
     showToast('Failed to post comment: ' + e.message);
+    input.value = text; // restore
+    document.getElementById('commentSendBtn').classList.add('active');
   }
 }
 
 /* ══════════════════════════════════════════════════════
-   LIKES MODAL  →  GET /posts/:id/likes
+   MODAL / SIDEBAR HELPERS
 ══════════════════════════════════════════════════════ */
-async function openLikes(postId) {
-  document.getElementById('modalLikesBody').innerHTML =
-    `<div class="modal-empty"><span class="material-icons">hourglass_empty</span>Loading…</div>`;
-  document.getElementById('modalLikes').classList.add('open');
-  try {
-    const likes = await apiFetch(`/posts/${postId}/likes`);
-    document.getElementById('modalLikesBody').innerHTML = likes.length
-      ? likes.map(u => `<div class="modal-row"><a href="user.html"><img class="modal-avatar" src="${u.avatar_url||ME_AVATAR}"></a><div><div class="modal-user">${u.name}</div><div class="modal-time">@${u.username}</div></div></div>`).join('')
-      : `<div class="modal-empty"><span class="material-icons">bolt</span>No likes yet.</div>`;
-  } catch(e) {
-    document.getElementById('modalLikesBody').innerHTML =
-      `<div class="modal-empty"><span class="material-icons">wifi_off</span>Could not load likes.</div>`;
-  }
-}
-
 function closeModal(id) {
   document.getElementById(id).classList.remove('open');
   if (id === 'modalComments') activePostId = null;
 }
 
-/* ══════════════════════════════════════════════════════
-   SIDEBAR
-══════════════════════════════════════════════════════ */
 function toggleSidebar() {
   const s=document.getElementById('sidebar'), o=document.getElementById('sidebarOverlay');
   s.classList.toggle('open'); o.classList.toggle('open');
@@ -773,13 +870,11 @@ function toggleSidebar() {
   }
 }
 
-/* Spin animation for loading button */
-const style = document.createElement('style');
-style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-document.head.appendChild(style);
-
 /* ── INIT ── */
-buildFeed();
+(async () => {
+  await resolveMe();
+  buildFeed();
+})();
 </script>
 </body>
 </html>
