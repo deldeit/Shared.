@@ -2,1297 +2,784 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Shared.</title>
-<meta name="theme-color" content="#000000">
 <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
-:root{
-  --bg:#000;--text:#fff;--muted:rgba(255,255,255,.68);--muted-2:rgba(255,255,255,.42);
-  --border:rgba(255,255,255,.13);--panel:rgba(255,255,255,.05);
-  --danger:#ff3b30;--like:#ff2d55;
-  --sidebar-w:330px;--feed-width:440px;
-  --safe-top:env(safe-area-inset-top,0px);--safe-bottom:env(safe-area-inset-bottom,0px);
-  --radius:28px;
-}
-*{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%}
-body{background:#000;color:#fff;font-family:'Archivo Black',sans-serif;overflow:hidden;}
-button,input,a{font-family:'Archivo Black',sans-serif;}
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --black:#000; --white:#fff; --surface:#111; --card-bg:#0d0d0d;
+    --border:#1e1e1e; --muted:#555; --red:#e53935;
+    --squircle:24px; --pill:999px;
+    --skel:#1c1c1c; --skel-shine:#282828; --nav-h:56px;
+  }
+  html,body { background:var(--black); color:var(--white); font-family:'Archivo Black',sans-serif; min-height:100vh; overflow-x:hidden; -webkit-tap-highlight-color:transparent; }
 
-/* ═══ SIDEBAR ══════════════════════════════════════════════ */
-.sidebar-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:19;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .28s,visibility .28s;}
-.sidebar-overlay.open{opacity:1;visibility:visible;pointer-events:auto;}
-.hamburger{position:fixed;top:14px;left:16px;z-index:22;width:44px;height:44px;border-radius:14px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.92);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .18s,transform .18s;}
-.hamburger:hover{background:rgba(255,255,255,.08);}
-.hamburger:active{transform:scale(.94);}
-.hamburger .material-symbols-rounded{font-size:24px;}
+  /* NAV */
+  nav { position:fixed; top:0; left:0; right:0; height:var(--nav-h); background:var(--black); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:center; z-index:100; padding:0 12px; }
+  .nav-logo { font-size:1.25rem; letter-spacing:-.5px; }
+  .nav-menu-btn { position:absolute; left:12px; background:none; border:none; cursor:pointer; color:var(--white); display:flex; align-items:center; justify-content:center; width:40px; height:40px; border-radius:10px; }
+  .nav-menu-btn:active { background:var(--border); }
+  .nav-menu-btn .material-icons { font-size:24px; }
 
-.sidebar{position:fixed;left:0;top:0;bottom:0;width:var(--sidebar-w);display:flex;flex-direction:column;gap:0;border-right:1px solid rgba(255,255,255,.09);background:#050505;z-index:21;overflow:hidden;transform:translateX(-100%);transition:transform .32s cubic-bezier(.4,0,.2,1);}
-.sidebar.open{transform:translateX(0);}
+  /* SIDEBAR */
+  .sidebar-overlay { position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:200; opacity:0; pointer-events:none; transition:opacity .22s; }
+  .sidebar-overlay.open { opacity:1; pointer-events:all; }
+  .sidebar { position:fixed; top:0; left:0; width:min(300px,85vw); height:100%; background:var(--surface); border-right:1px solid var(--border); z-index:201; display:flex; flex-direction:column; padding:52px 14px 32px; transform:translateX(-100%); transition:transform .26s cubic-bezier(.4,0,.2,1); overflow-y:auto; }
+  .sidebar.open { transform:translateX(0); }
+  .sidebar-close { position:absolute; top:10px; right:10px; background:none; border:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; }
+  .sidebar-close:active { background:var(--border); }
+  .sidebar-profile { display:flex; align-items:center; gap:11px; background:none; border:1.5px solid var(--border); border-radius:var(--pill); padding:10px 14px; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.88rem; text-decoration:none; margin-bottom:18px; }
+  .sidebar-profile:active { background:var(--border); }
+  .sidebar-profile img { width:34px; height:34px; border-radius:50%; object-fit:cover; flex-shrink:0; }
 
-/* Sidebar profile card — clean, no label */
-.profile-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:18px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);}
-.profile-avatar{width:54px;height:54px;border-radius:50%;object-fit:cover;border:1px solid rgba(255,255,255,.12);background:#111;flex:0 0 auto;}
-.profile-meta{min-width:0;flex:1}
-.profile-name{display:flex;align-items:center;gap:6px;font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.profile-handle{margin-top:3px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .search-wrap { position:relative; margin-bottom:18px; }
+  .sidebar-search { display:flex; align-items:center; gap:8px; background:var(--black); border:1.5px solid var(--border); border-radius:var(--pill); padding:9px 14px; transition:border-color .15s; }
+  .sidebar-search.focused { border-color:#444; }
+  .sidebar-search .material-icons { color:var(--muted); font-size:17px; flex-shrink:0; }
+  .sidebar-search input { background:none; border:none; outline:none; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.83rem; width:100%; min-width:0; }
+  .sidebar-search input::placeholder { color:var(--muted); }
+  .search-dropdown { position:absolute; top:calc(100% + 6px); left:0; right:0; background:#161616; border:1px solid var(--border); border-radius:16px; z-index:10; max-height:220px; overflow-y:auto; display:none; }
+  .search-dropdown.open { display:block; }
+  .search-result { display:flex; align-items:center; gap:10px; padding:10px 14px; cursor:pointer; }
+  .search-result:active { background:var(--border); }
+  .search-result img { width:32px; height:32px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .search-result-name { font-size:.82rem; }
+  .search-result-handle { font-size:.7rem; color:var(--muted); margin-top:1px; }
+  .search-empty { padding:14px; font-size:.78rem; color:var(--muted); text-align:center; }
 
-/* Sidebar body */
-.sidebar-body{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 0;display:flex;flex-direction:column;gap:10px;}
-.sidebar-body::-webkit-scrollbar{display:none}
+  .sidebar-spacer { flex:1; min-height:20px; }
+  .sidebar-nav { display:flex; flex-direction:column; gap:6px; }
+  .sidebar-btn { display:flex; align-items:center; gap:12px; background:none; border:1.5px solid var(--border); border-radius:var(--pill); padding:12px 16px; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.88rem; cursor:pointer; width:100%; text-decoration:none; }
+  .sidebar-btn:active { background:var(--border); }
+  .sidebar-btn .material-icons { font-size:20px; }
+  .sidebar-btn.logout { color:var(--red); border-color:#3a1212; }
+  .sidebar-btn.logout:active { background:#1a0808; }
+  .sidebar-btn.logout .material-icons { color:var(--red); }
 
-.search-wrap{position:relative}
-.search{width:100%;display:block;padding:13px 16px;border-radius:16px;border:1px solid rgba(255,255,255,.15);background:rgba(255,255,255,.06);color:#fff;outline:none;font-size:14px;}
-.search::placeholder{color:rgba(255,255,255,.35)}
-.suggestions{position:absolute;left:0;right:0;top:calc(100% + 8px);display:none;background:#0e0e0e;border:1px solid rgba(255,255,255,.12);border-radius:16px;overflow:hidden;max-height:280px;overflow-y:auto;z-index:30;}
-.suggestion{display:flex;align-items:center;gap:12px;padding:12px 14px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,.05);}
-.suggestion:last-child{border-bottom:0}
-.suggestion:hover{background:rgba(255,255,255,.05)}
-.suggestion-avatar{width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,.1);flex:0 0 auto;object-fit:cover;background:#111;}
-.suggestion-meta{min-width:0;flex:1}
-.suggestion-title{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.suggestion-subtitle{margin-top:3px;font-size:11px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* FEED */
+  .feed { max-width:540px; margin:0 auto; padding:calc(var(--nav-h) + 16px) 12px 48px; display:flex; flex-direction:column; gap:16px; }
 
-.sidebar-footer{padding:14px;display:flex;flex-direction:column;gap:8px;}
-.nav-btn{display:flex;align-items:center;gap:12px;padding:13px 15px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;transition:.18s;text-decoration:none;user-select:none;line-height:1;font-size:14px;}
-.nav-btn:hover{background:rgba(255,255,255,.09)}
-.nav-btn.logout{background:rgba(255,59,48,.1);color:#ff7a73;border-color:rgba(255,59,48,.22);}
-.nav-btn .material-symbols-rounded{font-size:20px;line-height:1;}
+  /* UPLOAD CARD */
+  .upload-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--squircle); overflow:visible; padding:18px 16px 20px; display:flex; flex-direction:column; gap:14px; }
+  .upload-card-title { font-size:.82rem; color:var(--muted); display:flex; align-items:center; gap:6px; }
+  .upload-card-title .material-icons { font-size:15px; }
+  .drop-zone { border:1.5px dashed var(--border); border-radius:16px; aspect-ratio:1/1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; transition:border-color .18s,background .18s; position:relative; overflow:hidden; background:#0a0a0a; }
+  .drop-zone:hover,.drop-zone.drag-over { border-color:#555; background:#111; }
+  .drop-zone.has-image { border-style:solid; border-color:var(--border); }
+  .drop-zone-icon { color:var(--muted); }
+  .drop-zone-icon .material-icons { font-size:36px; }
+  .drop-zone-label { font-size:.78rem; color:var(--muted); text-align:center; line-height:1.5; }
+  .drop-zone-sub { font-size:.68rem; color:#3a3a3a; }
+  .drop-zone-btn { background:var(--white); color:var(--black); border:none; border-radius:var(--pill); padding:8px 18px; font-family:'Archivo Black',sans-serif; font-size:.76rem; cursor:pointer; display:flex; align-items:center; gap:5px; margin-top:4px; }
+  .drop-zone-btn .material-icons { font-size:15px; }
+  .drop-zone input[type=file] { display:none; }
+  .drop-preview { position:absolute; inset:0; object-fit:cover; width:100%; height:100%; display:none; }
+  .drop-preview.visible { display:block; }
+  .drop-clear { position:absolute; top:8px; right:8px; background:rgba(0,0,0,.7); border:none; border-radius:50%; width:28px; height:28px; display:none; align-items:center; justify-content:center; cursor:pointer; color:var(--white); }
+  .drop-clear.visible { display:flex; }
+  .drop-clear .material-icons { font-size:15px; }
 
-/* ═══ MAIN ══════════════════════════════════════════════════ */
-.main{width:100%;height:100vh;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
-.header{text-align:center;padding:18px 72px 14px;font-size:30px;letter-spacing:-.05em;border-bottom:1px solid rgba(255,255,255,.07);position:sticky;top:0;background:#000;z-index:5;}
+  .upload-field { display:flex; flex-direction:column; gap:6px; position:relative; }
+  .upload-field-label { font-size:.7rem; color:var(--muted); display:flex; align-items:center; gap:5px; }
+  .upload-field-label .material-icons { font-size:13px; }
+  .upload-input-wrap { display:flex; align-items:center; gap:8px; background:var(--black); border:1.5px solid var(--border); border-radius:14px; padding:10px 13px; transition:border-color .15s; }
+  .upload-input-wrap:focus-within { border-color:#444; }
+  .upload-input-wrap .material-icons { color:var(--muted); font-size:16px; flex-shrink:0; }
+  .upload-input-wrap textarea, .upload-input-wrap input { background:none; border:none; outline:none; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.82rem; width:100%; min-width:0; resize:none; }
+  .upload-input-wrap textarea { min-height:60px; line-height:1.5; }
+  .upload-input-wrap textarea::placeholder, .upload-input-wrap input::placeholder { color:#333; }
+  .ac-dropdown { position:absolute; top:calc(100% + 4px); left:0; right:0; background:#161616; border:1px solid var(--border); border-radius:14px; z-index:50; max-height:180px; overflow-y:auto; display:none; }
+  .ac-dropdown.open { display:block; }
+  .ac-item { display:flex; align-items:center; gap:10px; padding:9px 13px; cursor:pointer; font-size:.8rem; }
+  .ac-item:active { background:var(--border); }
+  .ac-item .material-icons { font-size:15px; color:var(--muted); flex-shrink:0; }
+  .ac-item-sub { font-size:.68rem; color:var(--muted); margin-top:1px; }
+  .song-pill { display:none; align-items:center; gap:9px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:7px 10px; margin-top:2px; }
+  .song-pill.visible { display:flex; }
+  .song-pill img { width:34px; height:34px; border-radius:7px; object-fit:cover; flex-shrink:0; background:#222; }
+  .song-pill-info { flex:1; min-width:0; }
+  .song-pill-title { font-size:.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .song-pill-artist { font-size:.68rem; color:var(--muted); margin-top:1px; }
+  .song-pill-clear { background:none; border:none; color:var(--muted); cursor:pointer; display:flex; align-items:center; justify-content:center; width:24px; height:24px; flex-shrink:0; }
+  .song-pill-clear .material-icons { font-size:16px; }
+  .upload-submit { background:var(--white); color:var(--black); border:none; border-radius:var(--pill); padding:12px; font-family:'Archivo Black',sans-serif; font-size:.88rem; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:7px; width:100%; transition:opacity .15s; }
+  .upload-submit:disabled { opacity:.4; cursor:not-allowed; }
+  .upload-submit .material-icons { font-size:18px; }
 
-/* ═══ STORIES ═══════════════════════════════════════════════ */
-.stories-section{padding-top:10px;}
-.section-head{display:flex;align-items:center;justify-content:space-between;padding:0 14px 10px;}
-.section-title{font-size:11px;color:var(--muted-2);letter-spacing:.14em;text-transform:uppercase;}
-.stories{display:flex;gap:14px;overflow-x:auto;padding:4px 14px 10px;scrollbar-width:none;}
-.stories::-webkit-scrollbar{display:none}
-.story{min-width:64px;text-align:center;cursor:pointer;flex:0 0 auto;background:transparent;border:0;color:#fff;}
-.story img{width:58px;height:58px;border-radius:50%;border:2px solid rgba(255,255,255,.8);display:block;margin:0 auto 7px;object-fit:cover;background:#111;}
-.story div{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:64px;color:var(--muted);}
+  /* SKELETON */
+  @keyframes shimmer { 0%{background-position:-400px 0} 100%{background-position:400px 0} }
+  .skel { background:linear-gradient(90deg,var(--skel) 25%,var(--skel-shine) 50%,var(--skel) 75%); background-size:400px 100%; animation:shimmer 1.3s infinite linear; border-radius:6px; }
+  .skel-card { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--squircle); overflow:hidden; padding-bottom:14px; }
+  .skel-header { display:flex; align-items:center; gap:10px; padding:13px 14px 11px; }
+  .skel-avatar { width:36px; height:36px; border-radius:50%; flex-shrink:0; }
+  .skel-meta { flex:1; display:flex; flex-direction:column; gap:6px; }
+  .skel-line { height:10px; }
+  .skel-line.s{width:38%} .skel-line.m{width:62%} .skel-line.l{width:88%} .skel-line.f{width:100%}
+  .skel-image { width:100%; aspect-ratio:1/1; border-radius:0; }
+  .skel-body { padding:12px 14px 0; display:flex; flex-direction:column; gap:9px; }
+  .skel-song { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px 10px; margin-top:2px; }
+  .skel-song-cover { width:38px; height:38px; border-radius:7px; flex-shrink:0; }
+  .skel-song-info { flex:1; display:flex; flex-direction:column; gap:6px; }
+  .skel-actions { display:flex; gap:8px; margin-top:2px; }
+  .skel-btn { height:32px; border-radius:var(--pill); }
+  .skel-btn.w1{width:74px} .skel-btn.w2{width:94px}
 
-/* ═══ MOMENTS ═══════════════════════════════════════════════ */
-.moments-section{padding:6px 0 0;}
-.moments-strip{display:flex;gap:10px;overflow-x:auto;padding:4px 14px 14px;scrollbar-width:none;}
-.moments-strip::-webkit-scrollbar{display:none}
+  /* POST */
+  .post { background:var(--card-bg); border:1px solid var(--border); border-radius:var(--squircle); overflow:hidden; opacity:0; transform:translateY(6px); transition:opacity .3s ease,transform .3s ease; }
+  .post.visible { opacity:1; transform:translateY(0); }
+  .post-header { display:flex; align-items:center; gap:10px; padding:13px 14px 10px; }
+  .post-avatar { width:36px; height:36px; border-radius:50%; object-fit:cover; background:var(--muted); flex-shrink:0; display:block; }
+  .post-meta { flex:1; min-width:0; }
+  .post-username { font-size:.83rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; color:var(--white); text-decoration:none; display:block; }
+  .post-username:hover { text-decoration:underline; }
+  .post-date { font-size:.7rem; color:var(--muted); margin-top:1px; }
+  .post-image { width:100%; aspect-ratio:1/1; object-fit:cover; background:#1a1a1a; display:block; }
+  .post-body { padding:12px 14px 14px; }
+  .post-location { display:flex; align-items:center; gap:3px; font-size:.7rem; color:var(--muted); margin-bottom:7px; }
+  .post-location .material-icons { font-size:12px; }
+  .post-caption { font-size:.8rem; line-height:1.55; margin-bottom:12px; color:#ccc; }
+  .post-song { display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:8px 10px; margin-bottom:12px; }
+  .song-cover { width:38px; height:38px; border-radius:7px; background:#222; object-fit:cover; flex-shrink:0; }
+  .song-info { flex:1; min-width:0; }
+  .song-title { font-size:.78rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .song-artist { font-size:.68rem; color:var(--muted); margin-top:2px; }
+  .song-icon .material-icons { font-size:17px; color:var(--muted); }
+  .post-actions { display:flex; gap:8px; }
+  .action-btn { display:flex; align-items:center; gap:5px; background:var(--white); color:var(--black); border:none; border-radius:var(--pill); padding:8px 14px; font-family:'Archivo Black',sans-serif; font-size:.76rem; cursor:pointer; touch-action:manipulation; transition:opacity .15s; }
+  .action-btn:active { opacity:.75; }
+  .action-btn.liked { background:#222; color:var(--white); }
+  .action-btn .material-icons { font-size:15px; }
 
-.moment-card{
-  flex:0 0 auto;width:120px;border-radius:20px;overflow:hidden;cursor:pointer;
-  position:relative;border:1px solid rgba(255,255,255,.09);background:#0a0a0a;
-  transition:transform .2s,box-shadow .2s;
-}
-.moment-card:hover{transform:scale(1.04);box-shadow:0 12px 32px rgba(0,0,0,.6);}
-.moment-card:active{transform:scale(.96);}
-.moment-thumb{width:120px;height:190px;object-fit:cover;display:block;background:#111;}
-/* gradient overlay */
-.moment-grad{
-  position:absolute;inset:0;
-  background:linear-gradient(0deg, rgba(0,0,0,.85) 0%, rgba(0,0,0,.3) 45%, transparent 70%);
-}
-/* top ring removed — no avatar on moment cards */
-.moment-meta{
-  position:absolute;bottom:0;left:0;right:0;
-  padding:0 9px 12px;
-}
-.moment-name{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.3;text-align:center;}
-.moment-caption-pill{
-  margin-top:4px;
-  font-size:9px;color:rgba(255,255,255,.7);
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  text-align:center;
-  background:rgba(255,255,255,.1);
-  border-radius:999px;padding:2px 7px;
-  backdrop-filter:blur(8px);
-}
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:300; display:flex; align-items:flex-end; justify-content:center; opacity:0; pointer-events:none; transition:opacity .2s; }
+  .modal-overlay.open { opacity:1; pointer-events:all; }
+  .modal-sheet { background:var(--surface); border:1px solid var(--border); border-radius:22px 22px 0 0; width:100%; max-width:540px; max-height:72vh; display:flex; flex-direction:column; transform:translateY(30px); transition:transform .24s cubic-bezier(.4,0,.2,1); }
+  .modal-overlay.open .modal-sheet { transform:translateY(0); }
+  .modal-handle { width:34px; height:4px; background:var(--border); border-radius:2px; margin:10px auto 0; flex-shrink:0; }
+  .modal-header { display:flex; align-items:center; gap:8px; padding:12px 18px 10px; border-bottom:1px solid var(--border); flex-shrink:0; }
+  .modal-header .material-icons { font-size:18px; color:var(--muted); }
+  .modal-title { font-size:.88rem; flex:1; }
+  .modal-body { overflow-y:auto; padding:6px 0 8px; -webkit-overflow-scrolling:touch; flex:1; }
+  .modal-row { display:flex; align-items:flex-start; gap:11px; padding:10px 18px; }
+  .modal-avatar { width:34px; height:34px; border-radius:50%; background:var(--muted); object-fit:cover; flex-shrink:0; cursor:pointer; }
+  .modal-user { font-size:.8rem; }
+  .modal-time { font-size:.68rem; color:var(--muted); }
+  .modal-comment-text { font-size:.78rem; color:#ccc; margin-top:2px; line-height:1.4; }
+  .modal-empty { padding:20px 18px; font-size:.78rem; color:var(--muted); display:flex; align-items:center; gap:8px; }
+  .modal-empty .material-icons { font-size:16px; }
 
-/* ═══ MOMENT VIEWER ════════════════════════════════════════ */
-.moment-viewer{
-  position:fixed;inset:0;z-index:200;
-  display:flex;align-items:stretch;
-  background:#000;opacity:0;visibility:hidden;pointer-events:none;
-  transition:opacity .22s,visibility .22s;
-}
-.moment-viewer.open{opacity:1;visibility:visible;pointer-events:auto;}
+  /* COMMENT INPUT */
+  .comment-input-bar { display:flex; align-items:center; gap:10px; padding:10px 14px 14px; border-top:1px solid var(--border); flex-shrink:0; }
+  .comment-input-bar img { width:30px; height:30px; border-radius:50%; object-fit:cover; flex-shrink:0; }
+  .comment-input-wrap { flex:1; display:flex; align-items:center; gap:8px; background:var(--black); border:1.5px solid var(--border); border-radius:var(--pill); padding:8px 12px; transition:border-color .15s; }
+  .comment-input-wrap:focus-within { border-color:#444; }
+  .comment-input-wrap input { flex:1; background:none; border:none; outline:none; color:var(--white); font-family:'Archivo Black',sans-serif; font-size:.8rem; min-width:0; }
+  .comment-input-wrap input::placeholder { color:#333; }
+  .comment-send-btn { background:none; border:none; cursor:pointer; color:var(--muted); display:flex; align-items:center; padding:0; flex-shrink:0; transition:color .15s; }
+  .comment-send-btn.active { color:var(--white); }
+  .comment-send-btn .material-icons { font-size:20px; }
 
-.moment-viewer-shell{
-  position:relative;width:100%;max-width:480px;margin:0 auto;
-  display:flex;flex-direction:column;overflow:hidden;
-}
-.moment-bg-blur{
-  position:absolute;inset:0;
-  background-size:cover;background-position:center;
-  filter:blur(40px) brightness(.35) saturate(1.4);
-  transform:scale(1.1);
-  z-index:0;
-}
-.moment-stage{
-  position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;
-}
-.moment-stage img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  max-height:100vh;
-}
-.moment-shade{
-  position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(0,0,0,.55) 0%,transparent 22%,transparent 62%,rgba(0,0,0,.88) 100%);
-  pointer-events:none;
-}
-/* Progress */
-.moment-top{
-  position:absolute;top:0;left:0;right:0;z-index:3;
-  padding:calc(14px + var(--safe-top)) 14px 10px;
-}
-.moment-prog-row{display:flex;gap:4px;margin-bottom:12px;}
-.moment-prog{flex:1;height:2.5px;background:rgba(255,255,255,.2);border-radius:999px;overflow:hidden;}
-.moment-prog > span{display:block;width:0%;height:100%;background:#fff;border-radius:inherit;transition:none;}
+  /* TOAST */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%) translateY(20px); background:#1a1a1a; border:1px solid var(--border); border-radius:var(--pill); padding:10px 20px; font-size:.78rem; color:var(--white); opacity:0; transition:opacity .2s,transform .2s; pointer-events:none; z-index:999; white-space:nowrap; }
+  .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
 
-.moment-header{display:flex;align-items:center;justify-content:space-between;gap:10px;}
-.moment-user{display:flex;align-items:center;gap:10px;min-width:0;}
-.moment-av{width:36px;height:36px;border-radius:50%;object-fit:cover;border:1.5px solid rgba(255,255,255,.5);background:#111;flex:0 0 auto;}
-.moment-username{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.moment-time{font-size:10px;color:rgba(255,255,255,.55);margin-top:2px;}
+  /* API error banner */
+  .api-error { display:none; background:#1a0808; border:1px solid #3a1212; border-radius:14px; padding:12px 16px; margin-bottom:4px; font-size:.75rem; color:#ff6b6b; display:flex; align-items:center; gap:8px; }
+  .api-error .material-icons { font-size:16px; flex-shrink:0; }
 
-/* Caption box inside viewer */
-.moment-caption-viewer{
-  position:absolute;bottom:0;left:0;right:0;z-index:3;
-  padding:0 16px calc(28px + var(--safe-bottom));
-}
-.moment-caption-text{
-  font-size:15px;line-height:1.5;
-  color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.9);
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-  cursor:pointer;transition:all .2s;
-}
-.moment-caption-text.expanded{-webkit-line-clamp:unset;}
-.moment-expand-hint{
-  font-size:11px;color:rgba(255,255,255,.5);margin-top:4px;cursor:pointer;
-}
-
-/* Tap zones */
-.moment-tap-zone{position:absolute;inset:0;z-index:2;display:grid;grid-template-columns:1fr 1fr;}
-.mv-close{
-  width:40px;height:40px;border-radius:999px;
-  border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.08);
-  color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;
-  backdrop-filter:blur(10px);flex:0 0 auto;
-}
-
-/* ═══ FEED ══════════════════════════════════════════════════ */
-.feed-label{display:flex;align-items:center;gap:7px;padding:8px 14px 4px;font-size:10px;color:var(--muted-2);letter-spacing:.12em;text-transform:uppercase;}
-.feed-label .material-symbols-rounded{font-size:13px;}
-.feed{display:flex;flex-direction:column;gap:18px;padding:10px 0 100px;}
-
-/* ═══ POST ══════════════════════════════════════════════════ */
-.post{
-  width:min(var(--feed-width),calc(100vw - 20px));margin:0 auto;
-  border:1px solid rgba(255,255,255,.11);border-radius:var(--radius);
-  overflow:hidden;background:#080808;
-  animation:fadeUp .32s ease both;
-}
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
-.post-header{display:flex;align-items:center;gap:11px;padding:12px 13px 10px;}
-.avatar{width:40px;height:40px;border-radius:50%;border:1px solid rgba(255,255,255,.12);flex:0 0 auto;object-fit:cover;background:#111;}
-.user-meta{flex:1;min-width:0;}
-.username{display:flex;align-items:center;gap:5px;cursor:pointer;font-size:14px;line-height:1.1;white-space:nowrap;overflow:hidden;}
-.verified{font-size:14px;color:#fff;flex:0 0 auto;font-variation-settings:'FILL' 1;}
-.post-time{margin-top:3px;font-size:10px;color:var(--muted-2);}
-.following-badge{padding:3px 8px;border-radius:999px;font-size:9px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);color:var(--muted-2);white-space:nowrap;flex:0 0 auto;margin-left:auto;}
-
-/* Delete button */
-.delete-btn{
-  width:32px;height:32px;border-radius:999px;
-  border:1px solid rgba(255,59,48,.28);background:rgba(255,59,48,.06);
-  color:#ff7a73;display:inline-flex;align-items:center;justify-content:center;
-  cursor:pointer;transition:.18s;flex:0 0 auto;margin-left:6px;
-}
-.delete-btn:hover{background:rgba(255,59,48,.16);}
-.delete-btn:active{transform:scale(.92);}
-.delete-btn .material-symbols-rounded{font-size:16px;}
-
-/* Media */
-.media{position:relative;width:100%;aspect-ratio:4/3;background:#111;overflow:hidden;}
-.media img{width:100%;height:100%;display:block;object-fit:cover;}
-.like-pop{position:absolute;inset:auto auto 50% 50%;transform:translate(-50%,50%) scale(.7);pointer-events:none;opacity:0;z-index:3;color:var(--like);transition:opacity .14s,transform .14s;}
-.like-pop.show{opacity:1;transform:translate(-50%,50%) scale(1);}
-.like-pop .material-symbols-rounded{font-size:72px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 48;}
-
-/* Actions */
-.actions{display:flex;align-items:center;gap:10px;padding:10px 13px 0;}
-.like-row{display:flex;align-items:center;gap:8px;flex:1;}
-.like-btn{width:38px;height:38px;border-radius:999px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.04);color:#fff;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.18s;flex:0 0 auto;}
-.like-btn:hover{background:rgba(255,255,255,.09)}
-.like-btn:active{transform:scale(.95)}
-.like-btn.liked{color:var(--like);background:rgba(255,45,85,.08);border-color:rgba(255,45,85,.28)}
-.like-btn .material-symbols-rounded{font-size:19px;font-variation-settings:'FILL' 1,'wght' 700,'GRAD' 0,'opsz' 24;}
-.count{font-size:12px;color:var(--muted);cursor:pointer;user-select:none;}
-
-/* Location */
-.location-row{display:flex;align-items:center;gap:5px;padding:8px 13px 0;font-size:11px;color:var(--muted-2);}
-.location-row .material-symbols-rounded{font-size:13px;flex:0 0 auto;}
-/* Tags */
-.tag-row{display:flex;flex-wrap:wrap;gap:5px;padding:7px 13px 0;}
-.tag-pill{padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.11);background:rgba(255,255,255,.04);color:rgba(255,255,255,.75);font-size:10px;}
-/* Caption */
-.caption{
-  padding:9px 13px 0;font-size:13.5px;line-height:1.5;color:var(--muted);
-  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
-}
-.caption.expanded{display:block;-webkit-line-clamp:unset;}
-.caption .author-handle{color:#fff;margin-right:6px;}
-.caption-more{padding:3px 13px 0;font-size:11px;color:var(--muted-2);cursor:pointer;display:none;}
-.caption-more.visible{display:block;}
-
-/* ═══ SONG CARD ═════════════════════════════════════════════ */
-.song-card{
-  display:flex;align-items:center;gap:11px;
-  padding:10px;margin:10px 10px 0;
-  border-radius:16px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
-  cursor:pointer;transition:background .18s;position:relative;overflow:hidden;
-}
-.song-card::before{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(135deg,rgba(255,255,255,.03),transparent);
-  pointer-events:none;
-}
-.song-card:hover{background:rgba(255,255,255,.08);}
-.song-card.playing{border-color:rgba(255,255,255,.22);background:rgba(255,255,255,.07);}
-.song-card.loading-itunes{opacity:.7;}
-.music-bars{display:none;align-items:flex-end;gap:2px;width:16px;height:16px;flex:0 0 auto;}
-.song-card.playing .music-bars{display:flex;}
-.music-bars span{display:block;width:2.5px;border-radius:2px;background:#fff;animation:bar .65s ease infinite alternate;}
-.music-bars span:nth-child(1){height:6px;animation-delay:0s;}
-.music-bars span:nth-child(2){height:12px;animation-delay:.16s;}
-.music-bars span:nth-child(3){height:8px;animation-delay:.3s;}
-@keyframes bar{to{height:3px;}}
-.album-cover{width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.1);flex:0 0 auto;object-fit:cover;background:#1a1a1a;}
-.note-cover{width:46px;height:46px;border-radius:10px;border:1px solid rgba(255,255,255,.1);display:flex;align-items:center;justify-content:center;background:#1a1a1a;flex:0 0 auto;}
-.note-cover .material-symbols-rounded{font-size:22px;color:var(--muted-2);}
-.song-info{min-width:0;flex:1;}
-.song-title{font-size:13px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.song-author{margin-top:3px;font-size:10px;color:var(--muted-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-
-/* audio bar removed — music plays silently in background */
-
-/* ═══ SKELETONS ═════════════════════════════════════════════ */
-.skeleton-post{width:min(var(--feed-width),calc(100vw - 20px));margin:0 auto;border:1px solid rgba(255,255,255,.06);border-radius:var(--radius);overflow:hidden;background:#080808;}
-.skel-header{display:flex;align-items:center;gap:12px;padding:12px 14px;}
-.skel-circle{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.06);flex:0 0 auto;animation:shimmer 1.4s ease infinite;}
-.skel-lines{flex:1;display:flex;flex-direction:column;gap:6px;}
-.skel-line{height:9px;border-radius:6px;background:rgba(255,255,255,.06);animation:shimmer 1.4s ease infinite;}
-.skel-line.short{width:40%;}
-.skel-image{width:100%;aspect-ratio:4/3;background:rgba(255,255,255,.04);animation:shimmer 1.4s ease infinite;}
-.skel-caption{height:10px;margin:12px 14px 8px;border-radius:6px;background:rgba(255,255,255,.04);animation:shimmer 1.4s ease infinite;}
-@keyframes shimmer{0%{opacity:.4}50%{opacity:1}100%{opacity:.4}}
-
-/* ═══ LOAD MORE ════════════════════════════════════════════ */
-#loadMore{
-  display:flex;align-items:center;justify-content:center;
-  width:min(var(--feed-width),calc(100vw - 20px));margin:0 auto 100px;
-  padding:15px;border-radius:16px;border:1px solid rgba(255,255,255,.11);
-  background:rgba(255,255,255,.03);color:var(--muted);font-size:13px;cursor:pointer;
-  transition:.2s;font-family:'Archivo Black',sans-serif;gap:7px;
-}
-#loadMore:hover{background:rgba(255,255,255,.07);}
-#loadMore.hidden{display:none;}
-
-/* ═══ DELETE CONFIRM ════════════════════════════════════════ */
-.del-confirm{
-  position:fixed;inset:0;z-index:300;display:none;align-items:flex-end;justify-content:center;
-  background:rgba(0,0,0,.7);padding:16px;
-}
-.del-confirm.open{display:flex;}
-.del-sheet{
-  width:min(92vw,440px);background:#111;border:1px solid rgba(255,255,255,.12);
-  border-radius:22px;padding:22px;display:flex;flex-direction:column;gap:12px;
-  animation:slideUp .22s ease;
-}
-@keyframes slideUp{from{transform:translateY(40px);opacity:0;}to{transform:translateY(0);opacity:1;}}
-.del-title{font-size:17px;}
-.del-body{font-size:13px;color:var(--muted);line-height:1.5;}
-.del-actions{display:flex;gap:10px;margin-top:4px;}
-.del-cancel{flex:1;padding:13px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.05);color:#fff;cursor:pointer;font-size:14px;font-family:'Archivo Black',sans-serif;}
-.del-ok{flex:1;padding:13px;border-radius:14px;border:1px solid rgba(255,59,48,.3);background:rgba(255,59,48,.14);color:#ff7a73;cursor:pointer;font-size:14px;font-family:'Archivo Black',sans-serif;}
-
-/* ═══ MODAL ════════════════════════════════════════════════ */
-.modal{position:fixed;inset:0;z-index:120;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.88);padding:16px;}
-.modal.open{display:flex}
-.modal-box{width:min(92vw,520px);max-height:min(80vh,760px);overflow:auto;background:#0c0c0c;border:1px solid rgba(255,255,255,.13);border-radius:22px;padding:14px;}
-.modal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;}
-.modal-title{font-size:18px}
-.modal-close{width:36px;height:36px;border-radius:999px;border:1px solid rgba(255,255,255,.13);background:rgba(255,255,255,.04);color:#fff;cursor:pointer;font-family:'Archivo Black',sans-serif;}
-.list-item{display:flex;align-items:center;gap:10px;width:100%;padding:10px 8px;border-radius:14px;cursor:pointer;transition:background .14s;}
-.list-item:hover{background:rgba(255,255,255,.05)}
-.list-avatar{width:34px;height:34px;border-radius:50%;object-fit:cover;background:#111;border:1px solid rgba(255,255,255,.09);flex:0 0 auto;}
-.list-main{min-width:0;flex:1}
-.list-name{display:flex;align-items:center;gap:6px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.list-sub{margin-top:2px;color:var(--muted-2);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.empty{margin:16px 0 0;padding:22px;border-radius:22px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);color:var(--muted);text-align:center;font-size:14px;}
-.post > *:last-child{margin-bottom:13px;}
-
-@media(max-width:860px){
-  .header{font-size:26px}
-  .post,.skeleton-post,#loadMore{width:calc(100vw - 16px)}
-}
+  @supports (padding-bottom: env(safe-area-inset-bottom)) {
+    .comment-input-bar { padding-bottom:calc(14px + env(safe-area-inset-bottom)); }
+    .feed { padding-bottom:calc(48px + env(safe-area-inset-bottom)); }
+  }
 </style>
 </head>
 <body>
 
-<button class="hamburger" id="hamburgerBtn" type="button" aria-label="Open menu" aria-expanded="false">
-  <span class="material-symbols-rounded" id="hamburgerIcon">menu</span>
-</button>
-<div class="sidebar-overlay" id="sidebarOverlay"></div>
+<nav>
+  <button class="nav-menu-btn" onclick="toggleSidebar()">
+    <span class="material-icons">menu</span>
+  </button>
+  <span class="nav-logo">Shared.</span>
+</nav>
 
-<aside class="sidebar" id="sidebar" aria-hidden="true">
-  <div class="sidebar-body">
-    <div class="profile-card" style="margin-top:calc(56px + var(--safe-top))">
-      <img id="profileAvatar" class="profile-avatar" alt="Avatar" src="">
-      <div class="profile-meta">
-        <div class="profile-name" id="profileName">Loading…</div>
-        <div class="profile-handle" id="profileHandle">@shared</div>
-      </div>
+<div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+<aside class="sidebar" id="sidebar">
+  <button class="sidebar-close" onclick="toggleSidebar()">
+    <span class="material-icons">close</span>
+  </button>
+  <a class="sidebar-profile" href="user.html">
+    <img src="https://i.pravatar.cc/80?img=11" alt="avatar">
+    <span>@marco.visconti</span>
+  </a>
+  <div class="search-wrap">
+    <div class="sidebar-search" id="searchBox">
+      <span class="material-icons">search</span>
+      <input type="text" id="searchInput" placeholder="Search users…" autocomplete="off"
+             oninput="handleSearch(this.value)" onfocus="onSearchFocus()" onblur="onSearchBlur()">
     </div>
-    <div class="search-wrap">
-      <input id="search" class="search" placeholder="Search" autocomplete="off">
-      <div id="suggestions" class="suggestions"></div>
-    </div>
+    <div class="search-dropdown" id="searchDropdown"></div>
   </div>
-
-  <div class="sidebar-footer">
-    <button class="nav-btn" type="button" onclick="goUpload()">
-      <span class="material-symbols-rounded">upload</span><span>Upload</span>
-    </button>
-    <a class="nav-btn" href="settings.html">
-      <span class="material-symbols-rounded">settings</span><span>Impostazioni</span>
-    </a>
-    <a class="nav-btn" href="about.html">
-      <span class="material-symbols-rounded">info</span><span>About</span>
-    </a>
-    <button class="nav-btn logout" type="button" onclick="logout()">
-      <span class="material-symbols-rounded">logout</span><span>Logout</span>
-    </button>
+  <div class="sidebar-spacer"></div>
+  <div class="sidebar-nav">
+    <a class="sidebar-btn" href="about.html"><span class="material-icons">info</span> About</a>
+    <a class="sidebar-btn" href="settings.html"><span class="material-icons">settings</span> Settings</a>
+    <button class="sidebar-btn logout"><span class="material-icons">logout</span> Logout</button>
   </div>
 </aside>
 
-<main class="main" id="mainScroll">
-  <div class="header">Shared.</div>
-
-  <section id="storiesSection" class="stories-section" style="display:none">
-    <div class="section-head"><div class="section-title">Stories</div></div>
-    <div id="stories" class="stories"></div>
-  </section>
-
-  <section id="momentsSection" class="moments-section" style="display:none">
-    <div class="section-head"><div class="section-title">Moments</div></div>
-    <div id="momentsStrip" class="moments-strip"></div>
-  </section>
-
-  <div id="feedFollowingLabel" class="feed-label" style="display:none">
-    <span class="material-symbols-rounded">group</span><span>Da chi segui</span>
-  </div>
-  <div id="feedDiscoverLabel" class="feed-label" style="display:none">
-    <span class="material-symbols-rounded">explore</span><span>Scopri</span>
-  </div>
-  <div id="feed" class="feed"></div>
-  <button id="loadMore" type="button"><span class="material-symbols-rounded">add</span>Carica altri</button>
+<main class="feed" id="feed">
+  <!-- Upload card injected by JS -->
 </main>
 
-<!-- Audio -->
-<audio id="globalAudio" loop preload="auto"></audio>
-
-<div id="audioBar">
-  <div class="audio-bar-cover-wrap">
-    <img id="audioBarCover" alt="Cover" src="">
-    <div class="audio-playing-ring" id="audioRing"></div>
-  </div>
-  <div class="audio-bar-info">
-    <div id="audioBarTitle">—</div>
-    <div id="audioBarArtist"></div>
-    <div class="audio-bar-progress"><div class="audio-bar-progress-fill" id="audioProgress"></div></div>
-  </div>
-  <div class="audio-bar-controls">
-    <button id="audioBarToggle" type="button"><span class="material-symbols-rounded" id="audioBarIcon">pause</span></button>
-    <button id="audioBarClose" type="button"><span class="material-symbols-rounded">close</span></button>
+<!-- MODAL LIKES -->
+<div class="modal-overlay" id="modalLikes" onclick="closeModal('modalLikes')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="material-icons">bolt</span>
+      <span class="modal-title">Likes</span>
+    </div>
+    <div class="modal-body" id="modalLikesBody"></div>
   </div>
 </div>
 
-<!-- Moment viewer -->
-<div id="momentViewer" class="moment-viewer" aria-hidden="true">
-  <div class="moment-viewer-shell">
-    <div class="moment-bg-blur" id="momentBgBlur"></div>
-    <div class="moment-stage">
-      <img id="momentImg" alt="Moment">
-      <div class="moment-shade"></div>
-      <div class="moment-tap-zone" aria-hidden="true">
-        <div id="prevMoment"></div>
-        <div id="nextMoment"></div>
-      </div>
+<!-- MODAL COMMENTS -->
+<div class="modal-overlay" id="modalComments" onclick="closeModal('modalComments')">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <span class="material-icons">chat_bubble_outline</span>
+      <span class="modal-title" id="commentsTitle">Comments</span>
     </div>
-    <div class="moment-top">
-      <div class="moment-prog-row" id="momentProgRow"></div>
-      <div class="moment-header">
-        <div class="moment-user">
-          <img id="momentAv" class="moment-av" alt="">
-          <div>
-            <div id="momentUsername" class="moment-username"></div>
-            <div id="momentTimeEl" class="moment-time"></div>
-          </div>
-        </div>
-        <button id="closeMoment" class="mv-close" type="button">
-          <span class="material-symbols-rounded">close</span>
+    <div class="modal-body" id="modalCommentsBody"></div>
+    <div class="comment-input-bar">
+      <img src="https://i.pravatar.cc/80?img=11" alt="me">
+      <div class="comment-input-wrap">
+        <input type="text" id="commentInput" placeholder="Add a comment…"
+               oninput="onCommentInput()" onkeydown="if(event.key==='Enter')submitComment()">
+        <button class="comment-send-btn" id="commentSendBtn" onclick="submitComment()">
+          <span class="material-icons">send</span>
         </button>
       </div>
     </div>
-    <div class="moment-caption-viewer">
-      <div id="momentCaptionText" class="moment-caption-text"></div>
-      <div id="momentExpandHint" class="moment-expand-hint" style="display:none">Leggi tutto ↑</div>
-    </div>
   </div>
 </div>
 
-<!-- Delete confirm -->
-<div id="delConfirm" class="del-confirm">
-  <div class="del-sheet">
-    <div class="del-title">Elimina post</div>
-    <div class="del-body">Sei sicuro? Questa azione è irreversibile e rimuoverà il post dal feed.</div>
-    <div class="del-actions">
-      <button class="del-cancel" id="delCancel">Annulla</button>
-      <button class="del-ok" id="delOk">Elimina</button>
-    </div>
-  </div>
-</div>
+<div class="toast" id="toast"></div>
 
-<!-- Likes modal -->
-<div id="likesModal" class="modal" aria-hidden="true">
-  <div class="modal-box" role="dialog" aria-modal="true">
-    <div class="modal-head">
-      <div class="modal-title">Likes</div>
-      <button class="modal-close" id="closeLikesBtn" type="button">✕</button>
-    </div>
-    <div id="likesList"></div>
-  </div>
-</div>
+<script>
+/* ══════════════════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════════════════ */
+const API   = 'https://api.sharedweb.org';
+const ME_ID = 'me';   // current logged-in user id (matches seed)
+const ME_AVATAR = 'https://i.pravatar.cc/80?img=11';
 
-<script type="module">
-/* ═══════════════════════════════════════════════════════════
-   CONFIG & STATE
-═══════════════════════════════════════════════════════════ */
-const API_BASE   = "https://api.sharedweb.org";
-const ITUNES_API = "https://itunes.apple.com/search";
-const BATCH      = 12;
-
-const state = {
-  profiles:[], posts:[], moments:[], likes:[], follows:[],
-  currentUserId:null, currentUserProfile:null,
-  storyQueue:[], followingPosts:[], discoverPosts:[], renderedCount:0, allLoaded:false,
-  // moment viewer
-  mvQueue:[], mvIndex:0, mvTimer:null, mvRaf:null, mvStartTs:0, mvDuration:8000,
-  // audio
-  audioPostId:null, audioPlaying:false, audioProgressRaf:null,
-  // like deltas
-  likeDeltas:{},
-  // delete
-  pendingDeleteId:null,
-  searchQuery:"",
-};
-
-/* ═══════════════════════════════════════════════════════════
-   ELEMENTS
-═══════════════════════════════════════════════════════════ */
-const el = id => document.getElementById(id);
-const E = {
-  main:el("mainScroll"), storiesSection:el("storiesSection"), stories:el("stories"),
-  momentsSection:el("momentsSection"), momentsStrip:el("momentsStrip"),
-  feed:el("feed"), feedFollowingLabel:el("feedFollowingLabel"), feedDiscoverLabel:el("feedDiscoverLabel"),
-  loadMore:el("loadMore"), search:el("search"), suggestions:el("suggestions"),
-  likesModal:el("likesModal"), likesList:el("likesList"), closeLikesBtn:el("closeLikesBtn"),
-  sidebar:el("sidebar"), sidebarOverlay:el("sidebarOverlay"),
-  hamburgerBtn:el("hamburgerBtn"), hamburgerIcon:el("hamburgerIcon"),
-  profileAvatar:el("profileAvatar"), profileName:el("profileName"), profileHandle:el("profileHandle"),
-  sidebarHeroBg:el("sidebarHeroBg"),
-  statPosts:el("statPosts"), statFollowers:el("statFollowers"), statFollowing:el("statFollowing"),
-  audioBar:el("audioBar"), audioBarCover:el("audioBarCover"),
-  audioBarTitle:el("audioBarTitle"), audioBarArtist:el("audioBarArtist"),
-  audioBarToggle:el("audioBarToggle"), audioBarIcon:el("audioBarIcon"),
-  audioBarClose:el("audioBarClose"), audioProgress:el("audioProgress"),
-  audioRing:el("audioRing"), globalAudio:el("globalAudio"),
-  momentViewer:el("momentViewer"), momentBgBlur:el("momentBgBlur"),
-  momentImg:el("momentImg"), momentAv:el("momentAv"),
-  momentUsername:el("momentUsername"), momentTimeEl:el("momentTimeEl"),
-  momentProgRow:el("momentProgRow"), closeMoment:el("closeMoment"),
-  prevMoment:el("prevMoment"), nextMoment:el("nextMoment"),
-  momentCaptionText:el("momentCaptionText"), momentExpandHint:el("momentExpandHint"),
-  delConfirm:el("delConfirm"), delCancel:el("delCancel"), delOk:el("delOk"),
-};
-
-/* ═══════════════════════════════════════════════════════════
-   SIDEBAR
-═══════════════════════════════════════════════════════════ */
-let sidebarOpen = false;
-const openSidebar  = () => { sidebarOpen=true;  E.sidebar.classList.add("open");    E.sidebarOverlay.classList.add("open");    E.hamburgerIcon.textContent="close"; };
-const closeSidebar = () => { sidebarOpen=false; E.sidebar.classList.remove("open"); E.sidebarOverlay.classList.remove("open"); E.hamburgerIcon.textContent="menu"; };
-E.hamburgerBtn.addEventListener("click", () => sidebarOpen ? closeSidebar() : openSidebar());
-E.sidebarOverlay.addEventListener("click", closeSidebar);
-window.addEventListener("keydown", e => { if(e.key==="Escape" && sidebarOpen) closeSidebar(); });
-
-/* ═══════════════════════════════════════════════════════════
-   UTILS
-═══════════════════════════════════════════════════════════ */
-const safeArr = v => Array.isArray(v) ? v : [];
-const esc = s => String(s??"").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#039;");
-const fmtN = n => { const x=Number(n||0); return x>=1e6?`${(x/1e6).toFixed(1)}M`:x>=1000?`${(x/1000).toFixed(1)}K`:String(x); };
-const norm  = p => (!p||/^https?:\/\//i.test(p)||p.startsWith("data:")) ? p : p;
-
-function timeAgo(v){
-  const d=v?new Date(v):null; if(!d||isNaN(d))return"";
-  const s=Math.max(0,Date.now()-d.getTime()), m=Math.floor(s/6e4), h=Math.floor(s/36e5), dy=Math.floor(s/864e5);
-  return m<1?"ora":m<60?`${m}m`:h<24?`${h}h`:dy<7?`${dy}g`:d.toLocaleDateString([],{month:"short",day:"numeric"});
-}
-
-const defAvatar = () => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120"><rect width="120" height="120" rx="60" fill="#111"/><circle cx="60" cy="48" r="18" fill="#fff"/><path d="M24 102c7-20 24-30 36-30s29 10 36 30" fill="#fff"/></svg>')}`;
-const defImg    = () => `data:image/svg+xml;charset=UTF-8,${encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><rect width="800" height="600" fill="#0f0f0f"/></svg>')}`;
-
-const profileById = id => state.profiles.find(p => String(p.id)===String(id)) || null;
-const avatarForProfile = p => norm(p?.avatar_url||p?.avatar||p?.profile_image||"") || defAvatar();
-function avatarForPost(post){
-  const p = profileById(post.user_id)||profileById(post.profile_id);
-  return norm(post.avatar_url||p?.avatar_url||p?.avatar||p?.profile_image||"") || defAvatar();
-}
-function usernameForPost(post){
-  const p = profileById(post.user_id)||profileById(post.profile_id);
-  return post.username||p?.username||p?.full_name||"user";
-}
-const isVerified = p => p?.verified===true||p?.verified==='true'||p?.verified===1;
-const tagsFor = post => {
-  const r=post.tags; if(!r)return[];
-  return (Array.isArray(r)?r:String(r).split(",")).map(t=>String(t).trim()).filter(Boolean).slice(0,6);
-};
-const locationFor = post => post.location||post.place||post.city||post.location_name||"";
-
-/* ═══════════════════════════════════════════════════════════
-   ITUNES ENRICHMENT (free, no key)
-═══════════════════════════════════════════════════════════ */
-const itunesCache = new Map();
-
-async function fetchItunesMeta(title, artist){
-  const key = `${title}|${artist}`.toLowerCase().trim();
-  if(itunesCache.has(key)) return itunesCache.get(key);
-  try{
-    const term = encodeURIComponent([title, artist].filter(Boolean).join(" "));
-    const r = await fetch(`${ITUNES_API}?term=${term}&media=music&entity=song&limit=1`);
-    if(!r.ok) throw new Error("itunes fail");
-    const data = await r.json();
-    const track = data?.results?.[0];
-    const meta = track ? {
-      cover:   track.artworkUrl100?.replace("100x100bb","300x300bb") || track.artworkUrl100 || "",
-      preview: track.previewUrl || "",
-      title:   track.trackName || title,
-      artist:  track.artistName || artist,
-    } : null;
-    itunesCache.set(key, meta);
-    return meta;
-  }catch{
-    itunesCache.set(key, null);
-    return null;
-  }
-}
-
-/* ═══════════════════════════════════════════════════════════
-   LIKE HELPERS
-═══════════════════════════════════════════════════════════ */
-const likeCount  = id => Math.max(0, state.likes.filter(l=>String(l.post_id??l.postId??l.postid)===String(id)).length + (state.likeDeltas[id]??0));
-const likedByMe  = id => !!state.currentUserId && state.likes.some(l=>String(l.post_id??l.postId??l.postid)===String(id)&&String(l.user_id)===String(state.currentUserId));
-
-/* ═══════════════════════════════════════════════════════════
-   FOLLOW HELPERS
-═══════════════════════════════════════════════════════════ */
-function iFollow(uid){
-  return !!state.currentUserId && state.follows.some(f=>
-    String(f.follower_id??f.follower??f.from_user_id??f.from)===String(state.currentUserId) &&
-    String(f.following_id??f.following??f.to_user_id??f.to)===String(uid));
-}
-function followsMe(uid){
-  return !!state.currentUserId && state.follows.some(f=>
-    String(f.follower_id??f.follower??f.from_user_id??f.from)===String(uid) &&
-    String(f.following_id??f.following??f.to_user_id??f.to)===String(state.currentUserId));
-}
-const isMutual = uid => iFollow(uid) && followsMe(uid);
-
-/* ═══════════════════════════════════════════════════════════
-   API
-═══════════════════════════════════════════════════════════ */
-async function apiFetch(path){
-  const r = await fetch(`${API_BASE}${path}`, {headers:{Accept:"application/json"}});
-  if(!r.ok) throw new Error(`${r.status} ${path}`);
-  return r.json();
-}
-async function apiSend(path,method,body){
-  const r = await fetch(`${API_BASE}${path}`, {method, headers:{Accept:"application/json","Content-Type":"application/json"}, body:body?JSON.stringify(body):undefined});
-  if(!r.ok) throw new Error(`${r.status} ${method} ${path}`);
-  return r.json().catch(()=>null);
-}
-async function tryPaths(paths){
-  for(const p of paths){ try{ return await apiFetch(p); } catch(e){ if(!String(e).includes("404"))throw e; } }
-  return null;
-}
-
-const fetchPosts    = () => tryPaths(["/posts","/feed","/home","/content"]).then(d=>safeArr(Array.isArray(d)?d:(d?.posts||d?.data||d?.results||[])));
-const fetchProfiles = () => tryPaths(["/profiles","/users","/accounts"]).then(d=>safeArr(Array.isArray(d)?d:(d?.profiles||d?.users||d?.data||[])));
-const fetchLikes    = () => tryPaths(["/likes","/reactions"]).then(d=>safeArr(Array.isArray(d)?d:(d?.likes||d?.data||[])));
-const fetchFollows  = () => tryPaths(["/follows","/follow","/followers","/following", state.currentUserId?`/users/${state.currentUserId}/follows`:null].filter(Boolean)).then(d=>safeArr(Array.isArray(d)?d:(d?.follows||d?.data||[])));
-const fetchMoments  = () => tryPaths(["/moments","/reels","/shorts","/stories","/videos"]).then(d=>safeArr(Array.isArray(d)?d:(d?.moments||d?.reels||d?.data||[])));
-
-async function fetchCurrentUser(){
-  const id=localStorage.getItem("shared_current_user_id");
-  const un=localStorage.getItem("shared_current_username");
-  const av=localStorage.getItem("shared_current_avatar");
-  if(id||un) return {id:id||null, username:un||"you", avatar_url:av||""};
-  return state.profiles[0]||null;
-}
-
-/* ═══════════════════════════════════════════════════════════
-   RENDER SIDEBAR / CURRENT USER
-═══════════════════════════════════════════════════════════ */
-function renderCurrentUser(){
-  const p = state.currentUserProfile;
-  const username = p?.username||p?.full_name||"you";
-  const handle   = p?.handle||p?.username ? `@${String(p?.handle||p?.username).replace(/^@/,"")}` : "@shared";
-  const avatar   = avatarForProfile(p);
-  E.profileName.textContent   = username;
-  E.profileHandle.textContent = handle;
-  E.profileAvatar.src         = avatar;
-  // set hero bg gradient from avatar colour (use the image as CSS background for blur)
-  if(avatar && !avatar.startsWith("data:")){
-    E.sidebarHeroBg.style.backgroundImage = `url(${avatar})`;
-    E.sidebarHeroBg.style.filter = "blur(60px) brightness(.45) saturate(1.6)";
-  }
-  // stats
-  const myId = state.currentUserId;
-  const myPosts = state.posts.filter(post=>String(post.user_id||post.profile_id)===String(myId)).length;
-  const followers = state.follows.filter(f=>String(f.following_id??f.following??f.to_user_id??f.to)===String(myId)).length;
-  const following = state.follows.filter(f=>String(f.follower_id??f.follower??f.from_user_id??f.from)===String(myId)).length;
-  E.statPosts.textContent     = fmtN(myPosts||p?.posts_count||"—");
-  E.statFollowers.textContent = fmtN(followers||p?.followers_count||"—");
-  E.statFollowing.textContent = fmtN(following||p?.following_count||"—");
-}
-
-/* ═══════════════════════════════════════════════════════════
-   SKELETONS
-═══════════════════════════════════════════════════════════ */
-function renderSkeletons(n=4){
-  E.feed.innerHTML = Array.from({length:n},()=>`
-    <div class="skeleton-post">
-      <div class="skel-header"><div class="skel-circle"></div><div class="skel-lines"><div class="skel-line"></div><div class="skel-line short"></div></div></div>
-      <div class="skel-image"></div><div class="skel-caption"></div>
-    </div>`).join("");
-}
-
-/* ═══════════════════════════════════════════════════════════
-   STORIES
-═══════════════════════════════════════════════════════════ */
-function buildStoryQueue(){
-  return state.profiles.map(p=>({
-    id:p.id, username:p.username||p.full_name||"user",
-    avatar: avatarForProfile(p),
-    story:  norm(p.story_url||p.story_image||p.story||p.latest_story||""),
-    caption:p.story_caption||"",
-    created_at:p.story_updated_at||p.updated_at||"",
-    profile:p
-  })).filter(x=>x.story);
-}
-function renderStories(){
-  if(!state.storyQueue.length){ E.storiesSection.style.display="none"; return; }
-  E.storiesSection.style.display="block";
-  E.stories.innerHTML = state.storyQueue.map((s,i)=>`
-    <button class="story" data-story-index="${i}" type="button">
-      <img loading="lazy" src="${s.avatar}" alt="${esc(s.username)}">
-      <div>${esc(s.username)}</div>
-    </button>`).join("");
-  E.stories.querySelectorAll("[data-story-index]").forEach(b=>{
-    b.addEventListener("click",()=>openMomentViewer(state.storyQueue, Number(b.dataset.storyIndex)));
+/* ══════════════════════════════════════════════════════
+   API HELPERS
+══════════════════════════════════════════════════════ */
+async function apiFetch(path, opts = {}) {
+  const res = await fetch(API + path, {
+    headers: { 'Content-Type': 'application/json', ...opts.headers },
+    ...opts,
   });
-}
-
-/* ═══════════════════════════════════════════════════════════
-   MOMENTS
-═══════════════════════════════════════════════════════════ */
-function renderMoments(){
-  if(!state.moments.length){ E.momentsSection.style.display="none"; return; }
-  E.momentsSection.style.display="block";
-  E.momentsStrip.innerHTML = state.moments.map((m,i)=>{
-    const p = profileById(m.user_id||m.profile_id);
-    const av = norm(m.avatar_url||p?.avatar_url||p?.avatar||"") || defAvatar();
-    const thumb = norm(m.thumbnail||m.thumb||m.cover||m.image_url||m.image||m.video_url||"");
-    const uname = m.username||p?.username||p?.full_name||"user";
-    const cap   = m.caption||m.text||"";
-    return `
-      <div class="moment-card" data-moment-index="${i}">
-        <img class="moment-thumb" src="${thumb||defImg()}" alt="${esc(uname)}" loading="lazy">
-        <div class="moment-grad"></div>
-        <div class="moment-card-avatar-wrap"><img class="moment-card-avatar" src="${av}" alt=""></div>
-        <div class="moment-meta">
-          <div class="moment-name">${esc(uname)}</div>
-          ${cap?`<div class="moment-caption-pill">${esc(cap)}</div>`:""}
-        </div>
-      </div>`;
-  }).join("");
-  E.momentsStrip.querySelectorAll("[data-moment-index]").forEach(c=>{
-    c.addEventListener("click",()=>openMomentViewer(state.moments, Number(c.dataset.momentIndex)));
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════
-   MOMENT VIEWER
-═══════════════════════════════════════════════════════════ */
-function openMomentViewer(queue, index){
-  state.mvQueue=[...queue]; state.mvIndex=index;
-  E.momentViewer.classList.add("open");
-  E.momentViewer.setAttribute("aria-hidden","false");
-  document.body.style.overflow="hidden";
-  renderMomentSlide();
-  startMomentTimer();
-}
-function closeMomentViewer(){
-  stopMomentTimer();
-  E.momentViewer.classList.remove("open");
-  E.momentViewer.setAttribute("aria-hidden","true");
-  document.body.style.overflow="hidden";
-}
-function renderMomentSlide(){
-  const item = state.mvQueue[state.mvIndex]; if(!item) return;
-  const p = profileById(item.user_id||item.profile_id||item.id);
-  const av   = norm(item.avatar||item.avatar_url||p?.avatar_url||p?.avatar||"") || defAvatar();
-  const img  = norm(item.story||item.thumbnail||item.thumb||item.image_url||item.image||item.cover||"");
-  const name = item.username||p?.username||p?.full_name||"user";
-  const cap  = item.caption||item.text||"";
-  const time = item.created_at||item.inserted_at||"";
-
-  E.momentImg.src         = img || defImg();
-  E.momentAv.src          = av;
-  E.momentUsername.textContent = name;
-  E.momentTimeEl.textContent   = time ? timeAgo(time) : "";
-  E.momentBgBlur.style.backgroundImage = `url(${img||av})`;
-
-  // caption
-  E.momentCaptionText.textContent = cap;
-  E.momentCaptionText.classList.remove("expanded");
-  if(cap){
-    // show expand hint only when text overflows
-    requestAnimationFrame(()=>{
-      const overflows = E.momentCaptionText.scrollHeight > E.momentCaptionText.clientHeight + 2;
-      E.momentExpandHint.style.display = overflows ? "block" : "none";
-      E.momentExpandHint.textContent = "Leggi tutto ↑";
-    });
-  } else {
-    E.momentExpandHint.style.display="none";
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: res.statusText }));
+    throw new Error(err.detail || 'API error');
   }
-
-  // progress bars
-  const total = state.mvQueue.length;
-  E.momentProgRow.innerHTML = Array.from({length:total},(_,i)=>
-    `<div class="moment-prog"><span style="width:${i<state.mvIndex?100:0}%"></span></div>`
-  ).join("");
-}
-function updateMomentProgress(){
-  const bars = [...E.momentProgRow.querySelectorAll(".moment-prog > span")];
-  bars.forEach((b,i)=>{
-    if(i<state.mvIndex) b.style.width="100%";
-    else if(i>state.mvIndex) b.style.width="0%";
-    else { const e=performance.now()-state.mvStartTs; b.style.width=`${Math.min(100,(e/state.mvDuration)*100)}%`; }
-  });
-  state.mvRaf = requestAnimationFrame(updateMomentProgress);
-}
-function startMomentTimer(){
-  stopMomentTimer();
-  state.mvStartTs = performance.now();
-  state.mvTimer   = setTimeout(()=>advanceMoment(1), state.mvDuration);
-  state.mvRaf     = requestAnimationFrame(updateMomentProgress);
-}
-function stopMomentTimer(){ clearTimeout(state.mvTimer); cancelAnimationFrame(state.mvRaf); }
-function advanceMoment(dir){
-  state.mvIndex = (state.mvIndex+dir+state.mvQueue.length)%state.mvQueue.length;
-  renderMomentSlide(); startMomentTimer();
+  if (res.status === 204) return null;
+  return res.json();
 }
 
-E.closeMoment.addEventListener("click", closeMomentViewer);
-E.prevMoment.addEventListener("click",  e=>{e.stopPropagation();advanceMoment(-1);});
-E.nextMoment.addEventListener("click",  e=>{e.stopPropagation();advanceMoment(1);});
-E.momentViewer.addEventListener("click",e=>{if(e.target===E.momentViewer)closeMomentViewer();});
-E.momentCaptionText.addEventListener("click",()=>{
-  const exp = E.momentCaptionText.classList.toggle("expanded");
-  E.momentExpandHint.textContent = exp ? "Mostra meno ↓" : "Leggi tutto ↑";
-});
-window.addEventListener("keydown",e=>{
-  if(!E.momentViewer.classList.contains("open")) return;
-  if(e.key==="Escape") closeMomentViewer();
-  if(e.key==="ArrowLeft")  advanceMoment(-1);
-  if(e.key==="ArrowRight") advanceMoment(1);
-});
-document.addEventListener("visibilitychange",()=>{
-  if(document.hidden) stopMomentTimer();
-  else if(E.momentViewer.classList.contains("open")) startMomentTimer();
-});
-
-/* ═══════════════════════════════════════════════════════════
-   BUILD POST HTML
-═══════════════════════════════════════════════════════════ */
-function isMyPost(post){
-  return state.currentUserId && String(post.user_id||post.profile_id)===String(state.currentUserId);
+/* ══════════════════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
 }
-function buildPostHtml(post, badge=""){
-  const username   = usernameForPost(post);
-  const profile    = profileById(post.user_id)||profileById(post.profile_id);
-  const avatar     = avatarForPost(post);
-  const image      = norm(post.image_url||post.media_url||post.image||"");
-  const caption    = post.caption||post.text||"";
-  const songTitle  = post.song_title||post.song||"";
-  const songAuthor = post.song_author||post.song_artist||post.song_by||"";
-  const songPreview= post.song_preview||post.audio_url||post.preview_url||"";
-  const songCover  = norm(post.song_cover||post.album_cover||post.cover_url||post.artwork_url||"");
-  const createdAt  = post.created_at||post.inserted_at||post.updated_at||"";
-  const likes      = likeCount(post.id);
-  const liked      = likedByMe(post.id)||!!post.liked;
-  const tags       = tagsFor(post);
-  const location   = locationFor(post);
-  const mine       = isMyPost(post);
-  const isPlaying  = state.audioPostId===String(post.id) && state.audioPlaying;
-  const hasSong    = !!(songTitle||songPreview);
 
-  return `
-<article class="post" data-post-id="${esc(post.id)}">
-  <div class="post-header">
-    <img class="avatar" loading="lazy" src="${avatar}" alt="${esc(username)}">
-    <div class="user-meta">
-      <div class="username" data-profile-id="${esc(post.user_id||post.profile_id||"")}">
-        <span>${esc(username)}</span>
-        ${profile&&isVerified(profile)?`<span class="material-symbols-rounded verified" style="font-size:14px;font-variation-settings:'FILL' 1">verified</span>`:""}
-      </div>
-      <div class="post-time">${esc(timeAgo(createdAt))}</div>
+/* ══════════════════════════════════════════════════════
+   SIDEBAR SEARCH  (live → GET /users?q=…)
+══════════════════════════════════════════════════════ */
+let searchTimer = null, searchBlurTimer = null;
+
+function handleSearch(q) {
+  clearTimeout(searchTimer);
+  const dd = document.getElementById('searchDropdown');
+  if (!q.trim()) { dd.innerHTML = ''; dd.classList.remove('open'); return; }
+  searchTimer = setTimeout(async () => {
+    try {
+      const users = await apiFetch(`/users?q=${encodeURIComponent(q.trim())}`);
+      if (!users.length) {
+        dd.innerHTML = `<div class="search-empty">No users found</div>`;
+      } else {
+        dd.innerHTML = users.map(u => `
+          <div class="search-result" onmousedown="location.href='user.html'">
+            <img src="${u.avatar_url || ME_AVATAR}" alt="${u.name}">
+            <div>
+              <div class="search-result-name">${u.name}</div>
+              <div class="search-result-handle">@${u.username}</div>
+            </div>
+          </div>`).join('');
+      }
+      dd.classList.add('open');
+    } catch(e) { console.warn('search error', e); }
+  }, 250);
+}
+function onSearchFocus() { clearTimeout(searchBlurTimer); document.getElementById('searchBox').classList.add('focused'); }
+function onSearchBlur()  { searchBlurTimer = setTimeout(() => { document.getElementById('searchDropdown').classList.remove('open'); document.getElementById('searchBox').classList.remove('focused'); }, 180); }
+
+/* ══════════════════════════════════════════════════════
+   UPLOAD CARD
+══════════════════════════════════════════════════════ */
+const CITIES = [
+  'Florence, Tuscany','Rome, Lazio','Milan, Lombardy','Naples, Campania',
+  'Venice, Veneto','Turin, Piedmont','Bologna, Emilia-Romagna','Genoa, Liguria',
+  'Palermo, Sicily','Catania, Sicily','Bari, Apulia','Verona, Veneto',
+  'Padua, Veneto','Bergamo, Lombardy','Pisa, Tuscany','Siena, Tuscany',
+  'Rimini, Emilia-Romagna','Trieste, Friuli-Venezia Giulia','Lecce, Apulia',
+  'Barcelona, Spain','Berlin, Germany','London, UK','Madrid, Spain',
+  'Paris, France','Tokyo, Japan','New York, USA','Los Angeles, USA',
+  'Amsterdam, Netherlands','Vienna, Austria','Prague, Czech Republic',
+  'Lisbon, Portugal','Dublin, Ireland','Stockholm, Sweden','Zurich, Switzerland',
+];
+const SONGS = [
+  { title:'Nuvole Bianche',    artist:'Ludovico Einaudi', cover:'https://picsum.photos/seed/alb1/80/80' },
+  { title:'Blinding Lights',   artist:'The Weeknd',       cover:'https://picsum.photos/seed/alb2/80/80' },
+  { title:'Con te partirò',    artist:'Andrea Bocelli',   cover:'https://picsum.photos/seed/alb3/80/80' },
+  { title:'Levitating',        artist:'Dua Lipa',         cover:'https://picsum.photos/seed/alb5/80/80' },
+  { title:'Shape of You',      artist:'Ed Sheeran',       cover:'https://picsum.photos/seed/alb6/80/80' },
+  { title:'Bohemian Rhapsody', artist:'Queen',            cover:'https://picsum.photos/seed/alb7/80/80' },
+  { title:'Superstition',      artist:'Stevie Wonder',    cover:'https://picsum.photos/seed/alb9/80/80' },
+  { title:'Volare',            artist:'Domenico Modugno', cover:'https://picsum.photos/seed/alb10/80/80' },
+  { title:'Bad Guy',           artist:'Billie Eilish',    cover:'https://picsum.photos/seed/alb13/80/80' },
+  { title:'Flowers',           artist:'Miley Cyrus',      cover:'https://picsum.photos/seed/alb14/80/80' },
+  { title:'Anti-Hero',         artist:'Taylor Swift',     cover:'https://picsum.photos/seed/alb15/80/80' },
+  { title:'As It Was',         artist:'Harry Styles',     cover:'https://picsum.photos/seed/alb16/80/80' },
+  { title:'Espresso',          artist:'Sabrina Carpenter',cover:'https://picsum.photos/seed/alb19/80/80' },
+];
+
+function buildUploadCard() {
+  const el = document.createElement('div');
+  el.className = 'upload-card';
+  el.innerHTML = `
+    <div class="upload-card-title">
+      <span class="material-icons">add_circle_outline</span> New post
     </div>
-    ${badge?`<div class="following-badge">${badge}</div>`:""}
-    ${mine?`<button class="delete-btn" data-delete-id="${esc(post.id)}" type="button" title="Elimina post"><span class="material-symbols-rounded">delete</span></button>`:""}
-  </div>
-
-  <div class="media" data-like-zone="${esc(post.id)}">
-    <img class="lazy-media" loading="lazy" data-src="${esc(image)}" alt="Post di ${esc(username)}" src="${defImg()}">
-    <div class="like-pop" aria-hidden="true"><span class="material-symbols-rounded">favorite</span></div>
-  </div>
-
-  <div class="actions">
-    <div class="like-row">
-      <button class="like-btn${liked?" liked":""}" data-like-btn="${esc(post.id)}" type="button">
-        <span class="material-symbols-rounded">favorite</span>
+    <div class="drop-zone" id="dropZone"
+         ondragover="onDragOver(event)" ondragleave="onDragLeave()" ondrop="onDrop(event)"
+         onclick="document.getElementById('fileInput').click()">
+      <img class="drop-preview" id="dropPreview" alt="preview">
+      <button class="drop-clear" id="dropClear" onclick="clearImage(event)">
+        <span class="material-icons">close</span>
       </button>
-      <div class="count" data-like-count="${esc(post.id)}">${fmtN(likes)} likes</div>
+      <div class="drop-zone-icon" id="dropIcon"><span class="material-icons">add_photo_alternate</span></div>
+      <div class="drop-zone-label" id="dropLabel">Drag your photo here<br><span class="drop-zone-sub">or</span></div>
+      <button class="drop-zone-btn" id="dropBtn" onclick="event.stopPropagation();document.getElementById('fileInput').click()">
+        <span class="material-icons">upload</span> Browse
+      </button>
+      <input type="file" id="fileInput" accept="image/*" onchange="onFileChange(event)">
     </div>
-  </div>
-
-  ${location?`<div class="location-row"><span class="material-symbols-rounded">location_on</span><span>${esc(location)}</span></div>`:""}
-  ${tags.length?`<div class="tag-row">${tags.map(t=>`<span class="tag-pill">${esc(t)}</span>`).join("")}</div>`:""}
-
-  ${caption?`
-    <div class="caption" id="cap-${esc(post.id)}"><span class="author-handle">${esc(username)}</span>${esc(caption)}</div>
-    <div class="caption-more" id="capmore-${esc(post.id)}" data-cap="${esc(post.id)}">Leggi tutto</div>
-  `:""}
-
-  ${hasSong?`
-    <div class="song-card${isPlaying?" playing":""}" id="sc-${esc(post.id)}"
-         data-song-play="${esc(post.id)}"
-         data-audio="${esc(songPreview)}"
-         data-song-title="${esc(songTitle)}"
-         data-song-artist="${esc(songAuthor)}"
-         data-song-cover="${esc(songCover)}">
-      ${songCover
-        ?`<img class="album-cover" id="scov-${esc(post.id)}" src="${songCover}" alt="Cover">`
-        :`<div class="note-cover" id="scov-${esc(post.id)}"><span class="material-symbols-rounded">music_note</span></div>`}
-      <div class="song-info">
-        <div class="song-title" id="stit-${esc(post.id)}">${esc(songTitle)||"Caricamento…"}</div>
-        <div class="song-author" id="sart-${esc(post.id)}">${esc(songAuthor)}</div>
-        <div class="song-source-badge" id="ssrc-${esc(post.id)}"></div>
+    <div class="upload-field">
+      <div class="upload-field-label"><span class="material-icons">edit</span> Caption</div>
+      <div class="upload-input-wrap"><textarea id="captionInput" placeholder="Write something…" rows="3"></textarea></div>
+    </div>
+    <div class="upload-field">
+      <div class="upload-field-label"><span class="material-icons">location_on</span> Location</div>
+      <div class="upload-input-wrap">
+        <span class="material-icons">search</span>
+        <input type="text" id="locationInput" placeholder="Search a city…" autocomplete="off"
+               oninput="handleLocation(this.value)" onfocus="onLocFocus()" onblur="onLocBlur()">
       </div>
-      <div class="play-btn-inline"><span class="material-symbols-rounded">${isPlaying?"pause":"play_arrow"}</span></div>
-      <div class="music-bars"><span></span><span></span><span></span></div>
+      <div class="ac-dropdown" id="locDropdown"></div>
     </div>
-  `:""}
-</article>`;
+    <div class="upload-field">
+      <div class="upload-field-label"><span class="material-icons">music_note</span> Song</div>
+      <div class="upload-input-wrap" id="songInputWrap">
+        <span class="material-icons">search</span>
+        <input type="text" id="songInput" placeholder="Search artist or track…" autocomplete="off"
+               oninput="handleSong(this.value)" onfocus="onSongFocus()" onblur="onSongBlur()">
+      </div>
+      <div class="ac-dropdown" id="songDropdown"></div>
+      <div class="song-pill" id="songPill">
+        <img id="songPillCover" src="" alt="cover">
+        <div class="song-pill-info">
+          <div class="song-pill-title" id="songPillTitle"></div>
+          <div class="song-pill-artist" id="songPillArtist"></div>
+        </div>
+        <button class="song-pill-clear" onclick="clearSong()"><span class="material-icons">close</span></button>
+      </div>
+    </div>
+    <button class="upload-submit" id="uploadSubmit" onclick="handleSubmit()">
+      <span class="material-icons">send</span> Publish
+    </button>`;
+  return el;
 }
 
-/* ═══════════════════════════════════════════════════════════
-   ITUNES ENRICHMENT ON VISIBLE SONG CARDS
-═══════════════════════════════════════════════════════════ */
-function enrichVisibleSongCards(){
-  document.querySelectorAll("[data-song-play]").forEach(async card=>{
-    if(card.dataset.itunesEnriched) return;
-    card.dataset.itunesEnriched="1";
-    const postId  = card.dataset.songPlay;
-    const title   = card.dataset.songTitle?.trim();
-    const artist  = card.dataset.songArtist?.trim();
-    if(!title && !artist) return;
-
-    // Only fetch iTunes if we're missing cover or preview
-    const missingCover   = !card.dataset.songCover;
-    const missingPreview = !card.dataset.audio;
-    if(!missingCover && !missingPreview) return;
-
-    const meta = await fetchItunesMeta(title, artist);
-    if(!meta) return;
-
-    // Update cover in DOM
-    if(missingCover && meta.cover){
-      card.dataset.songCover = meta.cover;
-      const covEl = document.getElementById(`scov-${postId}`);
-      if(covEl && covEl.tagName==="DIV"){
-        const img = document.createElement("img");
-        img.className="album-cover"; img.id=`scov-${postId}`;
-        img.src=meta.cover; img.alt="Cover";
-        covEl.replaceWith(img);
-      } else if(covEl && covEl.tagName==="IMG"){
-        covEl.src = meta.cover;
-      }
-    }
-    // Update preview
-    if(missingPreview && meta.preview){
-      card.dataset.audio = meta.preview;
-    }
-    // Update title/artist if improved
-    if(meta.title){ card.dataset.songTitle=meta.title; const t=document.getElementById(`stit-${postId}`); if(t) t.textContent=meta.title; }
-    if(meta.artist){ card.dataset.songArtist=meta.artist; const a=document.getElementById(`sart-${postId}`); if(a) a.textContent=meta.artist; }
-    const src = document.getElementById(`ssrc-${postId}`);
-    if(src) src.textContent = "via iTunes";
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════
-   FEED SORT & RENDER
-═══════════════════════════════════════════════════════════ */
-function sortPosts(){
-  const all = [...state.posts].sort((a,b)=>new Date(b.created_at||b.inserted_at||0)-new Date(a.created_at||a.inserted_at||0));
-  const mutual=[], following=[], discover=[];
-  all.forEach(p=>{
-    const uid = p.user_id||p.profile_id;
-    if(isMutual(uid))        mutual.push({post:p,badge:"Mutuo"});
-    else if(iFollow(uid))    following.push({post:p,badge:"Segui"});
-    else                     discover.push({post:p,badge:""});
-  });
-  for(let i=discover.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [discover[i],discover[j]]=[discover[j],discover[i]]; }
-  state.followingPosts = [...mutual,...following];
-  state.discoverPosts  = discover;
-}
-
-function renderFeed(append=false){
-  if(!append){ E.feed.innerHTML=""; state.renderedCount=0; sortPosts(); }
-
-  const combined = [...state.followingPosts, ...state.discoverPosts];
-  const batch    = combined.slice(state.renderedCount, state.renderedCount+BATCH);
-
-  if(!batch.length && !append){
-    E.feed.innerHTML=`<div class="empty">Nessun post trovato.</div>`;
-    E.loadMore.classList.add("hidden"); return;
-  }
-
-  if(!append){
-    E.feedFollowingLabel.style.display = state.followingPosts.length?"flex":"none";
-    E.feedDiscoverLabel.style.display  = state.discoverPosts.length?"flex":"none";
-  }
-
-  batch.forEach((item,idx)=>{
-    const html = buildPostHtml(item.post||item, item.badge||"");
-    const wrapper = document.createElement("div");
-    wrapper.innerHTML = html.trim();
-    const article = wrapper.firstChild;
-    article.style.animationDelay=`${idx*35}ms`;
-    E.feed.appendChild(article);
-  });
-
-  state.renderedCount += batch.length;
-  if(state.renderedCount >= combined.length){ state.allLoaded=true; E.loadMore.classList.add("hidden"); }
-
-  wireLazy();
-  wireInteractions();
-  wireSongCards();
-  wireDoubleTap();
-  wireCaptionToggles();
-  enrichVisibleSongCards();
-}
-
-/* ═══════════════════════════════════════════════════════════
-   LAZY IMAGES
-═══════════════════════════════════════════════════════════ */
-function wireLazy(){
-  const io = new IntersectionObserver((entries,obs)=>{
-    entries.forEach(e=>{
-      if(!e.isIntersecting) return;
-      const img=e.target; img.src=img.dataset.src||""; img.removeAttribute("data-src"); obs.unobserve(img);
-    });
-  },{root:E.main,threshold:0.1,rootMargin:"200px 0px"});
-  document.querySelectorAll("img.lazy-media[data-src]").forEach(i=>io.observe(i));
-}
-
-/* ═══════════════════════════════════════════════════════════
-   CAPTION TOGGLE
-═══════════════════════════════════════════════════════════ */
-function wireCaptionToggles(){
-  document.querySelectorAll(".caption").forEach(cap=>{
-    requestAnimationFrame(()=>{
-      if(cap.scrollHeight > cap.clientHeight+2){
-        const m=document.getElementById("capmore-"+cap.id.replace("cap-",""));
-        if(m) m.classList.add("visible");
-      }
-    });
-  });
-  document.querySelectorAll(".caption-more").forEach(btn=>{
-    btn.addEventListener("click",()=>{
-      const cap=document.getElementById("cap-"+btn.dataset.cap); if(!cap) return;
-      const exp=cap.classList.toggle("expanded");
-      btn.textContent=exp?"Mostra meno":"Leggi tutto";
-    });
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════
-   LIKE
-═══════════════════════════════════════════════════════════ */
-function showPulse(postId){
-  const z=document.querySelector(`[data-like-zone="${CSS.escape(postId)}"]`);
-  const p=z?.querySelector(".like-pop"); if(!p) return;
-  p.classList.add("show"); setTimeout(()=>p.classList.remove("show"),200);
-}
-function refreshLikeUi(postId){
-  const btn=document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`);
-  const cnt=document.querySelector(`[data-like-count="${CSS.escape(postId)}"]`);
-  if(btn) btn.classList.toggle("liked", likedByMe(postId)||(state.likeDeltas[postId]??0)>0);
-  if(cnt) cnt.textContent=`${fmtN(likeCount(postId))} likes`;
-}
-async function persistLike(postId, wasLiked){
-  if(!state.currentUserId) return;
-  state.likeDeltas[postId]=(state.likeDeltas[postId]??0)+(wasLiked?-1:1);
-  refreshLikeUi(postId);
-  try{
-    if(wasLiked) await apiSend("/likes","DELETE",{post_id:postId,user_id:state.currentUserId});
-    else         await apiSend("/likes","POST",{post_id:postId,user_id:state.currentUserId});
-    state.likes = await fetchLikes();
-    state.likeDeltas[postId]=0;
-  }catch(e){ state.likeDeltas[postId]=(state.likeDeltas[postId]??0)+(wasLiked?1:-1); console.error(e); }
-  refreshLikeUi(postId);
-}
-function toggleLike(postId){
-  const btn=document.querySelector(`[data-like-btn="${CSS.escape(postId)}"]`); if(!btn) return;
-  showPulse(postId);
-  persistLike(postId, btn.classList.contains("liked")).catch(console.error);
-}
-
-/* ═══════════════════════════════════════════════════════════
-   DELETE
-═══════════════════════════════════════════════════════════ */
-function promptDelete(postId){
-  state.pendingDeleteId = postId;
-  E.delConfirm.classList.add("open");
-}
-function closeDeleteConfirm(){ E.delConfirm.classList.remove("open"); state.pendingDeleteId=null; }
-E.delCancel.addEventListener("click", closeDeleteConfirm);
-E.delConfirm.addEventListener("click", e=>{ if(e.target===E.delConfirm) closeDeleteConfirm(); });
-E.delOk.addEventListener("click", async()=>{
-  const id = state.pendingDeleteId; if(!id) return;
-  closeDeleteConfirm();
-  // Optimistically remove from DOM
-  const art = document.querySelector(`[data-post-id="${CSS.escape(id)}"]`);
-  if(art){ art.style.transition="opacity .2s,transform .2s"; art.style.opacity="0"; art.style.transform="scale(.96)"; setTimeout(()=>art.remove(),220); }
-  // Remove from state
-  state.posts = state.posts.filter(p=>String(p.id)!==String(id));
-  state.followingPosts = state.followingPosts.filter(x=>String((x.post||x).id)!==String(id))
-  state.discoverPosts  = state.discoverPosts.filter(x=>String((x.post||x).id)!==String(id));
-  try{
-    await apiSend(`/posts/${id}`,"DELETE",null);
-  }catch(e){ console.error("Delete failed",e); }
-});
-
-/* ═══════════════════════════════════════════════════════════
-   INTERACTIONS WIRING
-═══════════════════════════════════════════════════════════ */
-function wireInteractions(){
-  document.querySelectorAll("[data-profile-id]").forEach(n=>{
-    n.addEventListener("click",()=>{ if(n.dataset.profileId) window.location.href=`profile.html?id=${encodeURIComponent(n.dataset.profileId)}`; });
-  });
-  document.querySelectorAll("[data-like-btn]").forEach(b=>b.addEventListener("click",()=>toggleLike(b.dataset.likeBtn)));
-  document.querySelectorAll("[data-like-count]").forEach(c=>c.addEventListener("click",()=>openLikesModal(c.dataset.likeCount)));
-  document.querySelectorAll("[data-delete-id]").forEach(b=>b.addEventListener("click",e=>{ e.stopPropagation(); promptDelete(b.dataset.deleteId); }));
-}
-function wireDoubleTap(){
-  document.querySelectorAll("[data-like-zone]").forEach(zone=>{
-    zone.addEventListener("dblclick",()=>toggleLike(zone.dataset.likeZone));
-    let ts=0,last=null;
-    zone.addEventListener("touchend",()=>{
-      const id=zone.dataset.likeZone,now=Date.now();
-      if(last===id&&now-ts<320){toggleLike(id);last=null;return;}
-      ts=now;last=id;
-    },{passive:true});
-  });
-}
-
-/* ═══════════════════════════════════════════════════════════
-   AUDIO
-═══════════════════════════════════════════════════════════ */
-function wireSongCards(){
-  document.querySelectorAll("[data-song-play]").forEach(card=>{
-    card.addEventListener("click",()=>{
-      const id=card.dataset.songPlay, src=card.dataset.audio;
-      if(!src){ return; }
-      if(state.audioPostId===id){ state.audioPlaying?pauseAudio():resumeAudio(); return; }
-      startAudio(id, src, card.dataset.songTitle, card.dataset.songArtist, card.dataset.songCover);
-    });
-  });
-}
-function updatePlayBtn(postId, playing){
-  const btn = document.querySelector(`[data-song-play="${CSS.escape(postId)}"] .play-btn-inline .material-symbols-rounded`);
-  if(btn) btn.textContent = playing?"pause":"play_arrow";
-}
-function startAudio(postId, src, title, artist, cover){
-  if(state.audioPostId){
-    document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`)?.classList.remove("playing");
-    updatePlayBtn(state.audioPostId, false);
-  }
-  state.audioPostId=postId; state.audioPlaying=true;
-  E.globalAudio.src=src; E.globalAudio.volume=0.22;
-  E.globalAudio.play().catch(()=>{});
-  const displayCover = cover || defAvatar();
-  E.audioBarCover.src    = displayCover;
-  E.audioBarTitle.textContent  = title||"Now playing";
-  E.audioBarArtist.textContent = artist||"";
-  E.audioBarIcon.textContent   = "pause";
-  E.audioBar.classList.add("visible");
-  document.querySelector(`[data-song-play="${CSS.escape(postId)}"]`)?.classList.add("playing");
-  updatePlayBtn(postId, true);
-  startProgressRaf();
-}
-function pauseAudio(){
-  state.audioPlaying=false; E.globalAudio.pause();
-  E.audioBarIcon.textContent="play_arrow";
-  E.audioRing.style.animationPlayState="paused";
-  document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`)?.classList.remove("playing");
-  updatePlayBtn(state.audioPostId, false);
-  stopProgressRaf();
-}
-function resumeAudio(){
-  state.audioPlaying=true; E.globalAudio.play().catch(()=>{});
-  E.audioBarIcon.textContent="pause";
-  E.audioRing.style.animationPlayState="running";
-  document.querySelector(`[data-song-play="${CSS.escape(state.audioPostId)}"]`)?.classList.add("playing");
-  updatePlayBtn(state.audioPostId, true);
-  startProgressRaf();
-}
-function stopAudio(){
-  pauseAudio(); state.audioPostId=null; E.audioBar.classList.remove("visible"); E.globalAudio.src=""; E.audioProgress.style.width="0%";
-}
-function startProgressRaf(){
-  stopProgressRaf();
-  const tick=()=>{
-    const dur=E.globalAudio.duration||0, cur=E.globalAudio.currentTime||0;
-    if(dur>0) E.audioProgress.style.width=`${(cur/dur)*100}%`;
-    state.audioProgressRaf=requestAnimationFrame(tick);
+/* Drop zone */
+let uploadFile = null;
+function onDragOver(e) { e.preventDefault(); document.getElementById('dropZone').classList.add('drag-over'); }
+function onDragLeave()  { document.getElementById('dropZone').classList.remove('drag-over'); }
+function onDrop(e) { e.preventDefault(); document.getElementById('dropZone').classList.remove('drag-over'); const f=e.dataTransfer.files[0]; if(f&&f.type.startsWith('image/')) loadImageFile(f); }
+function onFileChange(e) { const f=e.target.files[0]; if(f) loadImageFile(f); }
+function loadImageFile(file) {
+  uploadFile = file;
+  const r = new FileReader();
+  r.onload = ev => {
+    document.getElementById('dropPreview').src = ev.target.result;
+    document.getElementById('dropPreview').classList.add('visible');
+    document.getElementById('dropClear').classList.add('visible');
+    ['dropIcon','dropLabel','dropBtn'].forEach(id => document.getElementById(id).style.display='none');
+    document.getElementById('dropZone').classList.add('has-image');
   };
-  state.audioProgressRaf=requestAnimationFrame(tick);
+  r.readAsDataURL(file);
 }
-function stopProgressRaf(){ cancelAnimationFrame(state.audioProgressRaf); }
-
-E.audioBarToggle.addEventListener("click",()=>state.audioPlaying?pauseAudio():resumeAudio());
-E.audioBarClose.addEventListener("click", stopAudio);
-
-/* Load more */
-E.loadMore.addEventListener("click",()=>{
-  if(state.allLoaded) return;
-  E.loadMore.innerHTML="<span>Caricamento…</span>";
-  renderFeed(true);
-  E.loadMore.innerHTML=`<span class="material-symbols-rounded">add</span>Carica altri`;
-});
-
-/* Likes modal */
-function openLikesModal(postId){
-  const items=state.likes.filter(l=>String(l.post_id??l.postId??l.postid)===String(postId)).map(l=>{
-    const p=profileById(l.user_id);
-    return{id:p?.id||l.user_id,name:p?.username||p?.full_name||"user",avatar:avatarForProfile(p),sub:p?.bio||"",verified:isVerified(p)};
-  });
-  E.likesList.innerHTML=items.length?items.map(x=>`
-    <div class="list-item" data-open-profile="${esc(x.id)}">
-      <img class="list-avatar" src="${x.avatar}" alt="">
-      <div class="list-main">
-        <div class="list-name"><span>${esc(x.name)}</span>${x.verified?`<span class="material-symbols-rounded verified" style="font-size:13px;font-variation-settings:'FILL' 1">verified</span>`:""}</div>
-        <div class="list-sub">${esc(x.sub)}</div>
-      </div>
-    </div>`).join(""):`<div class="empty">Nessun like ancora.</div>`;
-  E.likesModal.classList.add("open");
-  E.likesList.querySelectorAll("[data-open-profile]").forEach(i=>{
-    i.addEventListener("click",()=>{ if(i.dataset.openProfile) window.location.href=`profile.html?id=${encodeURIComponent(i.dataset.openProfile)}`; });
-  });
+function clearImage(e) {
+  e && e.stopPropagation();
+  uploadFile = null;
+  document.getElementById('dropPreview').classList.remove('visible');
+  document.getElementById('dropPreview').src = '';
+  document.getElementById('dropClear').classList.remove('visible');
+  ['dropIcon','dropLabel','dropBtn'].forEach(id => document.getElementById(id).style.display='');
+  document.getElementById('dropZone').classList.remove('has-image');
+  document.getElementById('fileInput').value = '';
 }
-const closeLikesModal=()=>E.likesModal.classList.remove("open");
-E.closeLikesBtn.addEventListener("click",closeLikesModal);
-E.likesModal.addEventListener("click",e=>{if(e.target===E.likesModal)closeLikesModal();});
-window.addEventListener("keydown",e=>{if(E.likesModal.classList.contains("open")&&e.key==="Escape")closeLikesModal();});
 
-/* Search */
-function updateSuggestions(){
-  const q=state.searchQuery.trim().toLowerCase();
-  if(!q){E.suggestions.style.display="none";E.suggestions.innerHTML="";return;}
-  const matches=state.profiles.filter(p=>
-    (p.username||p.full_name||"").toLowerCase().includes(q)||
-    (p.bio||"").toLowerCase().includes(q)
-  ).slice(0,8);
-  if(!matches.length){E.suggestions.style.display="none";return;}
-  E.suggestions.innerHTML=matches.map(p=>`
-    <div class="suggestion" data-sid="${esc(p.id)}">
-      <img class="suggestion-avatar" src="${avatarForProfile(p)}" alt="">
-      <div class="suggestion-meta">
-        <div class="suggestion-title">${esc(p.username||p.full_name||"user")}</div>
-        <div class="suggestion-subtitle">${esc(p.bio||"Apri profilo")}</div>
-      </div>
-    </div>`).join("");
-  E.suggestions.style.display="block";
-  E.suggestions.querySelectorAll("[data-sid]").forEach(n=>{
-    n.addEventListener("click",()=>window.location.href=`profile.html?id=${encodeURIComponent(n.dataset.sid)}`);
-  });
+/* Location AC */
+let locBlurTimer=null;
+function handleLocation(q) {
+  const dd=document.getElementById('locDropdown'), v=q.trim().toLowerCase();
+  if(!v){dd.classList.remove('open');return;}
+  const res=CITIES.filter(c=>c.toLowerCase().includes(v)).slice(0,7);
+  if(!res.length){dd.classList.remove('open');return;}
+  dd.innerHTML=res.map(c=>`<div class="ac-item" onmousedown="selectCity('${c.replace(/'/g,"\\'")}')"><span class="material-icons">location_on</span><div>${c}</div></div>`).join('');
+  dd.classList.add('open');
 }
-E.search.addEventListener("input",()=>{state.searchQuery=E.search.value;updateSuggestions();});
-E.search.addEventListener("focus",updateSuggestions);
-document.addEventListener("click",e=>{if(!e.target.closest(".search-wrap"))E.suggestions.style.display="none";});
+function onLocFocus(){clearTimeout(locBlurTimer);const v=document.getElementById('locationInput').value.trim();if(v)handleLocation(v);}
+function onLocBlur(){locBlurTimer=setTimeout(()=>document.getElementById('locDropdown').classList.remove('open'),180);}
+function selectCity(c){document.getElementById('locationInput').value=c;document.getElementById('locDropdown').classList.remove('open');}
 
-/* Bootstrap */
-async function loadData(){
-  renderSkeletons(4);
-  try{
-    const [rawPosts,rawProfiles,rawLikes,rawMoments]=await Promise.all([
-      fetchPosts(), fetchProfiles(), fetchLikes(), fetchMoments()
-    ]);
-    state.profiles = rawProfiles;
-    state.currentUserProfile = await fetchCurrentUser();
-    state.currentUserId      = state.currentUserProfile?.id||null;
-    state.follows = await fetchFollows().catch(()=>[]);
-    state.posts   = rawPosts;
-    state.likes   = rawLikes;
-    state.moments = rawMoments;
-    state.storyQueue = buildStoryQueue();
-    renderCurrentUser();
-    renderStories();
-    renderMoments();
-    renderFeed(false);
-    updateSuggestions();
-  }catch(err){
-    console.error(err);
-    E.feed.innerHTML=`<div class="empty">Impossibile caricare i contenuti.</div>`;
-    state.currentUserProfile=await fetchCurrentUser().catch(()=>null);
-    renderCurrentUser();
+/* Song AC */
+let songBlurTimer=null, selectedSong=null;
+function handleSong(q){
+  const dd=document.getElementById('songDropdown'),v=q.trim().toLowerCase();
+  if(!v){dd.classList.remove('open');return;}
+  const res=SONGS.filter(s=>s.title.toLowerCase().includes(v)||s.artist.toLowerCase().includes(v)).slice(0,6);
+  if(!res.length){dd.classList.remove('open');return;}
+  dd.innerHTML=res.map(s=>`<div class="ac-item" onmousedown="selectSong(${SONGS.indexOf(s)})"><img src="${s.cover}" style="width:32px;height:32px;border-radius:6px;object-fit:cover;flex-shrink:0"><div><div>${s.title}</div><div class="ac-item-sub">${s.artist}</div></div></div>`).join('');
+  dd.classList.add('open');
+}
+function onSongFocus(){clearTimeout(songBlurTimer);const v=document.getElementById('songInput').value.trim();if(v&&!selectedSong)handleSong(v);}
+function onSongBlur(){songBlurTimer=setTimeout(()=>document.getElementById('songDropdown').classList.remove('open'),180);}
+function selectSong(i){
+  selectedSong=SONGS[i];
+  document.getElementById('songInput').value='';
+  document.getElementById('songDropdown').classList.remove('open');
+  document.getElementById('songInputWrap').style.display='none';
+  document.getElementById('songPillCover').src=selectedSong.cover;
+  document.getElementById('songPillTitle').textContent=selectedSong.title;
+  document.getElementById('songPillArtist').textContent=selectedSong.artist;
+  document.getElementById('songPill').classList.add('visible');
+}
+function clearSong(){
+  selectedSong=null;
+  document.getElementById('songInputWrap').style.display='';
+  document.getElementById('songPill').classList.remove('visible');
+  document.getElementById('songInput').value='';
+}
+
+/* Submit → POST /posts */
+async function handleSubmit() {
+  if(!uploadFile){ showToast('Select a photo first.'); return; }
+  const btn = document.getElementById('uploadSubmit');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="material-icons" style="animation:spin 1s linear infinite">refresh</span> Publishing…';
+
+  const fd = new FormData();
+  fd.append('user_id',    ME_ID);
+  fd.append('caption',    document.getElementById('captionInput').value.trim());
+  fd.append('location',   document.getElementById('locationInput').value.trim());
+  fd.append('song_title',  selectedSong?.title  || '');
+  fd.append('song_artist', selectedSong?.artist || '');
+  fd.append('song_cover',  selectedSong?.cover  || '');
+  fd.append('image', uploadFile, uploadFile.name);
+
+  try {
+    const post = await fetch(API + '/posts', { method:'POST', body:fd }).then(r => {
+      if(!r.ok) throw new Error('Upload failed');
+      return r.json();
+    });
+    clearImage();
+    document.getElementById('captionInput').value='';
+    document.getElementById('locationInput').value='';
+    clearSong();
+    // Prepend new post to feed
+    const feed = document.getElementById('feed');
+    const uploadCard = feed.firstElementChild;
+    const el = buildPostEl(post);
+    el.classList.add('visible');
+    feed.insertBefore(el, uploadCard.nextSibling);
+    showToast('Post published.');
+  } catch(e) {
+    showToast('Failed to publish: ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<span class="material-icons">send</span> Publish';
   }
 }
 
-window.goUpload = ()=>window.location.href="upload.html";
-window.logout   = ()=>{
-  ["shared_current_user_id","shared_current_username","shared_current_avatar"].forEach(k=>localStorage.removeItem(k));
-  window.location.href="index.html";
-};
+/* ══════════════════════════════════════════════════════
+   FEED  →  GET /feed
+══════════════════════════════════════════════════════ */
+function buildSkeleton(){
+  const el=document.createElement('div');el.className='skel-card';
+  el.innerHTML=`<div class="skel-header"><div class="skel skel-avatar"></div><div class="skel-meta"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel skel-image"></div><div class="skel-body"><div class="skel skel-line s"></div><div class="skel skel-line l"></div><div class="skel skel-line f"></div><div class="skel skel-line m"></div><div class="skel-song"><div class="skel skel-song-cover"></div><div class="skel-song-info"><div class="skel skel-line m"></div><div class="skel skel-line s"></div></div></div><div class="skel-actions"><div class="skel skel-btn w1"></div><div class="skel skel-btn w2"></div></div></div>`;
+  return el;
+}
 
-loadData();
+function buildPostEl(p) {
+  const el = document.createElement('article');
+  el.className = 'post';
+  el.dataset.postId = p.id;
+  const imageUrl = p.image_url.startsWith('http') ? p.image_url : API + p.image_url;
+  const coverUrl = p.song_cover
+    ? (p.song_cover.startsWith('http') ? p.song_cover : API + p.song_cover) : '';
+  const avatarUrl = p.user.avatar_url || ME_AVATAR;
+
+  el.innerHTML = `
+    <div class="post-header">
+      <a href="user.html"><img class="post-avatar" src="${avatarUrl}" alt="${p.user.username}"></a>
+      <div class="post-meta">
+        <a class="post-username" href="user.html">@${p.user.username}</a>
+        <div class="post-date">${p.time_human}</div>
+      </div>
+    </div>
+    <img class="post-image" src="${imageUrl}" alt="post" loading="lazy">
+    <div class="post-body">
+      ${p.location ? `<div class="post-location"><span class="material-icons">location_on</span>${p.location}</div>` : ''}
+      ${p.caption  ? `<div class="post-caption">${p.caption}</div>` : ''}
+      ${p.song_title ? `
+      <div class="post-song">
+        ${coverUrl ? `<img class="song-cover" src="${coverUrl}" alt="album">` : ''}
+        <div class="song-info">
+          <div class="song-title">${p.song_title}</div>
+          <div class="song-artist">${p.song_artist}</div>
+        </div>
+        <div class="song-icon"><span class="material-icons">music_note</span></div>
+      </div>` : ''}
+      <div class="post-actions">
+        <button class="action-btn ${p.liked_by_me ? 'liked' : ''}" id="like-btn-${p.id}" onclick="toggleLike('${p.id}')">
+          <span class="material-icons">bolt</span>
+          <span id="like-count-${p.id}">${p.like_count}</span>
+        </button>
+        <button class="action-btn" onclick="openComments('${p.id}')">
+          <span class="material-icons">chat_bubble_outline</span>
+          <span id="ccount-${p.id}">${p.comment_count}</span>
+        </button>
+      </div>
+    </div>`;
+  return el;
+}
+
+async function buildFeed() {
+  const feed = document.getElementById('feed');
+
+  // Upload card first
+  feed.appendChild(buildUploadCard());
+
+  // Skeletons
+  const skels = Array.from({length:4}, () => { const s=buildSkeleton(); feed.appendChild(s); return s; });
+
+  let posts = [];
+  try {
+    posts = await apiFetch(`/feed?viewer=${ME_ID}`);
+  } catch(e) {
+    // Show inline error after upload card
+    const errEl = document.createElement('div');
+    errEl.className = 'api-error';
+    errEl.innerHTML = `<span class="material-icons">wifi_off</span>
+      Could not reach <strong>api.sharedweb.org</strong> — showing cached demo feed.`;
+    feed.insertBefore(errEl, skels[0]);
+    // Fallback: use demo data
+    posts = DEMO_POSTS;
+  }
+
+  skels.forEach(s => s.remove());
+  posts.forEach((p, i) => {
+    const el = buildPostEl(p);
+    feed.appendChild(el);
+    setTimeout(() => el.classList.add('visible'), 60 + i * 90);
+  });
+}
+
+/* Inline demo fallback (mirrors seed data structure) */
+const DEMO_POSTS = [
+  { id:'p1', user:{id:'u1',username:'sara.bianchi',name:'Sara Bianchi',avatar_url:'https://i.pravatar.cc/80?img=5',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post1/600/600', caption:"Afternoon light on the Lungarno. Some hours can't be explained, only lived.", location:'Florence, Tuscany', song_title:'Nuvole Bianche', song_artist:'Ludovico Einaudi', song_cover:'https://picsum.photos/seed/alb1/80/80', time_human:'2h ago', like_count:4, comment_count:2, liked_by_me:false },
+  { id:'p2', user:{id:'u2',username:'luca.ferretti',name:'Luca Ferretti',avatar_url:'https://i.pravatar.cc/80?img=12',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post2/600/600', caption:'Breakfast alone in a city of 3 million people.', location:'Milan, Lombardy', song_title:'Blinding Lights', song_artist:'The Weeknd', song_cover:'https://picsum.photos/seed/alb2/80/80', time_human:'4h ago', like_count:2, comment_count:1, liked_by_me:false },
+  { id:'p3', user:{id:'u3',username:'gioia.romano',name:'Gioia Romano',avatar_url:'https://i.pravatar.cc/80?img=44',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post3/600/600', caption:'Spanish Steps at 7 in the morning. Zero tourists, just silence.', location:'Rome, Lazio', song_title:'Con te partirò', song_artist:'Andrea Bocelli', song_cover:'https://picsum.photos/seed/alb3/80/80', time_human:'6h ago', like_count:3, comment_count:2, liked_by_me:false },
+  { id:'p4', user:{id:'u4',username:'edo.mazza',name:'Edoardo Mazza',avatar_url:'https://i.pravatar.cc/80?img=33',bio:'',created_at:''}, image_url:'https://picsum.photos/seed/post4/600/600', caption:"Spaccanapoli on a Saturday. The city that never stops.", location:'Naples, Campania', song_title:'Volare', song_artist:'Domenico Modugno', song_cover:'https://picsum.photos/seed/alb4/80/80', time_human:'8h ago', like_count:2, comment_count:0, liked_by_me:false },
+];
+
+/* ══════════════════════════════════════════════════════
+   LIKES  →  POST/DELETE /posts/:id/likes
+══════════════════════════════════════════════════════ */
+async function toggleLike(postId) {
+  const btn   = document.getElementById(`like-btn-${postId}`);
+  const count = document.getElementById(`like-count-${postId}`);
+  const liked = btn.classList.contains('liked');
+  try {
+    let res;
+    if (liked) {
+      res = await apiFetch(`/posts/${postId}/likes?user_id=${ME_ID}`, { method:'DELETE' });
+      btn.classList.remove('liked');
+    } else {
+      res = await apiFetch(`/posts/${postId}/likes?user_id=${ME_ID}`, { method:'POST' });
+      btn.classList.add('liked');
+    }
+    if (res) count.textContent = res.like_count;
+  } catch(e) {
+    showToast(e.message);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   COMMENTS  →  GET/POST /posts/:id/comments
+══════════════════════════════════════════════════════ */
+let activePostId = null;
+
+async function openComments(postId) {
+  activePostId = postId;
+  document.getElementById('commentInput').value = '';
+  document.getElementById('commentSendBtn').classList.remove('active');
+  document.getElementById('modalCommentsBody').innerHTML =
+    `<div class="modal-empty"><span class="material-icons">hourglass_empty</span>Loading…</div>`;
+  document.getElementById('commentsTitle').textContent = 'Comments';
+  document.getElementById('modalComments').classList.add('open');
+
+  try {
+    const comments = await apiFetch(`/posts/${postId}/comments`);
+    renderComments(comments);
+    document.getElementById('commentsTitle').textContent = `Comments (${comments.length})`;
+  } catch(e) {
+    document.getElementById('modalCommentsBody').innerHTML =
+      `<div class="modal-empty"><span class="material-icons">wifi_off</span>Could not load comments.</div>`;
+  }
+  setTimeout(() => document.getElementById('commentInput').focus(), 300);
+}
+
+function renderComments(comments) {
+  const body = document.getElementById('modalCommentsBody');
+  if (!comments.length) {
+    body.innerHTML = `<div class="modal-empty"><span class="material-icons">chat_bubble_outline</span>No comments yet. Be the first!</div>`;
+    return;
+  }
+  body.innerHTML = comments.map(c => `
+    <div class="modal-row">
+      <a href="user.html"><img class="modal-avatar" src="${c.user.avatar_url || ME_AVATAR}"></a>
+      <div>
+        <div class="modal-user">
+          <a href="user.html" style="color:var(--white);text-decoration:none">@${c.user.username}</a>
+          <span class="modal-time">${c.time_human}</span>
+        </div>
+        <div class="modal-comment-text">${c.text}</div>
+      </div>
+    </div>`).join('');
+}
+
+function onCommentInput() {
+  const v = document.getElementById('commentInput').value.trim();
+  document.getElementById('commentSendBtn').classList.toggle('active', v.length > 0);
+}
+
+async function submitComment() {
+  const input = document.getElementById('commentInput');
+  const text  = input.value.trim();
+  if (!text || !activePostId) return;
+
+  input.value = '';
+  document.getElementById('commentSendBtn').classList.remove('active');
+
+  try {
+    const c = await apiFetch(`/posts/${activePostId}/comments`, {
+      method: 'POST',
+      body: JSON.stringify({ user_id: ME_ID, text }),
+    });
+    // Append to list
+    const body = document.getElementById('modalCommentsBody');
+    const empty = body.querySelector('.modal-empty');
+    if (empty) body.innerHTML = '';
+    body.insertAdjacentHTML('beforeend', `
+      <div class="modal-row">
+        <a href="user.html"><img class="modal-avatar" src="${ME_AVATAR}"></a>
+        <div>
+          <div class="modal-user">
+            <a href="user.html" style="color:var(--white);text-decoration:none">@marco.visconti</a>
+            <span class="modal-time">just now</span>
+          </div>
+          <div class="modal-comment-text">${c.text}</div>
+        </div>
+      </div>`);
+    body.scrollTop = body.scrollHeight;
+    // Update count on post card
+    const cc = document.getElementById(`ccount-${activePostId}`);
+    if (cc) cc.textContent = parseInt(cc.textContent || 0) + 1;
+    const titleEl = document.getElementById('commentsTitle');
+    const cur = parseInt(titleEl.textContent.match(/\d+/)?.[0] || 0);
+    titleEl.textContent = `Comments (${cur + 1})`;
+  } catch(e) {
+    showToast('Failed to post comment: ' + e.message);
+  }
+}
+
+/* ══════════════════════════════════════════════════════
+   LIKES MODAL  →  GET /posts/:id/likes
+══════════════════════════════════════════════════════ */
+async function openLikes(postId) {
+  document.getElementById('modalLikesBody').innerHTML =
+    `<div class="modal-empty"><span class="material-icons">hourglass_empty</span>Loading…</div>`;
+  document.getElementById('modalLikes').classList.add('open');
+  try {
+    const likes = await apiFetch(`/posts/${postId}/likes`);
+    document.getElementById('modalLikesBody').innerHTML = likes.length
+      ? likes.map(u => `<div class="modal-row"><a href="user.html"><img class="modal-avatar" src="${u.avatar_url||ME_AVATAR}"></a><div><div class="modal-user">${u.name}</div><div class="modal-time">@${u.username}</div></div></div>`).join('')
+      : `<div class="modal-empty"><span class="material-icons">bolt</span>No likes yet.</div>`;
+  } catch(e) {
+    document.getElementById('modalLikesBody').innerHTML =
+      `<div class="modal-empty"><span class="material-icons">wifi_off</span>Could not load likes.</div>`;
+  }
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+  if (id === 'modalComments') activePostId = null;
+}
+
+/* ══════════════════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════════════════ */
+function toggleSidebar() {
+  const s=document.getElementById('sidebar'), o=document.getElementById('sidebarOverlay');
+  s.classList.toggle('open'); o.classList.toggle('open');
+  if(!s.classList.contains('open')){
+    document.getElementById('searchInput').value='';
+    document.getElementById('searchDropdown').classList.remove('open');
+  }
+}
+
+/* Spin animation for loading button */
+const style = document.createElement('style');
+style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
+document.head.appendChild(style);
+
+/* ── INIT ── */
+buildFeed();
 </script>
 </body>
 </html>
